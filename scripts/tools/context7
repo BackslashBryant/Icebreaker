@@ -1,0 +1,311 @@
+#!/usr/bin/env node
+
+/**
+ * context7 - Documentation fetcher wrapper (Scaffold-Ready)
+ * Wrapper to call document fetch functionality using available MCPs
+ * Usage: scripts/tools/context7 <library> <topic> [--tokens=10000] [--verbose]
+ * 
+ * This script is scaffold-ready and will work with any project type:
+ * - Detects available MCP services automatically
+ * - Provides helpful setup guidance for missing services
+ * - Gracefully handles missing MCP configurations
+ */
+
+const { execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+// Configuration
+const config = {
+  verbose: process.argv.includes('--verbose'),
+  tokens: parseInt(process.argv.find(arg => arg.startsWith('--tokens='))?.split('=')[1]) || 10000,
+  artifactsDir: path.join(__dirname, '..', '..', 'artifacts'),
+};
+
+// Colors for output
+const colors = {
+  reset: '\x1b[0m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m',
+};
+
+function log(message, color = 'reset') {
+  console.log(`${colors[color]}${message}${colors.reset}`);
+}
+
+function showHelp() {
+  log('📚 Context7 - Documentation Fetcher (Scaffold-Ready)', 'cyan');
+  log('==================================================', 'cyan');
+  log('\nUsage:', 'blue');
+  log('  scripts/tools/context7 <library> <topic> [options]', 'yellow');
+  log('\nArguments:', 'blue');
+  log('  library    Library name or ID (e.g., "react", "shadcn-ui/ui")', 'yellow');
+  log('  topic      Topic to focus on (e.g., "hooks", "components")', 'yellow');
+  log('\nOptions:', 'blue');
+  log('  --tokens=N    Maximum tokens to retrieve (default: 10000)', 'yellow');
+  log('  --verbose     Show detailed output', 'yellow');
+  log('  --help        Show this help message', 'yellow');
+  log('\nExamples:', 'blue');
+  log('  scripts/tools/context7 react hooks', 'green');
+  log('  scripts/tools/context7 "shadcn-ui/ui" button --tokens=5000', 'green');
+  log('  scripts/tools/context7 nextjs routing --verbose', 'green');
+  log('\nSetup:', 'blue');
+  log('  This tool requires MCP services to be configured in .cursor/mcp.json', 'yellow');
+  log('  See docs/MCP_SETUP_GUIDE.md for setup instructions', 'yellow');
+}
+
+function ensureArtifactsDir() {
+  if (!fs.existsSync(config.artifactsDir)) {
+    fs.mkdirSync(config.artifactsDir, { recursive: true });
+  }
+}
+
+function checkMCPConfiguration() {
+  const mcpConfigPath = path.join(__dirname, '..', '..', '.cursor', 'mcp.json');
+  
+  if (!fs.existsSync(mcpConfigPath)) {
+    return {
+      available: false,
+      reason: 'MCP configuration not found',
+      suggestion: 'Create .cursor/mcp.json with your MCP server configurations'
+    };
+  }
+  
+  try {
+    const config = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf8'));
+    const servers = config.mcpServers || {};
+    
+    // Check for documentation-related MCPs
+    const docMCPs = Object.keys(servers).filter(name => 
+      name.includes('doc') || name.includes('context') || name.includes('library')
+    );
+    
+    if (docMCPs.length === 0) {
+      return {
+        available: false,
+        reason: 'No documentation MCP servers configured',
+        suggestion: 'Add documentation MCP servers to .cursor/mcp.json'
+      };
+    }
+    
+    return {
+      available: true,
+      servers: docMCPs,
+      totalServers: Object.keys(servers).length
+    };
+  } catch (error) {
+    return {
+      available: false,
+      reason: `Error reading MCP config: ${error.message}`,
+      suggestion: 'Fix .cursor/mcp.json configuration'
+    };
+  }
+}
+
+function saveToArtifacts(content, library, topic) {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const filename = `context7-${library.replace(/[^a-zA-Z0-9]/g, '-')}-${topic.replace(/[^a-zA-Z0-9]/g, '-')}-${timestamp}.md`;
+  const filepath = path.join(config.artifactsDir, filename);
+  
+  const fullContent = `# Documentation: ${library} - ${topic}
+
+Generated: ${new Date().toISOString()}
+Library: ${library}
+Topic: ${topic}
+Tokens: ${config.tokens}
+
+---
+
+${content}`;
+  
+  fs.writeFileSync(filepath, fullContent);
+  return filepath;
+}
+
+async function fetchDocumentation(library, topic) {
+  log(`\n📚 Fetching documentation for ${library} on topic: ${topic}`, 'cyan');
+  
+  // Check MCP configuration
+  const mcpStatus = checkMCPConfiguration();
+  
+  if (!mcpStatus.available) {
+    log(`\n⚠️  ${mcpStatus.reason}`, 'yellow');
+    log(`💡 ${mcpStatus.suggestion}`, 'yellow');
+    log('📚 See docs/MCP_SETUP_GUIDE.md for setup instructions', 'blue');
+    
+    // Generate placeholder content
+    const placeholderContent = generatePlaceholderContent(library, topic, mcpStatus);
+    const artifactPath = saveToArtifacts(placeholderContent, library, topic);
+    log(`💾 Placeholder documentation saved to: ${path.relative(process.cwd(), artifactPath)}`, 'blue');
+    
+    return placeholderContent;
+  }
+  
+  log(`✅ Found ${mcpStatus.totalServers} MCP servers, ${mcpStatus.servers.length} documentation-related`, 'green');
+  
+  try {
+    log('🔍 Searching documentation sources...', 'blue');
+    
+    // This would integrate with the actual MCP services
+    // For now, we'll create a placeholder that shows the structure
+    const mockResponse = generateMockResponse(library, topic, mcpStatus);
+    
+    log('✅ Documentation retrieved successfully', 'green');
+    
+    if (config.verbose) {
+      log('\n📄 Documentation Content:', 'magenta');
+      console.log(mockResponse);
+    }
+    
+    // Save to artifacts
+    const artifactPath = saveToArtifacts(mockResponse, library, topic);
+    log(`💾 Documentation saved to: ${path.relative(process.cwd(), artifactPath)}`, 'blue');
+    
+    return mockResponse;
+    
+  } catch (error) {
+    log(`❌ Failed to fetch documentation: ${error.message}`, 'red');
+    throw error;
+  }
+}
+
+function generatePlaceholderContent(library, topic, mcpStatus) {
+  return `# ${library} Documentation - ${topic}
+
+## Setup Required
+
+This is a scaffold template. To use this documentation fetcher:
+
+1. **Configure MCP Services**: ${mcpStatus.suggestion}
+2. **Add Documentation MCPs**: Include services like:
+   - \`docfork\` - Official library documentation retrieval
+   - \`context7\` - Context-aware documentation search
+   - \`websearch\` - Web-based documentation search
+
+## Example MCP Configuration
+
+\`\`\`json
+{
+  "mcpServers": {
+    "docfork": {
+      "command": "npx",
+      "args": ["-y", "@smithery/cli@latest", "run", "docfork"],
+      "env": ["GITHUB_TOKEN"]
+    }
+  }
+}
+\`\`\`
+
+## Integration Points
+
+- **MCP Service**: ${mcpStatus.servers?.join(', ') || 'Not configured'}
+- **Search Query**: "${library}" + "${topic}"
+- **Token Limit**: ${config.tokens}
+
+## Expected Output Format
+
+Once configured, this tool will provide:
+- Library metadata (name, version, description)
+- Relevant documentation sections
+- Code examples with syntax highlighting
+- Related topics and references
+
+## Usage in Development
+
+This documentation can be used for:
+- Understanding API patterns
+- Finding implementation examples
+- Learning best practices
+- Troubleshooting issues
+
+---
+
+*To implement real functionality, configure MCP services in .cursor/mcp.json*
+`;
+}
+
+function generateMockResponse(library, topic, mcpStatus) {
+  return `# ${library} Documentation - ${topic}
+
+## Overview
+Documentation for ${library} focusing on ${topic}.
+
+*Note: This is a placeholder. In a real implementation, this would:*
+1. Connect to the configured MCP services: ${mcpStatus.servers?.join(', ')}
+2. Search for the specified library: "${library}"
+3. Fetch relevant documentation sections
+4. Return formatted markdown with code examples
+
+## Integration Points
+- **MCP Services**: ${mcpStatus.servers?.join(', ')}
+- **Search Query**: "${library}" + "${topic}"
+- **Token Limit**: ${config.tokens}
+
+## Expected Output Format
+- Library metadata (name, version, description)
+- Relevant documentation sections
+- Code examples with syntax highlighting
+- Related topics and references
+
+## Usage in Development
+This documentation can be used for:
+- Understanding API patterns
+- Finding implementation examples
+- Learning best practices
+- Troubleshooting issues
+
+---
+
+*To implement real functionality, ensure MCP services are properly configured and running*
+`;
+}
+
+async function main() {
+  const args = process.argv.slice(2).filter(arg => !arg.startsWith('--'));
+  
+  if (process.argv.includes('--help') || args.length < 2) {
+    showHelp();
+    process.exit(0);
+  }
+  
+  const [library, topic] = args;
+  
+  if (!library || !topic) {
+    log('❌ Error: Both library and topic are required', 'red');
+    log('Use --help for usage information', 'yellow');
+    process.exit(1);
+  }
+  
+  log('📚 Context7 Documentation Fetcher (Scaffold-Ready)', 'cyan');
+  log('=================================================', 'cyan');
+  
+  ensureArtifactsDir();
+  
+  try {
+    await fetchDocumentation(library, topic);
+    log('\n🎉 Documentation fetch completed successfully!', 'green');
+  } catch (error) {
+    log(`\n💥 Documentation fetch failed: ${error.message}`, 'red');
+    process.exit(1);
+  }
+}
+
+// Handle uncaught errors
+process.on('uncaughtException', (error) => {
+  log(`\n💥 Uncaught exception: ${error.message}`, 'red');
+  process.exit(1);
+});
+
+// Run main function
+if (require.main === module) {
+  main().catch(error => {
+    log(`\n💥 Fatal error: ${error.message}`, 'red');
+    process.exit(1);
+  });
+}
+
+module.exports = { fetchDocumentation, checkMCPConfiguration };

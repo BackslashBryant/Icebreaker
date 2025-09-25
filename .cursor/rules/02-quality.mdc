@@ -1,0 +1,183 @@
+---
+description: "Quality Gates, Testing, Security, and Git Operations"
+globs: ["**/*.{ts,tsx,js,jsx,mjs,cjs,py,go,rs,java}", "**/*"]
+alwaysApply: true
+---
+
+# Quality Gates & Testing
+
+## Quality Gates
+- Lint, typecheck, and unit tests must pass locally and in CI.
+- Track bundle and performance thresholds per app; document deltas in PRs.
+- Run the security scan script or document an approved waiver.
+
+## Pre-commit/Pre-push Hook Policy
+**CRITICAL**: Never bypass pre-commit or pre-push hooks with --no-verify.
+- If hooks fail, identify and fix the underlying issues.
+- TypeScript errors: Fix type issues, don't bypass
+- Linting errors: Fix code style issues, don't bypass
+- Test failures: Fix failing tests, don't bypass
+- Security issues: Address vulnerabilities, don't bypass
+- Only exception: Emergency production fixes with documented rationale and follow-up ticket
+
+## Testing
+- Add or adjust tests for each bug fix or behavior change.
+- Favor pure functions and dependency injection for testability.
+- Use snapshot tests for UI and property/edge tests for core logic.
+- Projects using Vitest must rely on 'vi.*'; do not introduce 'jest.*' helpers or mix frameworks in shared utilities.
+- Rewrites of shared test scaffolding (for example 'tests/setup.ts' or shared UI harnesses) require tech-lead approval and a documented risk summary before merging.
+
+## Performance & Monitoring
+- Track bundle and performance thresholds per app
+- Document performance deltas in PRs
+- Monitor Core Web Vitals and performance metrics
+- Use Playwright MCP for performance testing when applicable
+- Set up performance monitoring for production applications
+
+---
+
+# Security & Dependencies
+
+## Dependencies
+- New deps require **risk note + approval**.
+- Pin via lockfile; no `--force` without GitHub Issue + rationale.
+- Run `scripts/security-scan`; attach results to PR.
+
+## Secrets & Config
+- Never commit secrets or tokens.
+- Use env providers / secret managers; document required vars in `.env.example`.
+- Client code must **not** use server-only credentials.
+
+## Data & Privacy
+- Log only necessary metadata; scrub PII in debug logs.
+- Add input validation and error handling at boundaries (API, job queues).
+- After tightening authentication or authorization, update and validate every client, hook, or service that calls the endpoint before closing the work.
+
+## Security Scanning
+- Run security scans on all dependencies
+- Use Supabase MCP advisors for database security validation
+- Implement proper authentication and authorization
+- Validate all input at API boundaries
+- Document security decisions and rationale
+
+---
+
+# Git Operations & Hygiene
+
+## Git Hygiene
+- Branch names 'feat|fix|chore/<issue-number>-<slug>' must match the active GitHub Issue.
+- Create a new branch for each GitHub Issue before starting work.
+- Never work on multiple issues in the same branch.
+- Keep commits small, scoped, and referencing the GitHub Issue number.
+- Use squash merge by default to keep history clean.
+
+## Git Operations (Use GitHub MCP)
+- Use GitHub MCP for repository operations when available
+- Create branches, commits, and PRs through GitHub MCP
+- Fallback to terminal commands only when GitHub MCP unavailable
+- Document any deviations from MCP usage
+
+## CRITICAL: Automatic Git Workflow Enforcement
+**MANDATORY AUTOMATIC EXECUTION** - The complete git workflow must execute automatically:
+1. **AUTOMATIC**: Create feature branch when starting GitHub Issue work
+2. **AUTOMATIC**: Commit changes with GitHub Issue number when work is complete
+3. **AUTOMATIC**: Push branch to remote repository
+4. **AUTOMATIC**: Create Pull Request with proper template
+5. **AUTOMATIC**: Merge Pull Request after validation
+6. **AUTOMATIC**: Switch back to main branch and pull latest
+7. **AUTOMATIC**: Delete feature branch after merge
+8. **AUTOMATIC**: Update GitHub Issue status and documentation
+
+**NO USER REMINDERS ALLOWED** - This workflow must be automatic and complete.
+
+> Do not repeat Git steps in other rule files. This file is canonical.
+
+---
+
+# MCP Quality Gates
+
+## UI/Accessibility/Performance Scopes
+- Playwright MCP Lighthouse/Core Web Vitals + axe report required
+- Screenshot validation for UI changes
+- Accessibility testing with axe-core
+- Performance monitoring and optimization
+
+## Database Scopes
+- Supabase MCP advisors/logs snapshot required
+- Schema validation and migration testing
+- Data integrity checks
+- Performance monitoring for database operations
+
+## Research Scopes
+- Built-in web search findings summary linked
+- DocFork MCP for official documentation
+- GitHub MCP for pattern research
+- Desktop Commander MCP for system analysis
+
+## Security Scopes
+- Security scanning with scripts/security-scan
+- Dependency vulnerability assessment
+- Authentication and authorization validation
+- Input validation and boundary testing
+
+---
+
+# Quality Metrics & Monitoring
+
+## Development Velocity
+- Track time from issue creation to completion
+- Monitor PR review and merge times
+- Measure test coverage and quality metrics
+- Document process improvements
+
+## Error Rates & Resolution
+- Monitor bug reports and resolution times
+- Track test failure rates and causes
+- Document recurring issues and solutions
+- Implement preventive measures
+
+## User Satisfaction
+- Gather feedback on development process
+- Monitor user experience metrics
+- Track feature adoption and usage
+- Document user feedback and improvements
+
+## Automation Success
+- Monitor automated workflow success rates
+- Track MCP operation reliability
+- Document automation improvements
+- Measure time savings from automation
+
+---
+
+# Quality Assurance Checklist
+
+## Pre-Development
+- [ ] GitHub Issue created with proper labels
+- [ ] Scope and requirements clearly defined
+- [ ] Acceptance criteria documented
+- [ ] Risk assessment completed
+
+## During Development
+- [ ] Code follows established patterns
+- [ ] Tests written for new functionality
+- [ ] Security considerations addressed
+- [ ] Performance impact assessed
+
+## Pre-Commit
+- [ ] All tests pass locally
+- [ ] Linting and type checking successful
+- [ ] Security scan completed
+- [ ] Documentation updated
+
+## Pre-Merge
+- [ ] All CI checks pass
+- [ ] Code review completed
+- [ ] Performance benchmarks met
+- [ ] Security validation passed
+
+## Post-Merge
+- [ ] GitHub Issue updated and closed
+- [ ] Documentation updated
+- [ ] Process improvements documented
+- [ ] Lessons learned recorded

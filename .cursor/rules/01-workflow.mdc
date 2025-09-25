@@ -1,0 +1,412 @@
+---
+description: "Complete Development Workflow - Triage, Plan, Build, Verify, PR with OpenSpec and GitHub Issues"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Complete Development Workflow
+
+## 1) Triage
+- Confirm scope, inputs/outputs, constraints, and success criteria.
+- List blockers or unknowns explicitly in the ticket.
+- **AUTOMATIC**: Analyze request complexity, risk, and scope to determine workflow.
+- **AUTOMATIC**: Create OpenSpec change if complexity/risk is high, otherwise use GitHub Issues.
+- Create GitHub Issue with proper labels and acceptance criteria.
+
+### MCP Checkpoint (mandatory when applicable)
+- Research: Built-in web search (current standards), GitHub MCP (patterns), DocFork MCP (official docs).
+- Current state (UI/UX tickets): Playwright MCP quick screenshot/accessibility check.
+
+## 2) Plan
+- **IF OpenSpec workflow**: Review OpenSpec change proposal and tasks.
+- **IF GitHub Issues workflow**: Draft a mini-plan (3-6 bullets) with risks and selected checks from scripts/verify-all.
+- Choose the smallest viable change; avoid architecture shifts unless ticketed.
+
+## 3) Build
+- **IF OpenSpec workflow**: Follow tasks from OpenSpec change, validate against requirements.
+- **IF GitHub Issues workflow**: Make small, reversible commits and include the ticket ID in messages.
+- Modify existing code when possible; keep public APIs stable unless ticketed.
+
+### MCP Checkpoint (while building)
+- UI changes: Playwright MCP screenshots and axe checks for impacted screens.
+- DB changes: Supabase MCP schema/logs/advisors validation.
+- Git operations: GitHub MCP for repository management and operations.
+
+## 4) Verify
+- **IF OpenSpec workflow**: Validate against OpenSpec requirements and scenarios.
+- **IF GitHub Issues workflow**: Run scripts/verify-all (lint, types, tests, build).
+- Capture artifacts such as logs, screenshots, or CLI output.
+- When tightening auth or API boundaries, validate both the route and each consuming hook or service and record the check you ran.
+
+### MCP Quality Gates
+- UI/Accessibility/Performance scopes: Playwright MCP Lighthouse/Core Web Vitals + axe report required.
+- Database scopes: Supabase MCP advisors/logs snapshot required.
+- Research scopes: Built-in web search findings summary linked.
+
+## 5) PR
+- Use the PR template and request only relevant code owners.
+- Link the ticket and include summary, risk note, evidence, and backout plan.
+
+## 6) Ticket Completion (MANDATORY AUTOMATIC WORKFLOW)
+**CRITICAL**: All steps must be completed AUTOMATICALLY before marking ticket as done.
+
+### 6.0 OpenSpec Completion (IF OpenSpec workflow)
+- **AUTOMATIC**: Validate all requirements and scenarios are met
+- **AUTOMATIC**: Update OpenSpec change status to completed
+- **AUTOMATIC**: Archive OpenSpec change
+- **AUTOMATIC**: Update specifications if needed
+
+### 6.1 Git Operations (MANDATORY AUTOMATIC - NO EXCEPTIONS)
+**AUTOMATIC EXECUTION REQUIRED** - These steps must happen automatically without user reminders:
+
+1. **AUTOMATIC**: Create feature branch: `feat|fix|chore/<ticket-id>-<slug>`
+2. **AUTOMATIC**: Commit changes with ticket ID in message
+3. **AUTOMATIC**: Push branch to remote repository
+4. **AUTOMATIC**: Create Pull Request with proper template
+5. **AUTOMATIC**: Merge Pull Request (after validation)
+6. **AUTOMATIC**: Switch back to main branch and pull latest
+7. **AUTOMATIC**: Delete feature branch after merge
+8. **AUTOMATIC**: Link PR to GitHub Issue for automatic tracking
+
+**NO USER REMINDERS ALLOWED** - The complete git workflow must execute automatically.
+
+### 6.2 Ticket Management (GitHub Issues-First)
+- [ ] Update GitHub Issue status to "COMPLETED"
+- [ ] Mark all acceptance criteria as complete in issue
+- [ ] Add completion summary as issue comment
+- [ ] Close GitHub Issue when work is complete
+- [ ] Update `docs/tickets/TICKET_PLAN.md` status (if still using)
+
+### 6.3 Documentation Updates
+- [ ] Update `docs/PRD.md` Change Log with completion entry
+- [ ] Document any new patterns or learnings
+- [ ] Update any affected architecture documentation
+
+### 6.4 Quality Gates (NO BYPASSING)
+- [ ] All pre-commit hooks pass (fix underlying issues, don't use --no-verify)
+- [ ] All pre-push hooks pass (fix underlying issues, don't use --no-verify)
+- [ ] TypeScript compilation successful
+- [ ] Linting passes
+- [ ] Tests pass
+- [ ] Build successful
+
+### 6.5 Process Improvement
+- [ ] Identify any workflow gaps or issues encountered
+- [ ] Propose solutions for process improvements
+- [ ] Update rules if new patterns discovered
+
+**FAILURE TO COMPLETE ANY STEP = TICKET NOT COMPLETE**
+
+---
+
+# GitHub Issues-First Workflow
+
+## New Workflow: GitHub Issues-First
+- **Create**: Issues directly in GitHub with proper labels and structure
+- **Track**: Use GitHub Issues for all ticket management
+- **Complete**: Close issues when work is done with proper documentation
+- **Link**: PRs automatically reference issues for tracking
+
+## Required Fields (GitHub Issue)
+- **Title**: Clear, descriptive title with ticket ID
+- **Body**: Objective, scope, acceptance criteria, priority, assignee
+- **Labels**: Priority, type, component, status
+- **Assignee**: Team member responsible
+
+## Rules
+- No work before GitHub Issue **creation**.
+- One issue per PR (or clearly stated grouped subtasks).
+- Close GitHub Issue only after **evidence** meets acceptance criteria.
+- Link PR ↔ GitHub Issue; update issue with progress comments.
+- Use GitHub MCP for all issue management operations.
+
+## Legacy Support
+- Local ticket files in `docs/tickets/` are now **archived**
+- Old sync system moved to `docs/archived/sync-system/`
+- GitHub Issues are now the **single source of truth**
+
+## GitHub Issue Template
+```markdown
+## 🎯 Goal
+[Brief description of what needs to be accomplished]
+
+## 🧩 Background
+[Context and rationale for this issue]
+
+## 📋 Tasks
+- [ ] Task 1
+- [ ] Task 2
+- [ ] Task 3
+
+## 🧪 Acceptance Criteria
+- [ ] Technical criteria met
+- [ ] Tests updated
+- [ ] Docs updated
+- [ ] No regressions introduced
+
+## 🔗 Related
+- PRD section: `docs/PRD.md#section`
+- Related issues: #123, #456
+- Design: Figma, Loom, etc.
+
+## 🧾 Notes
+[Additional context, blockers, or considerations]
+```
+
+## Issue Labels
+- **Priority**: `priority:high`, `priority:medium`, `priority:low`
+- **Type**: `type:feature`, `type:bug`, `type:chore`, `type:docs`
+- **Component**: `component:frontend`, `component:backend`, `component:infra`
+- **Status**: `status:open`, `status:in-progress`, `status:review`, `status:done`
+
+## Workflow Integration
+- Issues automatically linked to PRs
+- PR status updates issue progress
+- Issue closure triggers documentation updates
+- Issue completion updates project status
+
+---
+
+# Intelligent OpenSpec Integration
+
+## Automatic OpenSpec Usage Rules
+
+### When to Automatically Use OpenSpec
+
+**ALWAYS use OpenSpec for:**
+- New features affecting multiple components
+- Breaking changes or API modifications
+- Complex refactoring spanning multiple files
+- Security-related changes
+- Performance optimizations
+- Architecture decisions
+- Multi-step implementations with dependencies
+
+**NEVER use OpenSpec for:**
+- Simple bug fixes (single file, <50 lines)
+- Typo corrections or formatting
+- Documentation-only changes
+- Test additions for existing functionality
+- Dependency updates without behavior changes
+
+### Automatic Decision Logic
+
+#### Complexity Detection
+```markdown
+IF (estimated_lines > 100 OR files_affected > 3 OR components_affected > 2)
+THEN automatically_create_openspec_change()
+```
+
+#### Risk Assessment
+```markdown
+IF (breaking_change OR security_impact OR performance_impact)
+THEN automatically_create_openspec_change()
+```
+
+#### Scope Analysis
+```markdown
+IF (multi_package OR multi_service OR cross_cutting_concern)
+THEN automatically_create_openspec_change()
+```
+
+### Automatic OpenSpec Workflow
+
+#### 1. Context Analysis
+- **WHEN** user requests a change
+- **THEN** analyze complexity, scope, and risk
+- **AND** automatically determine if OpenSpec is needed
+
+#### 2. Automatic Change Creation
+- **WHEN** OpenSpec is needed
+- **THEN** automatically create change proposal
+- **AND** generate structured requirements and scenarios
+- **AND** create implementation tasks
+
+#### 3. Seamless Integration
+- **WHEN** using OpenSpec
+- **THEN** automatically integrate with existing GitHub Issues
+- **AND** maintain ticket synchronization
+- **AND** preserve existing workflows
+
+### Implementation Commands
+
+#### Automatic Change Creation
+```bash
+# Cursor automatically runs this when complexity detected
+openspec change create --auto --context "user_request" --complexity "high"
+```
+
+#### Automatic Task Generation
+```bash
+# Cursor automatically generates tasks based on requirements
+openspec tasks generate --from-requirements --auto-prioritize
+```
+
+#### Automatic Validation
+```bash
+# Cursor automatically validates before implementation
+openspec validate --auto --pre-implementation
+```
+
+### Context-Aware Triggers
+
+#### High Complexity Triggers
+- Multi-file changes
+- New API endpoints
+- Database schema changes
+- Authentication/authorization changes
+- Performance optimizations
+- Security implementations
+
+#### Medium Complexity Triggers
+- New utility functions
+- Component refactoring
+- Configuration changes
+- Error handling improvements
+- Logging enhancements
+
+#### Low Complexity (No OpenSpec)
+- Bug fixes
+- Typo corrections
+- Documentation updates
+- Test additions
+- Formatting changes
+
+### Automatic Integration Points
+
+#### GitHub Issues Integration
+- **WHEN** OpenSpec change is created
+- **THEN** automatically create corresponding GitHub Issue
+- **AND** link OpenSpec change to GitHub Issue
+- **AND** sync status between systems
+
+#### MCP Integration
+- **WHEN** using MCP tools for OpenSpec changes
+- **THEN** automatically follow MCP safety policies
+- **AND** document MCP usage in change proposal
+- **AND** track MCP operations in change history
+
+#### CI/CD Integration
+- **WHEN** OpenSpec change is implemented
+- **THEN** automatically validate specifications
+- **AND** run quality gates
+- **AND** update change status
+
+### Automatic Change Lifecycle
+
+#### 1. Auto-Detection
+```markdown
+User: "Add user authentication with JWT tokens"
+Cursor: [Analyzes complexity] → [Detects high complexity] → [Auto-creates OpenSpec change]
+```
+
+#### 2. Auto-Proposal
+```markdown
+Cursor: [Creates structured proposal] → [Generates requirements] → [Defines scenarios] → [Creates tasks]
+```
+
+#### 3. Auto-Implementation
+```markdown
+Cursor: [Follows tasks] → [Implements features] → [Validates against specs] → [Updates progress]
+```
+
+#### 4. Auto-Archive
+```markdown
+Cursor: [Completes implementation] → [Validates against requirements] → [Archives change] → [Updates specs]
+```
+
+### Seamless User Experience
+
+#### Transparent Operation
+- **WHEN** OpenSpec is used automatically
+- **THEN** inform user of OpenSpec usage
+- **AND** explain why OpenSpec was chosen
+- **AND** show progress and status
+
+#### Fallback to Existing System
+- **WHEN** OpenSpec is not needed
+- **THEN** use existing GitHub Issues workflow
+- **AND** maintain current user experience
+- **AND** preserve existing processes
+
+### Automatic Quality Gates
+
+#### Pre-Implementation Validation
+- **WHEN** starting OpenSpec implementation
+- **THEN** automatically validate requirements
+- **AND** check for conflicts with existing specs
+- **AND** ensure implementation plan is complete
+
+#### During Implementation Validation
+- **WHEN** implementing OpenSpec tasks
+- **THEN** automatically validate against requirements
+- **AND** check for scope creep
+- **AND** ensure quality standards
+
+#### Post-Implementation Validation
+- **WHEN** completing OpenSpec implementation
+- **THEN** automatically validate against scenarios
+- **AND** run comprehensive tests
+- **AND** update specifications
+
+### Automatic Documentation
+
+#### Change Documentation
+- **WHEN** OpenSpec change is created
+- **THEN** automatically document rationale
+- **AND** record decision points
+- **AND** track implementation progress
+
+#### Specification Updates
+- **WHEN** OpenSpec change is archived
+- **THEN** automatically update specifications
+- **AND** maintain specification accuracy
+- **AND** preserve change history
+
+### Error Handling and Recovery
+
+#### Automatic Error Detection
+- **WHEN** OpenSpec operations fail
+- **THEN** automatically fallback to existing system
+- **AND** inform user of fallback
+- **AND** log error for analysis
+
+#### Automatic Recovery
+- **WHEN** OpenSpec system is unavailable
+- **THEN** automatically use existing workflows
+- **AND** maintain user productivity
+- **AND** preserve work progress
+
+### Performance Optimization
+
+#### Automatic Caching
+- **WHEN** OpenSpec operations are repeated
+- **THEN** automatically cache results
+- **AND** improve response times
+- **AND** reduce system load
+
+#### Automatic Cleanup
+- **WHEN** OpenSpec changes are archived
+- **THEN** automatically clean up temporary files
+- **AND** maintain system performance
+- **AND** preserve disk space
+
+## Implementation Notes
+
+### Cursor AI Integration
+- Cursor automatically analyzes user requests
+- Determines complexity and scope automatically
+- Creates OpenSpec changes when appropriate
+- Maintains seamless user experience
+
+### Existing System Preservation
+- All existing workflows continue unchanged
+- OpenSpec enhances, doesn't replace
+- Fallback to existing system always available
+- Zero disruption to current processes
+
+### Quality Assurance
+- Automatic validation at every step
+- Quality gates enforced automatically
+- Error handling and recovery built-in
+- Performance optimization automatic

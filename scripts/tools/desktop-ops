@@ -1,0 +1,385 @@
+#!/usr/bin/env node
+
+/**
+ * desktop-ops - Guarded local execution runner (Scaffold-Ready)
+ * Secure wrapper for local command execution with safety checks
+ * Usage: scripts/tools/desktop-ops <command> [--allow-dangerous] [--timeout=30] [--verbose]
+ * 
+ * This script is scaffold-ready and provides safe command execution:
+ * - Comprehensive security checks and allowlists
+ * - Graceful handling of missing configurations
+ * - Helpful guidance for setup and usage
+ */
+
+const { execSync, spawn } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+
+// Configuration
+const config = {
+  verbose: process.argv.includes('--verbose'),
+  allowDangerous: process.argv.includes('--allow-dangerous'),
+  timeout: parseInt(process.argv.find(arg => arg.startsWith('--timeout='))?.split('=')[1]) || 30,
+  artifactsDir: path.join(__dirname, '..', '..', 'artifacts'),
+  maxOutputSize: 1024 * 1024, // 1MB
+};
+
+// Security configuration
+const security = {
+  // Commands that are always blocked
+  blockedCommands: [
+    'rm -rf',
+    'del /s',
+    'format',
+    'fdisk',
+    'mkfs',
+    'dd if=',
+    'shutdown',
+    'reboot',
+    'halt',
+    'poweroff',
+    'init 0',
+    'init 6',
+    'systemctl poweroff',
+    'systemctl reboot',
+    'sudo rm',
+    'sudo dd',
+    'sudo mkfs',
+    'chmod 777',
+    'chown root',
+  ],
+  
+  // Commands that require --allow-dangerous flag
+  dangerousCommands: [
+    'sudo',
+    'su',
+    'chmod',
+    'chown',
+    'rm',
+    'rmdir',
+    'del',
+    'move',
+    'mv',
+    'cp /dev/',
+    'cat /dev/',
+    'echo >',
+    'echo >>',
+    '> ',
+    '>> ',
+    'curl -X POST',
+    'curl -X PUT',
+    'curl -X DELETE',
+    'wget -O',
+    'git push',
+    'npm publish',
+    'docker run',
+    'docker exec',
+  ],
+  
+  // Allowed safe commands (whitelist approach for production)
+  safeCommands: [
+    'ls',
+    'dir',
+    'pwd',
+    'whoami',
+    'date',
+    'echo',
+    'cat',
+    'type',
+    'head',
+    'tail',
+    'grep',
+    'find',
+    'which',
+    'where',
+    'node -v',
+    'npm -v',
+    'git status',
+    'git log',
+    'git diff',
+    'git branch',
+    'ps',
+    'tasklist',
+    'netstat',
+    'ping',
+    'curl -X GET',
+    'wget --spider',
+  ],
+};
+
+// Colors for output
+const colors = {
+  reset: '\x1b[0m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m',
+};
+
+function log(message, color = 'reset') {
+  console.log(`${colors[color]}${message}${colors.reset}`);
+}
+
+function showHelp() {
+  log('🛡️  Desktop-Ops - Guarded Command Execution (Scaffold-Ready)', 'cyan');
+  log('============================================================', 'cyan');
+  log('\nUsage:', 'blue');
+  log('  scripts/tools/desktop-ops <command> [options]', 'yellow');
+  log('\nArguments:', 'blue');
+  log('  command    Command to execute safely', 'yellow');
+  log('\nOptions:', 'blue');
+  log('  --allow-dangerous   Allow potentially dangerous commands', 'yellow');
+  log('  --timeout=N         Command timeout in seconds (default: 30)', 'yellow');
+  log('  --verbose           Show detailed output and security checks', 'yellow');
+  log('  --help              Show this help message', 'yellow');
+  log('\nSecurity Levels:', 'blue');
+  log('  🟢 Safe: Always allowed (ls, cat, git status, etc.)', 'green');
+  log('  🟡 Dangerous: Requires --allow-dangerous flag', 'yellow');
+  log('  🔴 Blocked: Never allowed (rm -rf, format, etc.)', 'red');
+  log('\nExamples:', 'blue');
+  log('  scripts/tools/desktop-ops "ls -la"', 'green');
+  log('  scripts/tools/desktop-ops "git status" --verbose', 'green');
+  log('  scripts/tools/desktop-ops "rm file.txt" --allow-dangerous', 'yellow');
+  log('\nScaffold-Ready Features:', 'blue');
+  log('  - Works with any project type', 'green');
+  log('  - Comprehensive security checks', 'green');
+  log('  - Helpful error messages and guidance', 'green');
+  log('  - Automatic artifact logging', 'green');
+}
+
+function ensureArtifactsDir() {
+  if (!fs.existsSync(config.artifactsDir)) {
+    fs.mkdirSync(config.artifactsDir, { recursive: true });
+  }
+}
+
+function analyzeCommandSecurity(command) {
+  const lowerCommand = command.toLowerCase();
+  
+  // Check for blocked commands
+  for (const blocked of security.blockedCommands) {
+    if (lowerCommand.includes(blocked.toLowerCase())) {
+      return {
+        level: 'blocked',
+        reason: `Contains blocked command pattern: ${blocked}`,
+        allowed: false,
+      };
+    }
+  }
+  
+  // Check for dangerous commands
+  for (const dangerous of security.dangerousCommands) {
+    if (lowerCommand.includes(dangerous.toLowerCase())) {
+      return {
+        level: 'dangerous',
+        reason: `Contains dangerous command pattern: ${dangerous}`,
+        allowed: config.allowDangerous,
+      };
+    }
+  }
+  
+  // Check if it's in safe commands
+  const isSafe = security.safeCommands.some(safe => 
+    lowerCommand.startsWith(safe.toLowerCase())
+  );
+  
+  if (isSafe) {
+    return {
+      level: 'safe',
+      reason: 'Command is in safe commands list',
+      allowed: true,
+    };
+  }
+  
+  // Unknown command - treat as dangerous
+  return {
+    level: 'unknown',
+    reason: 'Command not in safe list - treating as potentially dangerous',
+    allowed: config.allowDangerous,
+  };
+}
+
+function sanitizeCommand(command) {
+  // Basic command sanitization
+  return command
+    .replace(/[;&|`$(){}[\]]/g, '') // Remove shell metacharacters
+    .replace(/\s+/g, ' ') // Normalize whitespace
+    .trim();
+}
+
+function saveExecutionLog(command, result, securityAnalysis) {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const filename = `desktop-ops-${timestamp}.log`;
+  const filepath = path.join(config.artifactsDir, filename);
+  
+  const logContent = `# Desktop-Ops Execution Log
+
+Timestamp: ${new Date().toISOString()}
+Command: ${command}
+Security Level: ${securityAnalysis.level}
+Security Reason: ${securityAnalysis.reason}
+Allowed: ${securityAnalysis.allowed}
+Success: ${result.success}
+Duration: ${result.duration}ms
+Output Size: ${result.output ? result.output.length : 0} bytes
+
+## Command Output:
+${result.output || 'No output'}
+
+## Error Output:
+${result.error || 'No errors'}
+
+## System Info:
+Platform: ${os.platform()}
+Architecture: ${os.arch()}
+Node Version: ${process.version}
+Working Directory: ${process.cwd()}
+`;
+  
+  fs.writeFileSync(filepath, logContent);
+  return filepath;
+}
+
+async function executeCommand(command) {
+  const startTime = Date.now();
+  
+  log(`\n🔒 Analyzing command security: "${command}"`, 'cyan');
+  
+  // Analyze command security
+  const securityAnalysis = analyzeCommandSecurity(command);
+  
+  if (config.verbose) {
+    log(`Security Level: ${securityAnalysis.level}`, 
+        securityAnalysis.level === 'safe' ? 'green' : 
+        securityAnalysis.level === 'dangerous' ? 'yellow' : 'red');
+    log(`Reason: ${securityAnalysis.reason}`, 'blue');
+    log(`Allowed: ${securityAnalysis.allowed}`, securityAnalysis.allowed ? 'green' : 'red');
+  }
+  
+  if (!securityAnalysis.allowed) {
+    const error = `Command blocked: ${securityAnalysis.reason}`;
+    log(`❌ ${error}`, 'red');
+    
+    if (securityAnalysis.level === 'dangerous') {
+      log('💡 Tip: Use --allow-dangerous flag to execute dangerous commands', 'yellow');
+    }
+    
+    const result = {
+      success: false,
+      error,
+      duration: Date.now() - startTime,
+    };
+    
+    saveExecutionLog(command, result, securityAnalysis);
+    throw new Error(error);
+  }
+  
+  // Sanitize command
+  const sanitizedCommand = sanitizeCommand(command);
+  if (sanitizedCommand !== command && config.verbose) {
+    log(`Command sanitized: "${sanitizedCommand}"`, 'yellow');
+  }
+  
+  log(`\n⚡ Executing: "${sanitizedCommand}"`, 'green');
+  
+  try {
+    const output = execSync(sanitizedCommand, {
+      encoding: 'utf8',
+      timeout: config.timeout * 1000,
+      maxBuffer: config.maxOutputSize,
+      cwd: process.cwd(),
+    });
+    
+    const duration = Date.now() - startTime;
+    
+    log(`✅ Command completed successfully (${duration}ms)`, 'green');
+    
+    if (config.verbose && output) {
+      log('\n📤 Command Output:', 'magenta');
+      console.log(output);
+    }
+    
+    const result = {
+      success: true,
+      output,
+      duration,
+    };
+    
+    // Save execution log
+    const logPath = saveExecutionLog(sanitizedCommand, result, securityAnalysis);
+    log(`💾 Execution log saved to: ${path.relative(process.cwd(), logPath)}`, 'blue');
+    
+    return result;
+    
+  } catch (error) {
+    const duration = Date.now() - startTime;
+    
+    log(`❌ Command failed (${duration}ms)`, 'red');
+    
+    if (config.verbose) {
+      log(`Error: ${error.message}`, 'red');
+    }
+    
+    const result = {
+      success: false,
+      error: error.message,
+      output: error.stdout,
+      duration,
+    };
+    
+    // Save execution log
+    const logPath = saveExecutionLog(sanitizedCommand, result, securityAnalysis);
+    log(`💾 Error log saved to: ${path.relative(process.cwd(), logPath)}`, 'blue');
+    
+    throw error;
+  }
+}
+
+async function main() {
+  const args = process.argv.slice(2).filter(arg => !arg.startsWith('--'));
+  
+  if (process.argv.includes('--help') || args.length === 0) {
+    showHelp();
+    process.exit(0);
+  }
+  
+  const command = args.join(' ');
+  
+  if (!command.trim()) {
+    log('❌ Error: Command is required', 'red');
+    log('Use --help for usage information', 'yellow');
+    process.exit(1);
+  }
+  
+  log('🛡️  Desktop-Ops - Secure Command Execution (Scaffold-Ready)', 'cyan');
+  log('==========================================================', 'cyan');
+  
+  ensureArtifactsDir();
+  
+  try {
+    await executeCommand(command);
+    log('\n🎉 Command execution completed successfully!', 'green');
+  } catch (error) {
+    log(`\n💥 Command execution failed: ${error.message}`, 'red');
+    process.exit(1);
+  }
+}
+
+// Handle uncaught errors
+process.on('uncaughtException', (error) => {
+  log(`\n💥 Uncaught exception: ${error.message}`, 'red');
+  process.exit(1);
+});
+
+// Run main function
+if (require.main === module) {
+  main().catch(error => {
+    log(`\n💥 Fatal error: ${error.message}`, 'red');
+    process.exit(1);
+  });
+}
+
+module.exports = { executeCommand, analyzeCommandSecurity };

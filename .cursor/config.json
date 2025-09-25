@@ -1,0 +1,15 @@
+{
+  "$schema": "https://cursor.sh/config.schema.json",
+  "load": {
+    "preloadFiles": [
+      ".cursor/rules/*.mdc",
+      ".cursor/library/*.md"
+    ],
+    "baseRuleFile": ".cursor/rules/00-core.mdc"
+  },
+  "rules": {
+    "autoUpdateLessonsLearned": true,
+    "lessonsLearnedFile": ".cursor/rules/07-process-improvement.mdc"
+  }
+}
+

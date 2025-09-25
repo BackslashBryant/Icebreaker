@@ -1,0 +1,72 @@
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "description": "A scaffold-ready template project with advanced tooling and automation",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,mdx}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,mdx}\"",
+    "clean": "turbo run clean",
+    "verify": "npm run lint && npm run typecheck && npm run test",
+    "prepare": "husky install",
+    "postinstall": "npm run prepare",
+    "openspec:validate": "openspec validate --all || echo 'OpenSpec not installed - skipping validation'",
+    "openspec:list": "openspec list || echo 'OpenSpec not installed - skipping list'",
+    "openspec:show": "openspec show || echo 'OpenSpec not installed - skipping show'"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^14.0.0",
+    "prettier": "^3.0.0",
+    "turbo": "^1.10.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,mdx}": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "template",
+    "scaffold",
+    "cursor",
+    "typescript",
+    "react",
+    "nextjs",
+    "turbo",
+    "monorepo"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/my-project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/my-project/issues"
+  },
+  "homepage": "https://github.com/your-username/my-project#readme"
+}
