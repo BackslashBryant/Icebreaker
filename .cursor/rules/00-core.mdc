@@ -31,33 +31,30 @@ alwaysApply: true
   - Evidence: test output links or screenshots
   - Backout plan (1-2 bullets)
 
-## CRITICAL: Automatic Spec Kit Integration (NO EXCEPTIONS)
-**MANDATORY AUTOMATIC DECISION** - The system must automatically determine when to use Spec Kit based on request complexity, risk, and scope:
+## CRITICAL: Spec Kit Integration (When Available)
+**AUTOMATIC DECISION** - The system should use official Spec Kit when available for complex tasks:
 
-### Automatic Spec Kit Decision Logic
-- **WHEN** user requests a change
-- **THEN** automatically analyze complexity, risk, and scope
-- **IF** complexity is high OR risk is high OR scope is multi-component
-- **THEN** automatically use Spec Kit workflow (constitution → clarify → plan → implement)
-- **ELSE** use existing GitHub Issues workflow
+### Spec Kit Usage (When Installed)
+- Use `/constitution` for project governing principles
+- Use `/specify` to define what to build
+- Use `/clarify` to clarify underspecified areas
+- Use `/plan` to create technical implementation plans
+- Use `/tasks` to generate actionable task lists
+- Use `/implement` to execute all tasks
 
-### Spec Kit Triggers (Automatic)
-- New features affecting multiple components
+### When to Use Spec Kit
+- Complex features affecting multiple components
 - Breaking changes or API modifications  
-- Complex refactoring spanning multiple files
-- Security-related changes
-- Performance optimizations
 - Architecture decisions
 - Multi-step implementations with dependencies
+- When user explicitly requests Spec Kit usage
 
-### Existing Workflow Triggers (Automatic)
+### Fallback to GitHub Issues Workflow
+- When Spec Kit is not installed
 - Simple bug fixes (single file, <50 lines)
 - Typo corrections or formatting
 - Documentation-only changes
 - Test additions for existing functionality
-- Dependency updates without behavior changes
-
-**NEVER ASK USER TO CHOOSE WORKFLOW** - The system must automatically decide and inform user of decision.
 
 ## CRITICAL: Automatic Git Workflow (NO EXCEPTIONS)
 **MANDATORY AUTOMATIC EXECUTION** - See `.cursor/rules/02-quality.mdc` for complete git workflow details.

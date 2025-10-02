@@ -10,7 +10,7 @@ alwaysApply: true
 - Confirm scope, inputs/outputs, constraints, and success criteria.
 - List blockers or unknowns explicitly in the ticket.
 - **AUTOMATIC**: Analyze request complexity, risk, and scope to determine workflow.
-- **AUTOMATIC**: Use Spec Kit workflow if complexity/risk is high, otherwise use GitHub Issues.
+- **AUTOMATIC**: Use Spec Kit slash commands if available and complexity/risk is high, otherwise use GitHub Issues.
 - Create GitHub Issue with proper labels and acceptance criteria.
 
 ### MCP Checkpoint (mandatory when applicable)
@@ -18,12 +18,12 @@ alwaysApply: true
 - Current state (UI/UX tickets): Playwright MCP quick screenshot/accessibility check.
 
 ## 2) Plan
-- **IF Spec Kit workflow**: Review constitution, clarify requirements, and create implementation plan.
+- **IF Spec Kit available**: Use `/constitution`, `/clarify`, `/plan` slash commands for complex tasks.
 - **IF GitHub Issues workflow**: Draft a mini-plan (3-6 bullets) with risks and selected checks from scripts/verify-all.
 - Choose the smallest viable change; avoid architecture shifts unless ticketed.
 
 ## 3) Build
-- **IF Spec Kit workflow**: Follow Spec Kit implementation plan, validate against requirements.
+- **IF Spec Kit available**: Use `/implement` slash command to execute tasks.
 - **IF GitHub Issues workflow**: Make small, reversible commits and include the ticket ID in messages.
 - Modify existing code when possible; keep public APIs stable unless ticketed.
 
@@ -33,7 +33,7 @@ alwaysApply: true
 - Git operations: GitHub MCP for repository management and operations.
 
 ## 4) Verify
-- **IF Spec Kit workflow**: Validate against Spec Kit requirements and scenarios.
+- **IF Spec Kit available**: Use Spec Kit validation features.
 - **IF GitHub Issues workflow**: Run scripts/verify-all (lint, types, tests, build).
 - Capture artifacts such as logs, screenshots, or CLI output.
 - When tightening auth or API boundaries, validate both the route and each consuming hook or service and record the check you ran.
@@ -53,7 +53,7 @@ alwaysApply: true
 ### 6.0 Spec Kit Completion (IF Spec Kit workflow)
 - **AUTOMATIC**: Validate all requirements and scenarios are met
 - **AUTOMATIC**: Update Spec Kit implementation status to completed
-- **AUTOMATIC**: Archive Spec Kit implementation
+- **AUTOMATIC**: Archive Spec Kit implementation artifacts
 - **AUTOMATIC**: Update specifications if needed
 
 ### 6.1 Git Operations (MANDATORY AUTOMATIC - NO EXCEPTIONS)
@@ -158,236 +158,36 @@ alwaysApply: true
 
 ---
 
-# Intelligent Spec Kit Integration
+# Spec Kit Integration
 
-## Automatic Spec Kit Usage Rules
+## When to Use Spec Kit
 
-### When to Automatically Use Spec Kit
-
-**ALWAYS use Spec Kit for:**
-- New features affecting multiple components
+**Use Spec Kit slash commands for:**
+- Complex features affecting multiple components
 - Breaking changes or API modifications
-- Complex refactoring spanning multiple files
-- Security-related changes
-- Performance optimizations
 - Architecture decisions
 - Multi-step implementations with dependencies
+- When user explicitly requests Spec Kit usage
 
-**NEVER use Spec Kit for:**
+**Use GitHub Issues workflow for:**
 - Simple bug fixes (single file, <50 lines)
 - Typo corrections or formatting
 - Documentation-only changes
 - Test additions for existing functionality
 - Dependency updates without behavior changes
 
-### Automatic Decision Logic
+## Spec Kit Workflow
 
-#### Complexity Detection
-```markdown
-IF (estimated_lines > 100 OR files_affected > 3 OR components_affected > 2)
-THEN automatically_use_spec_kit_workflow()
-```
+1. **Start with `/constitution`** - Establish project principles
+2. **Use `/specify`** - Define what to build
+3. **Use `/clarify`** - Clarify any underspecified areas
+4. **Use `/plan`** - Create technical implementation plan
+5. **Use `/tasks`** - Generate actionable task list
+6. **Use `/implement`** - Execute the implementation
 
-#### Risk Assessment
-```markdown
-IF (breaking_change OR security_impact OR performance_impact)
-THEN automatically_use_spec_kit_workflow()
-```
+## Integration with Existing Workflow
 
-#### Scope Analysis
-```markdown
-IF (multi_package OR multi_service OR cross_cutting_concern)
-THEN automatically_use_spec_kit_workflow()
-```
-
-### Automatic Spec Kit Workflow
-
-#### 1. Context Analysis
-- **WHEN** user requests a change
-- **THEN** analyze complexity, scope, and risk
-- **AND** automatically determine if Spec Kit is needed
-
-#### 2. Automatic Workflow Execution
-- **WHEN** Spec Kit is needed
-- **THEN** automatically execute: constitution → clarify → plan → implement
-- **AND** generate structured requirements and scenarios
-- **AND** create implementation tasks
-
-#### 3. Seamless Integration
-- **WHEN** using Spec Kit
-- **THEN** automatically integrate with existing GitHub Issues
-- **AND** maintain ticket synchronization
-- **AND** preserve existing workflows
-
-### Implementation Commands
-
-#### Automatic Workflow Execution
-```bash
-# Cursor automatically runs this when complexity detected
-spec-kit clarify --context "user_request" --complexity "high"
-spec-kit plan --requirements "clarified_requirements"
-spec-kit implement --plan "generated_plan"
-```
-
-### Context-Aware Triggers
-
-#### High Complexity Triggers
-- Multi-file changes
-- New API endpoints
-- Database schema changes
-- Authentication/authorization changes
-- Performance optimizations
-- Security implementations
-
-#### Medium Complexity Triggers
-- New utility functions
-- Component refactoring
-- Configuration changes
-- Error handling improvements
-- Logging enhancements
-
-#### Low Complexity (No Spec Kit)
-- Bug fixes
-- Typo corrections
-- Documentation updates
-- Test additions
-- Formatting changes
-
-### Automatic Integration Points
-
-#### GitHub Issues Integration
-- **WHEN** Spec Kit workflow is used
-- **THEN** automatically create corresponding GitHub Issue
-- **AND** link Spec Kit implementation to GitHub Issue
-- **AND** sync status between systems
-
-#### MCP Integration
-- **WHEN** using MCP tools for Spec Kit changes
-- **THEN** automatically follow MCP safety policies
-- **AND** document MCP usage in implementation
-- **AND** track MCP operations in change history
-
-#### CI/CD Integration
-- **WHEN** Spec Kit implementation is completed
-- **THEN** automatically validate specifications
-- **AND** run quality gates
-- **AND** update implementation status
-
-### Automatic Implementation Lifecycle
-
-#### 1. Auto-Detection
-```markdown
-User: "Add user authentication with JWT tokens"
-Cursor: [Analyzes complexity] → [Detects high complexity] → [Auto-uses Spec Kit workflow]
-```
-
-#### 2. Auto-Clarification
-```markdown
-Cursor: [Reviews constitution] → [Clarifies requirements] → [Defines scope] → [Validates approach]
-```
-
-#### 3. Auto-Planning
-```markdown
-Cursor: [Creates implementation plan] → [Defines tasks] → [Sets priorities] → [Validates feasibility]
-```
-
-#### 4. Auto-Implementation
-```markdown
-Cursor: [Follows plan] → [Implements features] → [Validates against requirements] → [Updates progress]
-```
-
-### Seamless User Experience
-
-#### Transparent Operation
-- **WHEN** Spec Kit is used automatically
-- **THEN** inform user of Spec Kit usage
-- **AND** explain why Spec Kit was chosen
-- **AND** show progress and status
-
-#### Fallback to Existing System
-- **WHEN** Spec Kit is not needed
-- **THEN** use existing GitHub Issues workflow
-- **AND** maintain current user experience
-- **AND** preserve existing processes
-
-### Automatic Quality Gates
-
-#### Pre-Implementation Validation
-- **WHEN** starting Spec Kit implementation
-- **THEN** automatically validate requirements
-- **AND** check for conflicts with existing specs
-- **AND** ensure implementation plan is complete
-
-#### During Implementation Validation
-- **WHEN** implementing Spec Kit tasks
-- **THEN** automatically validate against requirements
-- **AND** check for scope creep
-- **AND** ensure quality standards
-
-#### Post-Implementation Validation
-- **WHEN** completing Spec Kit implementation
-- **THEN** automatically validate against scenarios
-- **AND** run comprehensive tests
-- **AND** update specifications
-
-### Automatic Documentation
-
-#### Implementation Documentation
-- **WHEN** Spec Kit workflow is used
-- **THEN** automatically document rationale
-- **AND** record decision points
-- **AND** track implementation progress
-
-#### Specification Updates
-- **WHEN** Spec Kit implementation is completed
-- **THEN** automatically update specifications
-- **AND** maintain specification accuracy
-- **AND** preserve change history
-
-### Error Handling and Recovery
-
-#### Automatic Error Detection
-- **WHEN** Spec Kit operations fail
-- **THEN** automatically fallback to existing system
-- **AND** inform user of fallback
-- **AND** log error for analysis
-
-#### Automatic Recovery
-- **WHEN** Spec Kit system is unavailable
-- **THEN** automatically use existing workflows
-- **AND** maintain user productivity
-- **AND** preserve work progress
-
-### Performance Optimization
-
-#### Automatic Caching
-- **WHEN** Spec Kit operations are repeated
-- **THEN** automatically cache results
-- **AND** improve response times
-- **AND** reduce system load
-
-#### Automatic Cleanup
-- **WHEN** Spec Kit implementations are completed
-- **THEN** automatically clean up temporary files
-- **AND** maintain system performance
-- **AND** preserve disk space
-
-## Implementation Notes
-
-### Cursor AI Integration
-- Cursor automatically analyzes user requests
-- Determines complexity and scope automatically
-- Uses Spec Kit workflow when appropriate
-- Maintains seamless user experience
-
-### Existing System Preservation
-- All existing workflows continue unchanged
-- Spec Kit enhances, doesn't replace
-- Fallback to existing system always available
-- Zero disruption to current processes
-
-### Quality Assurance
-- Automatic validation at every step
-- Quality gates enforced automatically
-- Error handling and recovery built-in
-- Performance optimization automatic
+- Spec Kit enhances existing GitHub Issues workflow
+- All existing git automation continues to work
+- MCP integrations remain functional
+- Quality gates are maintained

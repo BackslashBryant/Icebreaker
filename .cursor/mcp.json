@@ -1,33 +1,3 @@
 {
-  "mcpServers": {
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@smithery/cli@latest", "run", "github"],
-      "env": ["GITHUB_TOKEN"],
-      "config": {
-        "owner": "your-username",
-        "repo": "my-project"
-      }
-    },
-    "supabase": {
-      "command": "npx",
-      "args": ["-y", "@smithery/cli@latest", "run", "supabase"],
-      "env": ["SUPABASE_URL", "SUPABASE_ANON_KEY"]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@smithery/cli@latest", "run", "playwright"],
-      "env": ["GITHUB_TOKEN"]
-    },
-    "desktop-commander": {
-      "command": "npx",
-      "args": ["-y", "@smithery/cli@latest", "run", "desktop-commander"],
-      "env": ["GITHUB_TOKEN"]
-    },
-    "docfork": {
-      "command": "npx",
-      "args": ["-y", "@smithery/cli@latest", "run", "docfork"],
-      "env": ["GITHUB_TOKEN"]
-    }
-  }
+  "mcpServers": {}
 }

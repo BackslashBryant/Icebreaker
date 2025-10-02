@@ -1,13 +1,13 @@
 # 🚀 Cursor Template Project
 
-A **sophisticated, scaffold-ready template** with **Spec Kit integration** that automatically adapts to any project type with advanced AI-powered development workflow.
+A **sophisticated, scaffold-ready template** with **official GitHub Spec Kit integration** that automatically adapts to any project type with advanced AI-powered development workflow.
 
 ## ✨ **What Makes This Special?**
 
-This template is **intelligent** and **self-aware** with **Spec Kit integration**. Cursor AI will automatically:
+This template is **intelligent** and **self-aware** with **real Spec Kit integration**. Cursor AI will automatically:
 
 - 🎯 **Detect your project type** (frontend/backend/full-stack/monorepo)
-- 📋 **Use Spec Kit workflow** for complex changes (constitution → clarify → plan → implement)
+- 📋 **Use Spec Kit slash commands** for complex changes (`/constitution`, `/specify`, `/plan`, `/implement`)
 - 🛠️ **Auto-configure** the appropriate tools and settings
 - 🚀 **Enable advanced features** based on your needs
 - 📋 **Guide you through** the development process
@@ -48,10 +48,42 @@ git clone <your-template-repo> my-awesome-project
 cd my-awesome-project
 
 # The template works immediately - no setup required!
-# Cursor AI will automatically detect and guide you
 ```
 
-### **2. Let Cursor AI Guide You**
+### **2. Spec Kit Integration**
+
+This template includes the official GitHub Spec Kit for spec-driven development. Use these slash commands in Cursor:
+
+#### **Available Slash Commands**
+- `/constitution` - Create project governing principles
+- `/specify` - Define what you want to build
+- `/clarify` - Clarify underspecified areas
+- `/plan` - Create technical implementation plan
+- `/tasks` - Generate actionable task list
+- `/implement` - Execute the implementation
+
+#### **Example Workflow**
+```bash
+# 1. Establish project principles
+/constitution Create principles focused on code quality, testing standards, and user experience
+
+# 2. Define what to build
+/specify Build a task management application with Kanban boards and user authentication
+
+# 3. Clarify requirements
+/clarify
+
+# 4. Create implementation plan
+/plan Use React with TypeScript, Node.js with Express, and PostgreSQL database
+
+# 5. Generate tasks
+/tasks
+
+# 6. Execute implementation
+/implement
+```
+
+### **3. Let Cursor AI Guide You**
 Just start working! Cursor AI will automatically:
 
 - **Detect your project type** from your first few files

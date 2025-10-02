@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
 
 ## 1. Overview
-**Product**: Cursor Template Project with Spec Kit Integration
-**Purpose**: A sophisticated, scaffold-ready template that automatically adapts to any project type with advanced AI-powered development workflow and Spec Kit integration
+**Product**: Cursor Template Project with Official GitHub Spec Kit Integration
+**Purpose**: A sophisticated, scaffold-ready template that automatically adapts to any project type with official GitHub Spec Kit integration for spec-driven development
 **Target Audience**: Developers using Cursor AI for rapid project development and deployment
 
 ## 2. Goals / Success Metrics
@@ -18,7 +18,7 @@
   - Complete git workflow automation
 
 ## 3. Core Features
-- **Spec Kit Integration**: AI-powered development workflow with constitution-driven approach
+- **Spec Kit Integration**: Official GitHub Spec Kit with slash commands for spec-driven development
 - **Automatic Project Detection**: Intelligent detection of project type and requirements
 - **Git Automation**: Complete git workflow automation (branch, commit, push, PR, merge)
 - **MCP Integration**: Seamless integration with GitHub, Supabase, Playwright, and other MCPs
@@ -33,7 +33,7 @@
 - **Testing**: Vitest with comprehensive test setup
 - **Build System**: Turbo for monorepo management
 - **CI/CD**: GitHub Actions with automated testing and deployment
-- **Spec Kit**: AI-powered development workflow integration
+- **Spec Kit**: Official GitHub Spec Kit with slash commands (`/constitution`, `/specify`, `/plan`, `/implement`)
 
 ## 5. Data Model
 - **Project Structure**: Monorepo with frontend, backend, and shared packages

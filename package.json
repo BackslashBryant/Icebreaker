@@ -22,17 +22,10 @@
     "verify": "npm run lint && npm run test",
     "prepare": "husky install",
     "postinstall": "npm run prepare",
-        "spec:clarify": "specify clarify || echo 'Spec Kit not installed - skipping clarify'",
-        "spec:plan": "specify plan || echo 'Spec Kit not installed - skipping plan'",
-        "spec:implement": "specify implement || echo 'Spec Kit not installed - skipping implement'",
-        "spec:validate": "specify validate || echo 'Spec Kit not installed - skipping validate'",
-        "spec:research": "specify research || echo 'Spec Kit not installed - skipping research'",
     "git:create-branch": "bash scripts/create-branch.sh",
     "git:create-issue": "bash scripts/create-issue.sh",
     "git:create-pr": "bash scripts/create-pr.sh",
-    "git:automation": "bash scripts/git-automation.sh",
-    "spec-kit:setup": "bash scripts/spec-kit-setup.sh",
-    "spec-kit:verify": "bash scripts/verify-spec-kit.sh"
+    "git:automation": "bash scripts/git-automation.sh"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
