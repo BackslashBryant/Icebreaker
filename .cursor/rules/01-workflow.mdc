@@ -1,5 +1,5 @@
 ---
-description: "Complete Development Workflow - Triage, Plan, Build, Verify, PR with OpenSpec and GitHub Issues"
+description: "Complete Development Workflow - Triage, Plan, Build, Verify, PR with Spec Kit and GitHub Issues"
 globs: ["**/*"]
 alwaysApply: true
 ---
@@ -10,7 +10,7 @@ alwaysApply: true
 - Confirm scope, inputs/outputs, constraints, and success criteria.
 - List blockers or unknowns explicitly in the ticket.
 - **AUTOMATIC**: Analyze request complexity, risk, and scope to determine workflow.
-- **AUTOMATIC**: Create OpenSpec change if complexity/risk is high, otherwise use GitHub Issues.
+- **AUTOMATIC**: Use Spec Kit workflow if complexity/risk is high, otherwise use GitHub Issues.
 - Create GitHub Issue with proper labels and acceptance criteria.
 
 ### MCP Checkpoint (mandatory when applicable)
@@ -18,12 +18,12 @@ alwaysApply: true
 - Current state (UI/UX tickets): Playwright MCP quick screenshot/accessibility check.
 
 ## 2) Plan
-- **IF OpenSpec workflow**: Review OpenSpec change proposal and tasks.
+- **IF Spec Kit workflow**: Review constitution, clarify requirements, and create implementation plan.
 - **IF GitHub Issues workflow**: Draft a mini-plan (3-6 bullets) with risks and selected checks from scripts/verify-all.
 - Choose the smallest viable change; avoid architecture shifts unless ticketed.
 
 ## 3) Build
-- **IF OpenSpec workflow**: Follow tasks from OpenSpec change, validate against requirements.
+- **IF Spec Kit workflow**: Follow Spec Kit implementation plan, validate against requirements.
 - **IF GitHub Issues workflow**: Make small, reversible commits and include the ticket ID in messages.
 - Modify existing code when possible; keep public APIs stable unless ticketed.
 
@@ -33,7 +33,7 @@ alwaysApply: true
 - Git operations: GitHub MCP for repository management and operations.
 
 ## 4) Verify
-- **IF OpenSpec workflow**: Validate against OpenSpec requirements and scenarios.
+- **IF Spec Kit workflow**: Validate against Spec Kit requirements and scenarios.
 - **IF GitHub Issues workflow**: Run scripts/verify-all (lint, types, tests, build).
 - Capture artifacts such as logs, screenshots, or CLI output.
 - When tightening auth or API boundaries, validate both the route and each consuming hook or service and record the check you ran.
@@ -50,23 +50,14 @@ alwaysApply: true
 ## 6) Ticket Completion (MANDATORY AUTOMATIC WORKFLOW)
 **CRITICAL**: All steps must be completed AUTOMATICALLY before marking ticket as done.
 
-### 6.0 OpenSpec Completion (IF OpenSpec workflow)
+### 6.0 Spec Kit Completion (IF Spec Kit workflow)
 - **AUTOMATIC**: Validate all requirements and scenarios are met
-- **AUTOMATIC**: Update OpenSpec change status to completed
-- **AUTOMATIC**: Archive OpenSpec change
+- **AUTOMATIC**: Update Spec Kit implementation status to completed
+- **AUTOMATIC**: Archive Spec Kit implementation
 - **AUTOMATIC**: Update specifications if needed
 
 ### 6.1 Git Operations (MANDATORY AUTOMATIC - NO EXCEPTIONS)
-**AUTOMATIC EXECUTION REQUIRED** - These steps must happen automatically without user reminders:
-
-1. **AUTOMATIC**: Create feature branch: `feat|fix|chore/<ticket-id>-<slug>`
-2. **AUTOMATIC**: Commit changes with ticket ID in message
-3. **AUTOMATIC**: Push branch to remote repository
-4. **AUTOMATIC**: Create Pull Request with proper template
-5. **AUTOMATIC**: Merge Pull Request (after validation)
-6. **AUTOMATIC**: Switch back to main branch and pull latest
-7. **AUTOMATIC**: Delete feature branch after merge
-8. **AUTOMATIC**: Link PR to GitHub Issue for automatic tracking
+**AUTOMATIC EXECUTION REQUIRED** - See `.cursor/rules/02-quality.mdc` for complete git workflow details.
 
 **NO USER REMINDERS ALLOWED** - The complete git workflow must execute automatically.
 
@@ -167,13 +158,13 @@ alwaysApply: true
 
 ---
 
-# Intelligent OpenSpec Integration
+# Intelligent Spec Kit Integration
 
-## Automatic OpenSpec Usage Rules
+## Automatic Spec Kit Usage Rules
 
-### When to Automatically Use OpenSpec
+### When to Automatically Use Spec Kit
 
-**ALWAYS use OpenSpec for:**
+**ALWAYS use Spec Kit for:**
 - New features affecting multiple components
 - Breaking changes or API modifications
 - Complex refactoring spanning multiple files
@@ -182,7 +173,7 @@ alwaysApply: true
 - Architecture decisions
 - Multi-step implementations with dependencies
 
-**NEVER use OpenSpec for:**
+**NEVER use Spec Kit for:**
 - Simple bug fixes (single file, <50 lines)
 - Typo corrections or formatting
 - Documentation-only changes
@@ -194,58 +185,48 @@ alwaysApply: true
 #### Complexity Detection
 ```markdown
 IF (estimated_lines > 100 OR files_affected > 3 OR components_affected > 2)
-THEN automatically_create_openspec_change()
+THEN automatically_use_spec_kit_workflow()
 ```
 
 #### Risk Assessment
 ```markdown
 IF (breaking_change OR security_impact OR performance_impact)
-THEN automatically_create_openspec_change()
+THEN automatically_use_spec_kit_workflow()
 ```
 
 #### Scope Analysis
 ```markdown
 IF (multi_package OR multi_service OR cross_cutting_concern)
-THEN automatically_create_openspec_change()
+THEN automatically_use_spec_kit_workflow()
 ```
 
-### Automatic OpenSpec Workflow
+### Automatic Spec Kit Workflow
 
 #### 1. Context Analysis
 - **WHEN** user requests a change
 - **THEN** analyze complexity, scope, and risk
-- **AND** automatically determine if OpenSpec is needed
+- **AND** automatically determine if Spec Kit is needed
 
-#### 2. Automatic Change Creation
-- **WHEN** OpenSpec is needed
-- **THEN** automatically create change proposal
+#### 2. Automatic Workflow Execution
+- **WHEN** Spec Kit is needed
+- **THEN** automatically execute: constitution → clarify → plan → implement
 - **AND** generate structured requirements and scenarios
 - **AND** create implementation tasks
 
 #### 3. Seamless Integration
-- **WHEN** using OpenSpec
+- **WHEN** using Spec Kit
 - **THEN** automatically integrate with existing GitHub Issues
 - **AND** maintain ticket synchronization
 - **AND** preserve existing workflows
 
 ### Implementation Commands
 
-#### Automatic Change Creation
+#### Automatic Workflow Execution
 ```bash
 # Cursor automatically runs this when complexity detected
-openspec change create --auto --context "user_request" --complexity "high"
-```
-
-#### Automatic Task Generation
-```bash
-# Cursor automatically generates tasks based on requirements
-openspec tasks generate --from-requirements --auto-prioritize
-```
-
-#### Automatic Validation
-```bash
-# Cursor automatically validates before implementation
-openspec validate --auto --pre-implementation
+spec-kit clarify --context "user_request" --complexity "high"
+spec-kit plan --requirements "clarified_requirements"
+spec-kit implement --plan "generated_plan"
 ```
 
 ### Context-Aware Triggers
@@ -265,7 +246,7 @@ openspec validate --auto --pre-implementation
 - Error handling improvements
 - Logging enhancements
 
-#### Low Complexity (No OpenSpec)
+#### Low Complexity (No Spec Kit)
 - Bug fixes
 - Typo corrections
 - Documentation updates
@@ -275,56 +256,56 @@ openspec validate --auto --pre-implementation
 ### Automatic Integration Points
 
 #### GitHub Issues Integration
-- **WHEN** OpenSpec change is created
+- **WHEN** Spec Kit workflow is used
 - **THEN** automatically create corresponding GitHub Issue
-- **AND** link OpenSpec change to GitHub Issue
+- **AND** link Spec Kit implementation to GitHub Issue
 - **AND** sync status between systems
 
 #### MCP Integration
-- **WHEN** using MCP tools for OpenSpec changes
+- **WHEN** using MCP tools for Spec Kit changes
 - **THEN** automatically follow MCP safety policies
-- **AND** document MCP usage in change proposal
+- **AND** document MCP usage in implementation
 - **AND** track MCP operations in change history
 
 #### CI/CD Integration
-- **WHEN** OpenSpec change is implemented
+- **WHEN** Spec Kit implementation is completed
 - **THEN** automatically validate specifications
 - **AND** run quality gates
-- **AND** update change status
+- **AND** update implementation status
 
-### Automatic Change Lifecycle
+### Automatic Implementation Lifecycle
 
 #### 1. Auto-Detection
 ```markdown
 User: "Add user authentication with JWT tokens"
-Cursor: [Analyzes complexity] → [Detects high complexity] → [Auto-creates OpenSpec change]
+Cursor: [Analyzes complexity] → [Detects high complexity] → [Auto-uses Spec Kit workflow]
 ```
 
-#### 2. Auto-Proposal
+#### 2. Auto-Clarification
 ```markdown
-Cursor: [Creates structured proposal] → [Generates requirements] → [Defines scenarios] → [Creates tasks]
+Cursor: [Reviews constitution] → [Clarifies requirements] → [Defines scope] → [Validates approach]
 ```
 
-#### 3. Auto-Implementation
+#### 3. Auto-Planning
 ```markdown
-Cursor: [Follows tasks] → [Implements features] → [Validates against specs] → [Updates progress]
+Cursor: [Creates implementation plan] → [Defines tasks] → [Sets priorities] → [Validates feasibility]
 ```
 
-#### 4. Auto-Archive
+#### 4. Auto-Implementation
 ```markdown
-Cursor: [Completes implementation] → [Validates against requirements] → [Archives change] → [Updates specs]
+Cursor: [Follows plan] → [Implements features] → [Validates against requirements] → [Updates progress]
 ```
 
 ### Seamless User Experience
 
 #### Transparent Operation
-- **WHEN** OpenSpec is used automatically
-- **THEN** inform user of OpenSpec usage
-- **AND** explain why OpenSpec was chosen
+- **WHEN** Spec Kit is used automatically
+- **THEN** inform user of Spec Kit usage
+- **AND** explain why Spec Kit was chosen
 - **AND** show progress and status
 
 #### Fallback to Existing System
-- **WHEN** OpenSpec is not needed
+- **WHEN** Spec Kit is not needed
 - **THEN** use existing GitHub Issues workflow
 - **AND** maintain current user experience
 - **AND** preserve existing processes
@@ -332,33 +313,33 @@ Cursor: [Completes implementation] → [Validates against requirements] → [Arc
 ### Automatic Quality Gates
 
 #### Pre-Implementation Validation
-- **WHEN** starting OpenSpec implementation
+- **WHEN** starting Spec Kit implementation
 - **THEN** automatically validate requirements
 - **AND** check for conflicts with existing specs
 - **AND** ensure implementation plan is complete
 
 #### During Implementation Validation
-- **WHEN** implementing OpenSpec tasks
+- **WHEN** implementing Spec Kit tasks
 - **THEN** automatically validate against requirements
 - **AND** check for scope creep
 - **AND** ensure quality standards
 
 #### Post-Implementation Validation
-- **WHEN** completing OpenSpec implementation
+- **WHEN** completing Spec Kit implementation
 - **THEN** automatically validate against scenarios
 - **AND** run comprehensive tests
 - **AND** update specifications
 
 ### Automatic Documentation
 
-#### Change Documentation
-- **WHEN** OpenSpec change is created
+#### Implementation Documentation
+- **WHEN** Spec Kit workflow is used
 - **THEN** automatically document rationale
 - **AND** record decision points
 - **AND** track implementation progress
 
 #### Specification Updates
-- **WHEN** OpenSpec change is archived
+- **WHEN** Spec Kit implementation is completed
 - **THEN** automatically update specifications
 - **AND** maintain specification accuracy
 - **AND** preserve change history
@@ -366,13 +347,13 @@ Cursor: [Completes implementation] → [Validates against requirements] → [Arc
 ### Error Handling and Recovery
 
 #### Automatic Error Detection
-- **WHEN** OpenSpec operations fail
+- **WHEN** Spec Kit operations fail
 - **THEN** automatically fallback to existing system
 - **AND** inform user of fallback
 - **AND** log error for analysis
 
 #### Automatic Recovery
-- **WHEN** OpenSpec system is unavailable
+- **WHEN** Spec Kit system is unavailable
 - **THEN** automatically use existing workflows
 - **AND** maintain user productivity
 - **AND** preserve work progress
@@ -380,13 +361,13 @@ Cursor: [Completes implementation] → [Validates against requirements] → [Arc
 ### Performance Optimization
 
 #### Automatic Caching
-- **WHEN** OpenSpec operations are repeated
+- **WHEN** Spec Kit operations are repeated
 - **THEN** automatically cache results
 - **AND** improve response times
 - **AND** reduce system load
 
 #### Automatic Cleanup
-- **WHEN** OpenSpec changes are archived
+- **WHEN** Spec Kit implementations are completed
 - **THEN** automatically clean up temporary files
 - **AND** maintain system performance
 - **AND** preserve disk space
@@ -396,12 +377,12 @@ Cursor: [Completes implementation] → [Validates against requirements] → [Arc
 ### Cursor AI Integration
 - Cursor automatically analyzes user requests
 - Determines complexity and scope automatically
-- Creates OpenSpec changes when appropriate
+- Uses Spec Kit workflow when appropriate
 - Maintains seamless user experience
 
 ### Existing System Preservation
 - All existing workflows continue unchanged
-- OpenSpec enhances, doesn't replace
+- Spec Kit enhances, doesn't replace
 - Fallback to existing system always available
 - Zero disruption to current processes
 

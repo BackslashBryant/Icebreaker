@@ -53,7 +53,7 @@ export function parseFrontmatter(content: string): ITicketFrontmatter | null {
     const idx = line.indexOf(':');
     if (idx < 0) continue;
     const key = line.slice(0, idx).trim();
-    let valueRaw = line.slice(idx + 1).trim();
+    const valueRaw = line.slice(idx + 1).trim();
     if (valueRaw.startsWith('[') && valueRaw.endsWith(']')) {
       const inside = valueRaw.slice(1, -1).trim();
       const arr = inside

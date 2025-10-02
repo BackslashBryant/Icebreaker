@@ -119,7 +119,7 @@ async function main() {
     if (!found.body || !found.body.includes('Synced from docs/tickets')) updates.body = body;
     // Labels
     const currentLabelNames = (found.labels || []).map((l: any) => (typeof l === 'string' ? l : l.name));
-    const desiredSet = new Set(labels);
+    // const _desiredSet = new Set(labels);
     const currentSet = new Set(currentLabelNames);
     const labelsChanged = labels.length !== currentLabelNames.length || labels.some((l) => !currentSet.has(l));
     if (labelsChanged) updates.labels = labels;

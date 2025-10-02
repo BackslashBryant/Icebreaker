@@ -13,7 +13,7 @@ function readTicketFiles(dir) {
     return entries
       .filter((e) => e.isFile() && e.name.toLowerCase().endsWith('.md'))
       .map((e) => path.join(dir, e.name));
-  } catch (e) {
+  } catch {
     return [];
   }
 }

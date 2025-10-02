@@ -17,7 +17,7 @@ const nextConfig = {
   },
   
   // Webpack configuration
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+  webpack: (config, { buildId: _buildId, dev: _dev, isServer: _isServer, defaultLoaders: _defaultLoaders, webpack: _webpack }) => {
     // Add custom webpack configuration here
     return config;
   },

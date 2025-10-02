@@ -31,17 +31,17 @@ alwaysApply: true
   - Evidence: test output links or screenshots
   - Backout plan (1-2 bullets)
 
-## CRITICAL: Automatic OpenSpec Integration (NO EXCEPTIONS)
-**MANDATORY AUTOMATIC DECISION** - The system must automatically determine when to use OpenSpec based on request complexity, risk, and scope:
+## CRITICAL: Automatic Spec Kit Integration (NO EXCEPTIONS)
+**MANDATORY AUTOMATIC DECISION** - The system must automatically determine when to use Spec Kit based on request complexity, risk, and scope:
 
-### Automatic OpenSpec Decision Logic
+### Automatic Spec Kit Decision Logic
 - **WHEN** user requests a change
 - **THEN** automatically analyze complexity, risk, and scope
 - **IF** complexity is high OR risk is high OR scope is multi-component
-- **THEN** automatically create OpenSpec change and follow OpenSpec workflow
+- **THEN** automatically use Spec Kit workflow (constitution → clarify → plan → implement)
 - **ELSE** use existing GitHub Issues workflow
 
-### OpenSpec Triggers (Automatic)
+### Spec Kit Triggers (Automatic)
 - New features affecting multiple components
 - Breaking changes or API modifications  
 - Complex refactoring spanning multiple files
@@ -60,15 +60,7 @@ alwaysApply: true
 **NEVER ASK USER TO CHOOSE WORKFLOW** - The system must automatically decide and inform user of decision.
 
 ## CRITICAL: Automatic Git Workflow (NO EXCEPTIONS)
-**MANDATORY AUTOMATIC EXECUTION** - The complete git workflow must execute automatically without user reminders:
-1. Create feature branch automatically
-2. Commit changes with ticket ID automatically  
-3. Push branch to remote automatically
-4. Create Pull Request automatically
-5. Merge Pull Request automatically (after validation)
-6. Switch back to main and pull latest automatically
-7. Delete feature branch automatically
-8. Update documentation automatically
+**MANDATORY AUTOMATIC EXECUTION** - See `.cursor/rules/02-quality.mdc` for complete git workflow details.
 
 **NEVER ASK USER TO REMIND ABOUT GIT OPERATIONS** - This workflow must be automatic.
 

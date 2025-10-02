@@ -1,0 +1,182 @@
+---
+description: "Spec Kit Integration - AI-powered development workflow with constitution-driven approach"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Spec Kit Integration
+
+## Core Principles
+
+### AI-Powered Development
+- **Constitution-First**: All decisions reference the project constitution
+- **Clarify Before Code**: Requirements clarification before implementation
+- **Plan-Driven**: Structured implementation plans for complex changes
+- **Automated Workflow**: Seamless integration with existing development processes
+
+### Automatic Decision Logic
+- **WHEN** user requests a change
+- **THEN** analyze complexity, risk, and scope
+- **IF** complexity is high OR risk is high OR scope is multi-component
+- **THEN** automatically use Spec Kit workflow (constitution → clarify → plan → implement)
+- **ELSE** use existing GitHub Issues workflow
+
+## Spec Kit Workflow
+
+### 1. Constitution Review
+- **AUTOMATIC**: Load and review project constitution
+- **AUTOMATIC**: Validate request against constitutional principles
+- **AUTOMATIC**: Identify relevant standards and guidelines
+
+### 2. Requirements Clarification
+- **AUTOMATIC**: Run `spec-kit clarify` for complex requests
+- **AUTOMATIC**: Generate structured requirements
+- **AUTOMATIC**: Identify scope, constraints, and success criteria
+
+### 3. Implementation Planning
+- **AUTOMATIC**: Run `spec-kit plan` for structured approach
+- **AUTOMATIC**: Create detailed implementation plan
+- **AUTOMATIC**: Define tasks, dependencies, and timeline
+
+### 4. Guided Implementation
+- **AUTOMATIC**: Run `spec-kit implement` for execution
+- **AUTOMATIC**: Follow structured implementation plan
+- **AUTOMATIC**: Validate against requirements and constitution
+
+## Integration Points
+
+### GitHub Issues Integration
+- **WHEN** Spec Kit workflow is used
+- **THEN** automatically create corresponding GitHub Issue
+- **AND** link Spec Kit implementation to GitHub Issue
+- **AND** sync status between systems
+
+### MCP Integration
+- **WHEN** using MCP tools for Spec Kit changes
+- **THEN** automatically follow MCP safety policies
+- **AND** document MCP usage in implementation
+- **AND** track MCP operations in change history
+
+### Quality Gates Integration
+- **WHEN** Spec Kit implementation is completed
+- **THEN** automatically validate against constitution
+- **AND** run quality gates from `02-quality.mdc`
+- **AND** update implementation status
+
+## Automatic Triggers
+
+### High Complexity Triggers
+- Multi-file changes (>3 files)
+- New API endpoints
+- Database schema changes
+- Authentication/authorization changes
+- Performance optimizations
+- Security implementations
+
+### Medium Complexity Triggers
+- New utility functions
+- Component refactoring
+- Configuration changes
+- Error handling improvements
+- Logging enhancements
+
+### Low Complexity (No Spec Kit)
+- Bug fixes (single file, <50 lines)
+- Typo corrections or formatting
+- Documentation-only changes
+- Test additions for existing functionality
+- Dependency updates without behavior changes
+
+## Error Handling
+
+### Spec Kit Unavailable
+- **WHEN** Spec Kit is not installed or unavailable
+- **THEN** automatically fallback to existing GitHub Issues workflow
+- **AND** inform user of fallback
+- **AND** log error for analysis
+
+### Command Failures
+- **WHEN** Spec Kit commands fail
+- **THEN** automatically fallback to existing workflow
+- **AND** preserve work progress
+- **AND** maintain user productivity
+
+## Performance Optimization
+
+### Caching Strategy
+- **WHEN** Spec Kit operations are repeated
+- **THEN** automatically cache results
+- **AND** improve response times
+- **AND** reduce system load
+
+### Cleanup Process
+- **WHEN** Spec Kit implementations are completed
+- **THEN** automatically clean up temporary files
+- **AND** maintain system performance
+- **AND** preserve disk space
+
+## User Experience
+
+### Transparent Operation
+- **WHEN** Spec Kit is used automatically
+- **THEN** inform user of Spec Kit usage
+- **AND** explain why Spec Kit was chosen
+- **AND** show progress and status
+
+### Seamless Integration
+- **WHEN** Spec Kit is not needed
+- **THEN** use existing GitHub Issues workflow
+- **AND** maintain current user experience
+- **AND** preserve existing processes
+
+## Quality Assurance
+
+### Pre-Implementation Validation
+- **WHEN** starting Spec Kit implementation
+- **THEN** automatically validate requirements
+- **AND** check for conflicts with existing specs
+- **AND** ensure implementation plan is complete
+
+### During Implementation Validation
+- **WHEN** implementing Spec Kit tasks
+- **THEN** automatically validate against requirements
+- **AND** check for scope creep
+- **AND** ensure quality standards
+
+### Post-Implementation Validation
+- **WHEN** completing Spec Kit implementation
+- **THEN** automatically validate against scenarios
+- **AND** run comprehensive tests
+- **AND** update specifications
+
+## Documentation
+
+### Implementation Documentation
+- **WHEN** Spec Kit workflow is used
+- **THEN** automatically document rationale
+- **AND** record decision points
+- **AND** track implementation progress
+
+### Specification Updates
+- **WHEN** Spec Kit implementation is completed
+- **THEN** automatically update specifications
+- **AND** maintain specification accuracy
+- **AND** preserve change history
+
+## Success Metrics
+
+### Technical Metrics
+- Implementation success rate
+- Quality gate pass rate
+- Error reduction rate
+- Performance improvement
+
+### User Experience Metrics
+- User satisfaction with workflow
+- Time to implementation
+- Error resolution time
+- Process efficiency
+
+---
+
+*This rule file provides seamless Spec Kit integration while maintaining all existing functionality and workflows.*

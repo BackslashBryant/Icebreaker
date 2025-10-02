@@ -1,12 +1,13 @@
 # 🚀 Cursor Template Project
 
-A **sophisticated, scaffold-ready template** that automatically adapts to any project type with advanced AI-powered development workflow.
+A **sophisticated, scaffold-ready template** with **Spec Kit integration** that automatically adapts to any project type with advanced AI-powered development workflow.
 
 ## ✨ **What Makes This Special?**
 
-This template is **intelligent** and **self-aware**. Cursor AI will automatically:
+This template is **intelligent** and **self-aware** with **Spec Kit integration**. Cursor AI will automatically:
 
 - 🎯 **Detect your project type** (frontend/backend/full-stack/monorepo)
+- 📋 **Use Spec Kit workflow** for complex changes (constitution → clarify → plan → implement)
 - 🛠️ **Auto-configure** the appropriate tools and settings
 - 🚀 **Enable advanced features** based on your needs
 - 📋 **Guide you through** the development process
@@ -92,6 +93,14 @@ Just start working! Cursor AI will automatically:
 
 ## 🛠️ **Advanced Features**
 
+### **Spec Kit Integration**
+Advanced AI-powered development workflow:
+
+- **Constitution-First**: All decisions reference the project constitution
+- **Clarify Before Code**: Requirements clarification before implementation
+- **Plan-Driven**: Structured implementation plans for complex changes
+- **Automated Workflow**: Seamless integration with existing development processes
+
 ### **MCP Integration**
 Cursor AI will automatically suggest and configure:
 
@@ -129,6 +138,9 @@ my-awesome-project/
 ├── .github/                # GitHub Actions and templates
 ├── docs/                   # Comprehensive documentation
 ├── scripts/                # Automation and utility scripts
+├── memory/                 # Spec Kit constitution and memory
+├── specs/                  # Spec Kit specifications
+├── templates/              # Spec Kit templates
 ├── frontend/               # Frontend application (if needed)
 ├── backend/                # Backend application (if needed)
 ├── shared/                 # Shared utilities and types
