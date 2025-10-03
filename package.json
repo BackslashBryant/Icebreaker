@@ -25,7 +25,10 @@
     "git:create-branch": "bash scripts/create-branch.sh",
     "git:create-issue": "bash scripts/create-issue.sh",
     "git:create-pr": "bash scripts/create-pr.sh",
-    "git:automation": "bash scripts/git-automation.sh"
+    "git:automation": "bash scripts/git-automation.sh",
+    "update-check": "node scripts/update-check/dist/index.js check",
+    "update-check:repair": "node scripts/update-check/dist/index.js repair",
+    "update-check:status": "node scripts/update-check/dist/index.js status"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
