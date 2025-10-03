@@ -157,7 +157,7 @@ export function buildIssueBody(ticket: ITicketFile): string {
     parts.push('');
   }
   parts.push('---');
-  parts.push('Synced from docs/tickets via scripts/sync-issues.ts');
+  parts.push('Generated from docs/tickets');
   return parts.join('\n');
 }
 

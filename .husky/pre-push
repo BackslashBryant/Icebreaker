@@ -2,20 +2,16 @@
 import { execSync } from 'node:child_process';
 
 try {
-  if (!process.env.GITHUB_TOKEN) {
-    console.warn('WARNING: GITHUB_TOKEN is not set. CI will provide one automatically.');
-  }
-  execSync('npm run tickets:sync', { stdio: 'inherit' });
-  const changed = execSync('git status --porcelain', { encoding: 'utf8' }).trim();
-  if (changed) {
-    execSync('git add -A', { stdio: 'inherit' });
-    try {
-      execSync('git commit -m "chore: sync tickets → GitHub issues"', { stdio: 'inherit' });
-    } catch {}
-  }
+  console.log('🔍 Running pre-push quality checks...');
+  
+  // Run basic quality checks
+  execSync('npm run lint', { stdio: 'inherit' });
+  execSync('npm run typecheck', { stdio: 'inherit' });
+  
+  console.log('✅ Pre-push checks passed!');
   process.exit(0);
 } catch (e) {
-  console.error('Pre-push: ticket sync failed. Ensure GITHUB_TOKEN is set or rely on CI.');
+  console.error('❌ Pre-push checks failed. Please fix the issues before pushing.');
   process.exit(1);
 }
 
