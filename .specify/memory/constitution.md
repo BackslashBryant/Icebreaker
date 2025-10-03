@@ -2,6 +2,12 @@
 
 ## Core Principles
 
+### Template Project Principles
+- **Stack-Agnostic Design**: Template should work with any technology stack
+- **Automated Project Detection**: Intelligently detect project type and requirements
+- **Intelligent Setup**: Automatically configure appropriate tools and workflows
+- **Seamless Spec Kit Integration**: Official GitHub Spec Kit for spec-driven development
+
 ### Code Quality
 - Write clean, maintainable code with clear naming conventions
 - Follow established patterns and architectural principles
