@@ -1,3 +1,5 @@
+_Template placeholder. Replace with the PRD for your real project once the stack is generated._
+
 # Product Requirements Document (PRD)
 
 ## 1. Overview

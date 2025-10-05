@@ -1,81 +1,15 @@
 {
-  "name": "my-project",
-  "version": "1.0.0",
-  "description": "A scaffold-ready template project with Spec Kit integration, advanced tooling, and full automation",
-  "private": true,
-  "type": "module",
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
-  },
-  "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "test": "echo 'No tests configured yet'",
-    "test:coverage": "turbo run test:coverage",
-    "lint": "eslint . --max-warnings 50",
-    "lint:fix": "eslint . --fix",
-    "typecheck": "tsc --noEmit",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,mdx}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,mdx}\"",
-    "clean": "turbo run clean",
-    "verify": "npm run lint && npm run test",
-    "prepare": "husky install",
-    "postinstall": "npm run prepare",
-    "git:create-branch": "bash scripts/create-branch.sh",
-    "git:create-issue": "bash scripts/create-issue.sh",
-    "git:create-pr": "bash scripts/create-pr.sh",
-    "git:automation": "bash scripts/git-automation.sh",
-    "update-check": "node scripts/update-check/dist/index.js check",
-    "update-check:repair": "node scripts/update-check/dist/index.js repair",
-    "update-check:status": "node scripts/update-check/dist/index.js status"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.36.0",
-    "@types/node": "^20.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "eslint": "^8.0.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.0",
-    "globals": "^16.4.0",
-    "husky": "^8.0.0",
-    "lint-staged": "^14.0.0",
-    "prettier": "^3.0.0",
-    "turbo": "^1.10.0",
-    "typescript": "^5.0.0",
-    "typescript-eslint": "^8.45.0",
-    "vitest": "^1.0.0"
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,mdx}": [
-      "prettier --write"
-    ]
-  },
-  "keywords": [
-    "template",
-    "scaffold",
-    "cursor",
-    "spec-kit",
-    "automation",
-    "typescript",
-    "react",
-    "nextjs",
-    "turbo",
-    "monorepo"
-  ],
-  "author": "Your Name",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-username/my-project.git"
-  },
-  "bugs": {
-    "url": "https://github.com/your-username/my-project/issues"
-  },
-  "homepage": "https://github.com/your-username/my-project#readme"
+    "name":  "cursor-ai-workspace",
+    "version":  "0.0.0",
+    "private":  true,
+    "description":  "Stack-agnostic Cursor workspace template with Spec Kit and MCP automation.",
+    "scripts":  {
+                    "preflight":  "node ./tools/preflight.mjs",
+                    "verify":  "node ./scripts/verify-all",
+                    "bootstrap":  "node ./tools/bootstrap-spec-kit.mjs",
+                    "new-feature":  "node ./tools/new-feature.mjs"
+                },
+    "engines":  {
+                    "node":  "\u003e=18.0.0"
+                }
 }

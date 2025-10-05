@@ -78,61 +78,63 @@ function detectProjectType() {
 
 function getAvailableScripts(projectInfo) {
   const availableScripts = [];
-  const { scripts, dependencies } = projectInfo;
-  
-  // Check for common scripts and adapt based on what's available
+  const scripts = projectInfo.scripts || {};
+  const dependencies = projectInfo.dependencies || {};
+
   if (scripts.lint) {
     availableScripts.push({
       command: `npm run lint${config.fix ? ' --fix' : ''}`,
       description: 'Linting',
-      required: false
+      required: false,
     });
   }
-  
+
   if (scripts.typecheck || scripts.tsc) {
     availableScripts.push({
       command: 'npm run typecheck || npm run tsc',
       description: 'Type checking',
-      required: false
+      required: false,
     });
   }
-  
+
   if (scripts.test) {
     availableScripts.push({
       command: 'npm test',
       description: 'Unit tests',
-      required: false
+      required: false,
     });
   }
-  
+
   if (scripts.build) {
     availableScripts.push({
       command: 'npm run build',
       description: 'Build',
-      required: false
+      required: false,
     });
   }
-  
-  // Add project-specific scripts
-  if (projectInfo.type === 'nextjs') {
-    if (scripts['frontend:build']) {
+
+  if (projectInfo.type === 'nextjs' && scripts['frontend:build']) {
+    availableScripts.push({
+      command: 'npm run frontend:build',
+      description: 'Frontend build',
+      required: false,
+    });
+  }
+
+  if (projectInfo.hasPackageJson) {
+    const lockFiles = ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock'];
+    const hasLock = lockFiles.some((file) => fs.existsSync(path.join(__dirname, '..', file)));
+    const dependencyCount = Object.keys(dependencies).length;
+
+    if (hasLock && dependencyCount > 0) {
       availableScripts.push({
-        command: 'npm run frontend:build',
-        description: 'Frontend build',
-        required: false
+        command: 'npm audit --audit-level=moderate',
+        description: 'Dependency audit',
+        required: false,
       });
     }
   }
-  
-  // Always add dependency audit if package.json exists
-  if (projectInfo.hasPackageJson) {
-    availableScripts.push({
-      command: 'npm audit --audit-level=moderate',
-      description: 'Dependency audit',
-      required: false
-    });
-  }
-  
+
   return availableScripts;
 }
 

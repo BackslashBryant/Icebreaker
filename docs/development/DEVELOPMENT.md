@@ -1,3 +1,5 @@
+_Template placeholder. Tailor this development guide after you choose your stack._
+
 # Development Guide
 
 ## Prerequisites

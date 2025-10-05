@@ -1,3 +1,5 @@
+_Template placeholder. Replace or remove once your project defines this content._
+
 # Official GitHub Spec Kit Integration Guide
 
 ## Overview

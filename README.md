@@ -1,284 +1,43 @@
-# 🚀 Cursor Template Project
+# Cursor Workspace Template
 
-A **sophisticated, scaffold-ready template** with **official GitHub Spec Kit integration** that automatically adapts to any project type with advanced AI-powered development workflow.
+A stack-agnostic starting point for Cursor projects. It focuses on workflow automation (Spec Kit + MCP), lightweight preflight checks, and leaves the actual application stack for you or the agent to generate.
 
-## ✨ **What Makes This Special?**
+## What you get
 
-This template is **intelligent** and **self-aware** with **real Spec Kit integration**. Cursor AI will automatically:
+- **Spec Kit ready**: `/constitution`, `/specify`, `/clarify`, `/plan`, `/tasks`, `/implement` are expected to drive complex work.
+- **MCP scaffolding**: `.cursor/mcp.json` includes placeholders for GitHub, Supabase, Playwright, DocFork, and Desktop Commander servers�configure them with environment variables or prompt inputs.
+- **Preflight check**: `npm run preflight` calls the platform script (`.specify/scripts/.../check-prerequisites`) to ensure Spec Kit + MCP tooling is wired in before you start coding.
+- **Verify helper**: `scripts/verify-all` discovers whatever `npm run` scripts your generated project exposes and runs them sequentially or in parallel.
+- **Examples folder**: `examples/automation/` stores optional git/security helpers you can copy into a real project once you decide on tooling.
 
-- 🎯 **Detect your project type** (frontend/backend/full-stack/monorepo)
-- 📋 **Use Spec Kit slash commands** for complex changes (`/constitution`, `/specify`, `/plan`, `/implement`)
-- 🛠️ **Auto-configure** the appropriate tools and settings
-- 🚀 **Enable advanced features** based on your needs
-- 📋 **Guide you through** the development process
-- 🔄 **Automate workflows** for maximum productivity
+## Typical workflow
 
-## 🎯 **Project Types Supported**
+1. Clone this repo and configure `.cursor/mcp.json` (use inputs or env vars for secrets).
+2. Run `/constitution` and `/specify` inside Cursor to define your new project.
+3. Execute `npm run preflight` to confirm Spec Kit + MCP setup is complete.
+4. Let Cursor generate the stack (frontend, backend, CLI, etc.) based on the spec.
+5. Wire your stack�s lint/test/build commands into `package.json` so `npm run verify` works.
+6. Extend `.github/workflows/ci.yml` with jobs that match your stack.
 
-### **Frontend-Only Projects**
-- React, Vue, Angular, Svelte
-- Next.js, Nuxt, SvelteKit
-- Tailwind CSS, styled-components
-- Component testing with Vitest
+## Customising
 
-### **Backend-Only Projects**
-- Node.js, Express, Fastify
-- Database integration (PostgreSQL, MongoDB)
-- API development and testing
-- Authentication and security
+- **Docs**: Everything under `docs/` is a template�replace or delete once you create project-specific content.
+- **Automation**: Copy anything useful from `examples/automation/` into your project and update the rules/workflows accordingly.
+- **Rules**: Update `.cursor/rules/*.mdc` to reflect your team�s conventions, but keep them consistent with the automation.
+- **CI**: The default workflow only runs the preflight + verify helper. Expand it when you know which tools to run.
 
-### **Full-Stack Applications**
-- Complete frontend + backend setup
-- API integration and shared types
-- End-to-end testing
-- Production deployment ready
+## Commands
 
-### **Monorepo Projects**
-- Multiple packages with Turbo orchestration
-- Shared utilities and types
-- Cross-package testing and linting
-- Workspace management
-
-## 🚀 **Getting Started**
-
-### **1. Create Your Project**
 ```bash
-# Clone the template
-git clone <your-template-repo> my-awesome-project
-cd my-awesome-project
-
-# The template works immediately - no setup required!
+npm run preflight   # ensures Spec Kit + MCP wiring is healthy
+npm run verify      # runs scripts/verify-all (adapts to whatever your project exposes)
 ```
 
-### **2. Spec Kit Integration**
+## Next steps after scaffolding
 
-This template includes the official GitHub Spec Kit for spec-driven development. Use these slash commands in Cursor:
+- Install dependencies for the stack Cursor generates.
+- Keep secrets in environment variables or secret managers.
+- Document lessons learned in `.cursor/rules/07-process-improvement.mdc`.
+- Use MCP automation (GitHub, Playwright, DocFork, Supabase) to stay issue-first and auditable.
 
-#### **Available Slash Commands**
-- `/constitution` - Create project governing principles
-- `/specify` - Define what you want to build
-- `/clarify` - Clarify underspecified areas
-- `/plan` - Create technical implementation plan
-- `/tasks` - Generate actionable task list
-- `/implement` - Execute the implementation
-
-#### **Example Workflow**
-```bash
-# 1. Establish project principles
-/constitution Create principles focused on code quality, testing standards, and user experience
-
-# 2. Define what to build
-/specify Build a task management application with Kanban boards and user authentication
-
-# 3. Clarify requirements
-/clarify
-
-# 4. Create implementation plan
-/plan Use React with TypeScript, Node.js with Express, and PostgreSQL database
-
-# 5. Generate tasks
-/tasks
-
-# 6. Execute implementation
-/implement
-```
-
-### **3. Let Cursor AI Guide You**
-Just start working! Cursor AI will automatically:
-
-- **Detect your project type** from your first few files
-- **Suggest appropriate configurations** based on your needs
-- **Set up development environment** automatically
-- **Enable relevant features** as you work
-
-### **3. Choose Your Path**
-
-#### **Frontend Development**
-```
-# Just start building components!
-# Cursor AI will automatically:
-- Set up React/Vue/Next.js configuration
-- Configure Tailwind CSS and styling
-- Set up component testing
-- Enable hot reload and development server
-```
-
-#### **Backend Development**
-```
-# Start building APIs!
-# Cursor AI will automatically:
-- Set up Express.js server
-- Configure database connections
-- Set up authentication
-- Enable API testing and documentation
-```
-
-#### **Full-Stack Development**
-```
-# Build complete applications!
-# Cursor AI will automatically:
-- Set up both frontend and backend
-- Configure API integration
-- Set up end-to-end testing
-- Enable production deployment
-```
-
-## 🛠️ **Advanced Features**
-
-### **Spec Kit Integration**
-Advanced AI-powered development workflow:
-
-- **Constitution-First**: All decisions reference the project constitution
-- **Clarify Before Code**: Requirements clarification before implementation
-- **Plan-Driven**: Structured implementation plans for complex changes
-- **Automated Workflow**: Seamless integration with existing development processes
-
-### **MCP Integration**
-Cursor AI will automatically suggest and configure:
-
-- **GitHub MCP**: Repository management, issues, PRs
-- **Supabase MCP**: Database operations and real-time features
-- **Playwright MCP**: UI testing and accessibility
-- **Desktop Commander MCP**: System operations and file management
-- **DocFork MCP**: Documentation and library references
-
-### **Quality Gates**
-Automatic quality assurance:
-
-- **Linting**: ESLint with TypeScript support
-- **Testing**: Vitest with comprehensive test setup
-- **Security**: Dependency scanning and vulnerability checks
-- **Performance**: Bundle analysis and optimization
-- **Documentation**: Automatic documentation generation
-
-### **GitHub Issues-First Workflow**
-Modern development workflow:
-
-- **No local ticket files** - everything in GitHub Issues
-- **Automatic git workflow** - branch, commit, push, PR, merge
-- **Quality gates** - automatic checks before merging
-- **Issue tracking** - comprehensive project management
-
-## 📁 **Project Structure**
-
-```
-my-awesome-project/
-├── .cursor/                 # Cursor AI configuration
-│   ├── rules/              # Intelligent development rules
-│   ├── library/            # Code snippets and conventions
-│   └── tools/              # MCP tool configurations
-├── .github/                # GitHub Actions and templates
-├── docs/                   # Comprehensive documentation
-├── scripts/                # Automation and utility scripts
-├── memory/                 # Spec Kit constitution and memory
-├── specs/                  # Spec Kit specifications
-├── templates/              # Spec Kit templates
-├── frontend/               # Frontend application (if needed)
-├── backend/                # Backend application (if needed)
-├── shared/                 # Shared utilities and types
-└── tests/                  # Test configurations and examples
-```
-
-## 🎯 **How It Works**
-
-### **1. Intelligent Detection**
-Cursor AI automatically detects:
-- Project type from your files and context
-- Framework preferences from dependencies
-- Development phase from your current work
-- User experience level from interactions
-
-### **2. Automatic Configuration**
-Based on detection, Cursor AI will:
-- Set up appropriate project structure
-- Configure relevant tools and dependencies
-- Enable necessary MCPs and integrations
-- Set up quality gates and testing
-
-### **3. Proactive Guidance**
-Cursor AI continuously:
-- Suggests relevant next steps
-- Offers helpful features and tools
-- Provides best practices and patterns
-- Guides you through complex tasks
-
-### **4. Automated Workflows**
-Cursor AI handles:
-- Git operations (branch, commit, push, PR, merge)
-- Quality checks (linting, testing, security)
-- MCP health monitoring
-- Documentation updates
-
-## 🚀 **Quick Start Examples**
-
-### **React Frontend**
-```bash
-# Just start building!
-mkdir src/components
-# Cursor AI will automatically:
-# - Set up React configuration
-# - Configure Tailwind CSS
-# - Set up component testing
-# - Enable hot reload
-```
-
-### **Express Backend**
-```bash
-# Start building APIs!
-mkdir src/routes
-# Cursor AI will automatically:
-# - Set up Express server
-# - Configure database
-# - Set up authentication
-# - Enable API testing
-```
-
-### **Full-Stack App**
-```bash
-# Build complete applications!
-# Cursor AI will automatically:
-# - Set up both frontend and backend
-# - Configure API integration
-# - Set up end-to-end testing
-# - Enable production deployment
-```
-
-## 📚 **Documentation**
-
-- **[Development Guide](docs/development/DEVELOPMENT.md)** - Complete development workflow
-- **[MCP Setup Guide](docs/MCP_SETUP_GUIDE.md)** - MCP integration and configuration
-- **[Production Readiness](docs/PRODUCTION_READINESS.md)** - Production deployment checklist
-- **[Conventions](.cursor/library/conventions.md)** - Coding standards and patterns
-- **[Snippets](.cursor/library/snippets.md)** - Reusable code patterns
-
-## 🎉 **Why This Template?**
-
-### **Scaffold-Ready**
-- Works with **any project type** immediately
-- **No configuration required** - just start building
-- **Graceful degradation** when features aren't needed
-- **Universal compatibility** across frameworks
-
-### **Intelligent**
-- **Self-aware** and adapts to your needs
-- **Proactive guidance** throughout development
-- **Automatic feature detection** and configuration
-- **Context-aware suggestions** and assistance
-
-### **Sophisticated**
-- **Advanced automation** for maximum productivity
-- **Quality gates** and comprehensive testing
-- **Security scanning** and best practices
-- **Production-ready** configurations
-
-### **Well-Documented**
-- **Comprehensive guides** for every aspect
-- **Code snippets** and reusable patterns
-- **Best practices** and conventions
-- **Clear examples** and tutorials
-
-## 🚀 **Ready to Build?**
-
-This template is **production-ready** and will significantly enhance your development experience. Just start working, and let Cursor AI guide you through building amazing projects!
-
-**Happy coding! 🎉**
+Happy building!

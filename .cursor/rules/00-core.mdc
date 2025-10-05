@@ -1,415 +1,80 @@
 ---
-description: "Core Principles, Project Detection, Auto-Setup, and Process Improvement"
+description: "Core principles for the stack-agnostic Cursor workspace"
 globs: ["**/*"]
 alwaysApply: true
 ---
 
-# Core Enforcement & Intelligence
+# Core Principles
 
-## Scope and Behavior
-- Work one approved GitHub Issue at a time.
-- Keep functional outputs identical unless the issue says otherwise.
-- Avoid background tasks or speculative changes.
-- Use MCP for research prior to/during issues to maximize effectiveness
+## Working Agreement
+- Start every change from an approved GitHub Issue (or Spec Kit ticket).
+- Align on scope, success criteria, and unknowns before modifying code.
+- Prefer the smallest, reversible change that satisfies the ticket.
+- Keep communication async-friendly: document decisions and open questions.
 
-## Required Structure
-- Plan first with a brief step list plus risks and assumptions.
-- Implement the minimal change; favor existing patterns and scripts.
-- Verify with scripts/verify-all and record any failures.
-- Summarize what changed, why, which tests ran, and follow-up items.
+## Preflight & Planning\n- Run `npm run bootstrap` once per repo to ensure Spec Kit templates exist.\n- Run `npm run new-feature -- --title "..."` when kicking off a fresh ticket to generate spec/plan/tasks.\n- Run `npm run preflight` (or the platform script directly) before beginning work.
+- Use Spec Kit slash commands when available for research, specification, and planning.
+- When Spec Kit is not installed, outline a lightweight plan (3�6 bullets) with risks/assumptions.
+- Record any blockers or dependencies in the issue before proceeding.
 
-## Guardrails
-- No new dependencies without GitHub Issue approval.
-- Do not rename in ways that break imports; include migration steps when required.
-- Keep operations performance-friendly (prefer folding first and avoid needless loops).
-- Do not shrink or rewrite large suites or shared frameworks without a GitHub Issue proposal and reviewer sign-off outlining retained coverage.
+## Implementation Guardrails
+- Reuse existing patterns; extend only when justified by the ticket.
+- Coordinate breaking changes with affected owners before implementation.
+- Avoid speculative work or background tasks without product approval.
+- Keep hard-coded secrets and credentials out of the repository.
 
-## Acceptance
-- PR references the GitHub Issue and includes:
-  - Summary (3-5 bullets)
-  - Diff risk note (low/medium/high)
-  - Evidence: test output links or screenshots
-  - Backout plan (1-2 bullets)
+## Verification Expectations
+- Use `node scripts/verify-all` to discover runnable checks and execute them.
+- If the generated project defines lint/test/build scripts, ensure they pass locally and in CI.
+- Capture relevant artefacts (logs, screenshots, CLI output) for any manual or UI validation.
+- Document gaps in coverage or automation as follow-up issues.
 
-## CRITICAL: Spec Kit Integration (When Available)
-**AUTOMATIC DECISION** - The system should use official Spec Kit when available for complex tasks:
+## Spec Kit Integration
+- `/constitution`, `/specify`, `/clarify`, `/plan`, `/tasks`, `/implement` remain the default workflow for complex or multi-component work.
+- When Spec Kit is unavailable, rely on GitHub Issues and the minimal plan outlined above.
+- Close the feedback loop by updating specs/docs with reality after implementation.
 
-### Spec Kit Usage (When Installed)
-- Use `/constitution` for project governing principles
-- Use `/specify` to define what to build
-- Use `/clarify` to clarify underspecified areas
-- Use `/plan` to create technical implementation plans
-- Use `/tasks` to generate actionable task lists
-- Use `/implement` to execute all tasks
+## Documentation & Knowledge
+- Treat `docs/` as living documentation. Add or refresh content when work produces durable knowledge.
+- When you create project-specific guides (PRD, status, runbooks), link them from the issue or Spec Kit artefacts.
+- Track lessons learned in `.cursor/rules/07-process-improvement.mdc` when recurring issues are discovered.
 
-### When to Use Spec Kit
-- Complex features affecting multiple components
-- Breaking changes or API modifications  
-- Architecture decisions
-- Multi-step implementations with dependencies
-- When user explicitly requests Spec Kit usage
-
-### Fallback to GitHub Issues Workflow
-- When Spec Kit is not installed
-- Simple bug fixes (single file, <50 lines)
-- Typo corrections or formatting
-- Documentation-only changes
-- Test additions for existing functionality
-
-## CRITICAL: Automatic Git Workflow (NO EXCEPTIONS)
-**MANDATORY AUTOMATIC EXECUTION** - See `.cursor/rules/02-quality.mdc` for complete git workflow details.
-
-**NEVER ASK USER TO REMIND ABOUT GIT OPERATIONS** - This workflow must be automatic.
-
-## 🧠 Cursor Behavior Requirements
-
-- Before any ticket execution, Cursor must:
-  - Locate and load:
-    - `docs/PRD.md`
-    - `docs/tickets/TICKET_PLAN.md`
-  - Reference:
-    - `.cursor/rules/01-workflow.mdc` for ticket structure and flow
-    - `.cursor/rules/05-library.mdc` for reusable code patterns and conventions
-
-- If any required files are missing:
-  - Generate minimal scaffolds for `PRD.md` and `TICKET_PLAN.md` inside `docs/`
-  - Prompt the user for direction before continuing
-
-- Cursor must **never self-assign** adjacent or speculative work.
-
-- For external dependencies (e.g., environment variables, hardware setup, API keys), Cursor must:
-  - Hand off clearly to the user with checklists
-  - Annotate expected next step to resume
-
-- Every completion must summarize:
-  - ✅ Files changed
-  - 📄 Tickets updated
-  - 🧪 Tests created/modified
-  - 👤 User actions required (if any)
+## Completion Checklist
+- Issue/Spec artifacts updated to reflect the delivered work.
+- Tests/verifications run and reported.
+- Risk/backout note captured on the PR or completion message.
+- Follow-up items (if any) logged as new issues or TODOs with owners.
 
 ---
 
-## 🎯 Project Detection & Auto-Guidance
+# Automation Expectations
 
-### Automatic Project Type Detection
+## MCP Usage
+- Configure GitHub, DocFork, Supabase, Playwright, and Desktop Commander MCP servers via `.cursor/mcp.json` or environment configuration.
+- Use MCP tools for repository operations, research, database inspection, accessibility/performance checks, and documentation retrieval whenever available.
+- Document any gaps in automation support so they can be addressed in future template updates.
 
-#### Frontend-Only Detection
-**Triggers when:**
-- User mentions "frontend", "React", "Vue", "UI", "component", "page"
-- Files in `frontend/` directory are being worked on
-- User asks about styling, components, or user interface
+## Git Workflow
+- Create a feature branch (`issue-id/slug` or similar) per ticket.
+- Keep commits scoped and reference the driving issue.
+- Push, open PRs, and update issue status automatically via MCP or scripted automation when possible.
+- Merge with a clean history (squash or rebase) once quality gates pass.
 
-**Auto-suggestions:**
-- "I detect you're working on frontend. Would you like me to:"
-  - Set up the frontend development environment?
-  - Configure Tailwind CSS and component structure?
-  - Set up testing with Vitest and React Testing Library?
-  - Enable hot reload and development server?
-
-#### Backend-Only Detection
-**Triggers when:**
-- User mentions "backend", "API", "server", "database", "endpoint"
-- Files in `backend/` directory are being worked on
-- User asks about authentication, database, or server logic
-
-**Auto-suggestions:**
-- "I detect you're working on backend. Would you like me to:"
-  - Set up Express.js server with security middleware?
-  - Configure database connection and models?
-  - Set up authentication and authorization?
-  - Enable API documentation and testing?
-
-#### Full-Stack Detection
-**Triggers when:**
-- User mentions "full-stack", "both frontend and backend", "complete app"
-- Working on both `frontend/` and `backend/` directories
-- User asks about API integration or end-to-end functionality
-
-**Auto-suggestions:**
-- "I detect you're building a full-stack application. Would you like me to:"
-  - Set up the complete development environment?
-  - Configure API integration between frontend and backend?
-  - Set up end-to-end testing?
-  - Enable shared types and utilities?
-
-#### Monorepo Detection
-**Triggers when:**
-- User mentions "monorepo", "multiple packages", "workspace"
-- Working across multiple directories with shared code
-- User asks about package management or build orchestration
-
-**Auto-suggestions:**
-- "I detect you're setting up a monorepo. Would you like me to:"
-  - Configure Turbo for build orchestration?
-  - Set up shared packages and dependencies?
-  - Enable cross-package testing and linting?
-  - Configure workspace scripts and commands?
-
-### Framework Detection & Adaptation
-
-#### React/Next.js Detection
-**Triggers when:**
-- `package.json` contains React or Next.js dependencies
-- User mentions "React", "Next.js", "JSX", "components"
-
-**Auto-adaptations:**
-- Enable React-specific linting rules
-- Set up component testing patterns
-- Configure Next.js optimizations
-- Enable React DevTools integration
-
-#### Vue.js Detection
-**Triggers when:**
-- `package.json` contains Vue dependencies
-- User mentions "Vue", "Vuex", "Nuxt", "SFC"
-
-**Auto-adaptations:**
-- Enable Vue-specific linting rules
-- Set up Vue component testing
-- Configure Vue DevTools
-- Enable Single File Component support
-
-#### Node.js/Express Detection
-**Triggers when:**
-- `package.json` contains Express or Node.js dependencies
-- User mentions "Express", "Node.js", "API", "server"
-
-**Auto-adaptations:**
-- Enable Node.js-specific linting rules
-- Set up server testing patterns
-- Configure security middleware
-- Enable API documentation
+## Preflight Failures
+- Treat missing MCP configuration, Spec Kit setup, or verification scripts as blockers.
+- Either resolve the environment gap or document the exception in the ticket before continuing.
 
 ---
 
-## 🚀 Automatic Setup & Configuration
+# Collaboration Notes
 
-### Auto-Setup Triggers
-
-#### Project Initialization
-**When user says:**
-- "start new project", "create app", "set up project"
-- "I want to build...", "I need to create..."
-
-**Auto-execute:**
-1. Detect project type from context
-2. Set up appropriate directory structure
-3. Configure package.json with relevant dependencies
-4. Set up development environment
-5. Enable relevant MCPs
-6. Configure quality gates
-7. Provide next steps
-
-#### Framework Selection
-**When user mentions:**
-- "React", "Vue", "Angular", "Svelte"
-- "Next.js", "Nuxt", "SvelteKit"
-- "Express", "Fastify", "Koa"
-
-**Auto-execute:**
-1. Install framework dependencies
-2. Configure framework-specific settings
-3. Set up development scripts
-4. Configure testing framework
-5. Enable relevant tooling
-6. Provide framework-specific guidance
-
-#### Feature Enablement
-**When user mentions:**
-- "authentication", "auth", "login"
-- "database", "db", "storage"
-- "API", "endpoints", "routes"
-- "testing", "tests", "quality"
-
-**Auto-execute:**
-1. Install relevant dependencies
-2. Configure feature-specific settings
-3. Set up example implementations
-4. Enable relevant MCPs
-5. Configure quality checks
-6. Provide usage examples
-
-### Smart Configuration
-
-#### Environment Setup
-**Auto-configure based on:**
-- Project type (frontend/backend/full-stack)
-- Framework selection
-- Feature requirements
-- Development vs production
-
-**Configuration includes:**
-- Environment variables
-- Build configurations
-- Development scripts
-- Testing setup
-- Quality gates
-
-#### MCP Auto-Configuration
-**Enable MCPs based on:**
-- Project requirements
-- User mentions
-- File patterns
-- Dependencies
-
-**Auto-enable:**
-- GitHub MCP for repository operations
-- Supabase MCP for database operations
-- Playwright MCP for UI testing
-- Desktop Commander MCP for system operations
-- DocFork MCP for documentation
-
-#### Quality Gates Auto-Setup
-**Configure based on:**
-- Project type
-- Framework
-- Dependencies
-- User requirements
-
-**Auto-configure:**
-- Linting rules
-- Testing frameworks
-- Security scanning
-- Performance monitoring
-- Documentation requirements
+- Summaries should include: what changed, why, how it was validated, and any next actions.
+- Ask for clarification early; capture answers in the issue/spec so future contributors benefit.
+- When deferring work, clearly mark TODOs with owner or follow-up issue reference.
+- Respect teammate timezones�leave enough context for others to pick up seamlessly.
 
 ---
 
-## 🧱 Code Structure & Organization
+# Final Reminder
 
-- Use `.ts` unless `.tsx` is explicitly required for JSX
-- Avoid files/folders prefixed with `_` unless required by framework
-- Limit file size to ≤ 100 LOC unless architectural rationale is documented
-- Prefer alias paths (e.g., `@/lib/...`) over deep relative imports
-- All async logic must be wrapped in `async/await` and `try/catch`
-- Avoid `void` asyncs unless explicitly required
-
----
-
-## 📛 Naming Standards
-
-- `camelCase` → variables and functions
-- `PascalCase` → components and types
-- Prefixes:
-  - `I` → interfaces (`IUser`)
-  - `T` → type aliases (`TSession`)
-  - `E` → enums (`EUserRole`)
-
----
-
-## 🧪 Testing Behavior
-
-- Colocate tests with the modules they cover
-- Use `describe()` and `it()` structure with composable, isolated tests
-- Follow test patterns from `.cursor/rules/05-library.mdc`
-- If skipping coverage, mark with `// TEST COVERAGE OMITTED` and explain
-- Fragile or flaky strategies must be logged in process improvement section
-
----
-
-## 🐛 Bug Prevention
-
-- Tag fragile logic with `// DO NOT MODIFY – dependency sensitive`
-- Simplify complex/nested code and add context comments
-- Avoid known-problematic framework or runtime behaviors
-- Log interop/tooling workarounds in process improvement section
-
----
-
-## 📚 Library Use & Integration
-
-- Abstract third-party logic into `lib/` or dedicated service layers
-- Use only approved libraries listed in the PRD or ticket
-- Follow integration patterns in `.cursor/rules/05-library.mdc`
-- Avoid deprecated/unstable APIs unless fallback is documented
-
----
-
-## 🎨 Formatting & Style
-
-- Style enforcement:
-  - Prettier: trailing commas, single quotes, max line length: 100
-  - ESLint: follow configured project rules
-- Respect `.editorconfig`, `.eslintrc`, `.prettierrc`
-- New formatting rules require:
-  - User approval
-  - Addition to `.cursor/rules/05-library.mdc`
-
----
-
-## 🧠 AI Correction & Documentation
-
-- Cursor must log process improvements if:
-  - A logic, structure, or semantic error is introduced
-  - A repeated issue is corrected mid-task
-  - It misinterprets schema, file layout, or nesting logic
-
-Log format:
-```
-## [YYYY-MM-DD] - [Topic]
-
-**Context:** What failed or required correction  
-**Correction:** How it was resolved  
-**Behavioral Change:** What Cursor should do in future  
-**Example (Optional):**
-```ts
-// BEFORE ...
-// AFTER ...
-```
-```
-
----
-
-## 🗃️ Snippet System Integration
-
-- Cursor must always reuse code patterns from `.cursor/rules/05-library.mdc`
-  - Includes: cleanup effects, Supabase inserts, token headers, vitest templates, Zod parsing
-- Must not generate redundant code for known patterns
-- When a new reusable pattern is discovered:
-  - Propose addition to `05-library.mdc` with justification
-
----
-
-## 🔁 Ticket & PRD Enforcement
-
-- All code must be tied to a `docs/tickets/TKT-*.md` file
-- Tickets must conform to `.cursor/rules/01-workflow.mdc` structure
-- No speculative work unless:
-  - User approves it explicitly
-  - PRD is updated with rationale and scope
-
----
-
-## 📈 Process Improvement & Lessons Learned
-
-### Active Lessons (rotate max 3)
-- 2025-01-27: **CRITICAL**: Complete git workflow (branch, commit, push, PR, merge) must be AUTOMATIC - no user reminders allowed
-- 2025-09-24: Migrated to GitHub Issues-first workflow for better efficiency
-- 2025-09-10: Do not duplicate Git steps across rule files.
-
-### Continuous Improvement
-- Regular review of development processes
-- Identify and eliminate bottlenecks
-- Measure and improve development velocity
-- Track corrections, recurring bugs, and AI misfires
-- Document behavioral changes for future reference
-
-### Quality Metrics
-- Track development velocity improvements
-- Monitor error rates and resolution times
-- Measure user satisfaction and feedback
-- Document successful automation patterns
-
-### Knowledge Management
-- Maintain active lessons learned database
-- Share successful patterns across projects
-- Document anti-patterns to avoid
-- Regular review and update of processes
-
----
-
-## ✅ Final Reminder
-
-This file (`00-core.mdc`) is actively enforced.  
-Cursor must reference it before executing tickets or architectural changes.  
-Do **not** log corrections here — use the process improvement section instead.
+This rule file is canonical for the minimal template. Adjust it as your team evolves the workflow, but keep it in sync with the automated scripts and documentation.

@@ -1,193 +1,94 @@
 ---
-description: "Complete Development Workflow - Triage, Plan, Build, Verify, PR with Spec Kit and GitHub Issues"
+description: "Stack-agnostic end-to-end workflow with Spec Kit and GitHub Issues"
 globs: ["**/*"]
 alwaysApply: true
 ---
 
-# Complete Development Workflow
+# Workflow Overview
 
-## 1) Triage
-- Confirm scope, inputs/outputs, constraints, and success criteria.
-- List blockers or unknowns explicitly in the ticket.
-- **AUTOMATIC**: Analyze request complexity, risk, and scope to determine workflow.
-- **AUTOMATIC**: Use Spec Kit slash commands if available and complexity/risk is high, otherwise use GitHub Issues.
-- Create GitHub Issue with proper labels and acceptance criteria.
+## 1. Triage\n- If this is the first ticket in a new repo, run `npm run bootstrap` to seed Spec Kit templates.\n- Confirm objective, scope, constraints, and success criteria with the requester.
+- Identify unknowns and research needs; capture them in the issue/spec.
+- Create or link the driving GitHub Issue (or Spec Kit task) **before** writing code.
+- Decide whether Spec Kit automation or a lightweight GitHub workflow is appropriate.
 
-### MCP Checkpoint (mandatory when applicable)
-- Research: Built-in web search (current standards), GitHub MCP (patterns), DocFork MCP (official docs).
-- Current state (UI/UX tickets): Playwright MCP quick screenshot/accessibility check.
+### Research & Context Gathering
+- Use DocFork MCP and web search for standards or prior art.
+- Use GitHub MCP to inspect related issues/PRs.
+- Run Playwright MCP for quick UI/accessibility snapshots when visuals are involved.
 
-## 2) Plan
-- **IF Spec Kit available**: Use `/constitution`, `/clarify`, `/plan` slash commands for complex tasks.
-- **IF GitHub Issues workflow**: Draft a mini-plan (3-6 bullets) with risks and selected checks from scripts/verify-all.
-- Choose the smallest viable change; avoid architecture shifts unless ticketed.
+## 2. Plan\n- Execute `npm run new-feature -- --title "<ticket title>"` to scaffold Spec Kit docs before planning.\n- Spec Kit available: run `/specify`, `/clarify`, `/plan`, `/tasks`.
+- GitHub workflow: write a short plan (3�6 bullets) with risks, data/model considerations, and verification strategy.
+- Call out dependencies, rollout steps, and fallback strategies.
 
-## 3) Build
-- **IF Spec Kit available**: Use `/implement` slash command to execute tasks.
-- **IF GitHub Issues workflow**: Make small, reversible commits and include the ticket ID in messages.
-- Modify existing code when possible; keep public APIs stable unless ticketed.
+## 3. Build
+- Work from the plan/tasks; keep changes incremental and reversible.
+- Automate git operations with GitHub MCP or your preferred script.
+- Update documentation, env files, and diagrams when the change affects them.
+- Log any deviations from the plan in the ticket/spec.
 
-### MCP Checkpoint (while building)
-- UI changes: Playwright MCP screenshots and axe checks for impacted screens.
-- DB changes: Supabase MCP schema/logs/advisors validation.
-- Git operations: GitHub MCP for repository management and operations.
+### MCP Checkpoints
+- UI changes ? Playwright MCP (screenshots, axe/Lighthouse).
+- Data changes ? Supabase MCP (schema diff, logs, advisors).
+- Research-heavy tasks ? DocFork MCP summary linked in the ticket.
 
-## 4) Verify
-- **IF Spec Kit available**: Use Spec Kit validation features.
-- **IF GitHub Issues workflow**: Run scripts/verify-all (lint, types, tests, build).
-- Capture artifacts such as logs, screenshots, or CLI output.
-- When tightening auth or API boundaries, validate both the route and each consuming hook or service and record the check you ran.
+## 4. Verify
+- Run `npm run verify` (or `node scripts/verify-all`) to execute all scripted checks that exist.
+- Add manual checks for scenarios not covered by automation; record evidence.
+- If no automated scripts exist yet, outline which checks a future version should include.
 
-### MCP Quality Gates
-- UI/Accessibility/Performance scopes: Playwright MCP Lighthouse/Core Web Vitals + axe report required.
-- Database scopes: Supabase MCP advisors/logs snapshot required.
-- Research scopes: Built-in web search findings summary linked.
+### CI Expectations
+- GitHub Actions (`.github/workflows/ci.yml`) runs the preflight script and best-effort verification.
+- Extend or replace the workflow after your stack is generated so that lint/test/build jobs appear here.
 
-## 5) PR
-- Use the PR template and request only relevant code owners.
-- Link the ticket and include summary, risk note, evidence, and backout plan.
-
-## 6) Ticket Completion (MANDATORY AUTOMATIC WORKFLOW)
-**CRITICAL**: All steps must be completed AUTOMATICALLY before marking ticket as done.
-
-### 6.0 Spec Kit Completion (IF Spec Kit workflow)
-- **AUTOMATIC**: Validate all requirements and scenarios are met
-- **AUTOMATIC**: Update Spec Kit implementation status to completed
-- **AUTOMATIC**: Archive Spec Kit implementation artifacts
-- **AUTOMATIC**: Update specifications if needed
-
-### 6.1 Git Operations (MANDATORY AUTOMATIC - NO EXCEPTIONS)
-**AUTOMATIC EXECUTION REQUIRED** - See `.cursor/rules/02-quality.mdc` for complete git workflow details.
-
-**NO USER REMINDERS ALLOWED** - The complete git workflow must execute automatically.
-
-### 6.2 Ticket Management (GitHub Issues-First)
-- [ ] Update GitHub Issue status to "COMPLETED"
-- [ ] Mark all acceptance criteria as complete in issue
-- [ ] Add completion summary as issue comment
-- [ ] Close GitHub Issue when work is complete
-- [ ] Update `docs/tickets/TICKET_PLAN.md` status (if still using)
-
-### 6.3 Documentation Updates
-- [ ] Update `docs/PRD.md` Change Log with completion entry
-- [ ] Document any new patterns or learnings
-- [ ] Update any affected architecture documentation
-
-### 6.4 Quality Gates (NO BYPASSING)
-- [ ] All pre-commit hooks pass (fix underlying issues, don't use --no-verify)
-- [ ] All pre-push hooks pass (fix underlying issues, don't use --no-verify)
-- [ ] TypeScript compilation successful
-- [ ] Linting passes
-- [ ] Tests pass
-- [ ] Build successful
-
-### 6.5 Process Improvement
-- [ ] Identify any workflow gaps or issues encountered
-- [ ] Propose solutions for process improvements
-- [ ] Update rules if new patterns discovered
-
-**FAILURE TO COMPLETE ANY STEP = TICKET NOT COMPLETE**
+## 5. Close the Loop
+- Update the issue/spec with summary, validation results, and follow-up tasks.
+- Ensure GitHub Issue status and labels reflect completion.
+- Merge via PR with risk note, backout plan, and evidence.
+- Capture lessons learned in the process improvement rule if applicable.
 
 ---
 
-# GitHub Issues-First Workflow
+# Ticket Template (Lightweight)
+```
+## Goal
+What outcome are we aiming for?
 
-## New Workflow: GitHub Issues-First
-- **Create**: Issues directly in GitHub with proper labels and structure
-- **Track**: Use GitHub Issues for all ticket management
-- **Complete**: Close issues when work is done with proper documentation
-- **Link**: PRs automatically reference issues for tracking
+## Plan
+- Step 1
+- Step 2
+- Step 3
 
-## Required Fields (GitHub Issue)
-- **Title**: Clear, descriptive title with ticket ID
-- **Body**: Objective, scope, acceptance criteria, priority, assignee
-- **Labels**: Priority, type, component, status
-- **Assignee**: Team member responsible
+## Risks & Unknowns
+- Item 1
 
-## Rules
-- No work before GitHub Issue **creation**.
-- One issue per PR (or clearly stated grouped subtasks).
-- Close GitHub Issue only after **evidence** meets acceptance criteria.
-- Link PR ↔ GitHub Issue; update issue with progress comments.
-- Use GitHub MCP for all issue management operations.
+## Validation
+- Automated: ...
+- Manual: ...
 
-## Legacy Support
-- Local ticket files in `docs/tickets/` are now **archived**
-- Old sync system moved to `docs/archived/sync-system/`
-- GitHub Issues are now the **single source of truth**
-
-## GitHub Issue Template
-```markdown
-## 🎯 Goal
-[Brief description of what needs to be accomplished]
-
-## 🧩 Background
-[Context and rationale for this issue]
-
-## 📋 Tasks
-- [ ] Task 1
-- [ ] Task 2
-- [ ] Task 3
-
-## 🧪 Acceptance Criteria
-- [ ] Technical criteria met
-- [ ] Tests updated
-- [ ] Docs updated
-- [ ] No regressions introduced
-
-## 🔗 Related
-- PRD section: `docs/PRD.md#section`
-- Related issues: #123, #456
-- Design: Figma, Loom, etc.
-
-## 🧾 Notes
-[Additional context, blockers, or considerations]
+## Follow-up
+- [ ] TODO with owner
 ```
 
-## Issue Labels
-- **Priority**: `priority:high`, `priority:medium`, `priority:low`
-- **Type**: `type:feature`, `type:bug`, `type:chore`, `type:docs`
-- **Component**: `component:frontend`, `component:backend`, `component:infra`
-- **Status**: `status:open`, `status:in-progress`, `status:review`, `status:done`
+---
 
-## Workflow Integration
-- Issues automatically linked to PRs
-- PR status updates issue progress
-- Issue closure triggers documentation updates
-- Issue completion updates project status
+# Automation Hooks
+
+- Add stack-specific commands to `package.json` once the project is generated.
+- Extend `scripts/verify-all` with custom detection logic if needed.
+- Update `.github/workflows/ci.yml` to run the right jobs (pnpm, npm, cargo, etc.).
+- Keep `.cursor/mcp.json` in sync with the tools you rely on; remove unused servers to reduce noise.
 
 ---
 
-# Spec Kit Integration
+# Exception Handling
 
-## When to Use Spec Kit
+When automation is unavailable or partially configured:
+1. Document the gap in the issue/spec.
+2. Provide manual steps for verification.
+3. Create a follow-up task to automate or script it later.
 
-**Use Spec Kit slash commands for:**
-- Complex features affecting multiple components
-- Breaking changes or API modifications
-- Architecture decisions
-- Multi-step implementations with dependencies
-- When user explicitly requests Spec Kit usage
+---
 
-**Use GitHub Issues workflow for:**
-- Simple bug fixes (single file, <50 lines)
-- Typo corrections or formatting
-- Documentation-only changes
-- Test additions for existing functionality
-- Dependency updates without behavior changes
+# Done Means Done
 
-## Spec Kit Workflow
-
-1. **Start with `/constitution`** - Establish project principles
-2. **Use `/specify`** - Define what to build
-3. **Use `/clarify`** - Clarify any underspecified areas
-4. **Use `/plan`** - Create technical implementation plan
-5. **Use `/tasks`** - Generate actionable task list
-6. **Use `/implement`** - Execute the implementation
-
-## Integration with Existing Workflow
-
-- Spec Kit enhances existing GitHub Issues workflow
-- All existing git automation continues to work
-- MCP integrations remain functional
-- Quality gates are maintained
+A ticket is complete when the plan is executed, code/tests/docs merged, issues closed, and follow-up tasks logged. Anything less is �in progress.�

@@ -1,3 +1,5 @@
+_Template placeholder. Replace or remove once your project defines this content._
+
 # MCP Setup Guide
 
 ## Overview

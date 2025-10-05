@@ -1,3 +1,5 @@
+_Template placeholder. Replace or remove once your project defines this content._
+
 # Security Policy
 
 ## Environment Variables

@@ -63,6 +63,61 @@ if (-not (Test-FeatureBranch -Branch $paths.CURRENT_BRANCH -HasGit:$paths.HAS_GI
     exit 1 
 }
 
+# Run global pre-flight checks once before returning early in paths-only mode
+$preflightErrors = @()
+$repoRoot = $paths.REPO_ROOT
+
+# 1. Verify Spec Kit installation structure exists
+$specKitRoot = Join-Path $repoRoot '.specify'
+if (-not (Test-Path $specKitRoot -PathType Container)) {
+    $preflightErrors += "Spec Kit directory not found. Run /specify setup before continuing."
+}
+
+# 2. Verify Cursor rules reference Spec Kit workflow
+$workflowRule = Join-Path $repoRoot '.cursor/rules/01-workflow.mdc'
+if (-not (Test-Path $workflowRule -PathType Leaf)) {
+    $preflightErrors += "Workflow rule file missing (.cursor/rules/01-workflow.mdc)."
+}
+
+# 3. Validate MCP configuration contains required servers and no inline secrets
+$mcpConfigPath = Join-Path $repoRoot '.cursor/mcp.json'
+$requiredServers = @('github','supabase','playwright','docfork','desktop-commander')
+
+if (-not (Test-Path $mcpConfigPath -PathType Leaf)) {
+    $preflightErrors += "MCP configuration missing (.cursor/mcp.json)."
+} else {
+    try {
+        $mcpJson = Get-Content -Path $mcpConfigPath -Raw | ConvertFrom-Json
+        $servers = $mcpJson.mcpServers
+        foreach ($name in $requiredServers) {
+            if (-not $servers.PSObject.Properties.Name.Contains($name)) {
+                $preflightErrors += "MCP server '$name' not configured."
+            }
+        }
+
+        foreach ($property in $servers.PSObject.Properties) {
+            $envConfig = $property.Value.env
+            if ($envConfig) {
+                foreach ($envVar in $envConfig.PSObject.Properties) {
+                    $value = [string]$envVar.Value
+                    if ($value -and ($value -notmatch '\$\{inputs\.') -and ($value -notmatch '\$\{env\.') ) {
+                        $preflightErrors += "Environment variable '$($envVar.Name)' for MCP server '$($property.Name)' contains inline value. Use inputs or external env vars instead."
+                    }
+                }
+            }
+        }
+    } catch {
+        $preflightErrors += "Unable to parse .cursor/mcp.json: $($_.Exception.Message)"
+    }
+}
+
+if ($preflightErrors.Count -gt 0 -and -not $PathsOnly) {
+    foreach ($message in $preflightErrors) {
+        Write-Output "ERROR: $message"
+    }
+    exit 1
+}
+
 # If paths-only mode, output paths and exit (support combined -Json -PathsOnly)
 if ($PathsOnly) {
     if ($Json) {
@@ -86,19 +141,31 @@ if ($PathsOnly) {
 }
 
 # Validate required directories and files
-if (-not (Test-Path $paths.FEATURE_DIR -PathType Container)) {
-    Write-Output "ERROR: Feature directory not found: $($paths.FEATURE_DIR)"
-    Write-Output "Run /specify first to create the feature structure."
-    exit 1
-}
+$featureExists = Test-Path $paths.FEATURE_DIR -PathType Container
+$onFeatureBranch = $paths.CURRENT_BRANCH -match '^[0-9]{3}-'
 
-if (-not (Test-Path $paths.IMPL_PLAN -PathType Leaf)) {
-    Write-Output "ERROR: plan.md not found in $($paths.FEATURE_DIR)"
-    Write-Output "Run /plan first to create the implementation plan."
-    exit 1
+if (-not $featureExists) {
+    if ($onFeatureBranch) {
+        Write-Output "ERROR: Feature directory not found: $($paths.FEATURE_DIR)"
+        Write-Output "Run /specify first to create the feature structure."
+        exit 1
+    }
+
+    Write-Output "INFO: No Spec Kit feature directory found yet."
+} else {
+    if (-not (Test-Path $paths.IMPL_PLAN -PathType Leaf)) {
+        Write-Output "ERROR: plan.md not found in $($paths.FEATURE_DIR)"
+        Write-Output "Run /plan first to create the implementation plan."
+        exit 1
+    }
 }
 
 # Check for tasks.md if required
+if ($RequireTasks -and $onFeatureBranch -and -not (Test-Path $paths.TASKS -PathType Leaf)) {
+    Write-Output "ERROR: tasks.md not found in $($paths.FEATURE_DIR)"
+    Write-Output "Run /tasks first to create the task list."
+    exit 1
+}
 if ($RequireTasks -and -not (Test-Path $paths.TASKS -PathType Leaf)) {
     Write-Output "ERROR: tasks.md not found in $($paths.FEATURE_DIR)"
     Write-Output "Run /tasks first to create the task list."
