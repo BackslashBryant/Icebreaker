@@ -1,94 +1,50 @@
 ---
-description: "Stack-agnostic end-to-end workflow with Spec Kit and GitHub Issues"
+description: "Vibe-first workflow"
 globs: ["**/*"]
 alwaysApply: true
 ---
 
-# Workflow Overview
+# Vibe Workflow Overview
 
-## 1. Triage\n- If this is the first ticket in a new repo, run `npm run bootstrap` to seed Spec Kit templates.\n- Confirm objective, scope, constraints, and success criteria with the requester.
-- Identify unknowns and research needs; capture them in the issue/spec.
-- Create or link the driving GitHub Issue (or Spec Kit task) **before** writing code.
-- Decide whether Spec Kit automation or a lightweight GitHub workflow is appropriate.
+## 0. Anchor to GitHub
+- Every session starts from a GitHub Issue. If one does not exist, create it (or ask the user to describe the vision so Cursor can open one).
+- Record the issue URL/ID in the Plan Mode prompt, saved plan filename, and vibe logs (tag entries with the issue ID using the supplied `scripts/vibe-session` helper or equivalent).
+- Keep branches issue-scoped (`1234-short-slug`) and reference the issue in commits/PRs so GitHub stays the system of record.
 
-### Research & Context Gathering
-- Use DocFork MCP and web search for standards or prior art.
-- Use GitHub MCP to inspect related issues/PRs.
-- Run Playwright MCP for quick UI/accessibility snapshots when visuals are involved.
+## 1. Align
+- Declare goal, polish level, and known constraints in chat.
+- Load or create a Plan Mode plan before touching files.
+- Drop supporting context in `.notes/` if the session spans more than a few edits.
+- When the stack is established or changes materially, run the **Stack Integration** plan template (`.cursor/plans/templates/stack-integration.md`) and execute `node tools/stack-wire.mjs --inspect/--apply` so lint/test/build scripts and CI stay in sync.
 
-## 2. Plan\n- Execute `npm run new-feature -- --title "<ticket title>"` to scaffold Spec Kit docs before planning.\n- Spec Kit available: run `/specify`, `/clarify`, `/plan`, `/tasks`.
-- GitHub workflow: write a short plan (3–6 bullets) with risks, data/model considerations, and verification strategy.
-- Call out dependencies, rollout steps, and fallback strategies.
+## 2. Plan & Queue
+- Let Agent ask clarifying questions; answer quickly.
+- Save plan to `.cursor/plans/` if it will survive the session.
+- Queue follow-up prompts with **Ctrl+Enter** so instructions keep flowing while Agent works.
+- Include an "MCP audit" step whenever the stack shifts: run `node tools/mcp-audit.mjs`, paste the report into the GitHub issue, and verify matching MCP servers are enabled/disabled accordingly.
 
 ## 3. Build
-- Work from the plan/tasks; keep changes incremental and reversible.
-- Automate git operations with GitHub MCP or your preferred script.
-- Update documentation, env files, and diagrams when the change affects them.
-- Log any deviations from the plan in the ticket/spec.
+- **MCP-FIRST MANDATORY**: Before any git operations (commit, push, branch, PR), check MCP triggers in 04-integrations.mdc
+- **Git Operations**: Use GitHub MCP for all git operations (commit, push, branch, PR) - terminal commands are fallback only
+- Operate in vibe mode by default: small reversible chunks, narrate decisions.
+- Reference docs or targeted rules manually (e.g. `@docs/library/library-reference.md`) when depth is required.
+- Stop Agent when things go off track and restate intent instead of letting it spiral.
 
-### MCP Checkpoints
-- UI changes ? Playwright MCP (screenshots, axe/Lighthouse).
-- Data changes ? Supabase MCP (schema diff, logs, advisors).
-- Research-heavy tasks ? DocFork MCP summary linked in the ticket.
-
-## 4. Verify
-- Run `npm run verify` (or `node scripts/verify-all`) to execute all scripted checks that exist.
-- Add manual checks for scenarios not covered by automation; record evidence.
-- If no automated scripts exist yet, outline which checks a future version should include.
-
-### CI Expectations
-- GitHub Actions (`.github/workflows/ci.yml`) runs the preflight script and best-effort verification.
-- Extend or replace the workflow after your stack is generated so that lint/test/build jobs appear here.
+## 4. Validate
+- Run the repo's verification helper (`scripts/verify-all` via your preferred package runner) for fast assurance; escalate to stack-specific scripts when shipping.
+- Capture console output or screenshots in `artifacts/` for wins and regressions.
+- Respect YOLO guardrails: allow the agent to run lint/test/build, but always review diffs.
 
 ## 5. Close the Loop
-- Update the issue/spec with summary, validation results, and follow-up tasks.
-- Ensure GitHub Issue status and labels reflect completion.
-- Merge via PR with risk note, backout plan, and evidence.
-- Capture lessons learned in the process improvement rule if applicable.
+- Update the plan/TODOs with what happened and what's next.
+- Queue a final message if someone will pick up later.
+- Log discoveries via the vibe logging helper (pass `--note "..."`) and add lessons to `.cursor/rules/07-process-improvement.mdc`.
+- If the MCP audit surfaced changes (e.g. new database/server/testing needs), open or update a GitHub Issue to track adding/removing the relevant MCP entries in `.cursor/mcp.json`, and note the recommendation in the final summary.
 
----
+## Optional Structured Mode
+When you need formal specs or compliance artefacts, run the Spec Kit bootstrap helper (`tools/bootstrap-spec-kit.mjs` via Node/uv/your runtime), enable Spec Kit commands, and reintroduce heavier verification. Until then, keep the vibe light.
 
-# Ticket Template (Lightweight)
-```
-## Goal
-What outcome are we aiming for?
-
-## Plan
-- Step 1
-- Step 2
-- Step 3
-
-## Risks & Unknowns
-- Item 1
-
-## Validation
-- Automated: ...
-- Manual: ...
-
-## Follow-up
-- [ ] TODO with owner
-```
-
----
-
-# Automation Hooks
-
-- Add stack-specific commands to `package.json` once the project is generated.
-- Extend `scripts/verify-all` with custom detection logic if needed.
-- Update `.github/workflows/ci.yml` to run the right jobs (pnpm, npm, cargo, etc.).
-- Keep `.cursor/mcp.json` in sync with the tools you rely on; remove unused servers to reduce noise.
-
----
-
-# Exception Handling
-
-When automation is unavailable or partially configured:
-1. Document the gap in the issue/spec.
-2. Provide manual steps for verification.
-3. Create a follow-up task to automate or script it later.
-
----
-
-# Done Means Done
-
-A ticket is complete when the plan is executed, code/tests/docs merged, issues closed, and follow-up tasks logged. Anything less is “in progress.”
+## New Project Safeguard
+- Clone this template but immediately add the real remote (e.g. `git remote set-url origin git@github.com:you/new-repo.git`) or push to a fork. Never ship work against the template origin.
+- Capture the target repo in the first GitHub Issue/plan so Cursor knows where PRs should land.
+- After cloning, review `.cursor/mcp.json` and disable unused defaults. During planning, recommend enabling or adding MCPs that match the chosen stack (e.g. database MCP when a DB is introduced, UI test MCP for frontend-heavy work).

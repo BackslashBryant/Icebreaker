@@ -1,0 +1,21 @@
+---
+description: "Process improvements & lessons"
+globs: ["**/*"]
+alwaysApply: false
+---
+
+# Lessons Learned
+
+Use `scripts/lessons-log` to append new entries here. Keep them concise, describe the trigger, the lesson, and the rule/update that resulted.
+
+## 2024-12-19: MCP-First Git Operations
+
+**Trigger**: User requested git push, agent used terminal commands instead of GitHub MCP
+**Lesson**: The rules clearly state that git operations should use GitHub MCP first (line 36 in 04-integrations.mdc: "git", "commit", "push", "branch", "pr", "pull request" → GitHub MCP)
+**Root Cause**: Agent didn't check MCP triggers before falling back to terminal commands
+**Rule Update**: Add explicit MCP-first check in workflow rules
+
+**Action Required**: 
+- Update workflow rules to include MCP trigger check as mandatory first step
+- Add explicit "MCP-first" decision tree in git operations
+- Ensure agent checks MCP availability before terminal fallback

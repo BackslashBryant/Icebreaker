@@ -33,7 +33,16 @@ alwaysApply: true
 - "performance" → Playwright MCP (Lighthouse/Core Web Vitals), Built-in web search (latest guidance)
 - "security", "vulnerability" → Built-in web search (advisories), GitHub MCP (repo advisories)
 - "terminal", "command", "file operation", "process", "system control" → Desktop Commander MCP
-- "git", "commit", "push", "branch", "pr", "pull request" → GitHub MCP
+- **"git", "commit", "push", "branch", "pr", "pull request" → GitHub MCP (MANDATORY FIRST CHOICE)**
+
+## MCP-First Decision Tree
+**BEFORE using terminal commands, check this list:**
+1. **Git Operations**: If user mentions git, commit, push, branch, PR → Use GitHub MCP first
+2. **UI Operations**: If user mentions UI, screenshot, accessibility → Use Playwright MCP first  
+3. **Database Operations**: If user mentions db, schema, SQL → Use Supabase MCP first
+4. **System Operations**: If user mentions terminal, file operations → Use Desktop Commander MCP first
+5. **Research**: If user mentions research, docs → Use DocFork MCP first
+6. **Fallback**: Only use terminal commands if MCP is unavailable or fails
 
 ## Phase Checkpoints (MCP-first)
 - **Triage/Plan:**
