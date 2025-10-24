@@ -1,5 +1,5 @@
 ---
-description: "Quality practices, verification, security, and git hygiene"
+description: "Quality gates and verification"
 globs: ["**/*"]
 alwaysApply: true
 ---
@@ -7,9 +7,9 @@ alwaysApply: true
 # Verification & Quality Gates
 
 ## Automated Checks
-- Prefer scripted checks whenever possible; expose them via `npm run` so `scripts/verify-all` can discover them.
+- Prefer scripted checks whenever possible; expose them via the repository's package runner (npm/pnpm/yarn/uv/etc.) so `scripts/verify-all` can discover and execute them.
 - Keep validations fast and deterministic so they can run locally and in CI.
-- When adding a new stack, update `scripts/verify-all` or your package scripts to include lint, test, build, type, and audit steps.
+- When adding a new stack, update `scripts/verify-all` or your package scripts to include lint, test, build, type, and audit steps appropriate to that stack.
 
 ## Manual Validation
 - Document any manual verification performed (UI walkthroughs, API calls, accessibility checks).
@@ -17,8 +17,8 @@ alwaysApply: true
 - Note residual risk or missing coverage so it can be automated later.
 
 ## CI Expectations
-- `Template CI` currently runs the preflight check and best-effort verification.
-- Extend the workflow once your stack is generated (e.g., add matrix jobs for frontend/backend services).
+- `Template CI` currently runs the preflight check and best-effort verification helper.
+- Extend the workflow once your stack is generated (e.g., add matrix jobs for frontend/backend services) and hook in any new verification commands you introduced.
 
 ---
 
@@ -41,6 +41,7 @@ alwaysApply: true
 - Keep commits scoped and reference the issue ID in the message.
 - Use GitHub MCP or your automation scripts to create branches, commits, PRs, and merges.
 - Merge cleanly (squash/rebase) after quality gates are green and the ticket is updated.
+- Install the provided git hook (`scripts/git-hooks/install`) so `.cursor/` changes never leave your machine unless you intentionally set `ALLOW_CURSOR_PUSH=1`.
 
 ---
 
@@ -55,13 +56,28 @@ Document the MCP run outputs or link to transcripts so reviewers can see what wa
 
 ---
 
+# Agent Review & Diffs
+
+- Run Cursor's **Agent Review** on every PR before handing it to humans; let it scan the diff for regressions, insecure code, or missing tests.
+- Use @symbols (`@file-tree`, `@Cursor Rules`, specific filenames) to keep the agent's context precise and under token limits.
+- For large/legacy codebases, break work into phases (structure/test scaffolds first, logic second) so Agent Review focuses on manageable diffs.
+- Prefer using the Agent CLI/headless agents for long-running refactors or CI hooks; log their output in the issue.
+
+---
+
+# Lessons Learned & Rule Updates
+- Treat every bug, regression, or avoided incident as an opportunity to harden the rules.
+- Append actionable notes to `.cursor/rules/07-process-improvement.mdc`; when a theme recurs, evolve or add a rule file so the fix becomes default behavior.
+- Reference evidence (logs, PRs, incidents) when writing lessons so future agents understand the context.
+
 # Quality Checklist
 
-- [ ] Preflight succeeded (`npm run preflight`).
+- [ ] Preflight succeeded (run `tools/preflight.mjs` via your runtime of choice).
 - [ ] Plan/tasks executed (Spec Kit or manual plan).
-- [ ] Automated checks run (`npm run verify` or equivalent).
+- [ ] Automated checks run (`scripts/verify-all` or stack-specific equivalents).
 - [ ] Manual checks (if any) recorded with evidence.
-- [ ] Issue/Spec updated with outcome, risk, and follow-ups.
+- [ ] Issue/Spec updated with outcome, risk, follow-ups, and MCP recommendations.
 - [ ] Git branch merged and cleaned up.
+- [ ] Lessons learned documented and, if necessary, rules updated to prevent recurrence.
 
 Anything left unchecked should be captured as follow-up work.

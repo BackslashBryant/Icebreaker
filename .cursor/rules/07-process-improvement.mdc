@@ -1,5 +1,5 @@
 ---
-description: "Process improvements & lessons"
+description: "Process improvements"
 globs: ["**/*"]
 alwaysApply: false
 ---

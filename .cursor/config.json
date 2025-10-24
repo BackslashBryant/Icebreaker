@@ -1,15 +1,24 @@
 {
-  "$schema": "https://cursor.sh/config.schema.json",
-  "load": {
-    "preloadFiles": [
-      ".cursor/rules/*.mdc",
-      ".cursor/library/*.md"
-    ],
-    "baseRuleFile": ".cursor/rules/00-core.mdc"
+  "rules": [
+    ".cursor/rules/00-core.mdc",
+    ".cursor/rules/01-workflow.mdc",
+    ".cursor/rules/02-quality.mdc",
+    ".cursor/rules/04-integrations.mdc",
+    ".cursor/rules/05-library.mdc",
+    ".cursor/rules/07-process-improvement.mdc"
+  ],
+  "plans": {
+    "directory": ".cursor/plans",
+    "templates": ".cursor/plans/templates"
   },
-  "rules": {
-    "autoUpdateLessonsLearned": true,
-    "lessonsLearnedFile": ".cursor/rules/07-process-improvement.mdc"
+  "mcp": {
+    "enabled": true,
+    "servers": [
+      "github",
+      "supabase",
+      "playwright",
+      "desktop-commander",
+      "docfork"
+    ]
   }
 }
-

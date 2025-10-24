@@ -1,80 +1,34 @@
 ---
-description: "Core principles for the stack-agnostic Cursor workspace"
+description: "Core development principles"
 globs: ["**/*"]
 alwaysApply: true
 ---
 
-# Core Principles
+# Cursor Vibe Operating Agreement
 
-## Working Agreement
-- Start every change from an approved GitHub Issue (or Spec Kit ticket).
-- Align on scope, success criteria, and unknowns before modifying code.
-- Prefer the smallest, reversible change that satisfies the ticket.
-- Keep communication async-friendly: document decisions and open questions.
+## Flow > Friction
+- Start each session by checking intention: prototype, polish, or ship. Narrate it so Agent matches your energy.
+- Prefer Plan Mode (Shift+Tab) for anything beyond a single edit. Let Agent draft the plan, tweak it, then build.
+- Keep prompts conversational. Voice input, queued messages (Ctrl+Enter), and saved plans are all welcome.
 
-## Preflight & Planning\n- Run `npm run bootstrap` once per repo to ensure Spec Kit templates exist.\n- Run `npm run new-feature -- --title "..."` when kicking off a fresh ticket to generate spec/plan/tasks.\n- Run `npm run preflight` (or the platform script directly) before beginning work.
-- Use Spec Kit slash commands when available for research, specification, and planning.
-- When Spec Kit is not installed, outline a lightweight plan (3–6 bullets) with risks/assumptions.
-- Record any blockers or dependencies in the issue before proceeding.
+## Safety Rails We Keep Even When Vibing
+- Never ship code you have not read; sanity-check diffs and run the quickest meaningful verification.
+- Flag real secrets, prod data, or compliance-sensitive areas before asking Agent to touch them.
+- Document gotchas in `.notes/` or the active plan so the next session inherits your context.
 
-## Implementation Guardrails
-- Reuse existing patterns; extend only when justified by the ticket.
-- Coordinate breaking changes with affected owners before implementation.
-- Avoid speculative work or background tasks without product approval.
-- Keep hard-coded secrets and credentials out of the repository.
+## Collaboration Rituals
+- Reference `AGENTS.md` for tone, preferred stack choices, and review expectations.
+- Mention focused rules (e.g. `@rules/testing`) or docs on demand instead of loading the entire library.
+- Celebrate experiments: log wins/misses with the vibe logging helper (`scripts/vibe-session` via your preferred runner) so artifacts capture the session.
+- Only push application/source changes by default. Keep `.cursor/` modifications local unless there is an explicit template/rule update request (use the git hook safeguard + `ALLOW_CURSOR_PUSH=1` override when necessary).
 
-## Verification Expectations
-- Use `node scripts/verify-all` to discover runnable checks and execute them.
-- If the generated project defines lint/test/build scripts, ensure they pass locally and in CI.
-- Capture relevant artefacts (logs, screenshots, CLI output) for any manual or UI validation.
-- Document gaps in coverage or automation as follow-up issues.
+## Exit Checklist
+- Plans or TODOs updated, even if you bail mid-flight.
+- Verification helper (`scripts/verify-all` via your preferred runner) invoked and results shared.
+- Queue final instructions for Agent if someone is continuing the flow.
 
-## Spec Kit Integration
-- `/constitution`, `/specify`, `/clarify`, `/plan`, `/tasks`, `/implement` remain the default workflow for complex or multi-component work.
-- When Spec Kit is unavailable, rely on GitHub Issues and the minimal plan outlined above.
-- Close the feedback loop by updating specs/docs with reality after implementation.
-
-## Documentation & Knowledge
-- Treat `docs/` as living documentation. Add or refresh content when work produces durable knowledge.
-- When you create project-specific guides (PRD, status, runbooks), link them from the issue or Spec Kit artefacts.
-- Track lessons learned in `.cursor/rules/07-process-improvement.mdc` when recurring issues are discovered.
-
-## Completion Checklist
-- Issue/Spec artifacts updated to reflect the delivered work.
-- Tests/verifications run and reported.
-- Risk/backout note captured on the PR or completion message.
-- Follow-up items (if any) logged as new issues or TODOs with owners.
-
----
-
-# Automation Expectations
-
-## MCP Usage
-- Configure GitHub, DocFork, Supabase, Playwright, and Desktop Commander MCP servers via `.cursor/mcp.json` or environment configuration.
-- Use MCP tools for repository operations, research, database inspection, accessibility/performance checks, and documentation retrieval whenever available.
-- Document any gaps in automation support so they can be addressed in future template updates.
-
-## Git Workflow
-- Create a feature branch (`issue-id/slug` or similar) per ticket.
-- Keep commits scoped and reference the driving issue.
-- Push, open PRs, and update issue status automatically via MCP or scripted automation when possible.
-- Merge with a clean history (squash or rebase) once quality gates pass.
-
-## Preflight Failures
-- Treat missing MCP configuration, Spec Kit setup, or verification scripts as blockers.
-- Either resolve the environment gap or document the exception in the ticket before continuing.
-
----
-
-# Collaboration Notes
-
-- Summaries should include: what changed, why, how it was validated, and any next actions.
-- Ask for clarification early; capture answers in the issue/spec so future contributors benefit.
-- When deferring work, clearly mark TODOs with owner or follow-up issue reference.
-- Respect teammate timezones—leave enough context for others to pick up seamlessly.
-
----
-
-# Final Reminder
-
-This rule file is canonical for the minimal template. Adjust it as your team evolves the workflow, but keep it in sync with the automated scripts and documentation.
+## Credibility Over Hype
+- Be precise about what succeeded, what failed, and where confidence is low; do not exaggerate accomplishments or gloss over blockers.
+- Cite evidence (test output, screenshots, logs) when claiming results.
+- When something breaks, document it honestly, propose next steps, and update `.cursor/rules/07-process-improvement.mdc` or other rules so the lesson persists.
+- Curate Cursor memories deliberately: propose only reusable insights (architecture, naming), never secrets/PII, and decline noisy suggestions.
