@@ -1,43 +1,232 @@
 # Cursor Workspace Template
 
-A stack-agnostic starting point for Cursor projects. It focuses on workflow automation (Spec Kit + MCP), lightweight preflight checks, and leaves the actual application stack for you or the agent to generate.
+A stack-agnostic starting point for Cursor projects. It focuses on workflow automation using Cursor Agents + MCP, lightweight verification helpers, and leaves the actual application stack for you or the agent to generate.
 
-## What you get
+## Quick Start
 
-- **Spec Kit ready**: `/constitution`, `/specify`, `/clarify`, `/plan`, `/tasks`, `/implement` are expected to drive complex work.
-- **MCP scaffolding**: `.cursor/mcp.json` includes placeholders for GitHub, Supabase, Playwright, DocFork, and Desktop Commander serversï¿½configure them with environment variables or prompt inputs.
-- **Preflight check**: `npm run preflight` calls the platform script (`.specify/scripts/.../check-prerequisites`) to ensure Spec Kit + MCP tooling is wired in before you start coding.
-- **Verify helper**: `scripts/verify-all` discovers whatever `npm run` scripts your generated project exposes and runs them sequentially or in parallel.
-- **Examples folder**: `examples/automation/` stores optional git/security helpers you can copy into a real project once you decide on tooling.
+**Get started in 3 steps:**
 
-## Typical workflow
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd cursor-template-project
+   ```
 
-1. Clone this repo and configure `.cursor/mcp.json` (use inputs or env vars for secrets).
-2. Run `/constitution` and `/specify` inside Cursor to define your new project.
-3. Execute `npm run preflight` to confirm Spec Kit + MCP setup is complete.
-4. Let Cursor generate the stack (frontend, backend, CLI, etc.) based on the spec.
-5. Wire your stackï¿½s lint/test/build commands into `package.json` so `npm run verify` works.
-6. Extend `.github/workflows/ci.yml` with jobs that match your stack.
+2. **Install dependencies (auto-setup)**
+   ```bash
+   npm install
+   ```
+   Postinstall runs your personal bootstrap (one-time token cache) and then `npm run setup` for you.
 
-## Customising
+3. **Start coding**
+   - Configure Cursor IDE: `npm run setup:cursor`
+   - Install extensions: `npm run setup:extensions`
+   - Create agents: `npm run setup:agents`
+   - Verify: `npm run status`
 
-- **Docs**: Everything under `docs/` is a templateï¿½replace or delete once you create project-specific content.
-- **Automation**: Copy anything useful from `examples/automation/` into your project and update the rules/workflows accordingly.
-- **Rules**: Update `.cursor/rules/*.mdc` to reflect your teamï¿½s conventions, but keep them consistent with the automation.
-- **CI**: The default workflow only runs the preflight + verify helper. Expand it when you know which tools to run.
+**See QUICKSTART.md for the complete quick start guide.**
 
-## Commands
+A default "Bootstrap Web Health MVP" feature is generated on first install. Run `npm run feature:new` to replace it with your own spec.
+
+---
+
+## What You Get
+
+- ? **Automated Setup**: One-command setup wizard (`npm run setup`)
+- ? **Health Dashboard**: Comprehensive status checker (`npm run status`)
+- ? **MCP Scaffolding**: Pre-configured GitHub, Supabase, Playwright, DocFork, and Desktop Commander servers
+- ? **Agent Workflow**: 11 specialized agents with sequential workflow
+- ? **Preflight Guards**: Automated checks before work starts
+- ? **GitHub Integration**: Issue templates, PR templates, label sync, and workflow automation
+- ? **Verification Helpers**: Stack-agnostic verification scripts
+- ? **Documentation**: Comprehensive guides for setup, agents, and workflows
+
+---
+
+## Setup Commands
+
+### One-Command Setup (Recommended)
 
 ```bash
-npm run preflight   # ensures Spec Kit + MCP wiring is healthy
-npm run verify      # runs scripts/verify-all (adapts to whatever your project exposes)
+npm run setup
 ```
 
-## Next steps after scaffolding
+Interactive wizard that handles:
+- Prerequisites checking
+- Token setup
+- MCP configuration
+- Preflight validation
+- Guide generation
 
-- Install dependencies for the stack Cursor generates.
-- Keep secrets in environment variables or secret managers.
-- Document lessons learned in `.cursor/rules/07-process-improvement.mdc`.
-- Use MCP automation (GitHub, Playwright, DocFork, Supabase) to stay issue-first and auditable.
+### Individual Setup Steps
 
-Happy building!
+```bash
+npm run status             # Check setup status
+npm run setup:tokens       # GitHub token wizard
+npm run setup:agents       # Generate agent creation guide
+npm run setup:extensions   # View extension installation guide
+npm run setup:cursor       # Generate Cursor settings guide
+npm run detect            # Detect project type and suggest MCPs/agents
+npm run personal:bootstrap # Store GitHub token + preferences locally
+npm run feature:new        # Bootstrap a new MVP spec/plan
+npm run preset:webapp      # Re-seed the default health-check MVP
+```
+
+`npm run personal:bootstrap` safely stores your GitHub token and preferences in `~/.cursor-personal/config.json`, letting postinstall automate everything.
+
+`npm run feature:new` creates `.notes/features/<slug>/spec.md`, rewrites `docs/Plan.md`, and resets progress for the next feature.
+
+Set `CURSOR_AUTO_SETUP=false npm run setup` if you prefer to walk through the wizard manually.
+---
+
+## Workflow Commands
+
+```bash
+npm run preflight          # Validate workspace scaffolding
+npm run verify             # Run verification suite (lint/test/build)
+npm run mcp:suggest        # Suggest MCP servers based on dependencies
+npm run agents:prompt      # Print agent prompts
+npm run github:labels      # Sync GitHub labels
+npm run github:issue       # Create GitHub issues from templates
+```
+
+---
+
+## Advanced Configuration
+
+### Manual Cursor IDE Setup
+
+If you prefer manual configuration, see `docs/cursor/SETTINGS_GUIDE.md` (generated via `npm run setup:cursor`):
+
+1. **Enable Cursor Tab**: Settings ? Features ? Enable "Cursor Tab"
+2. **Configure Indexing**: Settings ? Indexing ? Enable "Index New Files by Default" and "Git Graph Relationships"
+3. **Enable Agent Mode**: Settings ? Chat ? Enable Agent Mode features
+4. **Set Up MCP Servers**: Configure `.cursor/mcp.json` with your tokens
+
+### Manual Agent Creation
+
+See `docs/agents/CREATE_AGENTS.md` (generated via `npm run setup:agents`) for step-by-step instructions.
+
+### Manual Extension Installation
+
+See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
+
+---
+
+## Solo MVP Loop
+
+- Read `docs/process/MVP_LOOP.md` for the full solo workflow.
+- Use the GitHub issue templates in `.github/ISSUE_TEMPLATE` (**0 - Spec**, **1 - Plan**, **2 - Build**).
+- Active feature state lives in `.notes/features/current.json` and the spec/plan inside `.notes/features/<slug>/`.
+- `npm run feature:new` archives the previous feature, scaffolds a new spec + progress log, and rewrites `docs/Plan.md`.
+- Agents stop once the MVP DoD checklist in the spec is GREEN; log stretch work as a new spec.
+
+## Documentation
+
+### Getting Started
+
+- `QUICKSTART.md` - 3-step quick start guide
+- `docs/FIRST_RUN.md` - Detailed first-time setup walkthrough
+- `docs/agents/KICKOFF.md` - How to start your first feature
+
+### Guides
+
+- `docs/agents/README.md` - Agent roster and workflow
+- `docs/agents/SETUP.md` - Agent setup reference
+- `docs/cursor/SETTINGS_GUIDE.md` - Cursor IDE configuration (generated)
+- `docs/cursor/extensions.md` - Extension installation
+- `docs/cursor/models.md` - Model selection guide
+- `docs/MCP_SETUP_GUIDE.md` - MCP server configuration
+
+### Workflow
+
+- `docs/agents/KICKOFF.md` - Starting a new feature
+- `docs/github/README.md` - GitHub workflow checklist
+- `docs/github/BRANCH_PROTECTION.md` - Branch protection setup
+
+---
+
+## Typical Workflow
+
+1. **Setup** (one-time)
+   ```bash
+   npm install            # Auto-runs bootstrap + setup
+   npm run setup:agents   # Create agents in Cursor IDE
+   npm run status         # Verify everything is ready
+   ```
+
+2. **Stage 0 — Spec**
+   - Run `npm run feature:new` (or keep the seeded MVP).
+   - Fill in `.notes/features/<slug>/spec.md` and create a **0 - Spec** issue.
+   - Capture MVP DoD and success metrics; postpone extras to “Not Now”.
+
+3. **Stage 1 — Plan**
+   - Ask @Vector to update `docs/Plan.md` (use **1 - Plan** issue).
+   - Keep steps to 3-5 and map every DoD checkbox to a specific step.
+   - Let @Pixel sign off once scaffolding tests are outlined.
+
+4. **Stage 2 — Build & Verify**
+   - Work issue moves to **2 - Build**.
+   - Agents execute: Pixel ? Implementers ? Pixel ? Muse ? Nexus (Sentinel if required).
+   - Update `.notes/features/<slug>/progress.md` as stages complete.
+   - Ship once the spec’s MVP DoD is GREEN and `npm run verify` passes.
+
+5. **Ship**
+   - Archive the feature automatically on the next `npm run feature:new`.
+   - Log follow-up ideas in `.notes/ideas.md` or a new **0 - Spec** issue.
+   - Keep the repo clean by running `npm run preflight` before closing the loop.
+---
+
+## Customization
+
+- **Documentation**: Everything under `docs/` is a template--replace or delete once you create project-specific content
+- **Automation**: Copy useful scripts from `examples/automation/` into your project
+- **Rules**: Update `.cursor/rules/*.mdc` to reflect your team's conventions
+- **CI**: Expand `.github/workflows/ci.yml` with stack-specific jobs
+
+---
+
+## GitHub Integration Checklist
+
+1. ? Configure `GITHUB_TOKEN` (repo + workflow scopes): `npm run setup:tokens`
+2. ? Sync labels: `npm run github:labels`
+3. ? Update `.github/CODEOWNERS` and issue templates with your team info
+4. ? Enable GitHub MCP in Cursor IDE
+5. ? Set up branch protections (see `docs/github/BRANCH_PROTECTION.md`)
+
+---
+
+## Troubleshooting
+
+**Setup issues?**
+- Run `npm run status` to see what's missing
+- Check `docs/FIRST_RUN.md` for detailed walkthrough
+- Verify prerequisites: Node.js 18+, npm, Git, Cursor IDE
+
+**Agent issues?**
+- Verify agents are created: Check Cursor IDE Agents panel
+- Check MCP servers: `npm run status`
+- Review `docs/agents/CREATE_AGENTS.md`
+
+**MCP issues?**
+- Verify environment variables: `npm run status`
+- Check `.cursor/mcp.json` syntax
+- Run `npm run mcp:suggest` for suggestions
+
+---
+
+## Next Steps
+
+- ? Complete setup: `npm run setup`
+- ? Verify: `npm run status`
+- ? Start coding: See `docs/agents/KICKOFF.md`
+
+**Happy building!**
+
+
+
+
+
+
+
+

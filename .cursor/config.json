@@ -3,6 +3,7 @@
     ".cursor/rules/00-core.mdc",
     ".cursor/rules/01-workflow.mdc",
     ".cursor/rules/02-quality.mdc",
+    ".cursor/rules/03-personas.mdc",
     ".cursor/rules/04-integrations.mdc",
     ".cursor/rules/05-library.mdc",
     ".cursor/rules/07-process-improvement.mdc"

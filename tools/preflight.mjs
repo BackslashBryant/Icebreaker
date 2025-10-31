@@ -1,103 +1,366 @@
 #!/usr/bin/env node
 
 /**
- * Preflight runner for the stack-agnostic Cursor template.
- * Delegates to the platform-specific check-prerequisites script (PowerShell or Bash)
- * and normalises CLI flags so `npm run preflight` works anywhere.
+ * Lightweight preflight that validates the Agent-first workflow scaffolding.
+ * It keeps the repo stack-agnostic while ensuring the docs, prompts,
+ * and optional guardrails are present and well formed.
  */
 
-import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { detectRepoMode } from './lib/repo-mode.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 
-const powershellScript = path.join(repoRoot, '.specify', 'scripts', 'powershell', 'check-prerequisites.ps1');
-const bashScript = path.join(repoRoot, '.specify', 'scripts', 'bash', 'check-prerequisites.sh');
+const planPath = path.join(repoRoot, 'docs', 'Plan.md');
+const researchPath = path.join(repoRoot, 'docs', 'research.md');
+const kickoffPath = path.join(repoRoot, 'docs', 'agents', 'KICKOFF.md');
+const hookSamplePath = path.join(repoRoot, 'scripts', 'hooks', 'pre-commit.sample');
+const labelsPath = path.join(repoRoot, 'docs', 'github', 'labels.json');
+const issueTemplateDir = path.join(repoRoot, '.github', 'ISSUE_TEMPLATE');
+const pullRequestTemplatePath = path.join(repoRoot, '.github', 'PULL_REQUEST_TEMPLATE.md');
+const mcpConfigPath = path.join(repoRoot, '.cursor', 'mcp.json');
+const featuresDir = path.join(repoRoot, '.notes', 'features');
+const featureStatePath = path.join(featuresDir, 'current.json');
+const mvpGuidePath = path.join(repoRoot, 'docs', 'process', 'MVP_LOOP.md');
 
-const rawArgs = process.argv.slice(2);
-const forwardedArgs = rawArgs.filter(arg => arg !== '--ci');
-const wantsJson = rawArgs.includes('--ci') || rawArgs.includes('--json');
+const agents = [
+  'vector',
+  'pixel',
+  'forge',
+  'link',
+  'glide',
+  'apex',
+  'cider',
+  'muse',
+  'nexus',
+  'scout',
+  'sentinel',
+];
 
-const psFlagMap = new Map([
-  ['--json', '-Json'],
-  ['--require-tasks', '-RequireTasks'],
-  ['--include-tasks', '-IncludeTasks'],
-  ['--paths-only', '-PathsOnly'],
-  ['--help', '-Help'],
-]);
+const results = [];
 
-function translateArgsForPowerShell(args) {
-  const mapped = [];
-  for (const arg of args) {
-    mapped.push(psFlagMap.get(arg) ?? arg);
-  }
-  if (wantsJson && !mapped.includes('-Json')) {
-    mapped.push('-Json');
-  }
-  return mapped;
+function addResult(name, ok, message) {
+  results.push({ name, ok, message });
 }
 
-function translateArgsForBash(args) {
-  const mapped = [...args];
-  if (wantsJson && !mapped.includes('--json')) {
-    mapped.push('--json');
-  }
-  return mapped;
+function readLines(filePath) {
+  return readFileSync(filePath, 'utf8').split(/\r?\n/);
 }
 
-function run(command, args) {
-  const result = spawnSync(command, args, {
-    cwd: repoRoot,
-    stdio: 'inherit',
+function checkPlanScaffold() {
+  if (!existsSync(planPath)) {
+    addResult('Plan.md', false, 'docs/Plan.md is missing');
+    return;
+  }
+
+  const lines = readLines(planPath);
+  const requiredHeadings = [
+    '# Plan',
+    '## Goals',
+    '## Out-of-scope',
+    '## Steps (3-7)',
+    '## File targets',
+    '## Acceptance tests',
+    '## Owners',
+    '## Risks & Open questions',
+  ];
+
+  const missing = requiredHeadings.filter(heading => !lines.some(line => line.trim() === heading));
+  if (missing.length > 0) {
+    addResult('Plan.md', false, `Missing headings: ${missing.join(', ')}`);
+    return;
+  }
+
+  if (!lines.some(line => line.includes('_Active feature'))) {
+    addResult('Plan.md', false, 'Plan header must include `_Active feature` block (run npm run feature:new).');
+    return;
+  }
+
+  if (!lines.some(line => line.includes('Source spec'))) {
+    addResult('Plan.md', false, 'Plan must reference the generated spec path.');
+    return;
+  }
+
+  addResult('Plan.md', true, 'All required headings present');
+}
+
+function checkResearchLog() {
+  if (!existsSync(researchPath)) {
+    addResult('research.md', false, 'docs/research.md is missing');
+    return;
+  }
+
+  const text = readFileSync(researchPath, 'utf8');
+  const requiredSnippets = [
+    '# Research Log',
+    '## How to record',
+    '## Checklist for each lookup',
+    '## Example entry',
+  ];
+
+  const missing = requiredSnippets.filter(snippet => !text.includes(snippet));
+  if (missing.length > 0) {
+    addResult('research.md', false, `Missing sections: ${missing.join(', ')}`);
+    return;
+  }
+
+  addResult('research.md', true, 'Research log scaffold ready');
+}
+
+function checkAgentPrompts() {
+  const missing = agents.filter(agent => {
+    const promptPath = path.join(repoRoot, 'docs', 'agents', 'prompts', `${agent}.md`);
+    return !existsSync(promptPath);
   });
 
-  if (result.error) {
-    throw result.error;
+  if (missing.length > 0) {
+    addResult('Agent prompts', false, `Missing prompt files for: ${missing.join(', ')}`);
+    return;
   }
 
-  return result.status ?? 0;
+  addResult('Agent prompts', true, 'All prompts present');
 }
 
-function runPowerShell() {
-  const args = ['-NoProfile', '-File', powershellScript, ...translateArgsForPowerShell(forwardedArgs)];
+function checkKickoff() {
+  if (!existsSync(kickoffPath)) {
+    addResult('Kickoff', false, 'docs/agents/KICKOFF.md is missing');
+    return;
+  }
+  addResult('Kickoff', true, 'Kickoff + sanity test available');
+}
+
+function checkHookSample() {
+  if (!existsSync(hookSamplePath)) {
+    addResult('Path-scope hook', false, 'scripts/hooks/pre-commit.sample is missing');
+    return;
+  }
+  addResult('Path-scope hook', true, 'Optional pre-commit hook found');
+}
+
+function checkGitHubLabels() {
+  if (!existsSync(labelsPath)) {
+    addResult('GitHub labels', false, 'docs/github/labels.json is missing');
+    return;
+  }
   try {
-    return run('pwsh', args);
-  } catch (error) {
-    if (error && error.code === 'ENOENT') {
-      return run('powershell', args);
+    const parsed = JSON.parse(readFileSync(labelsPath, 'utf8'));
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      addResult('GitHub labels', false, 'docs/github/labels.json must be a non-empty array');
+      return;
     }
-    throw error;
+    addResult('GitHub labels', true, 'Label catalog ready');
+  } catch (error) {
+    addResult('GitHub labels', false, `docs/github/labels.json is invalid JSON (${error instanceof Error ? error.message : error})`);
   }
 }
 
-function runBash() {
-  const args = [bashScript, ...translateArgsForBash(forwardedArgs)];
-  return run('bash', args);
+function checkIssueTemplates() {
+  const required = [
+    '0-spec.md',
+    '1-plan.md',
+    '2-build.md',
+    'kickoff.md',
+    'bug_report.md',
+    'research.md',
+    'sentinel.md',
+    'maintenance.md',
+    'config.yml',
+  ];
+  if (!existsSync(issueTemplateDir)) {
+    addResult('Issue templates', false, '.github/ISSUE_TEMPLATE directory is missing');
+    return;
+  }
+  const missing = required.filter(file => !existsSync(path.join(issueTemplateDir, file)));
+  if (missing.length > 0) {
+    addResult('Issue templates', false, `Missing files: ${missing.join(', ')}`);
+    return;
+  }
+  addResult('Issue templates', true, 'Spec/Plan/Build workflow templates available');
+}
+
+function checkPullRequestTemplate() {
+  if (!existsSync(pullRequestTemplatePath)) {
+    addResult('Pull request template', false, '.github/PULL_REQUEST_TEMPLATE.md is missing');
+    return;
+  }
+  addResult('Pull request template', true, 'PR template present');
+}
+
+function checkMcpConfig() {
+  if (!existsSync(mcpConfigPath)) {
+    addResult('MCP config', false, '.cursor/mcp.json is missing');
+    return;
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(readFileSync(mcpConfigPath, 'utf8'));
+  } catch (error) {
+    addResult('MCP config', false, `.cursor/mcp.json is invalid JSON (${error instanceof Error ? error.message : error})`);
+    return;
+  }
+
+  const servers = parsed?.mcpServers;
+  if (!servers || typeof servers !== 'object') {
+    addResult('MCP config', false, '.cursor/mcp.json must export an object with "mcpServers"');
+    return;
+  }
+
+  const requiredServers = ['github', 'docfork', 'desktop-commander'];
+  const missing = requiredServers.filter(name => !servers[name]);
+  if (missing.length > 0) {
+    addResult('MCP config', false, `Missing required MCP servers: ${missing.join(', ')}`);
+    return;
+  }
+
+  addResult('MCP config', true, 'Core MCP servers configured');
+}
+
+function checkCursorDocs() {
+  const requiredDocs = [
+    path.join(repoRoot, 'docs', 'cursor', 'extensions.md'),
+    path.join(repoRoot, 'docs', 'cursor', 'symbols.md'),
+    path.join(repoRoot, 'docs', 'cursor', 'agent-tools.md'),
+    path.join(repoRoot, 'docs', 'cursor', 'agent-browser.md'),
+    path.join(repoRoot, 'docs', 'cursor', 'agent-hooks.md'),
+    path.join(repoRoot, 'docs', 'cursor', 'models.md'),
+  ];
+
+  const missing = requiredDocs.filter(docPath => !existsSync(docPath));
+  if (missing.length > 0) {
+    const friendly = missing.map(p => path.relative(repoRoot, p)).join(', ');
+    addResult('Cursor docs', false, `Missing documentation: ${friendly}`);
+    return;
+  }
+
+  addResult('Cursor docs', true, 'Cursor-specific guides available');
+}
+
+function checkFeatureWorkflow() {
+  if (!existsSync(featuresDir)) {
+    addResult('Feature workflow', false, '.notes/features directory missing (run npm run feature:new)');
+    return;
+  }
+
+  if (!existsSync(featureStatePath)) {
+    addResult('Feature workflow', false, 'current.json missing (run npm run feature:new)');
+    return;
+  }
+
+  let state;
+  try {
+    state = JSON.parse(readFileSync(featureStatePath, 'utf8'));
+  } catch (error) {
+    addResult('Feature workflow', false, `current.json invalid JSON (${error instanceof Error ? error.message : error})`);
+    return;
+  }
+
+  const slug = state?.slug;
+  if (!slug) {
+    addResult('Feature workflow', false, 'current.json missing slug property');
+    return;
+  }
+
+  const specPath = path.join(featuresDir, slug, 'spec.md');
+  const progressPath = path.join(featuresDir, slug, 'progress.md');
+  if (!existsSync(specPath) || !existsSync(progressPath)) {
+    addResult('Feature workflow', false, `Spec/progress files missing for slug ${slug} (run npm run feature:new)`);
+    return;
+  }
+
+  const specText = readFileSync(specPath, 'utf8');
+  if (!specText.includes('## MVP DoD')) {
+    addResult('Feature workflow', false, `Spec ${specPath} missing "## MVP DoD" section`);
+    return;
+  }
+
+  if (!specText.includes('- [ ]')) {
+    addResult('Feature workflow', false, `Spec ${specPath} must contain unchecked MVP DoD checkboxes`);
+    return;
+  }
+
+  addResult('Feature workflow', true, `Active feature detected (${slug})`);
+}
+
+function checkMvpGuide() {
+  if (!existsSync(mvpGuidePath)) {
+    addResult('MVP loop guide', false, 'docs/process/MVP_LOOP.md missing');
+    return;
+  }
+  addResult('MVP loop guide', true, 'Solo-dev loop documented');
+}
+
+function checkRepoMode() {
+  const mode = detectRepoMode();
+  const cursorDir = path.join(repoRoot, '.cursor');
+  const cursorIgnorePath = path.join(repoRoot, '.cursorignore');
+
+  if (mode === 'app') {
+    // In app mode, check if .cursor/ is being tracked
+    if (existsSync(cursorDir)) {
+      // Check if .cursorignore exists (should be allowed)
+      if (!existsSync(cursorIgnorePath)) {
+        addResult('Repo mode', false, 'App mode: .cursorignore should exist (app-specific Cursor config)');
+        return;
+      }
+      // Warn if .cursor/ has tracked files (other than what should be ignored)
+      addResult('Repo mode', true, `App mode: Cursor files should be ignored (except .cursorignore)`);
+      return;
+    }
+    addResult('Repo mode', true, 'App mode: No .cursor/ directory (correct)');
+    return;
+  }
+
+  // Template mode: .cursor/ should exist
+  if (!existsSync(cursorDir)) {
+    addResult('Repo mode', false, 'Template mode: .cursor/ directory missing');
+    return;
+  }
+  addResult('Repo mode', true, `Template mode: Cursor files tracked`);
 }
 
 function main() {
-  let exitCode = 0;
+  checkPlanScaffold();
+  checkResearchLog();
+  checkAgentPrompts();
+  checkKickoff();
+  checkHookSample();
+  checkGitHubLabels();
+  checkIssueTemplates();
+  checkPullRequestTemplate();
+  checkMcpConfig();
+  checkCursorDocs();
+  checkFeatureWorkflow();
+  checkMvpGuide();
+  checkRepoMode();
 
-  if (process.platform === 'win32' && existsSync(powershellScript)) {
-    exitCode = runPowerShell();
-  } else if (existsSync(bashScript)) {
-    exitCode = runBash();
-  } else if (existsSync(powershellScript)) {
-    exitCode = runPowerShell();
+  const rawArgs = process.argv.slice(2);
+  const wantsJson = rawArgs.includes('--json') || rawArgs.includes('--ci');
+
+  if (wantsJson) {
+    const payload = results.map(result => ({
+      check: result.name,
+      ok: result.ok,
+      message: result.message,
+    }));
+    console.log(JSON.stringify({ ok: results.every(r => r.ok), results: payload }, null, 2));
   } else {
-    console.error('No check-prerequisites script found. Ensure .specify/scripts are present.');
-    exitCode = 1;
+    for (const result of results) {
+      const status = result.ok ? 'PASS' : 'FAIL';
+      console.log(`${status}  ${result.name} - ${result.message}`);
+    }
   }
 
-  process.exit(exitCode);
+  const ok = results.every(result => result.ok);
+  process.exit(ok ? 0 : 1);
 }
 
 try {
   main();
 } catch (error) {
-  console.error(error instanceof Error ? error.message : error);
+  console.error(error instanceof Error ? error.stack ?? error.message : error);
   process.exit(1);
 }

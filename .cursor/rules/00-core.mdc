@@ -18,9 +18,10 @@ alwaysApply: true
 
 ## Collaboration Rituals
 - Reference `AGENTS.md` for tone, preferred stack choices, and review expectations.
+- Pin the quick guides under `docs/cursor/` (extensions, symbols, agent tooling) so Cursor stays the SME for new teammates.
 - Mention focused rules (e.g. `@rules/testing`) or docs on demand instead of loading the entire library.
-- Celebrate experiments: log wins/misses with the vibe logging helper (`scripts/vibe-session` via your preferred runner) so artifacts capture the session.
-- Only push application/source changes by default. Keep `.cursor/` modifications local unless there is an explicit template/rule update request (use the git hook safeguard + `ALLOW_CURSOR_PUSH=1` override when necessary).
+- Celebrate experiments: capture wins/misses in `.notes/` (session log) and roll durable lessons into `/docs/process-improvement.mdc` so artifacts capture the session.
+- **Cursor vs App Logic Separation**: This repository distinguishes between template mode (Cursor files tracked) and app mode (Cursor files blocked). See `docs/development/SEPARATION.md` for details. In app mode, `.cursor/` modifications are blocked from commits unless `ALLOW_CURSOR_PUSH=1` is set (template updates only). Run `npm run convert:app` when shifting from template to app development.
 
 ## Exit Checklist
 - Plans or TODOs updated, even if you bail mid-flight.

@@ -1,0 +1,26 @@
+---
+description: "Recurring issues, mitigations, and rule updates"
+---
+
+# Process Improvement Log
+
+Use this log to capture incidents, regressions, and workflow friction so we can evolve the rules in `.cursor/rules/07-process-improvement.mdc`.
+
+## How to record an entry
+1. **Event:** What happened? Link to issue/PR/build.
+2. **Impact:** Who/what was affected? Include severity.
+3. **Root cause:** Brief diagnosis; call out missing guardrails.
+4. **Action:** What we changed (rule updates, docs, automation).
+5. **Follow-up:** Additional tickets or experiments required.
+
+## Template
+```
+## YYYY-MM-DD – <title>
+- Event: …
+- Impact: …
+- Root cause: …
+- Action: …
+- Follow-up: …
+```
+
+Keep this file lean—one or two paragraphs per entry. Rotate resolved learnings into the relevant rule/doc and leave a pointer here for historical context.

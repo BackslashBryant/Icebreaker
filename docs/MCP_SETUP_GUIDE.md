@@ -78,6 +78,13 @@ The MCP configuration is located in `.cursor/mcp.json`:
 }
 ```
 
+## Automation Helpers
+- `npm run preflight` &mdash; validates that baseline MCPs (GitHub, DocFork, Desktop Commander) remain configured before agents run.
+- `npm run mcp:suggest` &mdash; analyses dependencies/config files and prints recommended MCPs alongside Cursor Directory links. Add `--json` or `--summary` for CI or scripted usage, and `--install <id>` (or `--install all`) to append the generated config to `.cursor/mcp.json`.
+- `npm run verify` &mdash; automatically invokes the suggestion helper so verification logs capture any new MCP recommendations.
+
+Record the output of `npm run mcp:suggest` in `.notes/` or the active plan so future sessions know whether to add or retire integrations.
+
 ## Troubleshooting
 
 ### Tool Installation Issues

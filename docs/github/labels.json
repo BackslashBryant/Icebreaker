@@ -1,0 +1,92 @@
+[
+  {
+    "name": "agent:vector",
+    "color": "0b7285",
+    "description": "Planning / Plan Mode tasks"
+  },
+  {
+    "name": "agent:pixel",
+    "color": "5c940d",
+    "description": "Testing and verification tasks"
+  },
+  {
+    "name": "agent:forge",
+    "color": "364fc7",
+    "description": "Backend implementation"
+  },
+  {
+    "name": "agent:link",
+    "color": "1c7ed6",
+    "description": "Web frontend implementation"
+  },
+  {
+    "name": "agent:glide",
+    "color": "1098ad",
+    "description": "Mobile web or PWA implementation"
+  },
+  {
+    "name": "agent:apex",
+    "color": "2b8a3e",
+    "description": "Android native work"
+  },
+  {
+    "name": "agent:cider",
+    "color": "2f9e44",
+    "description": "iOS native work"
+  },
+  {
+    "name": "agent:muse",
+    "color": "9775fa",
+    "description": "Documentation updates"
+  },
+  {
+    "name": "agent:nexus",
+    "color": "f59f00",
+    "description": "CI/CD and DevOps tasks"
+  },
+  {
+    "name": "agent:scout",
+    "color": "d6336c",
+    "description": "Research and spike tasks"
+  },
+  {
+    "name": "agent:sentinel",
+    "color": "f03e3e",
+    "description": "Security review tasks"
+  },
+  {
+    "name": "status:plan",
+    "color": "adb5bd",
+    "description": "Planning in progress"
+  },
+  {
+    "name": "status:build",
+    "color": "748ffc",
+    "description": "Implementation in progress"
+  },
+  {
+    "name": "status:verify",
+    "color": "ffa94d",
+    "description": "Verification in progress"
+  },
+  {
+    "name": "status:done",
+    "color": "51cf66",
+    "description": "Work completed"
+  },
+  {
+    "name": "bug",
+    "color": "e03131",
+    "description": "User-facing defect or regression"
+  },
+  {
+    "name": "maintenance",
+    "color": "868e96",
+    "description": "Chore or upkeep work"
+  },
+  {
+    "name": "security-review",
+    "color": "c92a2a",
+    "description": "Security follow-up required"
+  }
+]

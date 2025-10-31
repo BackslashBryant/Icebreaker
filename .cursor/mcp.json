@@ -1,86 +1,65 @@
 {
   "mcpServers": {
     "github": {
-      "command": "cmd",
+      "command": "npx",
       "args": [
-        "/c",
-        "npx",
         "-y",
-        "@modelcontextprotocol/server-github@latest"
+        "@smithery/cli@latest",
+        "run",
+        "github"
       ],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${inputs.github_pat}"
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
       }
     },
     "supabase": {
-      "command": "cmd",
+      "command": "npx",
       "args": [
-        "/c",
-        "npx",
         "-y",
-        "@supabase/mcp-server-supabase@latest",
-        "--read-only"
+        "@smithery/cli@latest",
+        "run",
+        "supabase"
       ],
       "env": {
-        "SUPABASE_ACCESS_TOKEN": "${inputs.supabase_pat}",
-        "SUPABASE_PROJECT_REF": "${inputs.supabase_project_ref}"
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_ANON_KEY": "${SUPABASE_ANON_KEY}"
       }
     },
     "playwright": {
-      "command": "cmd",
+      "command": "npx",
       "args": [
-        "/c",
-        "npx",
         "-y",
-        "@playwright/mcp@latest"
+        "@smithery/cli@latest",
+        "run",
+        "playwright"
       ],
       "env": {
-        "PLAYWRIGHT_BROWSERS_PATH": "${inputs.playwright_browsers_path}"
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "desktop-commander": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "desktop-commander"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
       }
     },
     "docfork": {
-      "command": "cmd",
+      "command": "npx",
       "args": [
-        "/c",
-        "npx",
         "-y",
-        "docfork@latest"
-      ]
-    },
-    "desktop-commander": {
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@wonderwhy-er/desktop-commander@latest"
-      ]
+        "@smithery/cli@latest",
+        "run",
+        "docfork"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
     }
-  },
-  "inputs": [
-    {
-      "type": "promptString",
-      "id": "github_pat",
-      "description": "GitHub Personal Access Token",
-      "password": true
-    },
-    {
-      "type": "promptString",
-      "id": "supabase_pat",
-      "description": "Supabase Personal Access Token",
-      "password": true
-    },
-    {
-      "type": "promptString",
-      "id": "supabase_project_ref",
-      "description": "Supabase Project Ref (optional)",
-      "password": false
-    },
-    {
-      "type": "promptString",
-      "id": "playwright_browsers_path",
-      "description": "Playwright browsers path (optional)",
-      "password": false
-    }
-  ]
+  }
 }

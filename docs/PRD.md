@@ -3,57 +3,43 @@ _Template placeholder. Replace with the PRD for your real project once the stack
 # Product Requirements Document (PRD)
 
 ## 1. Overview
-**Product**: Cursor Template Project with Official GitHub Spec Kit Integration
-**Purpose**: A sophisticated, scaffold-ready template that automatically adapts to any project type with official GitHub Spec Kit integration for spec-driven development
-**Target Audience**: Developers using Cursor AI for rapid project development and deployment
+**Product**: Cursor Agent Workspace Template  
+**Purpose**: Provide a stack-agnostic starting point that guides a solo builder through a realistic multi-agent workflow, from planning to docs, using Cursor 2.0 sequential agents and MCP integrations.  
+**Target Audience**: Hobbyists and indie developers who want automation guardrails without committing to a specific tech stack up front.
 
 ## 2. Goals / Success Metrics
-- **Primary Goal**: Provide a production-ready template that works with any project type immediately
-- **Secondary Goals**: 
-  - Integrate Spec Kit for complex development workflows
-  - Automate git operations and quality gates
-  - Provide comprehensive documentation and examples
+- **Primary Goal**: Make it trivial to kick off a Cursor Plan, run the agent roster sequentially, and document research with auditable MCP citations.
+- **Secondary Goals**:
+  - Keep the template stack-neutral so any generated project can plug in.
+  - Offer optional guardrails (path-scope hook, preflight, sanity scripts) that are easy to opt into.
+  - Provide ready-to-copy prompts, setup steps, and kickoff messaging so onboarding is copy/paste simple.
 - **Success Metrics**:
-  - Zero-configuration setup for new projects
-  - Automatic project type detection and configuration
-  - Seamless Spec Kit integration with fallback
-  - Complete git workflow automation
+  - `npm run preflight` passes on a fresh clone.
+  - Agents can be provisioned locally using only the prompts in `/docs/agents/prompts`.
+  - Kickoff template and sanity flow exercised without touching extra configuration.
 
 ## 3. Core Features
-- **Spec Kit Integration**: Official GitHub Spec Kit with slash commands for spec-driven development
-- **Automatic Project Detection**: Intelligent detection of project type and requirements
-- **Git Automation**: Complete git workflow automation (branch, commit, push, PR, merge)
-- **MCP Integration**: Seamless integration with GitHub, Supabase, Playwright, and other MCPs
-- **Quality Gates**: Comprehensive testing, linting, security scanning, and validation
-- **Template System**: Reusable templates for specifications, plans, and constitutions
-- **Documentation**: Comprehensive guides and examples for all features
+- **Agent Workflow Kit**: Roster, setup guide, prompts, kickoff template, and plan scaffold synced to a strict Vector -> Pixel -> Implementers -> Muse/Nexus/Sentinel flow.
+- **Research Logging**: `/docs/research.md` structure for Docfork/Search MCP citations, including checklist and example entries.
+- **Optional Guardrails**: Path-scope pre-commit sample, preflight validator, and CLI helpers to install hooks or print prompts.
+- **MCP Scaffolding**: `.cursor/mcp.json` placeholders plus docs guiding environment variables and usage expectations.
+- **Verify Helper**: `scripts/verify-all` to forward lint/test/build commands once the generated stack defines them.
 
 ## 4. Architecture Summary
-- **Frontend**: React/Next.js with TypeScript and Tailwind CSS
-- **Backend**: Node.js/Express with TypeScript
-- **Database**: PostgreSQL with Supabase integration
-- **Testing**: Vitest with comprehensive test setup
-- **Build System**: Turbo for monorepo management
-- **CI/CD**: GitHub Actions with automated testing and deployment
-- **Spec Kit**: Official GitHub Spec Kit with slash commands (`/constitution`, `/specify`, `/plan`, `/implement`)
+- **Application Stack**: Deliberately unspecified; users plug in their generated stack.
+- **Automation**: Node-based tooling for preflight, prompt export, and optional hook installation.
+- **CI/CD**: GitHub Action that runs the agent-focused preflight and `verify-all` script.
+- **Research & Security**: Docs scaffolding for Scout/Sentinel to log findings and risks.
 
 ## 5. Data Model
-- **Project Structure**: Monorepo with frontend, backend, and shared packages
-- **Spec Kit Data**: Constitution, specifications, and implementation plans
-- **Git Integration**: Issues, branches, pull requests, and commits
-- **Quality Metrics**: Test coverage, performance benchmarks, security scans
+- **Docs**: `/docs/Plan.md`, `/docs/research.md`, `/docs/agents/` provide the durable records for planning, research, and onboarding.
+- **Automation Scripts**: `tools/*.mjs` contain small, auditable Node utilities (preflight, hook install, prompt export).
+- **Optional Hooks**: `scripts/hooks/pre-commit.sample` enforces path scopes when copied into `.git/hooks`.
 
 ## 6. Security / Privacy
-- **Authentication**: JWT tokens with secure session management
-- **Data Protection**: Input validation, SQL injection prevention, XSS protection
-- **Infrastructure**: HTTPS enforcement, security headers, environment variable management
-- **Compliance**: Security scanning, vulnerability assessment, best practices enforcement
+- **Scope Guard**: Optional pre-commit hook restricts agent branches to their documented paths.
+- **MCP Secrets**: `.env.example` and docs outline environment variables; no secrets checked in.
+- **Audit Trail**: Research log and kickoff template encourage explicit citations and acceptance criteria before code lands.
 
 ## 7. Change Log
-- **2025-01-27**: Spec Kit Integration Implementation
-  - Added Spec Kit foundation with directory structure and templates
-  - Created Spec Kit rule file and integrated with Cursor rules
-  - Enhanced git automation with CLI fallback scripts
-  - Updated documentation to reflect Spec Kit integration
-  - Made template stack-agnostic and production-ready
-
+- **2025-01-30**: Pivoted from Spec Kit flows to Cursor 2.0 sequential agents, added preflight + hook/prompt helpers, refreshed documentation to match the new workflow.

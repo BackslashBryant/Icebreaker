@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Lessons Learned
 
-Use `scripts/lessons-log` to append new entries here. Keep them concise, describe the trigger, the lesson, and the rule/update that resulted.
+Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: describe the trigger, the lesson, and the rule/update that resulted.
 
 ## 2024-12-19: MCP-First Git Operations
 

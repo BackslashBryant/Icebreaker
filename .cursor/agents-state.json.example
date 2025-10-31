@@ -1,0 +1,17 @@
+{
+  "createdAgents": [
+    "vector",
+    "pixel",
+    "forge",
+    "link",
+    "glide",
+    "apex",
+    "cider",
+    "muse",
+    "nexus",
+    "scout",
+    "sentinel"
+  ],
+  "verifiedAt": "2024-01-01T00:00:00.000Z",
+  "notes": "Copy this file to agents-state.json after creating agents in Cursor IDE to enable validation checks"
+}

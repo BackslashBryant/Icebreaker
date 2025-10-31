@@ -5,6 +5,10 @@ This directory contains saved plans for development sessions.
 ## Structure
 
 - `templates/` - Plan templates for common scenarios
+  - `feature.md`
+  - `bugfix.md`
+  - `research.md`
+  - `stack-integration.md`
 - `[session-id]/` - Individual session plans
 
 ## Usage

@@ -19,11 +19,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Ensure Spec Kit scaffolding
-        run: npm run bootstrap
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
 
-      - name: Validate workspace expectations
-        run: node tools/preflight.mjs --ci
+      - name: Validate agent workflow scaffolding
+        run: npm run preflight -- --ci
 
       - name: Run verify-all (best-effort)
         run: |

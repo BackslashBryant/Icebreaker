@@ -11,7 +11,7 @@
  * - Gracefully handles missing dependencies or configurations
  */
 
-const { execSync, spawn } = require('child_process');
+const { execSync, spawn, spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -207,6 +207,28 @@ function runSequential(tasks) {
   return results;
 }
 
+function runMcpSuggestionSummary() {
+  const scriptPath = path.join(__dirname, '..', 'tools', 'mcp-suggest.mjs');
+  if (!fs.existsSync(scriptPath)) {
+    return;
+  }
+
+  log('\nMCP suggestion sweep', 'blue');
+  const result = spawnSync(process.execPath, [scriptPath, '--summary'], { encoding: 'utf8' });
+
+  if (result.stdout && result.stdout.trim().length > 0) {
+    console.log(result.stdout.trim());
+  }
+
+  if (result.stderr && result.stderr.trim().length > 0) {
+    console.error(result.stderr.trim());
+  }
+
+  if (result.status !== 0 && config.verbose) {
+    log('MCP suggestion script exited with a non-zero status (ignored).', 'yellow');
+  }
+}
+
 function generateSummary(results) {
   const totalDuration = results.reduce((sum, r) => sum + (r.duration || 0), 0);
   const successful = results.filter(r => r.success).length;
@@ -242,6 +264,8 @@ async function main() {
   // Detect project type and available scripts
   const projectInfo = detectProjectType();
   log(`\n📦 Detected project type: ${projectInfo.type}`, 'blue');
+  
+  runMcpSuggestionSummary();
   
   if (!projectInfo.hasPackageJson) {
     log('⚠️  No package.json found. This is a scaffold template.', 'yellow');

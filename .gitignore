@@ -110,11 +110,23 @@ public
 .pnp.*
 
 # IDEs and editors
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .idea/
 *.swp
 *.swo
 *~
+
+# Cursor workspace state (user-specific)
+.cursor/setup-state.json
+.cursor/detection-cache.json
+
+# Cursor logic files (blocked in app mode, tracked in template mode)
+# When repo is in app mode, uncomment the following lines:
+# .cursor/*
+# !.cursorignore
+# The pre-commit hook will also block .cursor/ commits in app mode.
+# Run `npm run convert:app` to automatically configure this.
 
 # OS generated files
 .DS_Store
@@ -156,3 +168,4 @@ temp/
 
 # Sentry
 .sentryclirc
+.notes/features/archive/

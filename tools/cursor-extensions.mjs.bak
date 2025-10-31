@@ -1,0 +1,74 @@
+﻿#!/usr/bin/env node
+
+/**
+ * cursor-extensions
+ *
+ * Prints workspace extension recommendations with quick instructions for installing
+ * them inside Cursor. Uses .vscode/extensions.json as the source of truth so
+ * teams can tweak the list in one place.
+ */
+
+import { readFileSync, existsSync } from 'node:fs';
+import path from 'node:path';
+
+const repoRoot = path.resolve(new URL('.', import.meta.url).pathname, '..');
+const extensionsPath = path.join(repoRoot, '.vscode', 'extensions.json');
+
+function loadExtensions() {
+  if (!existsSync(extensionsPath)) {
+    return [];
+  }
+  try {
+    const json = JSON.parse(readFileSync(extensionsPath, 'utf8'));
+    return Array.isArray(json.recommendations) ? json.recommendations : [];
+  } catch (error) {
+    console.error('Failed to parse .vscode/extensions.json:', error instanceof Error ? error.message : error);
+    return [];
+  }
+}
+
+function describeExtension(id) {
+  switch (id) {
+    case 'eamodio.gitlens':
+      return 'GitLens â€” inline Git history, blame, and PR insights.';
+    case 'rangav.vscode-thunder-client':
+      return 'Thunder Client â€” REST/GraphQL smoke testing inside Cursor.';
+    case 'esbenp.prettier-vscode':
+      return 'Prettier â€” consistent formatting fallback.';
+    case 'streetsidesoftware.code-spell-checker':
+      return 'Code Spell Checker â€” light proofreading for docs and prompts.';
+    case 'EditorConfig.EditorConfig':
+      return 'EditorConfig â€” enforces .editorconfig rules in the editor.';
+    default:
+      return '';
+  }
+}
+
+function printGuide(extensions) {
+  if (extensions.length === 0) {
+    console.log('No workspace extension recommendations found.');
+    return;
+  }
+
+  console.log('Workspace Extension Recommendations');
+  console.log('===================================');
+  extensions.forEach((id, index) => {
+    const description = describeExtension(id);
+    const niceDescription = description ? ` â€” ${description}` : '';
+    console.log(`${index + 1}. ${id}${niceDescription}`);
+  });
+
+  console.log('\nHow to install quickly:');
+  console.log('- Open Command Palette â†’ â€œExtensions: Show Recommended Extensionsâ€ â†’ Install All.');
+  console.log('- Or open the Extensions panel (Ctrl/Cmd + Shift + X) â†’ â‹® menu â†’ â€œInstall Workspace Recommended Extensionsâ€.');
+  console.log('- Migrating from VS Code? Use â€œCursor Settings â†’ Import from VS Codeâ€ to sync your existing set.');
+  console.log('\nDocs: docs/cursor/extensions.md');
+}
+
+function main() {
+  const extensions = loadExtensions();
+  printGuide(extensions);
+}
+
+main();
+

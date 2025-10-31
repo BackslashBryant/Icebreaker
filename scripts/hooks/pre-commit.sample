@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+# Optional path-scope guard. Install with:
+#   cp scripts/hooks/pre-commit.sample .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+
+# Function to detect repo mode (template or app)
+detect_repo_mode() {
+  local repo_mode_file=".repo-mode"
+  if [ -f "$repo_mode_file" ]; then
+    local mode=$(cat "$repo_mode_file" 2>/dev/null | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+    if [ "$mode" = "template" ] || [ "$mode" = "app" ]; then
+      echo "$mode"
+      return
+    fi
+  fi
+
+  # Fallback: check package.json for "template" indicators
+  if [ -f "package.json" ]; then
+    local name=$(grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' package.json 2>/dev/null | grep -i template)
+    local desc=$(grep -o '"description"[[:space:]]*:[[:space:]]*"[^"]*"' package.json 2>/dev/null | grep -i template)
+    if [ -n "$name" ] || [ -n "$desc" ]; then
+      echo "template"
+      return
+    fi
+  fi
+
+  # Default to template mode
+  echo "template"
+}
+
+# Check if Cursor files are being committed in app mode
+check_cursor_files() {
+  local mode=$(detect_repo_mode)
+
+  # In template mode, allow all Cursor files
+  if [ "$mode" = "template" ]; then
+    return 0
+  fi
+
+  # In app mode, block .cursor/ files (except .cursorignore)
+  if [ "$mode" = "app" ] && [ "$ALLOW_CURSOR_PUSH" != "1" ]; then
+    local files=$(git diff --cached --name-only)
+    local violations=0
+
+    while IFS= read -r f; do
+      # Block .cursor/ directory files except .cursorignore
+      if [[ "$f" =~ ^\.cursor/ ]] && [ "$f" != ".cursorignore" ]; then
+        echo "BLOCK: Cannot commit Cursor logic files in app mode: $f"
+        echo "       Repo is in app mode. Cursor files (.cursor/) are not allowed."
+        echo "       Exceptions: .cursorignore is allowed (app-specific config)"
+        echo ""
+        echo "       To override (for template updates only): ALLOW_CURSOR_PUSH=1 git commit"
+        violations=1
+      fi
+    done <<< "$files"
+
+    if [ $violations -ne 0 ]; then
+      return 1
+    fi
+  fi
+
+  return 0
+}
+
+# Run Cursor file check first
+if ! check_cursor_files; then
+  exit 1
+fi
+
+# Agent path-scope guard (existing logic)
+branch="$(git rev-parse --abbrev-ref HEAD)"
+case "$branch" in
+  agent/forge/*)    allowed='^(api|server|db|migrations)/' ;;
+  agent/link/*)     allowed='^(app|pages|components|styles)/' ;;
+  agent/glide/*)    allowed='^(app/|pwa/|public/|service-worker)' ;;
+  agent/apex/*)     allowed='^android/' ;;
+  agent/cider/*)    allowed='^ios/' ;;
+  agent/pixel/*)    allowed='^tests/|^jest|^vitest' ;;
+  agent/muse/*)     allowed='^(docs/|README\.md|CHANGELOG\.md)' ;;
+  agent/nexus/*)    allowed='^(\.github/|\.ci/|Dockerfile|vercel|deploy)' ;;
+  agent/sentinel/*) allowed='^docs/security/' ;;
+  agent/scout/*)    allowed='^docs/research\.md$' ;;
+  *)                exit 0 ;;
+esac
+files=$(git diff --cached --name-only)
+violations=0
+while IFS= read -r f; do
+  if ! [[ "$f" =~ $allowed ]]; then
+    echo "BLOCK: $branch cannot modify: $f"
+    violations=1
+  fi
+done <<< "$files"
+if [ $violations -ne 0 ]; then
+  echo "Tip: use the correct agent branch or reassign the task."
+  exit 1
+fi

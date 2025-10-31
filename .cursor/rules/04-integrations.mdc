@@ -1,4 +1,4 @@
----
+﻿---
 description: "MCP Integrations - GitHub, Supabase, Playwright, Desktop Commander, DocFork"
 globs: ["**/*"]
 alwaysApply: true
@@ -10,6 +10,7 @@ alwaysApply: true
 - Use integrations through scripts or adapters so tool specifics stay out of domain code.
 - Keep tasks stateless and idempotent; get human approval for side effects.
 - Use MCP tools when they add value to a complex problem and document any decision to skip them.
+- Run `npm run preflight` before agent execution to confirm baseline MCPs (GitHub, DocFork, Desktop Commander) stay configured.
 
 ## Configured MCPs (use when they add value)
 - **GitHub MCP**: repository analysis, code examples, and git operations.
@@ -25,29 +26,30 @@ alwaysApply: true
 - **DocFork MCP**: official library docs retrieval with examples.
 - **Desktop Commander MCP**: terminal commands, file operations, process management, system control.
 
-## Mandatory MCP Triggers (keyword → tool)
-- "ui", "screenshot", "accessibility", "axe", "lighthouse", "vitals" → Playwright MCP
-- "db", "database", "schema", "sql", "migration", "policy", "supabase" → Supabase MCP
-- "research", "best practice", "trend", "breaking change", "standard" → Built-in web search (first), then GitHub + DocFork as needed
-- "code example", "pattern", "usage" → GitHub MCP, DocFork MCP
-- "performance" → Playwright MCP (Lighthouse/Core Web Vitals), Built-in web search (latest guidance)
-- "security", "vulnerability" → Built-in web search (advisories), GitHub MCP (repo advisories)
-- "terminal", "command", "file operation", "process", "system control" → Desktop Commander MCP
-- **"git", "commit", "push", "branch", "pr", "pull request" → GitHub MCP (MANDATORY FIRST CHOICE)**
+## Mandatory MCP Triggers (keyword â†’ tool)
+- "ui", "screenshot", "accessibility", "axe", "lighthouse", "vitals" â†’ Playwright MCP
+- "db", "database", "schema", "sql", "migration", "policy", "supabase" â†’ Supabase MCP
+- "research", "best practice", "trend", "breaking change", "standard" â†’ Built-in web search (first), then GitHub + DocFork as needed
+- "code example", "pattern", "usage" â†’ GitHub MCP, DocFork MCP
+- "performance" â†’ Playwright MCP (Lighthouse/Core Web Vitals), Built-in web search (latest guidance)
+- "security", "vulnerability" â†’ Built-in web search (advisories), GitHub MCP (repo advisories)
+- "terminal", "command", "file operation", "process", "system control" â†’ Desktop Commander MCP
+- **"git", "commit", "push", "branch", "pr", "pull request" â†’ GitHub MCP (MANDATORY FIRST CHOICE)**
 
 ## MCP-First Decision Tree
 **BEFORE using terminal commands, check this list:**
-1. **Git Operations**: If user mentions git, commit, push, branch, PR → Use GitHub MCP first
-2. **UI Operations**: If user mentions UI, screenshot, accessibility → Use Playwright MCP first  
-3. **Database Operations**: If user mentions db, schema, SQL → Use Supabase MCP first
-4. **System Operations**: If user mentions terminal, file operations → Use Desktop Commander MCP first
-5. **Research**: If user mentions research, docs → Use DocFork MCP first
+1. **Git Operations**: If user mentions git, commit, push, branch, PR â†’ Use GitHub MCP first
+2. **UI Operations**: If user mentions UI, screenshot, accessibility â†’ Use Playwright MCP first  
+3. **Database Operations**: If user mentions db, schema, SQL â†’ Use Supabase MCP first
+4. **System Operations**: If user mentions terminal, file operations â†’ Use Desktop Commander MCP first
+5. **Research**: If user mentions research, docs â†’ Use DocFork MCP first
 6. **Fallback**: Only use terminal commands if MCP is unavailable or fails
 
 ## Phase Checkpoints (MCP-first)
 - **Triage/Plan:**
   - Built-in web search for current standards/best practices
-  - GitHub MCP for patterns; DocFork for official docs
+  - Agent Browser for exploratory web research (log citations in `/docs/research.md` before trusting results)
+  - Execute `npm run mcp:suggest` and capture recommendations in `.notes/` or the active plan; apply desired servers with `npm run mcp:suggest -- --install <id>`
 - **Build (as applicable):**
   - Playwright MCP for screenshots/axe during UI changes
   - Supabase MCP for schema/log checks during DB changes
@@ -218,3 +220,4 @@ If MCPs are unavailable or unhealthy:
 - Reference scripts from tasks or agents and capture logs in artifacts/.
 - Configuration lives in .cursor/mcp.json and /scripts/*/README.md.
 - Automation scripts that change environments or pipelines require ticketed scope and reviewer sign-off before merging.
+- Re-run `npm run mcp:suggest` after dependency/config changes and whenever plans add a new surface area; update `.cursor/mcp.json` (or plans) accordingly.

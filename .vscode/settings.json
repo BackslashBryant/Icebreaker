@@ -1,0 +1,67 @@
+{
+  // Cursor IDE Workspace Settings
+  // Optimized for Cursor IDE development workflow
+  // Note: Cursor-specific setting keys may need verification in Cursor Settings UI
+
+  // Editor Settings
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.trimAutoWhitespace": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+
+  // File Associations
+  "files.associations": {
+    "*.mdc": "markdown"
+  },
+
+  // File Exclusions (complements .cursorignore)
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.next": true,
+    "**/.nuxt": true,
+    "**/.turbo": true,
+    "**/coverage": true,
+    "**/artifacts": true,
+    "**/.cache": true,
+    "**/.parcel-cache": true
+  },
+
+  // Search Exclusions
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.next": true,
+    "**/.nuxt": true,
+    "**/.turbo": true,
+    "**/coverage": true,
+    "**/artifacts": true,
+    "**/.cache": true,
+    "**/.parcel-cache": true,
+    "**/test-results": true,
+    "**/playwright-report": true
+  },
+
+  // Cursor-specific settings (verify keys in Cursor Settings UI)
+  // Uncomment and adjust if these settings are supported:
+  // "cursor.chat.agentStickiness": true,
+  // "cursor.chat.autoScrollToBottom": true,
+  // "cursor.chat.autoApplyToFilesOutsideContext": true,
+  // "cursor.indexing.indexNewFilesByDefault": true,
+  // "cursor.indexing.gitGraphRelationships": true,
+  // "cursor.editor.chatEditTooltip": true,
+  // "cursor.editor.autoParseLinks": true,
+  // "cursor.editor.autoSelectForCtrlK": true,
+  // "cursor.editor.themedDiffs": true,
+  // "cursor.terminal.showTerminalHoverHint": true,
+  // "cursor.terminal.usePreviewBox": true
+}
