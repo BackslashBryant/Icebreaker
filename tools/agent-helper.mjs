@@ -8,6 +8,8 @@
  *
  * Usage:
  *   npm run setup:agents
+ *   npm run setup:agents -- --sync-state   # Refresh the state template
+ *   npm run setup:agents -- --no-state     # Skip state file updates
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
@@ -19,6 +21,11 @@ const repoRoot = path.resolve(__dirname, '..');
 const configPath = path.join(repoRoot, '.cursor', 'agents-config.json');
 const promptsDir = path.join(repoRoot, 'docs', 'agents', 'prompts');
 const outputPath = path.join(repoRoot, 'docs', 'agents', 'CREATE_AGENTS.md');
+const statePath = path.join(repoRoot, '.cursor', 'agents-state.json');
+
+const args = process.argv.slice(2);
+const skipStateSync = args.includes('--no-state');
+const refreshState = args.includes('--sync-state');
 
 function loadConfig() {
   if (!existsSync(configPath)) {
@@ -55,9 +62,9 @@ Agents are AI assistants configured with specific prompts, model preferences, an
 
 ## Prerequisites
 
-- ✅ Cursor IDE installed and running
-- ✅ MCP servers configured (run \`npm run setup\` first)
-- ✅ Agent prompts available (run \`npm run agents:prompt -- list\` to verify)
+-  Cursor IDE installed and running
+-  MCP servers configured (run \`npm run setup\` first)
+-  Agent prompts available (run \`npm run agents:prompt -- list\` to verify)
 
 ---
 
@@ -156,13 +163,13 @@ Agents work in this order:
 ${config.workflow.description}
 \`\`\`
 
-1. **Vector** → Creates plan from GitHub Issue
-2. **Pixel** → Scaffolds tests from acceptance criteria
-3. **Implementers** → Build features (Forge/Link/Glide/Apex/Cider)
-4. **Pixel** → Verifies implementation
-5. **Muse** → Updates documentation
-6. **Nexus** → Configures CI/CD and deployment
-7. **Sentinel** → Security review (if needed)
+1. **Vector**  Creates plan from GitHub Issue
+2. **Pixel**  Scaffolds tests from acceptance criteria
+3. **Implementers**  Build features (Forge/Link/Glide/Apex/Cider)
+4. **Pixel**  Verifies implementation
+5. **Muse**  Updates documentation
+6. **Nexus**  Configures CI/CD and deployment
+7. **Sentinel**  Security review (if needed)
 
 **Scout** is called on-demand for research when needed.
 
@@ -172,21 +179,22 @@ ${config.workflow.description}
 
 After creating all agents:
 
-1. ✅ Verify all ${agents.length} agents appear in Cursor's Agent panel
-2. ✅ Test with: Ask Vector to create a plan for a test issue
-3. ✅ Run: \`npm run status\` to check overall setup status
-4. ✅ (Optional) Copy \`.cursor/agents-state.json.example\` to \`.cursor/agents-state.json\` and update with your created agents for validation
+1. Verify all ${agents.length} agents appear in Cursor's Agent panel
+2. Test with: Ask Vector to create a plan for a test issue
+3. Update {{T}}.cursor/agents-state.json{{T}} with the agents you have created (the helper seeds it automatically; rerun {{T}}npm run setup:agents -- --sync-state{{T}} to refresh the roster)
+4. Run: {{T}}npm run status{{T}} to check overall setup status
 
-**Note**: Creating \`.cursor/agents-state.json\` enables agent validation checks in \`npm run status\`. Copy the example file and list your created agents:
-\`\`\`json
-{
-  "createdAgents": ["vector", "pixel", "forge", ...],
-  "verifiedAt": "2024-01-01T00:00:00.000Z"
-}
-\`\`\`
+**Tip**: Keep .cursor/agents-state.json in sync so npm run status reflects reality. List the agent IDs you finish and update verifiedAt when everything is green.
 
 ---
 
+## Troubleshooting
+---
+
+## Troubleshooting
+---
+
+## Troubleshooting
 ## Troubleshooting
 
 ### Agent Not Appearing
@@ -211,9 +219,9 @@ After creating all agents:
 
 ## Next Steps
 
-1. ✅ Create all ${agents.length} agents using instructions above
-2. ✅ Verify agents are working: \`npm run status\`
-3. ✅ Start your first feature: See \`docs/agents/KICKOFF.md\`
+1.  Create all ${agents.length} agents using instructions above
+2.  Verify agents are working: \`npm run status\`
+3.  Start your first feature: See \`docs/agents/KICKOFF.md\`
 
 ---
 
@@ -229,14 +237,90 @@ After creating all agents:
 _This guide was generated from \`.cursor/agents-config.json\`. Run \`npm run setup:agents\` to regenerate._
 `;
 
-  return guide;
+  guide = guide.replace(/{{T}}/g, '`');
+
+  return { guide, agents };
+}
+
+function toAscii(input) {
+  const map = new Map([
+    ['', '[done]'],
+    ['', '[warn]'],
+    ['', ''],
+    ['', '[fail]'],
+    ['', 'OK'],
+    ['', '->'],
+    ['', ''],
+    ['', '-'],
+    ['', '-'],
+    ['', "'"],
+    ['', "'"],
+    ['', '"'],
+    ['', '"'],
+    ['', '*'],
+    ['', '*'],
+    ['', ' '],
+  ]);
+
+  let output = '';
+  for (const ch of input) {
+    if (ch.charCodeAt(0) < 128) {
+      output += ch;
+    } else if (map.has(ch)) {
+      output += map.get(ch);
+    }
+  }
+  return output;
+}
+
+function ensureAgentState(agents) {
+  if (skipStateSync) {
+    return;
+  }
+
+  const agentNames = agents.map(agent => agent.name);
+  const stateDir = path.dirname(statePath);
+  if (!existsSync(stateDir)) {
+    mkdirSync(stateDir, { recursive: true });
+  }
+
+  if (!existsSync(statePath)) {
+    const template = {
+      expectedAgents: agentNames,
+      createdAgents: [],
+      verifiedAt: null,
+    };
+    writeFileSync(statePath, `${JSON.stringify(template, null, 2)}
+`, 'utf8');
+    console.log('Seeded agent state template at .cursor/agents-state.json');
+    return;
+  }
+
+  if (refreshState) {
+    try {
+      const current = JSON.parse(readFileSync(statePath, 'utf8'));
+      const existingCreated = Array.isArray(current.createdAgents) ? current.createdAgents : [];
+      const filtered = existingCreated.filter(name => agentNames.includes(name));
+      const nextState = {
+        ...current,
+        expectedAgents: agentNames,
+        createdAgents: filtered,
+      };
+      writeFileSync(statePath, `${JSON.stringify(nextState, null, 2)}
+`, 'utf8');
+      console.log('Synced agent roster in .cursor/agents-state.json');
+    } catch (error) {
+      console.warn('[warn] Failed to sync .cursor/agents-state.json:', error instanceof Error ? error.message : error);
+    }
+  }
 }
 
 function main() {
   console.log('Generating Agent Creation Guide...\n');
 
   try {
-    const guide = generateGuide();
+    const { guide, agents } = generateGuide();
+    const sanitizedGuide = toAscii(guide);
 
     // Ensure directory exists
     const outputDir = path.dirname(outputPath);
@@ -244,9 +328,10 @@ function main() {
       mkdirSync(outputDir, { recursive: true });
     }
 
-    writeFileSync(outputPath, guide, 'utf8');
-    console.log(`✓ Generated: ${path.relative(repoRoot, outputPath)}`);
+    writeFileSync(outputPath, sanitizedGuide, 'utf8');
+    console.log(`Generated: ${path.relative(repoRoot, outputPath)}`);
     console.log('\nNext steps:');
+    ensureAgentState(agents);
     console.log('  1. Open the generated guide: docs/agents/CREATE_AGENTS.md');
     console.log('  2. Follow the step-by-step instructions');
     console.log('  3. Create all agents in Cursor IDE');
@@ -260,3 +345,7 @@ function main() {
 }
 
 main();
+
+
+
+

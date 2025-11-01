@@ -47,6 +47,7 @@ Once setup is complete:
    npm run setup:agents
    ```
    Follow: `docs/agents/CREATE_AGENTS.md`
+   The command seeds `.cursor/agents-state.json`; rerun with `npm run setup:agents -- --sync-state` after each session to keep the roster current while you tick off created agents.
 
 4. **Verify Everything**:
    ```bash
@@ -57,6 +58,7 @@ Once setup is complete:
    - Review `docs/Plan.md` (pre-seeded webapp plan)
    - Create a GitHub issue using the **0 - Spec** template
    - See `docs/agents/KICKOFF.md` for the kickoff prompt
+   - Generate a PR draft with `npm run github:pr -- --dry-run` (add `-- --push` to publish the branch)
    - (Optional) Replace the seeded MVP: `npm run feature:new`
 
 ---

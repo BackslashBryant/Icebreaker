@@ -22,6 +22,7 @@ A stack-agnostic starting point for Cursor projects. It focuses on workflow auto
    - Configure Cursor IDE: `npm run setup:cursor`
    - Install extensions: `npm run setup:extensions`
    - Create agents: `npm run setup:agents`
+   - Track agent setup: rerun `npm run setup:agents -- --sync-state` and mark created agents in `.cursor/agents-state.json` to keep `npm run status` accurate
    - Verify: `npm run status`
 
 **See QUICKSTART.md for the complete quick start guide.**
@@ -32,14 +33,14 @@ A default "Bootstrap Web Health MVP" feature is generated on first install. Run 
 
 ## What You Get
 
-- ? **Automated Setup**: One-command setup wizard (`npm run setup`)
-- ? **Health Dashboard**: Comprehensive status checker (`npm run status`)
-- ? **MCP Scaffolding**: Pre-configured GitHub, Supabase, Playwright, DocFork, and Desktop Commander servers
-- ? **Agent Workflow**: 11 specialized agents with sequential workflow
-- ? **Preflight Guards**: Automated checks before work starts
-- ? **GitHub Integration**: Issue templates, PR templates, label sync, and workflow automation
-- ? **Verification Helpers**: Stack-agnostic verification scripts
-- ? **Documentation**: Comprehensive guides for setup, agents, and workflows
+- **Automated Setup**: One-command setup wizard (`npm run setup`)
+- **Health Dashboard**: Comprehensive status checker (`npm run status`)
+- **MCP Scaffolding**: Pre-configured GitHub, Supabase, Playwright, DocFork, and Desktop Commander servers
+- **Agent Workflow**: 11 specialized agents with sequential workflow
+- **Preflight Guards**: Automated checks before work starts
+- **GitHub Integration**: Issue templates, PR templates, label sync, and workflow automation
+- **Verification Helpers**: Stack-agnostic verification scripts
+- **Documentation**: Comprehensive guides for setup, agents, and workflows
 
 ---
 
@@ -88,7 +89,10 @@ npm run mcp:suggest        # Suggest MCP servers based on dependencies
 npm run agents:prompt      # Print agent prompts
 npm run github:labels      # Sync GitHub labels
 npm run github:issue       # Create GitHub issues from templates
+npm run github:pr          # Draft a PR from the current feature (use --push to publish)
 ```
+
+`npm run github:pr -- --dry-run` previews the payload without pushing or calling GitHub. Add `-- --push` to push the branch automatically.
 
 ---
 
@@ -155,21 +159,21 @@ See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
    npm run status         # Verify everything is ready
    ```
 
-2. **Stage 0 — Spec**
+2. **Stage 0 - Spec**
    - Run `npm run feature:new` (or keep the seeded MVP).
    - Fill in `.notes/features/<slug>/spec.md` and create a **0 - Spec** issue.
-   - Capture MVP DoD and success metrics; postpone extras to “Not Now”.
+   - Capture MVP DoD and success metrics; postpone extras to "Not Now".
 
-3. **Stage 1 — Plan**
+3. **Stage 1 - Plan**
    - Ask @Vector to update `docs/Plan.md` (use **1 - Plan** issue).
    - Keep steps to 3-5 and map every DoD checkbox to a specific step.
    - Let @Pixel sign off once scaffolding tests are outlined.
 
-4. **Stage 2 — Build & Verify**
+4. **Stage 2 - Build & Verify**
    - Work issue moves to **2 - Build**.
-   - Agents execute: Pixel ? Implementers ? Pixel ? Muse ? Nexus (Sentinel if required).
+   - Agents execute: Pixel -> Implementers -> Pixel -> Muse -> Nexus (Sentinel if required).
    - Update `.notes/features/<slug>/progress.md` as stages complete.
-   - Ship once the spec’s MVP DoD is GREEN and `npm run verify` passes.
+   - Ship once the spec's MVP DoD is GREEN and `npm run verify` passes.
 
 5. **Ship**
    - Archive the feature automatically on the next `npm run feature:new`.
@@ -217,16 +221,8 @@ See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
 
 ## Next Steps
 
-- ? Complete setup: `npm run setup`
-- ? Verify: `npm run status`
-- ? Start coding: See `docs/agents/KICKOFF.md`
+- Complete setup: `npm run setup`
+- Verify: `npm run status`
+- Start coding: See `docs/agents/KICKOFF.md`
 
 **Happy building!**
-
-
-
-
-
-
-
-

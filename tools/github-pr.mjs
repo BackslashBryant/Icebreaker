@@ -4,8 +4,10 @@
  * Creates a GitHub Pull Request from the current feature branch.
  *
  * Usage:
- *   npm run github:pr    # Auto-create PR from current feature
- *   npm run github:pr -- "feat/add-auth" "Add authentication"
+ *   npm run github:pr                 # Auto-create PR from current feature
+ *   npm run github:pr -- --push       # Auto-create and push branch before PR
+ *   npm run github:pr -- --dry-run    # Show payload without pushing or calling GitHub
+ *   npm run github:pr -- "branch" "Title"
  *
  * Requires:
  *   - GITHUB_TOKEN (repo scope)
@@ -89,6 +91,19 @@ function getBaseBranch() {
   }
 }
 
+function branchExistsRemote(branch) {
+  try {
+    const result = execSync(`git ls-remote --heads origin ${branch}`, {
+      cwd: repoRoot,
+      stdio: ['ignore', 'pipe', 'ignore'],
+      encoding: 'utf8',
+    }).trim();
+    return result.length > 0;
+  } catch {
+    return false;
+  }
+}
+
 function checkDoDComplete(specPath) {
   if (!existsSync(specPath)) {
     return { complete: false, reason: 'Spec file not found' };
@@ -140,10 +155,15 @@ function generatePRBody(currentFeature) {
 
   const dodStatus = checkDoDComplete(specPath);
   if (dodStatus.complete) {
-    body += `✅ **MVP DoD Complete** (${dodStatus.checked} items checked)\n\n`;
+    body += `- **MVP DoD Complete** (${dodStatus.checked} items checked)
+
+`;
   } else {
-    body += `⚠️ **MVP DoD In Progress** (${dodStatus.checked || 0} of ${dodStatus.total || '?'} items)\n`;
-    body += `Reason: ${dodStatus.reason}\n\n`;
+    body += `- **MVP DoD In Progress** (${dodStatus.checked || 0} of ${dodStatus.total || '?'} items)
+`;
+    body += `Reason: ${dodStatus.reason}
+
+`;
   }
 
   if (existsSync(progressPath)) {
@@ -194,11 +214,37 @@ async function createPR({ repo, token, title, body, head, base }) {
 }
 
 async function main() {
-  const args = process.argv.slice(2);
-  if (args.includes('--help') || args.includes('-h')) {
-    console.log('Usage: npm run github:pr    # Auto-create from current feature');
-    console.log('   or: npm run github:pr -- <branch> "<title>"');
+  const rawArgs = process.argv.slice(2);
+  if (rawArgs.includes('--help') || rawArgs.includes('-h')) {
+    console.log('Usage: npm run github:pr                 # Auto-create from current feature');
+    console.log('       npm run github:pr -- --push       # Auto-create and push branch before PR');
+    console.log('       npm run github:pr -- --dry-run    # Show payload without calling GitHub');
+    console.log('       npm run github:pr -- <branch> "Title"');
     process.exit(0);
+  }
+
+  let autoPush = false;
+  let dryRun = false;
+  const positional = [];
+
+  for (const arg of rawArgs) {
+    if (arg === '--push') {
+      autoPush = true;
+    } else if (arg === '--dry-run') {
+      dryRun = true;
+    } else if (arg === '--no-push') {
+      autoPush = false;
+    } else if (arg === '--') {
+      continue;
+    } else if (arg.startsWith('--')) {
+      throw new Error(`Unknown option: ${arg}`);
+    } else {
+      positional.push(arg);
+    }
+  }
+
+  if (positional.length === 1) {
+    throw new Error('Provide both branch and title when using manual mode.');
   }
 
   const token = getToken();
@@ -206,47 +252,64 @@ async function main() {
   const currentBranch = getCurrentBranch();
   const baseBranch = getBaseBranch();
 
-  let title, body, head;
+  let title;
+  let body;
+  let head;
+  let currentFeature = null;
 
-  if (args.length >= 2) {
-    // Manual mode: branch and title provided
-    head = args[0];
-    title = args.slice(1).join(' ');
+  if (positional.length >= 2) {
+    head = positional[0];
+    title = positional.slice(1).join(' ');
     body = `## Summary\n\n${title}\n\nSee PR template for details.`;
   } else {
-    // Auto mode: use current feature
-    const current = loadCurrentFeature();
-    if (!current) {
+    currentFeature = loadCurrentFeature();
+    if (!currentFeature) {
       throw new Error('No active feature found. Run `npm run feature:new` first or provide branch and title.');
     }
 
     head = currentBranch;
-    title = `[${current.slug}] ${current.featureName}`;
-    body = generatePRBody(current);
+    title = `[${currentFeature.slug}] ${currentFeature.featureName}`;
+    body = generatePRBody(currentFeature);
   }
 
-  // Ensure branch is pushed
-  try {
-    execSync(`git push -u origin ${head}`, {
-      cwd: repoRoot,
-      stdio: 'inherit',
-    });
-  } catch (error) {
-    console.warn('Warning: Failed to push branch. You may need to push manually.');
+  const needsPush = !branchExistsRemote(head);
+
+  if (dryRun) {
+    console.log('[dry-run] Prepared PR payload:');
+    console.log(`  Repo: ${repo}`);
+    console.log(`  Base: ${baseBranch}`);
+    console.log(`  Head: ${head}${needsPush ? ' (not pushed to origin)' : ''}`);
+    console.log(`  Auto-push: ${autoPush ? 'enabled' : 'disabled'}`);
+    console.log(`  Title: ${title}`);
+    console.log('\n---\n');
+    console.log(body);
+    return;
+  }
+
+  if (autoPush) {
+    try {
+      execSync(`git push -u origin ${head}`, {
+        cwd: repoRoot,
+        stdio: 'inherit',
+      });
+    } catch (error) {
+      throw new Error(`Failed to push branch "${head}" automatically. Push manually and rerun.`);
+    }
+  } else if (needsPush) {
+    throw new Error(`Branch "${head}" is not on origin. Push with "git push -u origin ${head}" or rerun with --push.`);
   }
 
   const result = await createPR({ repo, token, title, body, head, base: baseBranch });
   console.log(`Created PR #${result.number}: ${result.html_url}`);
 
-  if (args.length < 2) {
-    const specPath = path.join(repoRoot, '.notes', 'features', loadCurrentFeature().slug, 'spec.md');
+  if (currentFeature) {
+    const specPath = path.join(repoRoot, '.notes', 'features', currentFeature.slug, 'spec.md');
     const dodStatus = checkDoDComplete(specPath);
     if (!dodStatus.complete) {
-      console.log(`\n⚠️  Note: MVP DoD is not complete. Continue working or mark items as done.`);
+      console.log('\n[warn] MVP DoD is not complete. Continue working or mark items as done.');
     }
   }
 }
-
 main().catch(error => {
   console.error(error instanceof Error ? error.stack ?? error.message : error);
   process.exit(1);

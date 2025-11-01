@@ -6,10 +6,10 @@ Welcome! This guide walks you through what happens when you first clone this rep
 
 When you clone this repository, you get:
 
-- ✅ **Pre-configured workspace** with Cursor rules, agents, and MCP setup
-- ✅ **Automation tools** ready to use (`npm run` commands)
-- ✅ **Documentation** for workflows and best practices
-- ⚠️ **Setup required** for your environment (tokens, agents, Cursor settings)
+- **Pre-configured workspace** with Cursor rules, agents, and MCP setup
+- **Automation tools** ready to use (`npm run` commands)
+- **Documentation** for workflows and best practices
+- **Setup required** for your environment (tokens, agents, Cursor settings)
 
 ## Quick Setup (Recommended)
 
@@ -123,6 +123,8 @@ npm run setup:agents
 
 Then follow `docs/agents/CREATE_AGENTS.md` to create all 11 agents in Cursor IDE.
 
+Update `.cursor/agents-state.json` with the agents you finish; the helper seeds it automatically. Rerun `npm run setup:agents -- --sync-state` whenever you need to refresh the roster while keeping your completed list intact.
+
 ### 8. Verify Setup
 
 Check everything is ready:
@@ -132,28 +134,28 @@ npm run status
 ```
 
 This shows:
-- ✅ What's configured
-- ⚠️ What needs setup
-- ❌ What's missing
+- What's configured
+- What needs setup
+- What's missing
 
 ## Understanding the Structure
 
 ```
 cursor-template-project/
-├── .cursor/              # Cursor workspace configuration
-│   ├── config.json       # Rules and plans configuration
-│   ├── mcp.json          # MCP server configuration
-│   ├── agents-config.json # Agent configuration reference
-│   └── rules/            # Development rules
-├── docs/                 # Documentation
-│   ├── agents/          # Agent prompts and guides
-│   ├── cursor/          # Cursor-specific guides
-│   └── ...
-├── tools/                # Automation scripts
-│   ├── setup.mjs        # Main setup wizard
-│   ├── health-check.mjs  # Status checker
-│   └── ...
-└── scripts/              # Verification scripts
+|-- .cursor/              # Cursor workspace configuration
+|   |-- config.json       # Rules and plans configuration
+|   |-- mcp.json          # MCP server configuration
+|   |-- agents-config.json # Agent configuration reference
+|   `-- rules/            # Development rules
+|-- docs/                 # Documentation
+|   |-- agents/           # Agent prompts and guides
+|   |-- cursor/           # Cursor-specific guides
+|   `-- ...
+|-- tools/                # Automation scripts
+|   |-- setup.mjs         # Main setup wizard
+|   |-- health-check.mjs  # Status checker
+|   `-- ...
+`-- scripts/              # Verification scripts
 ```
 
 ## Common First-Run Issues
@@ -183,10 +185,11 @@ cursor-template-project/
 
 ## Next Steps After Setup
 
-1. ✅ **Verify**: Run `npm run status` - should show all green
-2. ✅ **Test**: Create a test issue and run the kickoff workflow
-3. ✅ **Explore**: Read `docs/agents/KICKOFF.md` for workflow details
-4. ✅ **Customize**: Update `.cursor/rules/` to match your team's preferences
+1. **Verify**: Run `npm run status` - should show all green
+2. **Test**: Create a test issue and run the kickoff workflow
+3. **Explore**: Read `docs/agents/KICKOFF.md` for workflow details
+4. **Customize**: Update `.cursor/rules/` to match your team's preferences
+5. **Share**: Run `npm run github:pr -- --dry-run` to preview the PR draft (add `-- --push` if you want the script to push your branch)
 
 ## Getting Help
 
@@ -199,28 +202,28 @@ cursor-template-project/
 
 ### Automatically Configured
 
-- ✅ Workspace settings (`.vscode/settings.json`)
-- ✅ MCP server templates (`.cursor/mcp.json`)
-- ✅ Agent prompts (`docs/agents/prompts/`)
-- ✅ GitHub templates (`.github/ISSUE_TEMPLATE/`)
-- ✅ Rules and workflows (`.cursor/rules/`)
+- Workspace settings (`.vscode/settings.json`)
+- MCP server templates (`.cursor/mcp.json`)
+- Agent prompts (`docs/agents/prompts/`)
+- GitHub templates (`.github/ISSUE_TEMPLATE/`)
+- Rules and workflows (`.cursor/rules/`)
 
 ### Needs Your Input
 
-- ⚠️ GitHub token (environment variable)
-- ⚠️ Cursor IDE settings (manual configuration)
-- ⚠️ Cursor agents (created via UI)
-- ⚠️ Extensions (installed via Cursor)
+- GitHub token (environment variable)
+- Cursor IDE settings (manual configuration)
+- Cursor agents (created via UI)
+- Extensions (installed via Cursor)
 
 ### Optional Configuration
 
-- 💡 Supabase credentials (if using Supabase)
-- 💡 Project-specific MCPs (detected via `npm run mcp:suggest`)
-- 💡 Custom rules (update `.cursor/rules/`)
+- Supabase credentials (if using Supabase)
+- Project-specific MCPs (detected via `npm run mcp:suggest`)
+- Custom rules (update `.cursor/rules/`)
 
 ---
 
-**Ready?** ? Run `npm install` to begin!
+**Ready?** Run `npm install` to begin!
 
 
 
