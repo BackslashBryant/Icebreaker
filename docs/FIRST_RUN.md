@@ -23,6 +23,8 @@ During the first install the postinstall hook will:
 - Run the personal bootstrap (`npm run personal:bootstrap`) to cache your GitHub token and preferences
 - Launch the full setup wizard in hands-free mode (`npm run setup`)
 - Generate the Cursor settings and agent guides
+- Refresh detection and agent state whenever dependencies change
+- Install the pre-commit guard so template railings are enforced by default
 
 When it finishes you can jump straight into the repo.
 

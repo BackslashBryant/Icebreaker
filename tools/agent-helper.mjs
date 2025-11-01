@@ -181,10 +181,10 @@ After creating all agents:
 
 1. Verify all ${agents.length} agents appear in Cursor's Agent panel
 2. Test with: Ask Vector to create a plan for a test issue
-3. Update {{T}}.cursor/agents-state.json{{T}} with the agents you have created (the helper seeds it automatically; rerun {{T}}npm run setup:agents -- --sync-state{{T}} to refresh the roster)
-4. Run: {{T}}npm run status{{T}} to check overall setup status
+3. Update \`.cursor/agents-state.json\` with the agents you have created (the helper seeds it automatically; rerun \`npm run setup:agents -- --sync-state\` to refresh the roster)
+4. Run: \`npm run status\` to check overall setup status
 
-**Tip**: Keep .cursor/agents-state.json in sync so npm run status reflects reality. List the agent IDs you finish and update verifiedAt when everything is green.
+**Tip**: Keep \`.cursor/agents-state.json\` in sync so \`npm run status\` reflects reality. List the agent IDs you finish and update \`verifiedAt\` when everything is green.
 
 ---
 
@@ -237,40 +237,7 @@ After creating all agents:
 _This guide was generated from \`.cursor/agents-config.json\`. Run \`npm run setup:agents\` to regenerate._
 `;
 
-  guide = guide.replace(/{{T}}/g, '`');
-
   return { guide, agents };
-}
-
-function toAscii(input) {
-  const map = new Map([
-    ['', '[done]'],
-    ['', '[warn]'],
-    ['', ''],
-    ['', '[fail]'],
-    ['', 'OK'],
-    ['', '->'],
-    ['', ''],
-    ['', '-'],
-    ['', '-'],
-    ['', "'"],
-    ['', "'"],
-    ['', '"'],
-    ['', '"'],
-    ['', '*'],
-    ['', '*'],
-    ['', ' '],
-  ]);
-
-  let output = '';
-  for (const ch of input) {
-    if (ch.charCodeAt(0) < 128) {
-      output += ch;
-    } else if (map.has(ch)) {
-      output += map.get(ch);
-    }
-  }
-  return output;
 }
 
 function ensureAgentState(agents) {
@@ -320,7 +287,6 @@ function main() {
 
   try {
     const { guide, agents } = generateGuide();
-    const sanitizedGuide = toAscii(guide);
 
     // Ensure directory exists
     const outputDir = path.dirname(outputPath);
@@ -328,7 +294,7 @@ function main() {
       mkdirSync(outputDir, { recursive: true });
     }
 
-    writeFileSync(outputPath, sanitizedGuide, 'utf8');
+    writeFileSync(outputPath, guide, 'utf8');
     console.log(`Generated: ${path.relative(repoRoot, outputPath)}`);
     console.log('\nNext steps:');
     ensureAgentState(agents);

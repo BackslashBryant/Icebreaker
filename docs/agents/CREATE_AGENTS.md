@@ -32,7 +32,7 @@ Agents are AI assistants configured with specific prompts, model preferences, an
 
 ## Agent Creation Steps
 
-### Step 2: Create  Scout (scout)
+### Step 2: Create 🔎 Scout (scout)
 
 **Role**: Research - Gen Z research sleuth
 
@@ -97,7 +97,7 @@ Escalations:
 
 ---
 
-### Step 3: Create  Vector (vector)
+### Step 3: Create 🎯 Vector (vector)
 
 **Role**: Project Planner - Gen X program manager; structured, pragmatic
 
@@ -217,7 +217,7 @@ Escalations:
 
 ---
 
-### Step 5: Create  Forge (forge)
+### Step 5: Create 🔗 Forge (forge)
 
 **Role**: Backend Engineer - Gen X artisan; quiet, precise, allergic to guesswork
 
@@ -278,7 +278,7 @@ Escalations:
 
 ---
 
-### Step 6: Create  Link (link)
+### Step 6: Create 🌐 Link (link)
 
 **Role**: Web Frontend - Gen Y web lead; accessibility-first
 
@@ -336,7 +336,7 @@ Before handoff:
 
 ---
 
-### Step 7: Create  Glide (glide)
+### Step 7: Create 📳 Glide (glide)
 
 **Role**: Mobile Web/PWA - Gen Z perf nerd
 
@@ -393,7 +393,7 @@ Before handoff:
 
 ---
 
-### Step 8: Create  Apex (apex)
+### Step 8: Create 🤖 Apex (apex)
 
 **Role**: Android - Gen Y Android minimalist
 
@@ -448,7 +448,7 @@ Before handoff:
 
 ---
 
-### Step 9: Create  Cider (cider)
+### Step 9: Create 🍏 Cider (cider)
 
 **Role**: iOS - Gen Y iOS perfectionist
 
@@ -503,7 +503,7 @@ Before handoff:
 
 ---
 
-### Step 10: Create  Muse (muse)
+### Step 10: Create 🎨 Muse (muse)
 
 **Role**: Docs/UX - Gen Z doc storyteller
 
@@ -561,7 +561,7 @@ Completion:
 
 ---
 
-### Step 11: Create  Nexus (nexus)
+### Step 11: Create 🚀 Nexus (nexus)
 
 **Role**: DevOps - Gen Y DevOps steward; calm checklists
 
@@ -625,7 +625,7 @@ Escalations:
 
 ---
 
-### Step 12: Create  Sentinel (sentinel)
+### Step 12: Create 🛡️ Sentinel (sentinel)
 
 **Role**: Security - Gen X security guardian
 
@@ -723,13 +723,13 @@ Agents work in this order:
 Vector plans -> Pixel scaffolds tests -> Implementers build -> Pixel verifies -> Muse docs -> Nexus deploys -> Sentinel reviews
 ```
 
-1. **Vector** ' Creates plan from GitHub Issue
-2. **Pixel** ' Scaffolds tests from acceptance criteria
-3. **Implementers** ' Build features (Forge/Link/Glide/Apex/Cider)
-4. **Pixel** ' Verifies implementation
-5. **Muse** ' Updates documentation
-6. **Nexus** ' Configures CI/CD and deployment
-7. **Sentinel** ' Security review (if needed)
+1. **Vector**  Creates plan from GitHub Issue
+2. **Pixel**  Scaffolds tests from acceptance criteria
+3. **Implementers**  Build features (Forge/Link/Glide/Apex/Cider)
+4. **Pixel**  Verifies implementation
+5. **Muse**  Updates documentation
+6. **Nexus**  Configures CI/CD and deployment
+7. **Sentinel**  Security review (if needed)
 
 **Scout** is called on-demand for research when needed.
 
@@ -744,7 +744,7 @@ After creating all agents:
 3. Update `.cursor/agents-state.json` with the agents you have created (the helper seeds it automatically; rerun `npm run setup:agents -- --sync-state` to refresh the roster)
 4. Run: `npm run status` to check overall setup status
 
-**Tip**: Keep .cursor/agents-state.json in sync so npm run status reflects reality. List the agent IDs you finish and update verifiedAt when everything is green.
+**Tip**: Keep `.cursor/agents-state.json` in sync so `npm run status` reflects reality. List the agent IDs you finish and update `verifiedAt` when everything is green.
 
 ---
 

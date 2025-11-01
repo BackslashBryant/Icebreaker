@@ -9,10 +9,12 @@
 import readline from 'node:readline';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 import { slugify, scaffoldFeature, loadCurrentFeature, archiveCurrentFeature } from './lib/workflow-utils.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
+const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
 function ask(rl, prompt) {
   return new Promise(resolve => {
@@ -88,6 +90,16 @@ async function main() {
   };
 
   scaffoldFeature(summary);
+
+  console.log('\n[brains] Refreshing automation helpers...\n');
+  const refreshResult = spawnSync(npmCmd, ['run', 'brains:refresh'], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+    env: process.env,
+  });
+  if (refreshResult.status !== 0) {
+    console.warn('\n[warn] brains:refresh exited non-zero. Run `npm run brains:refresh` manually to keep automation state current.\n');
+  }
 
   console.log('\nFeature scaffolding complete.\n');
   console.log('Key files:');

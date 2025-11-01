@@ -16,7 +16,7 @@ A stack-agnostic starting point for Cursor projects. It focuses on workflow auto
    ```bash
    npm install
    ```
-   Postinstall runs your personal bootstrap (one-time token cache) and then `npm run setup` for you.
+   Postinstall runs your personal bootstrap (one-time token cache), refreshes detection/state when dependencies change, installs the template pre-commit guard, and then `npm run setup` for you.
 
 3. **Start coding**
    - Configure Cursor IDE: `npm run setup:cursor`
@@ -68,6 +68,7 @@ npm run setup:agents       # Generate agent creation guide
 npm run setup:extensions   # View extension installation guide
 npm run setup:cursor       # Generate Cursor settings guide
 npm run detect            # Detect project type and suggest MCPs/agents
+npm run brains:refresh    # Re-run detection, agent sync, settings guide
 npm run personal:bootstrap # Store GitHub token + preferences locally
 npm run feature:new        # Bootstrap a new MVP spec/plan
 npm run preset:webapp      # Re-seed the default health-check MVP

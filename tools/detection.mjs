@@ -97,7 +97,7 @@ function detectProjectType(packageJson) {
   }
 
   // Mobile detection
-  if (deps.react-native || deps['@react-native-community']) {
+  if (deps['react-native'] || deps['@react-native-community']) {
     indicators.push({ type: 'react-native', confidence: 'high' });
   }
   if (hasFile('android') || hasFile('ios')) {

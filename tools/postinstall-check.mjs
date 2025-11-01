@@ -9,8 +9,9 @@
  * 4. Falls back to a reminder when automation is skipped
  */
 
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -19,6 +20,93 @@ import { loadPersonalConfig } from './lib/personal-config.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 const setupStatePath = path.join(repoRoot, '.cursor', 'setup-state.json');
+const depsHashPath = path.join(repoRoot, '.cursor', 'deps-hash.json');
+
+function computeDependencyFingerprint() {
+  const candidates = [
+    'package-lock.json',
+    'pnpm-lock.yaml',
+    'yarn.lock',
+    'package.json',
+  ];
+
+  const contents = [];
+  for (const file of candidates) {
+    const filePath = path.join(repoRoot, file);
+    if (existsSync(filePath)) {
+      contents.push(readFileSync(filePath, 'utf8'));
+    }
+  }
+
+  if (contents.length === 0) {
+    return null;
+  }
+
+  const hash = createHash('sha256');
+  contents.forEach(value => hash.update(value));
+  return hash.digest('hex');
+}
+
+function installPrecommitHook(isCI) {
+  if (isCI) {
+    return;
+  }
+
+  const result = spawnSync('node', ['tools/install-agent-hook.mjs'], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+    env: process.env,
+  });
+
+  if (result.status !== 0) {
+    console.warn('[warn] Failed to install pre-commit hook automatically. Run `npm run agents:install-hook` if you need template guardrails.');
+  }
+}
+
+function refreshBrainsIfNeeded(isCI) {
+  const fingerprint = computeDependencyFingerprint();
+  if (!fingerprint) {
+    return;
+  }
+
+  const cursorDir = path.join(repoRoot, '.cursor');
+  if (!existsSync(cursorDir)) {
+    mkdirSync(cursorDir, { recursive: true });
+  }
+
+  let previous = null;
+  if (existsSync(depsHashPath)) {
+    try {
+      previous = JSON.parse(readFileSync(depsHashPath, 'utf8'));
+    } catch {
+      previous = null;
+    }
+  }
+
+  if (previous?.hash === fingerprint) {
+    return;
+  }
+
+  if (isCI) {
+    writeFileSync(depsHashPath, JSON.stringify({ hash: fingerprint }, null, 2), 'utf8');
+    console.log('[info] Dependency fingerprint changed (CI). Run `npm run brains:refresh` locally to regenerate automation helpers.');
+    return;
+  }
+
+  console.log('\n[info] Dependency footprint changed. Auto-refreshing Cursor helpers...\n');
+  const result = spawnSync('node', ['tools/brains-refresh.mjs'], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+    env: process.env,
+  });
+
+  if (result.status !== 0) {
+    console.warn('[warn] brains:refresh exited with non-zero status. Run `npm run brains:refresh` manually.\n');
+    return;
+  }
+
+  writeFileSync(depsHashPath, JSON.stringify({ hash: fingerprint }, null, 2), 'utf8');
+}
 
 function runPersonalBootstrap() {
   const result = spawnSync('node', ['tools/personal-bootstrap.mjs'], {
@@ -89,6 +177,9 @@ function main() {
   if (!isCI) {
     runPresetWebapp();
   }
+
+  refreshBrainsIfNeeded(isCI);
+  installPrecommitHook(isCI);
 
   if (existsSync(setupStatePath)) {
     return; // setup already completed previously

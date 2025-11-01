@@ -20,6 +20,7 @@
                     "setup:extensions":  "node ./tools/cursor-extensions.mjs",
                     "setup:cursor":  "node ./tools/cursor-settings-gen.mjs",
                     "detect":  "node ./tools/detection.mjs",
+                    "brains:refresh":  "node ./tools/brains-refresh.mjs",
                     "personal:bootstrap":  "node ./tools/personal-bootstrap.mjs",
                     "feature:new":  "node ./tools/feature-new.mjs",
                     "preset:webapp":  "node ./tools/preset-webapp.mjs",

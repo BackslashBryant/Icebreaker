@@ -120,6 +120,8 @@ public
 # Cursor workspace state (user-specific)
 .cursor/setup-state.json
 .cursor/detection-cache.json
+.cursor/deps-hash.json
+.cursor/agents-state.json
 
 # Cursor logic files (blocked in app mode, tracked in template mode)
 # When repo is in app mode, uncomment the following lines:

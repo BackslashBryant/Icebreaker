@@ -24,6 +24,8 @@ During this automated setup Cursor will:
 - Configure MCP servers
 - Run preflight checks
 - Generate the Cursor guides
+- Auto-refresh detection and agent state when dependencies change
+- Install the template pre-commit guard (if one isn’t present)
 
 **Time**: ~5 minutes (hands-off)
 

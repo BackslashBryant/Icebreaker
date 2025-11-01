@@ -66,6 +66,13 @@ if ! check_cursor_files; then
   exit 1
 fi
 
+echo "[pre-commit] Running sanity checks..."
+if ! npm run status -- --ci >/dev/null; then
+  echo "[pre-commit] Workspace status failed. Fix issues or run Allow overrides intentionally."
+  exit 1
+fi
+echo "[pre-commit] Done."
+
 # Agent path-scope guard (existing logic)
 branch="$(git rev-parse --abbrev-ref HEAD)"
 case "$branch" in

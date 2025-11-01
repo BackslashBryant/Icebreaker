@@ -132,6 +132,6 @@
       "nexus",
       "sentinel"
     ],
-    "description": "Vector plans → Pixel scaffolds tests → Implementers build → Pixel verifies → Muse docs → Nexus deploys → Sentinel reviews"
+    "description": "Vector plans -> Pixel scaffolds tests -> Implementers build -> Pixel verifies -> Muse docs -> Nexus deploys -> Sentinel reviews"
   }
 }
