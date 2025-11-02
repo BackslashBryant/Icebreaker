@@ -11,6 +11,10 @@ Custom commands are reusable prompts that you can invoke in Cursor chat using th
 
 ## Available Commands
 
+- `/crew` - Survey context and recommend the next persona with a paste‑ready handoff
+- `/resume` - Identify the next checkpoint and owner, producing a ready‑to‑paste handoff
+- `/handoff` - Template to hand off a specific checkpoint to a specific persona
+- `/kickoff` - One‑paste kickoff block for starting a feature (mirrors docs/agents/KICKOFF.md)
 - `/vector-plan` - Create a project plan using Vector's structured planning workflow
 - `/pixel-test` - Generate test cases using Pixel's testing methodology
 - `/scout-research` - Research a topic using Scout's research workflow
