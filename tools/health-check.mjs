@@ -499,8 +499,8 @@ function checkAgents() {
             'Agents',
             'Agents Created',
             STATUS.NEEDS_SETUP,
-            `${createdAgents.length}/${agents.length} agents created. Missing: ${missingAgents.join(', ')}`,
-            'Run: npm run setup:agents (then update .cursor/agents-state.json after creating)',
+            `${createdAgents.length}/${agents.length} saved agents configured (optional). Missing: ${missingAgents.join(', ')}.`,
+            'Optional: run npm run setup:agents -- --sync-state to finish creating pinned agents.',
           );
         }
       } catch {
@@ -508,17 +508,16 @@ function checkAgents() {
           'Agents',
           'Agents Created',
           STATUS.NEEDS_SETUP,
-          'Agents need to be created in Cursor UI (state file exists but invalid)',
-          'Run: npm run setup:agents',
+          'Saved agent state file exists but could not be read (optional feature).',
+          'Optional: delete .cursor/agents-state.json or rerun npm run setup:agents -- --sync-state.',
         );
       }
     } else {
       addCheck(
         'Agents',
         'Agents Created',
-        STATUS.NEEDS_SETUP,
-        'Agents need to be created in Cursor UI',
-        'Run: npm run setup:agents (after creating agents, add them to .cursor/agents-state.json to verify)',
+        STATUS.READY,
+        'Auto-routing enabled. Saved agents are optional; run npm run setup:agents if you want them pinned in the sidebar.',
       );
     }
   } else {
@@ -608,7 +607,6 @@ function getContextualNextSteps() {
     'GITHUB_TOKEN': 'Run: npm run setup:tokens',
     'MCP Config File': 'Run: npm run setup',
     'Preflight Checks': 'Run: npm run preflight (see details above)',
-    'Agents Created': 'Run: npm run setup:agents',
     'Settings Applied': 'Run: npm run setup:cursor',
     'Extensions Installed': 'Run: npm run setup:extensions',
   };

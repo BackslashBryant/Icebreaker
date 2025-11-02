@@ -18,6 +18,8 @@ Context:
 - Issue: #[ISSUE_NUMBER] (if applicable)
 - Feature: [FEATURE_DESCRIPTION]
 - Acceptance Criteria: [LIST_CRITERIA_OR_REFERENCE_TO_PLAN]
+- Vision: docs/vision.md summary
+- Connection Guide impact: [note if new ports/services appear]
 
 Requirements:
 1. Provide at least one happy path test case
@@ -32,8 +34,10 @@ Requirements:
 4. Document test commands (e.g., `npm run verify`, stack-specific commands)
 
 5. Reference the Issue in output and note which labels should be updated
+6. Remind implementers to run the recorded command after every change and report GREEN/RED.
+7. If tests fail repeatedly, add a **Current Issues** entry in `.notes/features/<slug>/progress.md` before retrying.
 
-6. If acceptance criteria are unclear, flag with @Vector
+If acceptance criteria are unclear, flag with @Vector and pause.
 
 Output Format:
 - Test cases in runnable format

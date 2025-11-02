@@ -1,6 +1,16 @@
 # Cursor Workspace Template
 
-A stack-agnostic starting point for Cursor projects. It focuses on workflow automation using Cursor Agents + MCP, lightweight verification helpers, and leaves the actual application stack for you or the agent to generate.
+A stack-agnostic starting point for Cursor projects. It focuses on a visible, sequential crew of Cursor agents plus lightweight automation so you always know who is working, what checkpoint they are on, and how to ship safely.
+
+**Foundational habits baked into the repo:**
+- 📄 **Document the vision first** – `docs/vision.md` anchors every chat and plan.
+- ✅ **Numbered checkpoints** – Vector’s plan and every handoff obey “Do not continue until approved.”
+- 🎯 **Be stupidly specific** – prompts, rules, and playbooks demand exact selectors, values, and file targets.
+- 🧪 **Test after every change** – Pixel enforces per-change verification; failures go to **Current Issues**.
+- 🔁 **Reset on loops** – escalation protocol captures loops in `.notes/features/<slug>/progress.md`.
+- 🔌 **ConnectionGuide** – `docs/ConnectionGuide.md` prevents port/API collisions.
+- 🛑 **Global guardrails** – agents ask before committing, avoid mock data, and confirm tool choices.
+- 🧠 **Plan Mode → Act Mode** – every agent describes the approach, waits for “Proceed,” then executes.
 
 ## Quick Start
 
@@ -21,7 +31,7 @@ A stack-agnostic starting point for Cursor projects. It focuses on workflow auto
 3. **Start coding**
    - Configure Cursor IDE: `npm run setup:cursor`
    - Install extensions: `npm run setup:extensions`
-   - Create agents: `npm run setup:agents`
+   - (Optional) Create saved agents: `npm run setup:agents`
    - Track agent setup: rerun `npm run setup:agents -- --sync-state` and mark created agents in `.cursor/agents-state.json` to keep `npm run status` accurate
    - Verify: `npm run status`
 
@@ -36,7 +46,7 @@ A default "Bootstrap Web Health MVP" feature is generated on first install. Run 
 - **Automated Setup**: One-command setup wizard (`npm run setup`)
 - **Health Dashboard**: Comprehensive status checker (`npm run status`)
 - **MCP Scaffolding**: Pre-configured GitHub, Supabase, Playwright, DocFork, and Desktop Commander servers
-- **Agent Workflow**: 11 specialized agents with sequential workflow
+- **Agent Workflow**: 11 specialized agents with sequential workflow (auto-routed, command-based, or saved)
 - **Preflight Guards**: Automated checks before work starts
 - **GitHub Integration**: Issue templates, PR templates, label sync, and workflow automation
 - **Verification Helpers**: Stack-agnostic verification scripts
@@ -86,6 +96,7 @@ Set `CURSOR_AUTO_SETUP=false npm run setup` if you prefer to walk through the wi
 ```bash
 npm run preflight          # Validate workspace scaffolding
 npm run verify             # Run verification suite (lint/test/build)
+npm run test:personas      # Smoke-test persona auto-routing globs
 npm run mcp:suggest        # Suggest MCP servers based on dependencies
 npm run agents:prompt      # Print agent prompts
 npm run github:labels      # Sync GitHub labels
@@ -132,12 +143,15 @@ See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
 
 - `QUICKSTART.md` - 3-step quick start guide
 - `docs/FIRST_RUN.md` - Detailed first-time setup walkthrough
+- `docs/agents/PLAYBOOK.md` - Roster playbook and chat handoff cheat sheet
 - `docs/agents/KICKOFF.md` - How to start your first feature
 
 ### Guides
 
 - `docs/agents/README.md` - Agent roster and workflow
 - `docs/agents/SETUP.md` - Agent setup reference
+- `docs/vision.md` - Source of truth for product intent
+- `docs/ConnectionGuide.md` - Registry of ports, services, and integrations
 - `docs/cursor/SETTINGS_GUIDE.md` - Cursor IDE configuration (generated)
 - `docs/cursor/extensions.md` - Extension installation
 - `docs/cursor/models.md` - Model selection guide
@@ -156,7 +170,7 @@ See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
 1. **Setup** (one-time)
    ```bash
    npm install            # Auto-runs bootstrap + setup
-   npm run setup:agents   # Create agents in Cursor IDE
+   npm run setup:agents   # (Optional) Create persistent agents in Cursor IDE
    npm run status         # Verify everything is ready
    ```
 
@@ -180,6 +194,15 @@ See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
    - Archive the feature automatically on the next `npm run feature:new`.
    - Log follow-up ideas in `.notes/ideas.md` or a new **0 - Spec** issue.
    - Keep the repo clean by running `npm run preflight` before closing the loop.
+---
+
+## Agent Modes
+
+- **Auto-routing (default)** – The rule files under `.cursor/rules/persona-*.mdc` activate the right persona as soon as you open the matching files (e.g., `/docs/Plan.md` → Vector 🎯, `/tests/**` → Pixel 🖥️). No manual agent creation required.
+- **On-demand commands** – Use `/vector-plan`, `/pixel-test`, `/scout-research`, etc., to inject a persona prompt into any chat when you need them outside their file scope.
+- **Saved agents (advanced)** – If you prefer persistent agents in Cursor’s sidebar, run `npm run setup:agents` and paste the prompts from `docs/agents/CREATE_AGENTS.md`. The automatic rules still work alongside them.
+- The orchestrator rule (`.cursor/rules/06-orchestrator.mdc`) keeps the relay clean when multiple personas are in play or when no files are attached.
+
 ---
 
 ## Customization

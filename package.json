@@ -25,7 +25,8 @@
                     "feature:new":  "node ./tools/feature-new.mjs",
                     "preset:webapp":  "node ./tools/preset-webapp.mjs",
                     "postinstall":  "node ./tools/postinstall-check.mjs",
-                    "convert:app":  "node ./tools/convert-to-app.mjs"
+                    "convert:app":  "node ./tools/convert-to-app.mjs",
+                    "test:personas":  "node ./tools/test-persona-activation.mjs"
                 },
     "engines":  {
                     "node":  "\u003e=18.0.0"

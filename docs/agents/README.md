@@ -14,6 +14,8 @@
 | Scout | Research (tools + sources) | `/docs/research.md` | Reasoning |
 | Sentinel | Security review notes | `/docs/security/**` | Reasoning |
 
+**Read next:** `docs/agents/PLAYBOOK.md` (handoffs, Plan→Act rules) and `docs/agents/KICKOFF.md` (ready-made kickoff message).
+
 Active feature state lives under `.notes/features/`:
 - `current.json` points to the working slug.
 - `spec.md`, `progress.md`, and `docs/Plan.md` drive the MVP loop.
@@ -22,25 +24,23 @@ Active feature state lives under `.notes/features/`:
 **House Rules**
 - Speak to a hobbyist; define jargon once. Tell the truth; if unsure, say "unknown".
 - Message shape: Status -> Next 3 -> Question (optional).
-- Read `.notes/features/current.json` and `/docs/Plan.md` before proposing work. Stay within MVP DoD scope.
-- Small, reversible diffs. Hand off via @mentions when leaving your lane.
+- Start every session by reading `docs/vision.md`, `.notes/features/current.json`, `/docs/Plan.md`, and `docs/ConnectionGuide.md`.
+- Auto-routing rules activate personas when you work inside their path scopes; use the `/...` commands or saved agents when you need them elsewhere.
+- Stay within the numbered checkpoint you were assigned. Do not continue until the caller approves.
+- Ship small, reversible diffs. Run the targeted test right after each change and share the command/output.
 - Prefer Docfork MCP for library/API references; paste source snippets into `/docs/research.md`.
 
 **Plan Mode (sequential)**
 - Use `docs/process/MVP_LOOP.md` as the canonical flow.
-- Start a feature by drafting or validating `/docs/Plan.md` with @Vector, then move agent-by-agent.
+- Start a feature by updating `docs/vision.md`, then ask @Vector to refresh `/docs/Plan.md` with numbered checkpoints.
+- Each agent describes intent, waits for a “Proceed with step N” approval, then executes and tests that single step.
 
 **Run Order (typical)**
-Vector -> Pixel (tests scaffold) -> Forge/Link/Glide/Apex/Cider -> Pixel (verify) -> Muse (docs) -> Nexus (optional) -> Sentinel (if risk).
+Vector (plan) -> Pixel (scaffold tests) -> Forge/Link/Glide/Apex/Cider (implement checkpoint) -> Pixel (verify checkpoint) -> Muse (docs) -> Nexus (CI/env) -> Sentinel (security, when in scope).
 
 **Helpers**
-- `npm run agents:prompt -- all` prints every prompt for quick copy/paste.
-- `npm run agents:install-hook` installs the optional pre-commit path-scope guard (`--force` overwrites an existing hook).
-- `npm run github:labels` seeds GitHub labels defined in `docs/github/labels.json`.
+- `npm run agents:prompt -- all` prints prompt bodies for copy/paste into Cursor.
+- `npm run status` confirms workspace health before a session.
+- `npm run agents:install-hook` installs the optional path-scope guard (`--force` overwrites an existing hook).
 - `npm run github:issue -- <template> "<title>"` opens a GitHub issue using the local templates.
-- Agent tooling quickstarts live under `docs/cursor/`:
-  - `agent-tools.md` - enabling/disabling agent integrations safely.
-  - `agent-browser.md` - how to run web research with automatic citations.
-  - `agent-hooks.md` - wiring local automation to agent lifecycle events.
-  - `symbols.md` - shorthand for attaching the right context in prompts.
-
+- Agent tooling quickstarts live under `docs/cursor/` (`agent-tools.md`, `agent-browser.md`, `agent-hooks.md`, `symbols.md`).

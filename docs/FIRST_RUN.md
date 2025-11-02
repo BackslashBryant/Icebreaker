@@ -20,6 +20,7 @@ npm install
 ```
 
 During the first install the postinstall hook will:
+
 - Run the personal bootstrap (`npm run personal:bootstrap`) to cache your GitHub token and preferences
 - Launch the full setup wizard in hands-free mode (`npm run setup`)
 - Generate the Cursor settings and agent guides
@@ -51,6 +52,7 @@ git --version
 ```
 
 **Missing something?**
+
 - Node.js: https://nodejs.org/
 - Git: https://git-scm.com/
 - Cursor IDE: https://cursor.sh/
@@ -64,6 +66,7 @@ npm run setup:tokens
 ```
 
 This wizard will:
+
 - Guide you through creating a GitHub Personal Access Token
 - Validate the token format
 - Help you save it securely
@@ -87,6 +90,7 @@ npm run preflight
 ```
 
 This checks:
+
 - Plan scaffold exists
 - Agent prompts are present
 - Issue templates are configured
@@ -101,6 +105,7 @@ npm run setup:cursor
 ```
 
 Then open `docs/cursor/SETTINGS_GUIDE.md` and configure:
+
 - Cursor Tab (AI autocomplete)
 - Codebase Indexing
 - Agent Mode features
@@ -115,7 +120,11 @@ npm run setup:extensions
 
 Install via Cursor's Extensions panel or Command Palette.
 
-### 7. Create Agents
+### 7. (Optional) Create Agents
+
+**Note**: Creating saved agents is optional! Persona rules in `.cursor/rules/persona-*.mdc` automatically activate when you open matching files (e.g., editing `docs/Plan.md` wakes Vector 🎯, opening `tests/**` wakes Pixel 🖥️). You only need saved agents if you want them pinned in the Cursor sidebar.
+
+If you want persistent agents in the sidebar:
 
 Generate the agent creation guide:
 
@@ -136,6 +145,7 @@ npm run status
 ```
 
 This shows:
+
 - What's configured
 - What needs setup
 - What's missing
@@ -181,13 +191,15 @@ cursor-template-project/
 ### "Agents not working"
 
 **Solution**:
-1. Verify agents are created in Cursor IDE (run `npm run setup:agents` for guide)
-2. Check MCP servers are configured (`npm run status`)
-3. Ensure environment variables are set
+
+1. **Check auto-routing first**: Persona rules activate automatically when you open matching files. Try opening `docs/Plan.md` (Vector 🎯) or `tests/**` (Pixel 🖥️) to verify.
+2. If you want persistent agents in the sidebar, run `npm run setup:agents` for the guide.
+3. Check MCP servers are configured (`npm run status`)
+4. Ensure environment variables are set
 
 ## Next Steps After Setup
 
-1. **Verify**: Run `npm run status` - should show all green
+1. **Verify**: Run `npm run status` (and optionally `npm run test:personas` to confirm auto-routing globs)
 2. **Test**: Create a test issue and run the kickoff workflow
 3. **Explore**: Read `docs/agents/KICKOFF.md` for workflow details
 4. **Customize**: Update `.cursor/rules/` to match your team's preferences
@@ -226,6 +238,3 @@ cursor-template-project/
 ---
 
 **Ready?** Run `npm install` to begin!
-
-
-

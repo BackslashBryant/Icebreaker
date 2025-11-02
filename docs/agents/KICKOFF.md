@@ -2,42 +2,44 @@
 
 ## Prerequisites
 
-Before starting your first feature, ensure setup is complete:
+Before starting your first feature, confirm:
 
-1. [OK] **Setup Complete**: Run `npm run status` - all checks should pass
-2. [OK] **Agents Created**: All 11 agents should exist in Cursor IDE (see `docs/agents/CREATE_AGENTS.md`)
-3. [OK] **MCP Servers Configured**: GitHub MCP should be working (check with `npm run status`)
-4. [OK] **Environment Variables**: `GITHUB_TOKEN` should be set
+1. [OK] `npm run status` passes (setup and MCP servers healthy)
+2. [OK] All 11 agents exist in Cursor (see `docs/agents/CREATE_AGENTS.md`)
+3. [OK] `GITHUB_TOKEN` (and any optional MCP credentials) are set
+4. [OK] `docs/vision.md` reflects the current user journey and goals
+5. [OK] `docs/ConnectionGuide.md` lists any existing ports/endpoints
 
-**First time?** Run `npm install` (auto-setup) or `npm run setup` to complete initial setup.
+**First time?** Run `npm install` (auto-setup) or `npm run setup` to complete initial onboarding.
 
 ## Kickoff Flow
 
-1. Generate/confirm feature scaffold:
+1. Generate/confirm the feature scaffold:
    ```bash
    npm run feature:new
    ```
-2. Open the generated spec at `.notes/features/<slug>/spec.md` and fill any TODOs.
-3. Create a GitHub issue using the **0 - Spec** template and paste the spec content.
-4. Ask @Vector to update `docs/Plan.md` (use **1 - Plan** issue template).
-5. Move to **2 - Build** once Pixel has tests scaffolded.
+2. Fill in `.notes/features/<slug>/spec.md` and refresh `docs/vision.md`.
+3. Create a GitHub issue using the **0 - Spec** template; link the spec + vision.
+4. Open `docs/Plan.md` (auto-activates Vector 🎯) and/or run `/vector-plan` to update it with numbered checkpoints. Tell Vector: “Do not proceed past step 1 until I approve.”
+5. Share the plan, vision, and Connection Guide in chat. Once satisfied, move the issue to **1 - Plan**.
+6. Promote to **2 - Build** only after Pixel scaffolds tests for every acceptance criterion and reports command outputs.
 
-## Kickoff Message (for Cursor chat)
-
-Paste the following once the spec and plan are ready:
+## Kickoff Message (paste into Cursor chat)
 
 ```
 Goal: <copy Goals from docs/Plan.md>
+Vision: See docs/vision.md (rev <date>)
+Connection Guide: Updated ports/services in docs/ConnectionGuide.md
 Targets: <backend / web / mobile web / Android / iOS>
 DoD:
 - <copy MVP DoD checklist from spec>
 
-@Vector Finalise docs/Plan.md (reference spec slug, confirm MVP scope). Record citations in /docs/research.md.
-@Pixel Scaffold tests for every DoD item. Block build until GREEN scaffolding.
-@Forge/@Link/@Glide/@Apex/@Cider Implement only assigned plan steps (respect path scopes).
-@Pixel Re-run tests, report GREEN/RED with repro.
-@Muse Update docs/release notes referencing the shipped MVP.
-@Nexus Ensure CI/preview is configured (only if plan requires it).
+@Vector Plan Mode only: confirm checkpoints and acceptance tests. Do not continue past Step 1 without approval. Log citations in /docs/research.md.
+@Pixel Scaffold tests for each DoD item. Share exact commands + expect GREEN before implementation begins.
+@Forge/@Link/@Glide/@Apex/@Cider Implement Step 1 only when approved. Be stupidly specific, run targeted tests after every change, and update ConnectionGuide.md if ports/services shift.
+@Pixel Re-run tests per checkpoint and report GREEN/RED with repro instructions.
+@Muse Update README/CHANGELOG/docs referencing the tests and Connection Guide entries.
+@Nexus Ensure CI/env changes are reflected in docs/ConnectionGuide.md. Ask before committing or pushing.
 @Sentinel Join if security/privacy risks are in scope.
 @Scout Research only when someone says `unknown` or requests sources.
 ```
@@ -47,16 +49,16 @@ DoD:
 Prompt: Build a `/health` JSON endpoint and a tiny UI that renders its status.
 
 Expected sequence:
-- Vector -> refreshes Plan.md + checklist from spec
-- Pixel -> tests scaffold (1 happy + 1 edge)
-- Forge -> `/health` API (e.g., `{ "status": "ok", "time": "<iso>" }`)
-- Link -> minimal UI fetches `/health` and renders status; include a11y checklist
-- Pixel -> GREEN/RED with repro steps
-- Muse -> README updates (Prereqs/Setup/Try it/Troubleshoot) citing test names
-- Nexus (optional) -> CI runs tests on push/PR and posts preview/artifact URL
+1. Vector refreshes `docs/Plan.md`, numbering checkpoints and mapping them to the DoD.
+2. Pixel scaffolds one happy + one edge test per acceptance test; posts commands.
+3. Forge implements the `/health` API (e.g., `{ "status": "ok", "time": "<iso>" }`), runs targeted tests, and updates Connection Guide if a new port is used.
+4. Link creates the UI, shares accessibility checklist results, and runs frontend/unit tests.
+5. Pixel reruns the full test command set and reports GREEN/RED with repro steps.
+6. Muse updates README (Prereqs/Setup/Try it/Troubleshoot) referencing the new tests and Connection Guide.
+7. Nexus (optional) runs CI/preview and records any pipeline/env changes.
 
 Definition of Done:
-- Tests GREEN
-- Docs updated
-- (Optional) Preview works
-- `npm run preflight` passes locally
+- All targeted tests GREEN with commands recorded
+- `docs/vision.md` and `docs/ConnectionGuide.md` updated
+- README/CHANGELOG entries shipped by Muse
+- `npm run preflight` passes locally (or documented if blocked)

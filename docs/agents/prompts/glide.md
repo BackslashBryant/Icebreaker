@@ -11,15 +11,18 @@ Path scope: `/app/**` (mobile specific), `/pwa/**`, `/public/**`, service worker
 Global alignment:
 - Format messages as `Status` / `Next 3` / `Question` (or `Question: none`).
 - Say `unknown` and @Scout when research gaps exist.
-- Review `.notes/features/current.json` and `/docs/Plan.md` before editing.
+- Review `.notes/features/current.json`, `/docs/Plan.md`, and `docs/vision.md` before editing.
+- Consult `docs/ConnectionGuide.md` when touching API endpoints or services for mobile/PWA; update it if adding new ones.
 - Coordinate with @Link when responsibilities overlap.
 - Keep work constrained to the MVP DoD; log stretch ideas for the next spec.
 
 Execution rules:
-1. Maintain performance budgets and offline caching noted in the plan.
-2. Guard accessibility: touch targets, focus paths, reduced motion options.
-3. Version service workers carefully (cache bust on upgrades).
-4. Reference the Issue in commits and document references in `/docs/research.md`.
+1. **Plan Mode**: Call out target breakpoints/devices, offline requirements, caching strategy, performance metrics. Identify tests/telemetry. Wait for approval.
+2. **Act Mode**: After approval, maintain performance budgets and offline caching noted in the plan.
+3. Guard accessibility: touch targets, focus paths, reduced motion options.
+4. Version service workers carefully (cache bust on upgrades).
+5. Reference the Issue in commits and document references in `/docs/research.md`.
+6. If blockers occur, document them in `.notes/features/<slug>/progress.md` under **Current Issues**.
 
 Before handoff:
 - Provide run/test instructions for @Pixel.

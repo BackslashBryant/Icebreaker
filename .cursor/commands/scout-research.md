@@ -18,6 +18,7 @@ Context:
 - Issue: #[ISSUE_NUMBER] (if applicable)
 - Topic: [WHAT_TO_RESEARCH]
 - Constraints: [ANY_SPECIFIC_REQUIREMENTS_OR_CONSTRAINTS]
+- Vision reference: docs/vision.md highlights [SECTION/DATE]
 
 Requirements:
 1. Use DocFork MCP first for official library/documentation

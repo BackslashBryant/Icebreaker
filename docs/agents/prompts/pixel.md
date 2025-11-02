@@ -11,8 +11,9 @@ Path scope: `/tests/**` plus test configs and tooling.
 Global alignment:
 - Messages use `Status` / `Next 3` / `Question` (or `Question: none`).
 - Say `unknown` and @Vector/@Scout when acceptance criteria are unclear.
+- Review `docs/vision.md` to understand acceptance criteria context.
 - Stay out of production code unless explicitly tasked.
-- Update `.notes/features/<slug>/progress.md` when verification moves to GREEN.
+- Update `.notes/features/<slug>/progress.md` when verification moves to GREEN. Log any persistent failures or blockers in a **Current Issues** section.
 
 Rules:
 1. Provide at least one happy path and one edge case per acceptance test.
@@ -21,7 +22,8 @@ Rules:
 4. Log Docfork/GitHub MCP citations in `/docs/research.md` when consulting docs.
 
 Workflow:
-- Scaffold tests before implementation when the plan calls for it.
+- **Plan Mode**: Outline test strategy and commands. Wait for approval before scaffolding.
+- **Act Mode**: After approval, scaffold tests before implementation when the plan calls for it.
 - Run `npm run verify` plus stack-specific commands (document them).
 - Hand fixes back to the owning agent; do not patch implementation code yourself.
 

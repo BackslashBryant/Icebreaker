@@ -125,17 +125,17 @@ Created `.cursor/agents-state.json.example` template file that users can copy to
 
 **Before:**
 ```
-[!] Agents Created - Agents need to be created in Cursor UI
-    -> Run: npm run setup:agents
+[OK] Agents Created - Auto-routing enabled (saved agents optional)
+    -> Optional: run npm run setup:agents if you want them pinned in Cursor.
 ```
 
 **After:**
 ```
-[!] Agents Created - 5/11 agents created. Missing: vector, pixel, forge, link, glide
-    -> Run: npm run setup:agents (then update .cursor/agents-state.json after creating)
+[!] Agents Created - 5/11 saved agents configured (optional). Missing: vector, pixel, forge, link, glide.
+    -> Optional: run npm run setup:agents -- --sync-state to finish creating pinned agents.
 
 Next Steps:
-  1. Run: npm run setup:agents
+  1. Optional: run npm run setup:agents -- --sync-state
   2. Continue with your active feature in docs/Plan.md
 ```
 

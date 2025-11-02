@@ -15,7 +15,8 @@ Type `/vector-plan` in Cursor chat, then provide:
 
 Context:
 - Issue: #[ISSUE_NUMBER] - [BRIEF_DESCRIPTION]
-- Goal: [WHAT_WE_WANT_TO_ACHIEVE]
+- Vision: Summarised in docs/vision.md (rev [DATE])
+- Connection Guide: docs/ConnectionGuide.md (note any missing ports/services)
 
 Requirements:
 1. Create or update `/docs/Plan.md` with:
@@ -32,15 +33,17 @@ Requirements:
    - Sequential and reversible
    - Scope-appropriate (not too large)
    - Clear about implementation delegation
+   - Include "Do not proceed past step <n> without approval"
 
 3. Document any needed research citations in `/docs/research.md`
 
 4. Create a checklist mapping steps to owners and path scopes
+5. Note any updates required in `docs/ConnectionGuide.md`
 
 Deliverables:
 - Updated `/docs/Plan.md`
 - Research citations if needed
-- Handoff plan for Pixel (test scaffolding) and implementers
+- Handoff plan for Pixel (test scaffolding) and implementers with explicit checkpoints
 
 Please structure this as a proper Vector plan following the format in `.cursor/rules/01-workflow.mdc`.
 ```

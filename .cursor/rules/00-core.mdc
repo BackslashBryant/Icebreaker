@@ -7,26 +7,32 @@ alwaysApply: true
 # Cursor Vibe Operating Agreement
 
 ## Flow > Friction
-- Start each session by checking intention: prototype, polish, or ship. Narrate it so Agent matches your energy.
-- Prefer Plan Mode (Shift+Tab) for anything beyond a single edit. Let Agent draft the plan, tweak it, then build.
-- Keep prompts conversational. Voice input, queued messages (Ctrl+Enter), and saved plans are all welcome.
+- Start each session by checking intention: prototype, polish, or ship. Narrate it so the agent matches your energy.
+- Begin with `docs/vision.md`, `docs/ConnectionGuide.md`, and `.notes/features/current.json` so everyone shares context.
+- Prefer Plan Mode (Shift+Tab) for anything beyond a single edit. Let the agent draft the plan, tweak it, then build.
+- Keep prompts conversational; voice input, queued messages (Ctrl+Enter), and saved plans are all welcome.
 
 ## Safety Rails We Keep Even When Vibing
 - Never ship code you have not read; sanity-check diffs and run the quickest meaningful verification.
-- Flag real secrets, prod data, or compliance-sensitive areas before asking Agent to touch them.
+- Flag real secrets, prod data, or compliance-sensitive areas before asking the agent to touch them.
 - Document gotchas in `.notes/` or the active plan so the next session inherits your context.
+- Be stupidly specific: name files, selectors, colors, padding, payload keys. Vague in -> vague out.
+- Ask before committing, pushing, installing new tech, or touching new services. Present the proposed command first.
+- No mock data in production paths. If placeholders are required, confirm with the caller or Pixel.
+- Maintain `docs/ConnectionGuide.md` anytime a port, endpoint, or credential changes.
+- When loops happen, stop, capture them in the **Current Issues** section of `.notes/features/<slug>/progress.md`, and restart the chat with that context.
 
 ## Collaboration Rituals
-- Reference `AGENTS.md` for tone, preferred stack choices, and review expectations.
+- Reference `docs/agents/PLAYBOOK.md` for handoffs, tone, and checkpoints.
 - Pin the quick guides under `docs/cursor/` (extensions, symbols, agent tooling) so Cursor stays the SME for new teammates.
 - Mention focused rules (e.g. `@rules/testing`) or docs on demand instead of loading the entire library.
 - Celebrate experiments: capture wins/misses in `.notes/` (session log) and roll durable lessons into `/docs/process-improvement.mdc` so artifacts capture the session.
 - **Cursor vs App Logic Separation**: This repository distinguishes between template mode (Cursor files tracked) and app mode (Cursor files blocked). See `docs/development/SEPARATION.md` for details. In app mode, `.cursor/` modifications are blocked from commits unless `ALLOW_CURSOR_PUSH=1` is set (template updates only). Run `npm run convert:app` when shifting from template to app development.
 
 ## Exit Checklist
-- Plans or TODOs updated, even if you bail mid-flight.
-- Verification helper (`scripts/verify-all` via your preferred runner) invoked and results shared.
-- Queue final instructions for Agent if someone is continuing the flow.
+- Plans, vision, connection guide, and TODOs updated, even if you bail mid-flight.
+- Verification helper (`scripts/verify-all` via your preferred runner) invoked after the final change and results shared.
+- Queue final instructions or checkpoint status so the next agent can continue without guessing.
 
 ## Credibility Over Hype
 - Be precise about what succeeded, what failed, and where confidence is low; do not exaggerate accomplishments or gloss over blockers.

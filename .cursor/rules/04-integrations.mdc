@@ -1,223 +1,39 @@
-﻿---
-description: "MCP Integrations - GitHub, Supabase, Playwright, Desktop Commander, DocFork"
+---
+description: "MCP Integrations – GitHub, Supabase, Playwright, Desktop Commander, DocFork"
 globs: ["**/*"]
 alwaysApply: true
 ---
 
 # MCP Integrations
 
+These MCP servers are accelerators—not autopilot. Use them when they reduce risk, cite outputs when they influence a decision, and fall back to the CLI only when the MCP path is blocked.
+
 ## Principles
-- Use integrations through scripts or adapters so tool specifics stay out of domain code.
-- Keep tasks stateless and idempotent; get human approval for side effects.
-- Use MCP tools when they add value to a complex problem and document any decision to skip them.
-- Run `npm run preflight` before agent execution to confirm baseline MCPs (GitHub, DocFork, Desktop Commander) stay configured.
+- Stay in ticket scope. Propose the exact command/query before running it and wait for approval.
+- Prefer scripted helpers (see `tools/` and `examples/automation/`) so operations are reproducible.
+- Log meaningful results (links, summaries, screenshots) in `/docs/research.md`, `artifacts/`, or the relevant doc.
+- If an MCP fails twice, document it in `.notes/features/<slug>/progress.md` and suggest the fallback.
 
-## Configured MCPs (use when they add value)
-- **GitHub MCP**: repository analysis, code examples, and git operations.
-- **Supabase MCP**: database operations and configuration.
-- **Playwright MCP**: UI testing, accessibility, screenshots, Lighthouse/Core Web Vitals.
-- **Desktop Commander MCP**: system control, terminal commands, file operations, process management.
-- **DocFork MCP**: official library documentation retrieval.
+## When to Reach for Which Tool
+- **GitHub MCP** – Branch/PR automation, repo search, code examples. First stop for anything “git” or GitHub API shaped.
+- **DocFork MCP** – Official documentation lookups, code examples, version notes. Cite the source in `/docs/research.md`.
+- **Playwright MCP** – UI screenshots, axe/Lighthouse accessibility/perf checks. Attach outputs to the ticket or artifacts.
+- **Supabase MCP** – Database schema diffs, SQL experiments, policy checks. Update `docs/ConnectionGuide.md` when endpoints change.
+- **Desktop Commander MCP** – Local shell/file automation aligned with the allowlist in `.cursor/tools/policy.md`.
 
-## MCP Inventory (explicit)
-- **Playwright MCP**: UI testing, accessibility (axe), screenshots, Lighthouse/Core Web Vitals.
-- **Supabase MCP**: schema/types, SQL, logs, advisors, branches, Edge Functions.
-- **GitHub MCP**: code search, repo content, PRs/issues, branches, git operations.
-- **DocFork MCP**: official library docs retrieval with examples.
-- **Desktop Commander MCP**: terminal commands, file operations, process management, system control.
+## Plan vs Act Expectations
+1. **Plan Mode** – State which MCP you intend to use, the command/query, expected outcome, and rollback. Await approval.
+2. **Act Mode** – Execute exactly what was approved. Share the raw output (trimmed) plus a one-line interpretation.
+3. **Log** – Place citations or artifacts where the next agent will find them (`/docs/research.md`, `artifacts/<issue>/…`, README updates via Muse, etc.).
 
-## Mandatory MCP Triggers (keyword â†’ tool)
-- "ui", "screenshot", "accessibility", "axe", "lighthouse", "vitals" â†’ Playwright MCP
-- "db", "database", "schema", "sql", "migration", "policy", "supabase" â†’ Supabase MCP
-- "research", "best practice", "trend", "breaking change", "standard" â†’ Built-in web search (first), then GitHub + DocFork as needed
-- "code example", "pattern", "usage" â†’ GitHub MCP, DocFork MCP
-- "performance" â†’ Playwright MCP (Lighthouse/Core Web Vitals), Built-in web search (latest guidance)
-- "security", "vulnerability" â†’ Built-in web search (advisories), GitHub MCP (repo advisories)
-- "terminal", "command", "file operation", "process", "system control" â†’ Desktop Commander MCP
-- **"git", "commit", "push", "branch", "pr", "pull request" â†’ GitHub MCP (MANDATORY FIRST CHOICE)**
+## Health Checks
+- Run `npm run preflight` at the start of a session to confirm baseline MCP servers respond.
+- `npm run mcp:suggest` highlights additional servers worth enabling; document decisions in `.notes/features/<slug>/progress.md`.
+- Nexus records any credential or config changes in `docs/ConnectionGuide.md` before closing a task.
 
-## MCP-First Decision Tree
-**BEFORE using terminal commands, check this list:**
-1. **Git Operations**: If user mentions git, commit, push, branch, PR â†’ Use GitHub MCP first
-2. **UI Operations**: If user mentions UI, screenshot, accessibility â†’ Use Playwright MCP first  
-3. **Database Operations**: If user mentions db, schema, SQL â†’ Use Supabase MCP first
-4. **System Operations**: If user mentions terminal, file operations â†’ Use Desktop Commander MCP first
-5. **Research**: If user mentions research, docs â†’ Use DocFork MCP first
-6. **Fallback**: Only use terminal commands if MCP is unavailable or fails
+## Fallback Protocol
+1. Pause and report the outage (include the MCP name and error).
+2. Suggest an approved fallback (CLI, SDK, manual step) if it stays within scope.
+3. Capture the variance in the plan or Current Issues log so future runs know why the MCP was skipped.
 
-## Phase Checkpoints (MCP-first)
-- **Triage/Plan:**
-  - Built-in web search for current standards/best practices
-  - Agent Browser for exploratory web research (log citations in `/docs/research.md` before trusting results)
-  - Execute `npm run mcp:suggest` and capture recommendations in `.notes/` or the active plan; apply desired servers with `npm run mcp:suggest -- --install <id>`
-- **Build (as applicable):**
-  - Playwright MCP for screenshots/axe during UI changes
-  - Supabase MCP for schema/log checks during DB changes
-  - GitHub MCP for git operations and repository management
-- **Verify:**
-  - Playwright MCP for Lighthouse/Core Web Vitals and multi-browser checks
-  - Supabase MCP advisors/logs for DB integrity and security
-  - GitHub MCP for PR creation and repository operations
-
-## Evidence & Artifacts (required when triggers fire)
-- Store outputs under `artifacts/<TICKET_ID>/` structured by category:
-  - `ui/` (screenshots, axe reports, Lighthouse)
-  - `db/` (schema snapshots, advisor output, logs)
-  - `research/` (web search results, links, summaries)
-  - `git/` (PR links, commit references, branch operations)
-- Link artifacts from the ticket body and PR description.
-- Tickets that trigger MCPs must include at least one artifact per triggered category.
-
-## Quality Gates
-- No ticket may be marked complete if required MCP artifacts are missing for triggered categories.
-- PRs must reference MCP artifacts for UI/DB/Security/Performance scopes.
-
-## Health & Fallback
-- If an MCP is unavailable:
-  1) Pause and flag the outage.
-  2) Suggest alternatives (e.g., Playwright CLI, direct SQL) only if within ticket scope.
-  3) Document the deviation in the ticket and resume MCP use when restored.
-
-## Usage Metrics (lightweight)
-- Record MCP invocations per ticket (count, types) in the ticket notes.
-- Prefer MCP evidence over terminal logs for validation where possible.
-
-## MCP Availability Check
-If MCPs are unavailable or unhealthy:
-1. Pause the task and flag the outage.
-2. Let the requester know which MCP was needed and suggest alternatives.
-3. Continue only if the work stays within ticket scope without the tool; otherwise wait for restoration.
-
----
-
-# GitHub MCP Integration
-
-## Token Configuration
-**Token Permissions Required:**
-- `repo` - Full control of private repositories
-- `repo:status` - Access commit status
-- `repo_deployment` - Access deployment status
-- `public_repo` - Access public repositories
-- `repo:invite` - Access repository invitations
-- `security_events` - Read and write security events
-- `workflow` - Update GitHub Action workflows
-- `write:packages` - Upload packages to GitHub Package Registry
-- `read:packages` - Download packages from GitHub Package Registry
-
-**Token Management:**
-- Store in `GITHUB_TOKEN` environment variable
-- Token expires: 90 days (configurable)
-- Regenerate before expiration to avoid authentication failures
-- Rate limits: 30 requests/minute for search API, 5000/hour for core API
-
-## GitHub MCP Operations
-- Repository analysis and code examples
-- Git operations (branch, commit, push, PR, merge)
-- Issue and PR management
-- Code search and pattern analysis
-- Repository content retrieval
-- Branch operations and management
-
----
-
-# Supabase MCP Integration
-
-## Configuration
-- Store in `SUPABASE_URL` and `SUPABASE_ANON_KEY` environment variables
-- Configure project settings in Supabase dashboard
-- Set up database policies and security rules
-
-## Supabase MCP Operations
-- Database schema and types management
-- SQL query execution and validation
-- Logs and advisors monitoring
-- Branch management for development
-- Edge Functions deployment
-- Database security and policy validation
-
----
-
-# Playwright MCP Integration
-
-## Configuration
-- Requires `GITHUB_TOKEN` for authentication
-- Configure browser settings and test environments
-- Set up accessibility testing with axe-core
-
-## Playwright MCP Operations
-- UI testing and validation
-- Accessibility testing with axe-core
-- Screenshot capture and comparison
-- Lighthouse performance testing
-- Core Web Vitals monitoring
-- Multi-browser testing support
-
----
-
-# Desktop Commander MCP Integration
-
-## Configuration
-- Requires `GITHUB_TOKEN` for authentication
-- Configure system permissions and access
-- Set up file system operations
-
-## Desktop Commander MCP Operations
-- Terminal command execution
-- File operations and management
-- Process management and monitoring
-- System control and configuration
-- Environment variable management
-- System health monitoring
-
----
-
-# DocFork MCP Integration
-
-## Configuration
-- Requires `GITHUB_TOKEN` for authentication
-- Configure documentation sources and libraries
-- Set up search and retrieval patterns
-
-## DocFork MCP Operations
-- Official library documentation retrieval
-- Code examples and usage patterns
-- API documentation and references
-- Best practices and guidelines
-- Library comparison and analysis
-- Documentation search and filtering
-
----
-
-# MCP Safety Policies
-
-## Approval Requirements
-- MCP operations must be proposed and approved
-- Follow safety policies in `.cursor/tools/policy.md`
-- Document all MCP usage and results
-- Monitor MCP server health and performance
-
-## Security Considerations
-- Never expose sensitive data through MCP operations
-- Validate all inputs and outputs
-- Monitor MCP server logs for security issues
-- Implement proper authentication and authorization
-
-## Performance Monitoring
-- Track MCP operation performance
-- Monitor server health and availability
-- Implement fallback mechanisms
-- Document performance issues and solutions
-
-## Error Handling
-- Implement proper error handling for MCP operations
-- Provide clear error messages and recovery steps
-- Log all MCP errors for analysis
-- Implement retry mechanisms where appropriate
-
----
-
-# Usage Pattern
-- Reference scripts from tasks or agents and capture logs in artifacts/.
-- Configuration lives in .cursor/mcp.json and /scripts/*/README.md.
-- Automation scripts that change environments or pipelines require ticketed scope and reviewer sign-off before merging.
-- Re-run `npm run mcp:suggest` after dependency/config changes and whenever plans add a new surface area; update `.cursor/mcp.json` (or plans) accordingly.
+Treat MCP usage with the same care as code changes—propose, approve, execute, and document.

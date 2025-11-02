@@ -1,51 +1,29 @@
 # Creating Cursor Agents
 
-This guide provides step-by-step instructions for creating all 11 agents in Cursor IDE.
+Quick checklist for registering the 11 dev personas in Cursor. This is optional—auto-routing rules already wake each persona when you open their files—but saved agents are handy if you want them pinned in the sidebar. Keep `docs/agents/PLAYBOOK.md`, `docs/vision.md`, and `docs/ConnectionGuide.md` open so every prompt stays aligned.
 
-## Quick Overview
+## Before you start
+- Run `npm run setup` (or `npm install`) so prompts/docs are generated.
+- Open Cursor → **Agents** panel (`Ctrl/Cmd + I`) → **New Agent**.
+- Optionally run `npm run agents:prompt -- all` to copy prompts from the terminal.
+- Authenticate GitHub MCP (and any optional MCPs) before creating agents.
 
-Agents are AI assistants configured with specific prompts, model preferences, and tool access. They work together in a sequential workflow to implement features from planning to deployment.
+## Roster Setup
 
-**Total agents**: 11
-**Estimated time**: 10-15 minutes
-**Difficulty**: Easy (mostly copy-paste)
+### 🔎 Scout (`scout`)
+- Role: Research - Gen Z research sleuth
+- Path scope: `/docs/research.md`
+- Model hint: Reasoning (Claude 3.7 Sonnet, Gemini 2.5 Pro)
+- Recommended MCP: **docfork**, **github**
 
----
+Steps:
+1. Name the agent exactly `scout`.
+2. Paste the prompt below into the System prompt field.
+3. Choose a reasoning-focused model.
+4. Enable the recommended MCP servers (optional but encouraged).
+5. Save.
 
-## Prerequisites
-
--  Cursor IDE installed and running
--  MCP servers configured (run `npm run setup` first)
--  Agent prompts available (run `npm run agents:prompt -- list` to verify)
-
----
-
-## Step-by-Step Instructions
-
-### Step 1: Open Agent Creation Panel
-
-1. Open Cursor IDE
-2. Click the **Agents** icon in the sidebar (or press `Ctrl+I` / `Cmd+I`)
-3. Click **"New Agent"** button
-
----
-
-## Agent Creation Steps
-
-### Step 2: Create 🔎 Scout (scout)
-
-**Role**: Research - Gen Z research sleuth
-
-**Signature**: "Links or it didn't happen."
-
-**Path Scope**: `/docs/research.md`
-
-**Steps**:
-
-1. **Name**: Enter exactly: `scout`
-
-2. **Prompt**: Copy and paste the following prompt:
-
+Prompt:
 ```
 You are Scout (Researcher).
 
@@ -85,32 +63,20 @@ Escalations:
 - @Sentinel if security implications surface.
 ```
 
-3. **Model Hint**: Select **Reasoning-focused** model
-   - Reasoning models: Claude 3.7 Sonnet, Gemini 2.5 Pro
-   - Codegen models: GPT-4, Claude Sonnet, Gemini Pro
+### 🎯 Vector (`vector`)
+- Role: Project Planner - Gen X program manager; structured, pragmatic
+- Path scope: `/docs/**`
+- Model hint: Reasoning (Claude 3.7 Sonnet, Gemini 2.5 Pro)
+- Recommended MCP: **docfork**, **github**
 
-4. **MCP Tools** (Optional but recommended):
-   - Enable **docfork** MCP server
-   - Enable **github** MCP server
+Steps:
+1. Name the agent exactly `vector`.
+2. Paste the prompt below into the System prompt field.
+3. Choose a reasoning-focused model.
+4. Enable the recommended MCP servers (optional but encouraged).
+5. Save.
 
-5. **Save**: Click "Save" or "Create"
-
----
-
-### Step 3: Create 🎯 Vector (vector)
-
-**Role**: Project Planner - Gen X program manager; structured, pragmatic
-
-**Signature**: "Plan the work, work the plan."
-
-**Path Scope**: `/docs/**`
-
-**Steps**:
-
-1. **Name**: Enter exactly: `vector`
-
-2. **Prompt**: Copy and paste the following prompt:
-
+Prompt:
 ```
 You are Vector (Project Planner).
 
@@ -147,32 +113,20 @@ Handoffs:
 - @Nexus or @Sentinel when CI/deploy/security scope appears.
 ```
 
-3. **Model Hint**: Select **Reasoning-focused** model
-   - Reasoning models: Claude 3.7 Sonnet, Gemini 2.5 Pro
-   - Codegen models: GPT-4, Claude Sonnet, Gemini Pro
+### Pixel (`pixel`)
+- Role: Tester and QA - Gen X reliability engineer; dry wit, data obsessed
+- Path scope: `/tests/**`
+- Model hint: Reasoning (Claude 3.7 Sonnet, Gemini 2.5 Pro)
+- Recommended MCP: None
 
-4. **MCP Tools** (Optional but recommended):
-   - Enable **docfork** MCP server
-   - Enable **github** MCP server
+Steps:
+1. Name the agent exactly `pixel`.
+2. Paste the prompt below into the System prompt field.
+3. Choose a reasoning-focused model.
+4. Enable the recommended MCP servers (optional but encouraged).
+5. Save.
 
-5. **Save**: Click "Save" or "Create"
-
----
-
-### Step 4: Create Pixel (pixel)
-
-**Role**: Tester and QA - Gen X reliability engineer; dry wit, data obsessed
-
-**Signature**: "Trust, then verify."
-
-**Path Scope**: `/tests/**`
-
-**Steps**:
-
-1. **Name**: Enter exactly: `pixel`
-
-2. **Prompt**: Copy and paste the following prompt:
-
+Prompt:
 ```
 You are Pixel (Tester and QA).
 
@@ -207,30 +161,20 @@ Escalations:
 - @Nexus when CI needs new jobs to run tests.
 ```
 
-3. **Model Hint**: Select **Reasoning-focused** model
-   - Reasoning models: Claude 3.7 Sonnet, Gemini 2.5 Pro
-   - Codegen models: GPT-4, Claude Sonnet, Gemini Pro
+### 🔗 Forge (`forge`)
+- Role: Backend Engineer - Gen X artisan; quiet, precise, allergic to guesswork
+- Path scope: `/api/** /server/** /db/** /migrations/**`
+- Model hint: Codegen (GPT-4, Claude Sonnet, Gemini Pro)
+- Recommended MCP: **docfork**, **github**
 
-4. **MCP Tools**: None required for this agent
+Steps:
+1. Name the agent exactly `forge`.
+2. Paste the prompt below into the System prompt field.
+3. Choose a code-generation-focused model.
+4. Enable the recommended MCP servers (optional but encouraged).
+5. Save.
 
-5. **Save**: Click "Save" or "Create"
-
----
-
-### Step 5: Create 🔗 Forge (forge)
-
-**Role**: Backend Engineer - Gen X artisan; quiet, precise, allergic to guesswork
-
-**Signature**: "Interfaces first."
-
-**Path Scope**: `/api/** /server/** /db/** /migrations/**`
-
-**Steps**:
-
-1. **Name**: Enter exactly: `forge`
-
-2. **Prompt**: Copy and paste the following prompt:
-
+Prompt:
 ```
 You are Forge (Backend Engineer).
 
@@ -266,32 +210,20 @@ Escalations:
 - @Sentinel for auth, secret, or data exposure concerns.
 ```
 
-3. **Model Hint**: Select **Code generation-focused** model
-   - Reasoning models: Claude 3.7 Sonnet, Gemini 2.5 Pro
-   - Codegen models: GPT-4, Claude Sonnet, Gemini Pro
+### 🌐 Link (`link`)
+- Role: Web Frontend - Gen Y web lead; accessibility-first
+- Path scope: `/web/** /frontend/** /src/**`
+- Model hint: Codegen (GPT-4, Claude Sonnet, Gemini Pro)
+- Recommended MCP: **docfork**, **playwright**
 
-4. **MCP Tools** (Optional but recommended):
-   - Enable **docfork** MCP server
-   - Enable **github** MCP server
+Steps:
+1. Name the agent exactly `link`.
+2. Paste the prompt below into the System prompt field.
+3. Choose a code-generation-focused model.
+4. Enable the recommended MCP servers (optional but encouraged).
+5. Save.
 
-5. **Save**: Click "Save" or "Create"
-
----
-
-### Step 6: Create 🌐 Link (link)
-
-**Role**: Web Frontend - Gen Y web lead; accessibility-first
-
-**Signature**: "Users first, pixels second."
-
-**Path Scope**: `/web/** /frontend/** /src/**`
-
-**Steps**:
-
-1. **Name**: Enter exactly: `link`
-
-2. **Prompt**: Copy and paste the following prompt:
-
+Prompt:
 ```
 You are Link (Web Frontend Engineer).
 
@@ -324,32 +256,20 @@ Before handoff:
 - Remove `agent:link` and move the Issue to `status:verify` when ready for testing.
 ```
 
-3. **Model Hint**: Select **Code generation-focused** model
-   - Reasoning models: Claude 3.7 Sonnet, Gemini 2.5 Pro
-   - Codegen models: GPT-4, Claude Sonnet, Gemini Pro
+### 📳 Glide (`glide`)
+- Role: Mobile Web/PWA - Gen Z perf nerd
+- Path scope: `/web/** /mobile-web/** /pwa/**`
+- Model hint: Codegen (GPT-4, Claude Sonnet, Gemini Pro)
+- Recommended MCP: **docfork**, **playwright**
 
-4. **MCP Tools** (Optional but recommended):
-   - Enable **docfork** MCP server
-   - Enable **playwright** MCP server
+Steps:
+1. Name the agent exactly `glide`.
+2. Paste the prompt below into the System prompt field.
+3. Choose a code-generation-focused model.
+4. Enable the recommended MCP servers (optional but encouraged).
+5. Save.
 
-5. **Save**: Click "Save" or "Create"
-
----
-
-### Step 7: Create 📳 Glide (glide)
-
-**Role**: Mobile Web/PWA - Gen Z perf nerd
-
-**Signature**: "Fast on low-end."
-
-**Path Scope**: `/web/** /mobile-web/** /pwa/**`
-
-**Steps**:
-
-1. **Name**: Enter exactly: `glide`
-
-2. **Prompt**: Copy and paste the following prompt:
-
+Prompt:
 ```
 You are Glide (Mobile Web and PWA Engineer).
 
@@ -381,32 +301,20 @@ Before handoff:
 - Remove `agent:glide` and move to `status:verify` when ready for QA.
 ```
 
-3. **Model Hint**: Select **Code generation-focused** model
-   - Reasoning models: Claude 3.7 Sonnet, Gemini 2.5 Pro
-   - Codegen models: GPT-4, Claude Sonnet, Gemini Pro
+### 🤖 Apex (`apex`)
+- Role: Android - Gen Y Android minimalist
+- Path scope: `/android/**`
+- Model hint: Codegen (GPT-4, Claude Sonnet, Gemini Pro)
+- Recommended MCP: **docfork**
 
-4. **MCP Tools** (Optional but recommended):
-   - Enable **docfork** MCP server
-   - Enable **playwright** MCP server
+Steps:
+1. Name the agent exactly `apex`.
+2. Paste the prompt below into the System prompt field.
+3. Choose a code-generation-focused model.
+4. Enable the recommended MCP servers (optional but encouraged).
+5. Save.
 
-5. **Save**: Click "Save" or "Create"
-
----
-
-### Step 8: Create 🤖 Apex (apex)
-
-**Role**: Android - Gen Y Android minimalist
-
-**Signature**: "Ship small, ship steady."
-
-**Path Scope**: `/android/**`
-
-**Steps**:
-
-1. **Name**: Enter exactly: `apex`
-
-2. **Prompt**: Copy and paste the following prompt:
-
+Prompt:
 ```
 You are Apex (Android Engineer).
 
@@ -437,31 +345,20 @@ Before handoff:
 - Remove `agent:apex` when the branch is ready for verification.
 ```
 
-3. **Model Hint**: Select **Code generation-focused** model
-   - Reasoning models: Claude 3.7 Sonnet, Gemini 2.5 Pro
-   - Codegen models: GPT-4, Claude Sonnet, Gemini Pro
+### 🍏 Cider (`cider`)
+- Role: iOS - Gen Y iOS perfectionist
+- Path scope: `/ios/**`
+- Model hint: Codegen (GPT-4, Claude Sonnet, Gemini Pro)
+- Recommended MCP: **docfork**
 
-4. **MCP Tools** (Optional but recommended):
-   - Enable **docfork** MCP server
+Steps:
+1. Name the agent exactly `cider`.
+2. Paste the prompt below into the System prompt field.
+3. Choose a code-generation-focused model.
+4. Enable the recommended MCP servers (optional but encouraged).
+5. Save.
 
-5. **Save**: Click "Save" or "Create"
-
----
-
-### Step 9: Create 🍏 Cider (cider)
-
-**Role**: iOS - Gen Y iOS perfectionist
-
-**Signature**: "Make it smooth."
-
-**Path Scope**: `/ios/**`
-
-**Steps**:
-
-1. **Name**: Enter exactly: `cider`
-
-2. **Prompt**: Copy and paste the following prompt:
-
+Prompt:
 ```
 You are Cider (iOS Engineer).
 
@@ -492,31 +389,20 @@ Before handoff:
 - Remove `agent:cider` when the branch is ready for verification.
 ```
 
-3. **Model Hint**: Select **Code generation-focused** model
-   - Reasoning models: Claude 3.7 Sonnet, Gemini 2.5 Pro
-   - Codegen models: GPT-4, Claude Sonnet, Gemini Pro
+### 🎨 Muse (`muse`)
+- Role: Docs/UX - Gen Z doc storyteller
+- Path scope: `/docs/** /README.md /CHANGELOG.md`
+- Model hint: Codegen (GPT-4, Claude Sonnet, Gemini Pro)
+- Recommended MCP: **docfork**
 
-4. **MCP Tools** (Optional but recommended):
-   - Enable **docfork** MCP server
+Steps:
+1. Name the agent exactly `muse`.
+2. Paste the prompt below into the System prompt field.
+3. Choose a code-generation-focused model.
+4. Enable the recommended MCP servers (optional but encouraged).
+5. Save.
 
-5. **Save**: Click "Save" or "Create"
-
----
-
-### Step 10: Create 🎨 Muse (muse)
-
-**Role**: Docs/UX - Gen Z doc storyteller
-
-**Signature**: "Make it click."
-
-**Path Scope**: `/docs/** /README.md /CHANGELOG.md`
-
-**Steps**:
-
-1. **Name**: Enter exactly: `muse`
-
-2. **Prompt**: Copy and paste the following prompt:
-
+Prompt:
 ```
 You are Muse (Documentation and UX Writer).
 
@@ -550,31 +436,20 @@ Completion:
 - Remove `agent:muse` once documentation is ready for review.
 ```
 
-3. **Model Hint**: Select **Code generation-focused** model
-   - Reasoning models: Claude 3.7 Sonnet, Gemini 2.5 Pro
-   - Codegen models: GPT-4, Claude Sonnet, Gemini Pro
+### 🚀 Nexus (`nexus`)
+- Role: DevOps - Gen Y DevOps steward; calm checklists
+- Path scope: `.github/** /.ci/** Dockerfile deploy configs env.example docs/github/**`
+- Model hint: Codegen (GPT-4, Claude Sonnet, Gemini Pro)
+- Recommended MCP: **github**
 
-4. **MCP Tools** (Optional but recommended):
-   - Enable **docfork** MCP server
+Steps:
+1. Name the agent exactly `nexus`.
+2. Paste the prompt below into the System prompt field.
+3. Choose a code-generation-focused model.
+4. Enable the recommended MCP servers (optional but encouraged).
+5. Save.
 
-5. **Save**: Click "Save" or "Create"
-
----
-
-### Step 11: Create 🚀 Nexus (nexus)
-
-**Role**: DevOps - Gen Y DevOps steward; calm checklists
-
-**Signature**: "Pipelines tell the truth."
-
-**Path Scope**: `.github/** /.ci/** Dockerfile deploy configs env.example docs/github/**`
-
-**Steps**:
-
-1. **Name**: Enter exactly: `nexus`
-
-2. **Prompt**: Copy and paste the following prompt:
-
+Prompt:
 ```
 You are Nexus (DevOps Engineer).
 
@@ -614,31 +489,20 @@ Escalations:
 - @Sentinel when security concerns appear.
 ```
 
-3. **Model Hint**: Select **Code generation-focused** model
-   - Reasoning models: Claude 3.7 Sonnet, Gemini 2.5 Pro
-   - Codegen models: GPT-4, Claude Sonnet, Gemini Pro
+### 🛡️ Sentinel (`sentinel`)
+- Role: Security - Gen X security guardian
+- Path scope: `/docs/security/**`
+- Model hint: Reasoning (Claude 3.7 Sonnet, Gemini 2.5 Pro)
+- Recommended MCP: None
 
-4. **MCP Tools** (Optional but recommended):
-   - Enable **github** MCP server
+Steps:
+1. Name the agent exactly `sentinel`.
+2. Paste the prompt below into the System prompt field.
+3. Choose a reasoning-focused model.
+4. Enable the recommended MCP servers (optional but encouraged).
+5. Save.
 
-5. **Save**: Click "Save" or "Create"
-
----
-
-### Step 12: Create 🛡️ Sentinel (sentinel)
-
-**Role**: Security - Gen X security guardian
-
-**Signature**: "Least change, most safety."
-
-**Path Scope**: `/docs/security/**`
-
-**Steps**:
-
-1. **Name**: Enter exactly: `sentinel`
-
-2. **Prompt**: Copy and paste the following prompt:
-
+Prompt:
 ```
 You are Sentinel (Security Reviewer).
 
@@ -680,118 +544,10 @@ Escalations:
 - @Vector if scope must change or work should pause.
 ```
 
-3. **Model Hint**: Select **Reasoning-focused** model
-   - Reasoning models: Claude 3.7 Sonnet, Gemini 2.5 Pro
-   - Codegen models: GPT-4, Claude Sonnet, Gemini Pro
+## After creation
+- Confirm every agent appears in Cursor IDE.
+- Update `.cursor/agents-state.json` (copy from the example if needed) or rerun `npm run setup:agents -- --sync-state`.
+- Skim `docs/agents/PLAYBOOK.md` + `docs/agents/KICKOFF.md` so Plan→Act etiquette is top-of-mind.
+- Run `npm run status` to verify setup health before starting a feature.
 
-4. **MCP Tools**: None required for this agent
-
-5. **Save**: Click "Save" or "Create"
-
----
-
-## Batch Creation Tips
-
-### Copy All Prompts at Once
-
-Run this command to print all prompts:
-
-```bash
-npm run agents:prompt -- all
-```
-
-Then copy each prompt as you create the corresponding agent.
-
-### Model Selection Quick Reference
-
-- **Reasoning agents** (Vector, Pixel, Scout, Sentinel): Use Claude 3.7 Sonnet or Gemini 2.5 Pro
-- **Codegen agents** (Forge, Link, Glide, Apex, Cider, Nexus, Muse): Use GPT-4, Claude Sonnet, or Gemini Pro
-
-### MCP Tools Quick Reference
-
-- **Docfork**: Documentation lookup (Vector, Scout, Forge, Link, Glide, Apex, Cider, Muse)
-- **GitHub**: Repository operations (Vector, Forge, Link, Nexus, Scout)
-- **Playwright**: UI testing (Link, Glide)
-
----
-
-## Workflow Sequence
-
-Agents work in this order:
-
-```
-Vector plans -> Pixel scaffolds tests -> Implementers build -> Pixel verifies -> Muse docs -> Nexus deploys -> Sentinel reviews
-```
-
-1. **Vector**  Creates plan from GitHub Issue
-2. **Pixel**  Scaffolds tests from acceptance criteria
-3. **Implementers**  Build features (Forge/Link/Glide/Apex/Cider)
-4. **Pixel**  Verifies implementation
-5. **Muse**  Updates documentation
-6. **Nexus**  Configures CI/CD and deployment
-7. **Sentinel**  Security review (if needed)
-
-**Scout** is called on-demand for research when needed.
-
----
-
-## Verification
-
-After creating all agents:
-
-1. Verify all 11 agents appear in Cursor's Agent panel
-2. Test with: Ask Vector to create a plan for a test issue
-3. Update `.cursor/agents-state.json` with the agents you have created (the helper seeds it automatically; rerun `npm run setup:agents -- --sync-state` to refresh the roster)
-4. Run: `npm run status` to check overall setup status
-
-**Tip**: Keep `.cursor/agents-state.json` in sync so `npm run status` reflects reality. List the agent IDs you finish and update `verifiedAt` when everything is green.
-
----
-
-## Troubleshooting
----
-
-## Troubleshooting
----
-
-## Troubleshooting
-## Troubleshooting
-
-### Agent Not Appearing
-
-- **Check**: Did you click "Save" after creating?
-- **Check**: Refresh Cursor IDE (restart if needed)
-- **Check**: Verify agent name matches exactly (case-sensitive)
-
-### Prompt Not Working
-
-- **Check**: Copied entire prompt including all lines
-- **Check**: No extra characters or formatting issues
-- **Try**: Run `npm run agents:prompt -- scout` to verify prompt format
-
-### MCP Tools Not Available
-
-- **Check**: MCP servers configured in `.cursor/mcp.json`
-- **Check**: Environment variables set (run `npm run status`)
-- **Check**: Cursor IDE restarted after MCP configuration
-
----
-
-## Next Steps
-
-1.  Create all 11 agents using instructions above
-2.  Verify agents are working: `npm run status`
-3.  Start your first feature: See `docs/agents/KICKOFF.md`
-
----
-
-## Related Documentation
-
-- `docs/agents/README.md` - Agent roster and detailed descriptions
-- `docs/agents/SETUP.md` - Quick setup reference
-- `docs/agents/KICKOFF.md` - Kickoff template for starting work
-- `docs/cursor/models.md` - Model selection guide
-
----
-
-_This guide was generated from `.cursor/agents-config.json`. Run `npm run setup:agents` to regenerate._
+_Generated from `.cursor/agents-config.json`. Rerun `npm run setup:agents` whenever the roster changes._

@@ -423,7 +423,7 @@ function printCompletionReport(results) {
   log('\nNext Steps:', 'cyan');
   log(' 1. Configure Cursor IDE settings (npm run setup:cursor).');
   log(' 2. Install recommended extensions (npm run setup:extensions).');
-  log(' 3. Create Cursor agents (npm run setup:agents).');
+  log(' 3. (Optional) Create saved Cursor agents (npm run setup:agents).');
   log(' 4. Verify setup (npm run status).');
   log(' 5. Bootstrap your feature (npm run feature:new).');
   log(' 6. Follow docs/process/MVP_LOOP.md for spec -> plan -> build.');

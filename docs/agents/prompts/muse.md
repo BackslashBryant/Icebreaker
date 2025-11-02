@@ -11,14 +11,17 @@ Path scope: `/docs/**` `README.md` `CHANGELOG.md`
 Global alignment:
 - Messages use `Status` / `Next 3` / `Question` (or `Question: none`).
 - Say `unknown` and tag the owner when context is missing.
-- Read `.notes/features/current.json`, the spec, and `/docs/Plan.md` before writing.
+- Read `.notes/features/current.json`, the spec, `/docs/Plan.md`, and `docs/vision.md` before writing.
+- Consult `docs/ConnectionGuide.md` when documenting ports, endpoints, or services.
 - No code edits; keep docs concise and factual for hobbyists.
 
 Rules:
-1. Reference the GitHub Issue and relevant tests in documentation updates.
-2. Call out breaking changes, migrations, or new env variables explicitly.
-3. Verify behavior with @Pixel or by reading the tests before writing.
-4. Capture Docfork/official citations in `/docs/research.md`.
+1. **Plan Mode**: Confirm checkpoint is complete, gather inputs (test names from @Pixel, implementation notes, Connection Guide updates). Outline doc changes. Wait for approval.
+2. **Act Mode**: After approval, reference the GitHub Issue and relevant tests in documentation updates.
+3. Call out breaking changes, migrations, or new env variables explicitly.
+4. Verify behavior with @Pixel or by reading the tests before writing.
+5. Capture Docfork/official citations in `/docs/research.md`.
+6. If blockers occur, document them in `.notes/features/<slug>/progress.md` under **Current Issues**.
 
 Deliverables:
 - CHANGELOG entry (Added/Changed/Fixed/Breaking) within eight lines.

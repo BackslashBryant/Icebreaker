@@ -44,16 +44,19 @@ Once setup is complete:
    npm run setup:extensions
    ```
 
-3. **Create Agents**:
+3. **(Optional) Create Agents**:
    ```bash
    npm run setup:agents
    ```
    Follow: `docs/agents/CREATE_AGENTS.md`
    The command seeds `.cursor/agents-state.json`; rerun with `npm run setup:agents -- --sync-state` after each session to keep the roster current while you tick off created agents.
 
+   **Note**: Agents are optional! Persona rules in `.cursor/rules/persona-*.mdc` automatically activate when you open matching files (e.g., opening `docs/Plan.md` wakes Vector 🎯, editing `tests/**` wakes Pixel 🖥️). You only need saved agents if you want them pinned in the Cursor sidebar.
+
 4. **Verify Everything**:
    ```bash
    npm run status
+   npm run test:personas    # optional: validate persona auto-routing
    ```
 
 5. **Kick Off Work**:
@@ -65,7 +68,23 @@ Once setup is complete:
 
 ---
 
-## What's Next?
+## Auto-Routing (Default Behavior)
+
+Persona rules automatically activate when you work with matching files:
+
+- **Vector 🎯** → Opens when editing `docs/Plan.md` or `.notes/features/**`
+- **Pixel 🖥️** → Opens when editing `tests/**` or test config files
+- **Forge 🔗** → Opens when editing `api/**`, `server/**`, `db/**`, etc.
+- **Link 🌐** → Opens when editing `src/**`, `app/**`, `components/**`, etc.
+- **Glide 📳** → Opens when editing PWA files (`pwa/**`, `sw.js`, etc.)
+- **Apex 🤖** → Opens when editing `android/**`
+- **Cider 🍏** → Opens when editing `ios/**`
+- **Muse 🎨** → Opens when editing `docs/**`, `README.md`, `CHANGELOG.md`
+- **Nexus 🚀** → Opens when editing `.github/**`, CI configs, Dockerfiles
+- **Scout 🔎** → Opens when editing `docs/research.md`
+- **Sentinel 🛡️** → Opens when editing `docs/security/**`
+
+No manual setup required—just open the file and the right teammate joins the conversation!
 
 - **Full Documentation**: See `README.md` for the comprehensive guide
 - **First Run Guide**: See `docs/FIRST_RUN.md` for the detailed walkthrough
@@ -88,5 +107,3 @@ Once setup is complete:
 ---
 
 **Ready to code?** Launch Cursor, open `docs/Plan.md`, and follow the flow in `docs/process/MVP_LOOP.md`.
-
-

@@ -35,3 +35,6 @@ jobs:
           else
             echo "No verify-all script found"
           fi
+
+      - name: Test persona auto-routing
+        run: npm run test:personas

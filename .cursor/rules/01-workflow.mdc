@@ -6,16 +6,17 @@ alwaysApply: true
 
 # GitHub-Centric Workflow
 
-This repo assumes GitHub hosts the project, issues drive the work, and Cursor Agents execute sequentially. Every contribution should leave an auditable trail in GitHub (issues, branches, PRs, checks).
+This repo assumes GitHub hosts the project, issues drive the work, and Cursor Agents execute sequentially. Every contribution should leave an auditable trail in GitHub (issues, branches, PRs, checks) and must respect the Plan Mode → Act Mode checkpoints defined in `docs/Plan.md`.
 
 ## 0. Start From a GitHub Issue
+- Before anything else, confirm `docs/vision.md` and `docs/ConnectionGuide.md` are current.
 - Every feature, bug, or spike starts as an Issue.
 - If none exists, open one with the appropriate template (`/.github/ISSUE_TEMPLATE/`).
 - Reference the issue URL in `/docs/Plan.md`, commits, and PR description.
 
 ## 1. Plan (Vector)
-- Use Cursor Plan Mode with the issue context.
-- Save the plan to `/docs/Plan.md` (3-7 steps, acceptance tests, owners).
+- Use Cursor Plan Mode with the issue context plus `docs/vision.md`.
+- Save the plan to `/docs/Plan.md` (3-7 numbered checkpoints, acceptance tests, owners). Include “Do not continue past step _n_ without approval.”
 - Add labels: `agent:vector`, relevant implementer labels, and `status:plan`.
 - If Docfork/Search MCP is used, note the references in `/docs/research.md`.
 
@@ -25,18 +26,22 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Nexus or the acting human runs `npm run agents:install-hook` to copy the path-scope pre-commit hook locally.
 - Run `npm run preflight` before pushing to ensure scaffolding is intact.
 - Execute `npm run mcp:suggest` after dependency or config changes and note the recommendations in `.notes/` or the active plan; run `npm run mcp:suggest -- --install <id>` to append required servers to `.cursor/mcp.json`.
+- Record any new ports, endpoints, or services in `docs/ConnectionGuide.md` immediately.
 
 ## 3. Implement (Forge/Link/Glide/Apex/Cider)
+- Stay in Plan Mode until the caller says “Proceed.” Once approved, execute one checkpoint at a time.
 - Work within your agent branch and path scope.
 - Commit early/often; reference the issue (`#1234`) in commit messages.
+- Run targeted tests right after each change; paste the command/output in chat.
+- Update `.notes/features/<slug>/progress.md` with **Current Issues** if something fails or loops.
 - Push to GitHub and open a Draft PR immediately. Assign labels per agent (`agent:forge` etc.) and set status `status:build`.
 - Use GitHub MCP (or `gh`) for branch pushes, PR updates, and reviews. Terminal git is a fallback.
 
 ## 4. Verify (Pixel, Muse, Nexus, Sentinel)
-- Pixel runs `npm run verify` (or agreed scripts) and reports in the PR; update status label to `status:verify`.
+- Pixel runs `npm run verify` (or agreed scripts) after every checkpoint; report GREEN/RED with file:line references and repro commands. If red, halt and assign back.
 - `npm run verify` surfaces the MCP suggestion summary; log any add/remove actions before marking verification complete.
-- Muse updates README/CHANGELOG/docs, cites tests, and checks in changes.
-- Nexus confirms GitHub Actions succeeded, configures environment variables/Secrets, and keeps status checks enforced.
+- Muse updates README/CHANGELOG/docs, cites tests, references `docs/vision.md`, and keeps `docs/ConnectionGuide.md` consistent.
+- Nexus confirms GitHub Actions succeeded, configures environment variables/Secrets, and keeps status checks enforced. Record every change in the Connection Guide.
 - Sentinel jumps in for auth/secret/PII-sensitive work, leaving notes under `/docs/security/`.
 
 ## 5. Pull Request Expectations

@@ -11,14 +11,17 @@ Path scope: `/docs/research.md`
 Global alignment:
 - Use `Status` / `Next 3` / `Question` (or `Question: none`).
 - If data is missing, say `unknown` and outline how you will find it.
+- Review `docs/vision.md` to understand product context before researching.
 - Stick to research, recommendations, and trade-offs.
 
 Rules:
-1. Cite 3-5 high-signal sources (URL, version, key takeaway).
-2. Use Docfork and GitHub MCP first; supplement with trusted web results.
-3. Highlight trade-offs, recommend a default, and propose a rollback path.
-4. Flag licensing, pricing, maintenance, or security concerns.
-5. Reference the Issue ID so decisions stay traceable.
+1. **Plan Mode**: Restate research question, constraints, success criteria. List tools (Docfork first, GitHub MCP second, trusted web last). Wait for approval.
+2. **Act Mode**: After approval, cite 3-5 high-signal sources (URL, version, key takeaway).
+3. Use Docfork and GitHub MCP first; supplement with trusted web results.
+4. Highlight trade-offs, recommend a default, and propose a rollback path.
+5. Flag licensing, pricing, maintenance, or security concerns.
+6. Reference the Issue ID so decisions stay traceable.
+7. If blockers occur, document them in `.notes/features/<slug>/progress.md` under **Current Issues**.
 
 Output template:
 ```

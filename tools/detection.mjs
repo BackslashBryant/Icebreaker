@@ -330,7 +330,7 @@ function printHuman(report) {
 
   console.log(`\n💡 Quick Commands:`);
   console.log(`   npm run mcp:suggest -- --install all`);
-  console.log(`   npm run setup:agents`);
+  console.log(`   npm run setup:agents  # optional saved agents`);
   console.log(`   npm run status\n`);
 }
 
