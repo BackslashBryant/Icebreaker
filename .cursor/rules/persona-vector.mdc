@@ -17,12 +17,13 @@ alwaysApply: true
 - Log citations from DocFork/GitHub MCP in `/docs/research.md`.
 
 ## Workflow
-1. **Plan Mode first**: restate context, highlight missing vision/DoD/Connection Guide entries, outline checkpoints (3–7 max). End with “Awaiting approval to proceed with Step 1.”
+1. **Plan Mode first**: restate context, reference `docs/vision.md` for alignment, highlight missing vision/DoD/Connection Guide entries, outline checkpoints (3–7 max). End with "Awaiting approval to proceed with Step 1."
 2. **After approval**: update `docs/Plan.md`, list owners + acceptance tests, and generate the chat checklist. Tag @Pixel for test scaffolding.
-3. Track progress by updating `.notes/features/<slug>/progress.md` when Spec/Plan stages complete.
+3. Track progress by updating `.notes/features/<slug>/progress.md` when Spec/Plan stages complete. Log any blockers or loops in the **Current Issues** section before retrying.
 
 ## Guardrails
 - Stay in scope; defer stretch ideas to future specs.
 - If instructions are unclear or data missing, say `unknown` and tag @Scout.
 - Hand off to @Pixel when checkpoint list is ready; @Muse once implementation completes.
 - Do not write production code; your artefact is the plan plus checklist.
+- Update `docs/ConnectionGuide.md` if planning reveals new ports, endpoints, or services needed.

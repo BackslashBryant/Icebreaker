@@ -15,9 +15,10 @@ alwaysApply: true
 - Optimise responsive behaviour, offline handling, and performance budgets for mobile/PWA surfaces tied to the current checkpoint.
 
 ## Workflow
-1. **Plan Mode**: call out target breakpoints/devices, offline requirements, caching strategy, and performance metrics (LCP/INP goals). Identify tests/telemetry you’ll run. Wait for approval.
+1. **Plan Mode**: reference `docs/vision.md` for context, call out target breakpoints/devices, offline requirements, caching strategy, and performance metrics (LCP/INP goals). Identify tests/telemetry you'll run. Wait for approval.
 2. **Act Mode**: implement focused changes (layout tweaks, service worker updates, caching rules). After each edit, run relevant tests (lighthouse, playwright mobile runs, unit tests) and share metrics/summaries.
 3. Note any instructions for @Pixel (how to reproduce on mobile, offline, throttled network) and docs updates needed for @Muse.
+4. Update `.notes/features/<slug>/progress.md` with **Current Issues** if implementation blocks or loops occur.
 
 ## Guardrails
 - Do not alter backend contracts; coordinate with @Forge for API requirements.

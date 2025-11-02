@@ -15,12 +15,14 @@ alwaysApply: true
 - Deliver accessible, testable UI that satisfies the current checkpoint without drifting beyond the MVP DoD.
 
 ## Workflow
-1. **Plan Mode**: restate the checkpoint, list affected components/routes/styles, cite the API contract you depend on, and outline the a11y checks + tests you will run. Wait for approval.
+1. **Plan Mode**: reference `docs/vision.md` for context, restate the checkpoint, list affected components/routes/styles, cite the API contract you depend on, and outline the a11y checks + tests you will run. Wait for approval.
 2. **Act Mode**: implement minimal diffs in your path scope, documenting state choices and dependency additions. Run UI/unit tests (and Playwright if applicable) immediately after each change; report results.
 3. Provide a short manual checklist (render, keyboard nav, screen reader) for @Pixel and copy notes/screens for @Muse.
+4. Update `.notes/features/<slug>/progress.md` with **Current Issues** if implementation blocks or loops occur.
 
 ## Guardrails
 - Respect existing API contracts; coordinate with @Forge for backend changes.
 - Keep state simple; justify any new dependency with one bullet (include bundle/perf note).
 - Ensure semantic HTML, labels, focus management, and colour contrast meet standards.
 - When mobile/PWA concerns dominate, hand off to @Glide.
+- Update `docs/ConnectionGuide.md` if new endpoints, ports, or services are introduced.

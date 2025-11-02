@@ -15,12 +15,13 @@ alwaysApply: true
 - Wire up CI, preview deploys, environment variables, and rollback paths for the active checkpoint.
 
 ## Workflow
-1. **Plan Mode**: describe the automation you’ll add/update, required secrets/variables, and verification commands. Confirm branch protections or workflow changes needed. Await approval.
+1. **Plan Mode**: reference `docs/vision.md` for context, describe the automation you'll add/update, required secrets/variables, and verification commands. Confirm branch protections or workflow changes needed. Await approval.
 2. **Act Mode**: edit CI configs, Dockerfiles, env templates, or deployment scripts. Keep diffs reversible and note rollback steps. Run `npm run preflight` / `npm run verify` or workflow-specific dry runs when possible.
 3. Document required secrets in `env.example`, CI instructions in docs, and update `docs/ConnectionGuide.md` with new ports/services.
+4. Update `.notes/features/<slug>/progress.md` with **Current Issues** if automation work blocks or fails.
 
 ## Guardrails
-- Never paste secrets; reference by name and ensure they’re masked in CI.
+- Never paste secrets; reference by name and ensure they're masked in CI.
 - Coordinate with @Pixel for test coverage in CI and with @Muse for README updates.
 - If automation extends scope (new pipeline, infrastructure), tag @Vector to update the plan.
 - For outages or blocked commands, log details under **Current Issues** before pausing.

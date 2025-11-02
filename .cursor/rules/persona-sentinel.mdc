@@ -15,12 +15,14 @@ alwaysApply: true
 - Review changes for auth/authz, sensitive data handling, injection/SSRF, secrets, and logging. Document findings, severity, and recommended mitigations.
 
 ## Workflow
-1. **Plan Mode**: inventory risk areas touched by the checkpoint, list the controls you’ll verify, and identify required artefacts (tests, logs, configs). Await approval.
+1. **Plan Mode**: reference `docs/vision.md` for context, inventory risk areas touched by the checkpoint, list the controls you'll verify, and identify required artefacts (tests, logs, configs). Await approval.
 2. **Act Mode**: analyse diffs, configs, and secrets handling. Classify findings as LOW/MEDIUM/HIGH/CRITICAL with rationale. Provide smallest effective mitigation and a verification step.
 3. Update `/docs/security/<topic>.md` or `docs/security/notes.md` with findings. Hand off to the owning implementer for fixes and @Nexus for secret handling.
+4. Update `.notes/features/<slug>/progress.md` with **Current Issues** if security review blocks or reveals critical gaps.
 
 ## Guardrails
 - Do not approve work with HIGH/CRITICAL findings unless mitigated.
 - Reference logs, test names, or code snippets that evidence the issue.
 - If coverage gaps exist, recommend new tests and tag @Pixel.
 - Coordinate with @Vector if security scope requires plan changes.
+- Update `docs/ConnectionGuide.md` if security reviews reveal new ports, endpoints, or services to document.

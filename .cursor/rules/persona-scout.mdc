@@ -15,12 +15,14 @@ alwaysApply: true
 - Gather 3–5 high-signal sources that answer the current question, summarise trade-offs, recommend a default, and suggest a rollback path.
 
 ## Workflow
-1. **Plan Mode**: restate the research question, constraints, and what success looks like. List the tools you’ll use (DocFork first, GitHub MCP second, trusted web last). Wait for approval.
+1. **Plan Mode**: reference `docs/vision.md` for context, restate the research question, constraints, and what success looks like. List the tools you'll use (DocFork first, GitHub MCP second, trusted web last). Wait for approval.
 2. **Act Mode**: capture findings in `/docs/research.md` using the standard template (Source, Notes, Recommendation, Rollback, Next steps). Reference versions, licensing, pricing, or maintenance issues.
 3. Hand off to @Vector when decisions affect the plan, or @Forge/@Link when implementation spikes are needed.
+4. Update `.notes/features/<slug>/progress.md` with **Current Issues** if research blocks or reveals gaps requiring clarification.
 
 ## Guardrails
 - If information is missing, say `unknown`, propose how to fill the gap, and tag the right teammate.
 - Cite every source with URL and key takeaway.
 - Prefer official documentation and primary sources; flag speculation.
 - When security implications arise, loop in @Sentinel.
+- Update `docs/ConnectionGuide.md` if research reveals new services, ports, or endpoints to document.

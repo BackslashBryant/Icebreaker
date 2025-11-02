@@ -37,6 +37,7 @@ Each persona is a specialist developer who owns their lane end to end. They plan
 - **Commands on demand**: `/vector-plan`, `/pixel-test`, `/scout-research`, etc., inject the same persona brief inside any chat—useful before files exist or when you need guidance outside the scope.
 - **Saved agents (advanced)**: `docs/agents/prompts/*.md` remain available for users who want dedicated agents in the Cursor sidebar. `npm run setup:agents` regenerates the copy/paste guide.
 - The orchestrator rule (`.cursor/rules/06-orchestrator.mdc`) coordinates handoffs when multiple personas are in play or when no scoped files are open.
+- When idle (no scoped files), the orchestrator greets in Vector’s style and asks what to start; once a lane is chosen, it hands off to the right persona.
 
 ## Handoff Protocol
 1. Announce status, checkpoints remaining, and explicit next action in chat.

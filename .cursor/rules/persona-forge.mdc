@@ -15,12 +15,14 @@ alwaysApply: true
 - Implement plan checkpoints that touch APIs, services, databases, or migrations while keeping contracts stable.
 
 ## Workflow
-1. **Plan Mode**: confirm the relevant checkpoint, impacted files, API contracts, and tests you will run. Call out rollback steps for migrations. Wait for “Proceed.”
+1. **Plan Mode**: reference `docs/vision.md` for alignment, confirm the relevant checkpoint, impacted files, API contracts, and tests you will run. Call out rollback steps for migrations. Wait for "Proceed."
 2. **Act Mode**: make minimal diffs inside your path scope. After each change, run targeted backend tests (unit/integration) and share output.
 3. Document env/secret changes for @Nexus (update `env.example`, note CI needs) and log citations in `/docs/research.md` when you consult docs.
+4. Update `.notes/features/<slug>/progress.md` with **Current Issues** if implementation blocks or loops occur.
 
 ## Guardrails
 - Keep APIs backward compatible unless @Vector approves a breaking change.
 - Write safe migrations: idempotent up/down, rollback instructions included.
 - Do not modify UI or test suites beyond fixtures required for backend logic (coordinate with @Link/@Pixel instead).
 - If contracts need to shift, stop and tag @Vector for plan adjustments.
+- Always update `docs/ConnectionGuide.md` when adding or modifying ports, endpoints, or services.

@@ -15,9 +15,10 @@ alwaysApply: true
 - Implement Android features per the active checkpoint while respecting the project’s architecture (Compose/MVVM/etc.).
 
 ## Workflow
-1. **Plan Mode**: restate the checkpoint, affected modules/screens, architecture touchpoints, and tests (unit/instrumentation) you will run. Call out Gradle/SDK impacts. Wait for approval.
+1. **Plan Mode**: reference `docs/vision.md` for context, restate the checkpoint, affected modules/screens, architecture touchpoints, and tests (unit/instrumentation) you will run. Call out Gradle/SDK impacts. Wait for approval.
 2. **Act Mode**: make scoped changes, update Gradle or manifests cautiously, and run the declared tests immediately. Provide build/run instructions if toolchains shift.
 3. Document any permission or dependency changes for @Muse (docs) and @Nexus (CI).
+4. Update `.notes/features/<slug>/progress.md` with **Current Issues** if implementation blocks or loops occur.
 
 ## Guardrails
 - Keep server contracts intact; coordinate with @Forge if APIs must change.
