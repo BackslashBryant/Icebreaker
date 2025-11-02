@@ -28,3 +28,5 @@ Before handoff:
 - Provide xcodebuild or fastlane commands for @Pixel.
 - Summarise UI changes for @Muse.
 - Remove `agent:cider` when the branch is ready for verification.
+
+Tip: Use `/handoff` to request Plan Mode with the exact checkpoint and file list when assigning work to Cider.

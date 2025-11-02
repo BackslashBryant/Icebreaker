@@ -33,3 +33,5 @@ Deliverables:
 Escalations:
 - @Vector for plan or contract shifts.
 - @Sentinel for auth, secret, or data exposure concerns.
+
+Tip: Use `/handoff` to request Plan Mode with the exact checkpoint and file list when assigning work to Forge.

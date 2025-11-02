@@ -108,6 +108,20 @@ npm run github:pr          # Draft a PR from the current feature (use --push to 
 
 ---
 
+## Chat Commands (in Cursor)
+
+Type `/` in chat to insert these helpers. See `.cursor/commands/README.md` for details.
+
+- `/crew` – Survey context and recommend the next persona (with paste‑ready handoff)
+- `/resume` – Resume the next checkpoint from the plan
+- `/handoff` – Template for a crisp Plan‑Mode handoff to any persona
+- `/kickoff` – One‑paste kickoff block to start a feature
+- `/vector-plan` – Create or update the numbered plan
+- `/pixel-test` – Scaffold acceptance tests and commands
+- `/scout-research` – Research with sources, tradeoffs, default, rollback
+
+---
+
 ## Advanced Configuration
 
 ### Manual Cursor IDE Setup
@@ -205,6 +219,26 @@ See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
 
 ---
 
+## Auto‑Routing (Default Behavior)
+
+Open matching files and the right teammate joins automatically:
+
+- Vector 🎯 → `docs/Plan.md`, `.notes/features/**`
+- Pixel 🖥️ → `tests/**`, `**/__tests__/**`, test configs (Playwright/Jest/Vitest/Cypress)
+- Forge 🔗 → `api/**`, `server/**`, `db/**`, `migrations/**`, `services/**`, common monorepo variants under `apps/**` and `packages/**`
+- Link 🌐 → `src/**`, `app/**`, `pages/**`, `components/**`, `styles/**`, common monorepo variants under `apps/**` and `packages/**`
+- Glide 📳 → `pwa/**`, `public/**`, service workers (`sw.*`, `service-worker.*`), common monorepo variants
+- Apex 🤖 → `android/**`
+- Cider 🍏 → `ios/**`
+- Muse 🎨 → `docs/**`, `README.md`, `CHANGELOG.md` (including monorepos)
+- Nexus 🚀 → `.github/**`, `.ci/**`, `Dockerfile*`, `deploy/**`, `env.example`, `docs/github/**`
+- Scout 🔎 → `docs/research.md` (and `docs/research/**`)
+- Sentinel 🛡️ → `docs/security/**`, `security/**`
+
+Tip: Start with no files open and the orchestrator greets you in Vector’s voice; pick a lane, then open the files to auto‑route to that persona.
+
+---
+
 ## Customization
 
 - **Documentation**: Everything under `docs/` is a template--replace or delete once you create project-specific content
@@ -221,6 +255,8 @@ See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
 3. ? Update `.github/CODEOWNERS` and issue templates with your team info
 4. ? Enable GitHub MCP in Cursor IDE
 5. ? Set up branch protections (see `docs/github/BRANCH_PROTECTION.md`)
+6. ? Enable PR Auto-Labeler workflow (maps paths → `agent:*` labels)
+7. ? Require checks: Template CI + persona auto-routing test + ConnectionGuide doc check
 
 ---
 

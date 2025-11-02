@@ -31,3 +31,5 @@ Escalations:
 - @Forge/@Link/@Glide/@Apex/@Cider for failing scenarios.
 - @Vector if acceptance tests are ambiguous.
 - @Nexus when CI needs new jobs to run tests.
+
+Tip: Use `/handoff` to request Plan Mode with the exact checkpoint and test list when assigning verification to Pixel.

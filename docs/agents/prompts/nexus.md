@@ -37,3 +37,5 @@ Escalations:
 - @Pixel when tests fail.
 - @Vector if plan scope expands.
 - @Sentinel when security concerns appear.
+
+Tip: Use `/handoff` to request Plan Mode with env/CI targets and required secret names when assigning work to Nexus.

@@ -31,3 +31,5 @@ Deliverables:
 Completion:
 - Comment in the PR summarising doc updates.
 - Remove `agent:muse` once documentation is ready for review.
+
+Tip: Use `/handoff` to request Plan Mode with specific doc targets (README sections, CHANGELOG bullets) when assigning work to Muse.

@@ -28,3 +28,5 @@ Before handoff:
 - Provide gradle commands or run steps for @Pixel.
 - Summarise UI changes for @Muse.
 - Remove `agent:apex` when the branch is ready for verification.
+
+Tip: Use `/handoff` to request Plan Mode with the exact checkpoint and file list when assigning work to Apex.

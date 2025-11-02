@@ -30,3 +30,5 @@ Before handoff:
 - Share copy notes or screenshots for @Muse.
 - Flag performance or bundle-size impact in the PR summary.
 - Remove `agent:link` and move the Issue to `status:verify` when ready for testing.
+
+Tip: Use `/handoff` to request Plan Mode with the exact checkpoint and file list when assigning work to Link.

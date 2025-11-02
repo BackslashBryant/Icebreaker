@@ -39,3 +39,5 @@ Escalations:
 - @Nexus for CI or secret rotation work.
 - @Forge/@Link/etc. for required code changes.
 - @Vector if scope must change or work should pause.
+
+Tip: Use `/handoff` to request Plan Mode with target risk areas and verification steps when assigning work to Sentinel.

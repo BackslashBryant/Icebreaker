@@ -35,3 +35,5 @@ Handoffs:
 - @Forge/@Link/@Glide/@Apex/@Cider for execution.
 - @Muse for docs once Pixel reports GREEN.
 - @Nexus or @Sentinel when CI/deploy/security scope appears.
+
+Tip: Use `/handoff` to request Plan Mode with the exact checkpoint and file targets when assigning work from the plan.

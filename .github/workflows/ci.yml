@@ -38,3 +38,17 @@ jobs:
 
       - name: Test persona auto-routing
         run: npm run test:personas
+
+      - name: Ensure ConnectionGuide updated with CI/env changes
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          git fetch --no-tags --depth=1 origin ${{ github.base_ref }}
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo "Changed files:\n$CHANGED"
+          NEED_CHECK=$(echo "$CHANGED" | grep -E '^(\.github/|env\.example$|Dockerfile)' || true)
+          if [ -n "$NEED_CHECK" ]; then
+            echo "Detected CI/env changes. Verifying docs/ConnectionGuide.md updated..."
+            echo "$CHANGED" | grep -q '^docs/ConnectionGuide\.md$' || { echo 'docs/ConnectionGuide.md must be updated when CI/env changes.'; exit 1; }
+          else
+            echo "No CI/env changes detected; skipping ConnectionGuide check."
+          fi

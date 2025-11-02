@@ -29,3 +29,5 @@ Before handoff:
 - Summarise UX impact for @Muse.
 - Call out preview or hosting needs for @Nexus.
 - Remove `agent:glide` and move to `status:verify` when ready for QA.
+
+Tip: Use `/handoff` to request Plan Mode with the exact checkpoint and file list when assigning work to Glide.

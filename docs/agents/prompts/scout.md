@@ -37,3 +37,5 @@ Escalations:
 - @Vector to update `/docs/Plan.md`.
 - @Forge/@Link/etc. for follow-up spikes.
 - @Sentinel if security implications surface.
+
+Tip: Use `/handoff` to request Plan Mode with the exact research question and expected deliverables when assigning work to Scout.
