@@ -1,0 +1,105 @@
+# IceBreaker — Onboarding Vision
+
+> This is the buy‑in moment. We earn trust with clarity, choice, and respect for attention. Keep it short, human, and intentional.
+
+---
+
+## 🌟 Purpose
+
+Onboarding should:
+
+1. State the promise in plain language.
+2. Give users control (consent, visibility, vibe).
+3. Get them to Radar fast without feeling rushed.
+
+No tricks. No forced identity performance.
+
+---
+
+## 🎮 Flow (end‑to‑end)
+
+1. **Welcome**
+
+   * Brand moment. Retro logo + calm headline: *“Real world. Real time. Real connections.”*
+   * Two clean CTAs: **Press Start** / **Not for me** (graceful exit screen).
+
+2. **18+ Consent**
+
+   * Single checkbox: *“I confirm I am 18 or older.”*
+   * Continue disabled until checked. Cursor visibly focuses.
+
+3. **Location Explainer**
+
+   * Minimal teal icon + terminal-style copy.
+   * Plain text: *“We use approximate location to connect you with nearby people. Not stored long‑term.”*
+   * CTAs: **Enable Location** / **Skip for now** (reduced experience).
+
+4. **Vibe & Tags**
+
+   * **Vibe (required):** *“What kind of energy are you putting out right now?”*
+     Options: 🙃 Up for banter · 🤝 Open to intros · 🧠 Thinking out loud · ⏳ Killing time · 🎲 Surprise me
+   * **Tags (optional):** *“Want to give folks a sense of your wavelength?”*
+     Chips (examples): Quietly Curious · Creative Energy · Overthinking Things · Big Sci‑Fi Brain · Here for the humans
+   * **Visibility toggle:** *“Show me on the radar.”*
+   * **Soft penalty:** Skipping all tags is allowed, **but lowers discoverability** on Radar.
+
+5. **Done → Radar**
+
+   * Short success toast; no confetti, no noise.
+
+---
+
+## 🎨 UI & Tone (applied to onboarding)
+
+* **Theme:** terminal meets Game Boy. Deep navy/charcoal base; neon teal accents; warm gray copy.
+* **Type:** IBM Plex Mono / Space Mono (headers in caps, body in sentence case).
+* **Motion:** CRT sweep and subtle pulses — all disabled in reduced‑motion.
+* **Buttons:** rounded‑2xl, teal fill, clear focus rings.
+* **Microcopy:** confident, succinct, a touch playful; never clingy.
+
+---
+
+## ♿ Accessibility
+
+* **Reduced‑motion:** disable sweep, blink, pulse animations.
+* **High‑contrast:** brighten teal; ensure WCAG text contrast.
+* **Keyboard/Screen reader:** Order is logical; all CTAs have labels; focus visibly moves.
+* **Plain language:** Short, concrete sentences; no jargon.
+
+---
+
+## 🔐 Trust & Privacy Notes (visible in flow)
+
+* Explicit 18+ confirmation.
+* Location is **approximate** and **session‑based**.
+* Vibes/Tags are **signals for now**, not permanent identity.
+* Visibility is reversible any time.
+
+---
+
+## 🧠 Product Rules (dev decisions)
+
+* **Choice everywhere**: every step has a dignified opt‑out.
+* **Speed**: user can reach Radar in **<30 seconds**.
+* **Authenticity > theatrics**: keep interactions minimal and honest.
+* **Penalty is soft, not punitive**: skipping tags reduces priority but never blocks use.
+
+---
+
+## 🔖 Future Flags (design for extension)
+
+* **Social enrichment (post‑MVP):** Optional OAuth for Spotify/Reddit/X to auto‑suggest tags; must be clearly opt‑in and privacy‑framed.
+* **Personality/archetype mode:** Small, respectful archetypes for users who prefer structured identity hints.
+* **Tagless mode:** Always allowed; **reduced discoverability** remains the tradeoff.
+
+---
+
+## ✅ Acceptance (experience‑level)
+
+* User understands IceBreaker in **~10 seconds** on Welcome.
+* 18+ and Location steps are friction‑light and transparent.
+* Vibe selection is quick; tags are clearly optional.
+* Accessibility modes (reduced‑motion, high‑contrast) persist across steps.
+* From first screen to Radar in **under 30 seconds** for a decisive user.
+
+> Build this like a manifesto: short, honest, and respectful of the moment.

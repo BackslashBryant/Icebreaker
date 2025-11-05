@@ -1,0 +1,107 @@
+# IceBreaker — Social Enrichment Vision
+
+> Post‑MVP, optional. Purpose: let users **auto‑suggest vibes/tags** from the public signals they already have on other platforms — without compromising IceBreaker’s privacy ethos or creating identity theater.
+
+---
+
+## 🎯 Objectives
+
+* Make setup **faster and more authentic** for willing users.
+* Keep it **clearly opt‑in**, revocable, and transparent.
+* Map external signals to **present‑tense vibes/tags**, not permanent labels.
+
+---
+
+## 🧭 Principles
+
+1. **User first**: nothing pulls without explicit consent and a clear preview.
+2. **Minimal scopes**: request only what’s needed for suggestions; read‑only.
+3. **Local mapping**: transform data into IceBreaker tags/vibes; discard raw data.
+4. **Ephemeral**: suggestions refresh occasionally; no long‑term profiling.
+5. **Explainable**: user can see why a suggestion appeared and remove it.
+
+---
+
+## 🔌 Target Integrations (phased)
+
+* **Spotify**: top artists/genres → “Creative Energy”, “Lo‑fi head”, etc.
+* **Reddit**: top sub interests → “Builder brain”, “Tech curious”, etc.
+* **Twitter/X** (if feasible): liked/followed themes → “Web tinkerer”, “News‑savvy”.
+
+> Start with one provider (Spotify or Reddit) to validate UX and trust.
+
+---
+
+## 🧩 UX Flow (Profile → Connect)
+
+1. **Prompt**: “Want quicker setup? Connect a service to auto‑suggest tags.”
+2. **Consent screen**: shows provider, scopes (read‑only), and examples of what we’ll infer.
+3. **OAuth**: standard provider login.
+4. **Preview**: show suggested tags with dismiss toggles; user selects what to keep.
+5. **Done**: saved tags appear like any other; user can disconnect anytime.
+
+**Microcopy anchors**
+
+* Button: *“Connect to get suggestions”*
+* Scope note: *“Read‑only. Used to suggest tags. You choose what sticks.”*
+* Disconnect: *“Stop using suggestions and remove imported tags.”*
+
+---
+
+## 🗺️ Mapping Model (explainable)
+
+* Provider themes → **candidate tags** with confidence buckets (high/med/low).
+* Cap suggestions (e.g., max 5) to avoid noise.
+* Never auto‑apply: **user confirms** each tag.
+
+---
+
+## 🔐 Privacy & Data Handling
+
+* Store only **selected tags**; discard raw provider data after mapping.
+* No storing of track lists, follows, or histories.
+* Re‑pull only on explicit refresh.
+* Clear “Why this tag?” info (e.g., “From your top genres last month”).
+
+---
+
+## ⚙️ Product Implications
+
+* **Signal Engine**: enriched tags behave exactly like manual tags; no extra weight beyond caps.
+* **Onboarding**: keep **Vibe required**; enrichment is **optional** and shown in Profile or post‑onboarding nudge.
+* **Safety**: no public badges for connected accounts; no links out by default.
+
+---
+
+## 🧪 Rollout Plan
+
+* Phase 1: Single provider beta (Spotify or Reddit) with feature flag.
+* Phase 2: Add second provider; measure trust/usage.
+* Phase 3: Contextual suggestions (e.g., event themes) without OAuth.
+
+**KPIs**
+
+* Opt‑in rate, tag acceptance rate per provider.
+* Time to first chat vs. non‑connected users.
+* Report/Panic rates (should not increase).
+
+---
+
+## 🧭 Guardrails & Risks
+
+* **Scope creep**: keep scopes minimal and visible.
+* **Misclassification**: user review required; easy removal.
+* **API volatility**: design with provider abstraction; graceful fallback.
+* **Perceived status**: never boost visibility just for connecting; value is authenticity, not clout.
+
+---
+
+## ✅ Acceptance (post‑MVP)
+
+* Users can connect a provider, preview suggestions, select/dismiss, and disconnect.
+* Only selected tags persist; raw data is discarded after mapping.
+* No special ranking boost for enriched tags beyond existing caps.
+* UX copy and consent screens make purpose and privacy clear.
+* Feature can be toggled off globally without breaking Profile.
+
+> Keep this a convenience, not a requirement. It should feel like a shortcut to a more *true‑to‑you now* signal — never a new profile to maintain.

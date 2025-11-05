@@ -1,0 +1,123 @@
+# IceBreaker — Safety & Moderation Vision
+
+> Goal: Make IceBreaker a **no‑bullshit space** — no stalkers, no creeps, no spam — while staying privacy‑first and ephemeral. This doc defines user controls, product guardrails, and fair, transparent consequences.
+
+---
+
+## 🎯 Objectives
+
+* **Prevent harassment and spam** without building a surveillance machine.
+* **Empower users** with fast exits, blocks, and simple reporting.
+* **Respond proportionally**: soft friction first, hard actions when patterns persist.
+* **Keep it explainable**: users should understand what happened and why.
+
+---
+
+## 🧠 Principles
+
+1. **Consent + Control**: User can leave, block, or report at any time.
+2. **Privacy‑first**: No message content storage; minimal metadata; approximate location only.
+3. **Least necessary data**: Keep only what’s required for safety decisions.
+4. **Ephemeral by design**: Sessions expire; visibility is reversible.
+5. **Transparency**: Clear microcopy on actions and outcomes.
+
+---
+
+## 🧰 User Safety Controls (Visible)
+
+* **Panic FAB**: Ends session immediately; optional alert to contacts.
+* **Block**: Prevents future visibility/matches with that user; immediate and silent.
+* **Report**: Simple categories (Harassment, Spam, Impersonation, Other). Adds a safety signal; no chat content required.
+* **Mute** (optional): Hide this user for the current session without blocking.
+
+**Surface points**: Chat header (⋯ menu), end‑of‑chat screen, and user card tap‑hold.
+
+---
+
+## ⚙️ Product Guardrails (MVP)
+
+* **One‑chat‑at‑a‑time**: Users can’t shotgun multiple chats concurrently.
+* **Rate limit chat starts**: Soft cooldown after X failed/declined invites.
+* **New account probation**: Slightly reduced discoverability for first N sessions.
+* **Skip‑tags penalty**: Already defined — reduces discoverability (soft friction).
+* **Safety exclusion**: Recent Panic or multiple unique reports → temporary hidden from Radar.
+* **Cooldowns**: Short, session‑level timers (e.g., 15–60 min) before reappearing broadly.
+* **No cold DM**: Chat only after an explicit mutual action (tap→accept).
+
+> All guardrails should be **session‑scoped** and **tunable**, not permanent by default.
+
+---
+
+## 🧮 Signals & Consequences (Explainable)
+
+**Signals (minimal):**
+
+* Count of **unique blocks** and **unique reports** (by session/time window)
+* **Rapid chat attempts** without acceptance
+* **Panic proximity** (reports tied to sessions where Panic occurred)
+
+**Consequence ladder:**
+
+1. **Soft sort‑down** (lower discoverability)
+2. **Session cooldown** (temporary hidden)
+3. **Account pause** (short lock; explain why and how to appeal)
+4. **Removal** (clear, appealable)
+
+**Copy example:** *“We’re reducing your visibility for a while due to multiple reports. Keep it respectful. Learn more.”*
+
+---
+
+## 🔐 Data & Privacy Posture
+
+* Store **only**: report category, timestamp, anonymized session ID, reporter ID (hashed), and accused user ID.
+* **Do not store**: chat content, precise coordinates, device fingerprints.
+* Reports are **not public**; targets are not notified who reported them.
+
+---
+
+## ✍️ Microcopy & UX (Tone)
+
+* **Report prompt:** *“Help us keep this space safe. What happened?”*
+* **After report:** *“Thanks for speaking up. We’ll limit who they can reach while we review patterns.”*
+* **After block:** *“You won’t see each other again.”*
+* **Cooldown notice:** *“Visibility reduced for a bit due to recent reports.”* (link to guidelines)
+
+---
+
+## 🧩 Integrations with Other Docs
+
+* **Radar & Chat**: Enforce one‑chat‑at‑a‑time; reflect soft sort‑down; safety exclusion on recent Panic/reports.
+* **Signal Engine**: Include `reports_unique`, `declines_recent`, `panic_association` as **negative weights** with strict caps.
+* **Onboarding**: Add concise **Code of Conduct** checkbox (No harassment. No spam. Respect privacy.)
+* **Brand & UI**: Safety controls are visible, calm, and non‑dramatic.
+* **MVP Success**: Add abuse KPIs (see below).
+
+---
+
+## 📊 MVP Safety KPIs (experience‑level)
+
+* **Report rate** < 1% of sessions; if higher, copy/flows need review.
+* **Acceptance‑to‑chat** conversion healthy without spam spikes.
+* **Panic false‑positive** rate stays low (<1%).
+* **Repeat‑offender recidivism** decreases after cooldowns.
+
+---
+
+## 🔭 Post‑MVP Flags
+
+* **Appeals flow** (lightweight, human‑readable)
+* **Contextual prompts** (e.g., "Keep it respectful" nudge after patterns)
+* **Venue/event partnerships** for on‑site codes of conduct
+* **Optional verification** (email/phone) for higher trust contexts — clearly opt‑in, with benefits (e.g., higher visibility)
+
+---
+
+## ✅ Acceptance (MVP)
+
+* Users can **block** and **report** from Radar/Chat with two taps.
+* **Rate limiting** and **one‑chat‑at‑a‑time** are enforced.
+* **Soft sort‑down** and **temporary cooldowns** work and are communicated.
+* **Safety exclusion** triggers on Panic or multiple unique reports.
+* No message content stored; only minimal safety metadata retained.
+
+> Safety is a feature, not a vibe. Build it calm, clear, and fair — with privacy intact.

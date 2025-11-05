@@ -1,0 +1,137 @@
+# IceBreaker — Developer Vision Brief
+
+> Team — this is the **North Star**. No stacks. No tickets. Just why we exist, what this should *feel* like, and how we make decisions when the details get messy. Build for real humans meeting in real places, briefly and safely.
+
+---
+
+## 🚀 Purpose
+
+IceBreaker helps nearby adults connect for a short, safe conversation and then move on. Not a feed. Not forever. **A moment.**
+
+**If other apps are loud nightclubs, IceBreaker is the quiet nod across the room.**
+
+---
+
+## 🧭 What We Are / What We’re Not
+
+**We are:**
+
+* A proximity window into the present moment
+* Ephemeral conversation, by design
+* Calm, privacy‑first, opt‑in
+
+**We’re not:**
+
+* A dating app, social graph, or profile showcase
+* A place for scrolling, clout, or permanence
+* A data collection project
+
+---
+
+## 🧑‍🤝‍🧑 Who This Is For
+
+Adults (18+) in shared spaces — campuses, events, coworking spots, dense neighborhoods — who want **lightweight, authentic contact** without committing to an identity performance.
+
+They value: control, subtlety, safety, and a vibe that doesn’t try too hard.
+
+---
+
+## 🌀 Core Experience (end‑to‑end)
+
+1. **Welcome** → "Real world. Real time. Real connections." Clear choice to continue or bounce.
+2. **Consent & Clarity** → 18+ confirm; plain‑language location explainer.
+3. **Vibe & Optional Tags** → *Required current mood; optional identity hints.* Skipping tags is allowed but lowers discoverability.
+4. **Radar** → Ambient presence; see who’s open nearby.
+5. **Chat** → One‑tap, terminal‑style, ephemeral. Ends when the moment ends.
+6. **Panic** → Always there. One tap to exit and alert contacts. Calm, not dramatic.
+
+---
+
+## 🎨 Brand & UI Ethos (must follow)
+
+**Theme:** Retro‑handheld charm + modern minimalism ("terminal meets Game Boy").
+
+* **Base:** deep navy / charcoal
+* **Accent:** neon teal
+* **Secondary:** warm gray
+* **Type:** IBM Plex Mono / Space Mono (caps for headers)
+* **Buttons:** teal, rounded‑2xl, hover darken, crisp focus rings
+* **Icons:** simple, squared, pixel‑friendly
+* **Motion:** subtle CRT sweep, blink, and pulse — always respect reduced‑motion
+* **A11y:** high‑contrast mode, screen reader labels, keyboard‑first paths
+
+> **Rule:** If a screen breaks the vibe, it breaks the brand. Don’t ship it.
+
+---
+
+## 🧩 Interest/Vibe Philosophy (authentic, not performative)
+
+* **Required:** a simple **Vibe** (your current energy: Up for banter / Open to intros / Thinking out loud / Killing time / Surprise me).
+* **Optional:** a few **Tags** that hint at wavelength (Quietly Curious, Creative Energy, Overthinking Things, Big Sci‑Fi Brain, Here for the humans).
+* **Skip tags:** allowed, but **reduced visibility** on Radar (soft penalty).
+* **Future‑proofing flags:**
+
+  * Social enrichment via opt‑in OAuth (Spotify/Reddit/X) — **post‑MVP**
+  * Personality/archetype mode (Myers‑Briggs‑lite) — **experiment later**
+
+---
+
+## 🎛️ Sifting the Noise (compatibility without creepiness)
+
+**Lightweight scoring for Radar priority (MVP):**
+
+* 🎯 **Vibe match** (same vibe) — stronger signal
+* 🔗 **Shared tags** — incremental boost per match
+* 🧍 **Visibility on** — small boost
+* 🚫 **No tags** — soft penalty
+* 🛟 **Safety signal** (recent panic) — hide
+
+No one is fully hidden (unless safety applies). **Presence ≠ pressure.** The radar simply puts *better fits* closer to the center.
+
+> **Future flag:** A "Signal Engine" may learn from soft feedback (accept/decline, chat duration) — never storing message content and always privacy‑respecting.
+
+---
+
+## 🔐 Privacy & Safety Posture
+
+* Approximate distance only; no background tracking; no precise location history
+* Ephemeral chat; no long‑term transcripts
+* Panic is visible, fast, and calm; alerts include time + coarse area only
+* Clear, reversible controls for visibility and a11y
+
+---
+
+## 🧠 Decision Rules (use these when you’re unsure)
+
+1. **Privacy > precision**
+2. **Simplicity > cleverness**
+3. **A11y is the bar** (not a bonus)
+4. **Vibe is the product** — if it doesn’t feel like IceBreaker, don’t do it
+5. **Choice everywhere** — opt‑in, opt‑out, consequence is soft not punitive
+
+---
+
+## 📏 Success (non‑technical, experience‑level)
+
+* New user understands the premise **within 10 seconds**
+* Onboarding to Radar **in under 30 seconds**
+* First chat is **one tap** and feels instant
+* Ending is **clean and expected** ("Connection lost. Chat deleted.")
+* Users feel **safe** because Panic is obvious and respectful
+* Accessibility modes are honored across all screens
+
+---
+
+## 🗣️ Metaphors that guide us
+
+* **A walkie‑talkie for nearby humans**
+* **A radar ping that finds the right kind of now**
+* **A match strike that burns bright and fades**
+
+---
+
+## 🎯 Final word
+
+Build for **brief, real, human** moments. Keep it quiet, clean, and intentional. If a choice risks the vibe, choose the vibe.
+
+*That’s IceBreaker.*

@@ -1,5 +1,8 @@
 {
-  "slug": "bootstrap-web-health-mvp",
-  "featureName": "Bootstrap Web Health MVP",
-  "updatedAt": "2025-10-31T02:37:58.602Z"
+  "slug": "icebreaker-mvp-planning",
+  "featureName": "Icebreaker MVP Planning",
+  "updatedAt": "2025-01-27T00:00:00.000Z",
+  "status": "planning",
+  "vision": "docs/vision.md",
+  "description": "Planning phase for Icebreaker MVP - proximity-based ephemeral chat app"
 }

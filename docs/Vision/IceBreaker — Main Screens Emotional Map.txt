@@ -1,0 +1,109 @@
+# IceBreaker — Main Screens Emotional Map
+
+> Quick‑read reference for what each screen should *feel like*, the promise it delivers, and the guardrails that keep us on‑brand.
+
+---
+
+## 1) Splash / Welcome
+
+**Feel:** Quiet confidence; retro‑handheld wink; intentional choice.
+**Promise:** "This is different. Real world, real time, real connections."
+**Must not:** Beg, hype, or trap.
+**Microcopy anchor:** *“Press Start”* · *“Not for me”*
+**A11y note:** Reduced‑motion disables sweep; buttons have visible focus.
+
+---
+
+## 2) 18+ Consent
+
+**Feel:** Straightforward, respectful.
+**Promise:** Adult space, safety first.
+**Must not:** Guilt or dramatize.
+**Microcopy anchor:** *“I confirm I am 18 or older.”*
+
+---
+
+## 3) Location Explainer
+
+**Feel:** Transparent, calm, empowering.
+**Promise:** Approximate, session‑based location; your choice.
+**Must not:** Bury details or coerce.
+**Microcopy anchor:** *“Enable Location”* · *“Skip for now”*
+
+---
+
+## 4) Vibe & Tags
+
+**Feel:** Present‑tense, low effort, optional identity hints.
+**Promise:** You control what’s shown; signals improve relevance.
+**Must not:** Force identity performance.
+**Microcopy anchor:** *“What kind of energy are you putting out right now?”*
+**Rule:** Skipping tags allowed → **reduced discoverability** (soft penalty).
+
+---
+
+## 5) Profile
+
+**Feel:** Agency and clarity.
+**Promise:** You decide visibility; you manage safety contacts.
+**Must not:** Invite resume‑building or clout signals.
+**Microcopy anchor:** *“Choose what they see. Stay in control.”*
+
+---
+
+## 6) Settings
+
+**Feel:** Respectful autonomy.
+**Promise:** Your space, your rules (a11y toggles, sign out).
+**Must not:** Hide critical controls.
+**Microcopy anchor:** *“Your space, your rules.”*
+
+---
+
+## 7) Radar
+
+**Feel:** Ambient presence; quietly relevant.
+**Promise:** People nearby who match your vibe — no pressure.
+**Must not:** Look like a feed or leaderboard.
+**Microcopy anchor:** *“No one here — yet.”*
+**Rule:** Lightweight compatibility sorts; no avatars; safety can hide.
+
+---
+
+## 8) Chat
+
+**Feel:** Focused, ephemeral, terminal‑clean.
+**Promise:** Say it while it matters; then it fades.
+**Must not:** Add stickers, reactions, or history.
+**Microcopy anchor:** *“Connection lost. Chat deleted.”*
+
+---
+
+## 9) Panic
+
+**Feel:** Reassuring, immediate, calm.
+**Promise:** One tap to exit and alert contacts.
+**Must not:** Be dramatic or hidden.
+**Microcopy anchor:** Modal *“Everything okay?”* → *“Send alert & exit”* / *“Never mind”*
+
+---
+
+## Visual & Tone Guardrails (applies everywhere)
+
+* **Theme:** Terminal meets Game Boy. Deep navy/charcoal base; neon teal accents; warm gray text.
+* **Type:** IBM Plex Mono / Space Mono (caps for headers; sentence case body).
+* **Motion:** CRT sweep/blink/pulse — always respect reduced‑motion.
+* **A11y:** High‑contrast toggle; keyboard paths; ARIA labels.
+* **Do:** One intent per screen. Use space. Let the moment breathe.
+* **Don’t:** Add social graph cues, clout badges, or noisy chrome.
+
+---
+
+## Acceptance (per screen)
+
+* The *feel* and *promise* are obvious within 3 seconds.
+* Copy matches tone examples; no hype, no guilt.
+* Reduced‑motion/high‑contrast work consistently.
+* Interactions are minimal and intentional; nothing competes with the single purpose of the screen.
+
+> If a screen starts to feel like a feed, we took a wrong turn.

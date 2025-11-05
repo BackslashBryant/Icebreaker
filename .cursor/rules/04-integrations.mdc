@@ -1,5 +1,5 @@
 ---
-description: "MCP Integrations – GitHub, Supabase, Playwright, Desktop Commander, DocFork"
+description: "MCP Integrations – GitHub, Supabase, Playwright, Desktop Commander, Ref Tools, Toolbox"
 globs: ["**/*"]
 alwaysApply: true
 ---
@@ -15,11 +15,12 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 - If an MCP fails twice, document it in `.notes/features/<slug>/progress.md` and suggest the fallback.
 
 ## When to Reach for Which Tool
-- **GitHub MCP** – Branch/PR automation, repo search, code examples. First stop for anything “git” or GitHub API shaped.
-- **DocFork MCP** – Official documentation lookups, code examples, version notes. Cite the source in `/docs/research.md`.
+- **GitHub MCP** – Branch/PR automation, repo search, code examples. First stop for anything "git" or GitHub API shaped.
+- **Ref Tools MCP** – Token-efficient documentation search for APIs, libraries, services. Supports private repos and PDFs. Cite sources in `/docs/research.md`.
 - **Playwright MCP** – UI screenshots, axe/Lighthouse accessibility/perf checks. Attach outputs to the ticket or artifacts.
-- **Supabase MCP** – Database schema diffs, SQL experiments, policy checks. Update `docs/ConnectionGuide.md` when endpoints change.
+- **Supabase MCP Lite** – Database schema diffs, SQL experiments, policy checks (if Supabase is chosen). Update `docs/ConnectionGuide.md` when endpoints change.
 - **Desktop Commander MCP** – Local shell/file automation aligned with the allowlist in `.cursor/tools/policy.md`.
+- **Toolbox MCP** – Search for and discover additional MCP servers in the Smithery registry.
 
 ## Plan vs Act Expectations
 1. **Plan Mode** – State which MCP you intend to use, the command/query, expected outcome, and rollback. Await approval.

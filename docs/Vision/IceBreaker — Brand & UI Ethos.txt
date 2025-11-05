@@ -1,0 +1,97 @@
+# IceBreaker — Brand & UI Ethos
+
+> This is the shared style bible. If a screen breaks the vibe, it breaks the brand. Keep it quiet, clean, and intentional.
+
+---
+
+## 🧭 North Star
+
+* **We are:** A calm, opt‑in way to meet nearby people in the moment.
+* **We’re not:** A dating app, public feed, or profile parade.
+* **Feelings to evoke:** Curiosity, safety, ease, a touch of nerdy‑cool.
+* **Metaphors:** Walkie‑talkie for nearby humans. Radar ping. Match strike that fades.
+
+---
+
+## 🎨 Visual System
+
+**Theme:** Retro‑handheld charm + modern minimalism (terminal meets Game Boy).
+
+* **Base:** Deep navy (#0A0F1F) or charcoal (#0D0D0D)
+* **Accent:** Neon teal (#00B8D9)
+* **Secondary:** Warm gray (#C2C2C2)
+* **Typography:** IBM Plex Mono / Space Mono (headers in caps; body in sentence case)
+* **Iconography:** Simple line icons with squared/pixel‑friendly corners
+* **Buttons:** Rounded‑2xl, solid teal fill, hover darken, crisp focus ring
+* **Dividers:** ASCII‑style where fitting
+
+> Use space generously. One strong action per screen.
+
+---
+
+## ♿ Accessibility
+
+* **Reduced‑motion:** Disable sweeps, blinks, pulses.
+* **High‑contrast:** Brighten teal; maintain WCAG text contrast.
+* **Keyboard/Screen reader:** Clear focus states; ARIA labels everywhere.
+* **Language:** Plain, short sentences. No jargon.
+
+> A11y is the baseline, not a bonus.
+
+---
+
+## ✍️ Tone & Microcopy
+
+* **Voice:** Confident, succinct, slightly playful; never clingy or hypey.
+* **Examples:**
+
+  * Welcome: *“Real world. Real time. Real connections.”*
+  * Empty Radar: *“No one here — yet.”*
+  * Chat end: *“Connection lost. Chat deleted.”*
+  * Panic confirm: *“Everything okay?”*
+* **Do:** Offer choices, be kind, be clear.
+* **Don’t:** Guilt, nag, or oversell.
+
+---
+
+## 🧩 Core Components
+
+* **Buttons:** Primary / secondary / icon‑only in teal, rounded‑2xl
+* **Inputs:** Monospace fields; blinking cursor on focus
+* **Chips:** Chunky pixel‑style for vibes and tags
+* **Toasts:** Top‑center, monospace, neutral language
+* **FAB (Panic):** Teal outline; always visible on Radar and Chat
+
+---
+
+## 🗺️ Screens — Feel & Promise
+
+* **Splash / Welcome:** Brand moment. Clear choice to enter or bounce.
+* **Onboarding:** Consent, clarity, control. It’s the buy‑in moment.
+* **Vibe & Tags:** Present state first (required vibe), identity hints optional.
+* **Profile:** Agency over what’s visible; emergency contacts.
+* **Radar:** Ambient presence; quiet relevance; no pressure.
+* **Chat:** Terminal‑style, quick, meaningful; then it fades.
+* **Panic:** Reassuring, immediate, never dramatic.
+* **Settings:** “Your space, your rules.”
+
+---
+
+## ⚙️ Product Principles (UI implications)
+
+1. **Presence over profile** → No avatars or follower cues on Radar.
+2. **Ephemeral by default** → Visuals should imply impermanence (e.g., gentle sweep).
+3. **Privacy first** → Approximate distance only; clear visibility toggles.
+4. **Simplicity wins** → Fewer controls, fewer states, one intent per screen.
+5. **Safety visible** → Panic is obvious and reachable with keyboard.
+
+---
+
+## ✅ Acceptance (Brand/UI)
+
+* Palette, type, icons, and components match this doc.
+* Copy follows tone; examples are the benchmark.
+* Reduced‑motion and high‑contrast modes function and persist.
+* Interactions feel calm, intentional, and consistent across screens.
+
+> If in doubt, remove noise. Let the moment breathe.

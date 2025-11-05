@@ -39,6 +39,34 @@ A stack-agnostic starting point for Cursor projects. It focuses on a visible, se
 
 A default "Bootstrap Web Health MVP" feature is generated on first install. Run `npm run feature:new` to replace it with your own spec.
 
+## Try It: Health Check MVP
+
+The Bootstrap Web Health MVP is ready to run:
+
+1. **Start the backend**:
+   ```bash
+   cd backend
+   npm install
+   npm run dev
+   ```
+   Server runs on `http://localhost:8000`
+
+2. **Start the frontend** (in a new terminal):
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+   Frontend runs on `http://localhost:3000`
+
+3. **Verify**:
+   - Visit `http://localhost:3000` to see the health status UI
+   - Or test the API directly: `curl http://localhost:8000/api/health`
+   - Run tests: `cd backend && npx vitest run` and `cd frontend && npx vitest run`
+   - Run E2E: `cd tests && npx playwright test`
+
+**Test Results**: All 7 tests passing (2 backend, 2 frontend, 3 E2E). See `.notes/features/bootstrap-web-health-mvp/progress.md` for details.
+
 ---
 
 ## What You Get

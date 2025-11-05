@@ -1,65 +1,86 @@
 {
   "mcpServers": {
-    "github": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "github"
-      ],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
-      }
-    },
-    "supabase": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "supabase"
-      ],
-      "env": {
-        "SUPABASE_URL": "${SUPABASE_URL}",
-        "SUPABASE_ANON_KEY": "${SUPABASE_ANON_KEY}"
-      }
-    },
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "playwright"
-      ],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
-      }
-    },
     "desktop-commander": {
-      "command": "npx",
+      "command": "cmd",
       "args": [
+        "/c",
+        "npx",
         "-y",
         "@smithery/cli@latest",
         "run",
-        "desktop-commander"
-      ],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
-      }
+        "@wonderwhy-er/desktop-commander",
+        "--key",
+        "0faa80d7-4649-4752-aa02-89680cfadf07"
+      ]
     },
-    "docfork": {
+    "github": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@smithery-ai/github",
+        "--key",
+        "0faa80d7-4649-4752-aa02-89680cfadf07",
+        "--profile",
+        "spectacular-piranha-CUJgZQ"
+      ]
+    },
+    "playwright-mcp": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@microsoft/playwright-mcp",
+        "--key",
+        "0faa80d7-4649-4752-aa02-89680cfadf07"
+      ]
+    },
+    "ref-tools-mcp": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@ref-tools/ref-tools-mcp",
+        "--key",
+        "0faa80d7-4649-4752-aa02-89680cfadf07",
+        "--profile",
+        "spectacular-piranha-CUJgZQ"
+      ]
+    },
+    "supabase-mcp-lite": {
       "command": "npx",
       "args": [
         "-y",
         "@smithery/cli@latest",
         "run",
-        "docfork"
-      ],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
-      }
+        "@pinion05/supabase-mcp-lite",
+        "--key",
+        "0faa80d7-4649-4752-aa02-89680cfadf07",
+        "--profile",
+        "spectacular-piranha-CUJgZQ"
+      ]
+    },
+    "toolbox": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@smithery/toolbox",
+        "--key",
+        "0faa80d7-4649-4752-aa02-89680cfadf07"
+      ]
     }
   }
 }

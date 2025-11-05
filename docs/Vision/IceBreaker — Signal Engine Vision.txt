@@ -1,0 +1,120 @@
+# IceBreaker — Signal Engine Vision
+
+> The Signal Engine ranks nearby presence so Radar feels *quietly relevant* without turning into a popularity contest. It is lightweight, privacy‑respecting, and explainable to users and devs.
+
+---
+
+## 🎯 Purpose
+
+* Reduce noise in crowded spaces
+* Surface *compatible now* (not famous forever)
+* Stay transparent, fair, and easy to tune
+
+---
+
+## 🧠 Principles
+
+1. **Now > Always** — prioritize current vibe and session context.
+2. **Privacy by design** — no social graphs; approximate distance; no message content stored.
+3. **Explainable** — simple scoring you can read in a table.
+4. **Soft, not hard** — avoid strict filters; prefer sort order.
+5. **Safety wins** — panic/safety signals can fully remove.
+
+---
+
+## ⚙️ MVP Inputs (per user pair A→B)
+
+* `vibe_match` — same vibe selected this session (boolean)
+* `shared_tags` — count of overlapping optional tags (0..N)
+* `visibility_on` — B’s visibility toggle (boolean)
+* `tagless` — B selected no tags (boolean)
+* `safety_flag` — recent panic by/near B (boolean)
+* `proximity_tier` — coarse bucket (e.g., within room / venue / nearby)
+
+> **No past chats, no social graph.** All signals are session‑level and ephemeral.
+
+---
+
+## 📐 MVP Score (interpretable)
+
+```
+score(A,B) =
+  w_vibe   * VIBE_MATCH(A,B)           +
+  w_tag    * MIN(shared_tags(A,B), 3)  +
+  w_vis    * VISIBILITY_ON(B)          +
+  w_tagless* TAGLESS(B)                +
+  w_dist   * PROXIMITY_TIER(A,B)
+```
+
+**Default weights (tunable):**
+
+* `w_vibe = +10`
+* `w_tag  = +5` (per tag, up to 3)
+* `w_vis  = +3`
+* `w_tagless = −5`
+* `w_dist = +2` (closer bucket gets higher multiplier)
+
+**Safety rule:** if `safety_flag == true` → **exclude B** from A’s results.
+
+**Tie‑breakers:** stable random seed per session to avoid jitter; then alphabetical handle.
+
+---
+
+## 🗺️ Placement & UI Hints
+
+* Higher score → closer to center of Radar and/or stronger pulse.
+* Accessible list view sorts descending by score with subtle labels (e.g., “good fit”).
+* No badges that imply status or popularity.
+
+---
+
+## 🔧 Tuning & Controls
+
+* Expose weights in a config file the team can A/B quietly.
+* Add a user toggle: **Show only vibe matches** (optional, defaults off).
+* Soft caps: never let any single factor dominate beyond set limits (e.g., tag cap at 3).
+
+---
+
+## 🧪 Data & Privacy
+
+* Only keep **aggregate metrics**: how often chats start after a top‑3 suggestion; average chat duration bucket; panic rate by vibe.
+* **Never store** message content or precise coordinates.
+* Session IDs auto‑expire; scores are recomputed live.
+
+---
+
+## 🛡️ Safety & Abuse Handling
+
+* Automatic exclusion on recent panic.
+* Optional shadow‑cooldown if a user is rapidly declined by many (post‑MVP; design carefully to avoid bias).
+* Clear microcopy: the system is about **compatibility now**, not ranking people.
+
+---
+
+## 🔭 Post‑MVP Roadmap (Flags)
+
+* **Passive feedback**: lightweight signals like accept/decline taps, chat dwell time bucket (short/medium/long) → small future weight.
+* **Personality archetypes**: opt‑in Myers‑Briggs‑lite archetype adds another small, explainable factor.
+* **Social enrichment**: if user connects Spotify/Reddit/X, map top themes to tags; strictly opt‑in.
+* **Context modes**: event/venue themes temporarily bias scores (e.g., “Hackathon: builders up‑weighted”).
+
+---
+
+## 🧭 Fairness & Guardrails
+
+* Cap any factor’s contribution; prefer multiple small signals to a single strong one.
+* Audit weights when moving between contexts (campus vs. conference).
+* Provide a simple in‑app explanation: *“People you see first share your vibe, tags, and are nearby.”*
+
+---
+
+## ✅ Acceptance (MVP)
+
+* Radar sort order reflects vibe/tag/visibility/distance as defined.
+* Safety exclusions work deterministically.
+* Config weights exist and can be changed without code rewrites.
+* No user is fully hidden by score alone (only by safety rules).
+* A11y list view presents the same order as the visual radar.
+
+> Build it like a dimmer, not a switch: gently guide attention, don’t gate it.

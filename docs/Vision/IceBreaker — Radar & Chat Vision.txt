@@ -1,0 +1,106 @@
+# IceBreaker — Radar & Chat Vision
+
+> This is the emotional core of IceBreaker. Radar shows quiet presence. Chat makes the moment real. Then it ends — intentionally.
+
+---
+
+## 🎯 Purpose
+
+* **Radar**: Surface nearby people who are open right now — without pressure or profiles.
+* **Chat**: Enable a brief, real exchange — then let it fade when proximity ends.
+
+---
+
+## 🛰️ Radar — Presence without pressure
+
+**What it is**
+
+* A scan‑style view (CRT sweep) of who’s within range.
+* Chunky pixel dots or accessible list. **No avatars. No follower cues.**
+* Sorts by lightweight compatibility so relevance quietly leads.
+
+**What it should feel like**
+
+* A subtle ping — like glancing around a room.
+* Calm, minimal, and respectful of attention.
+
+**UI language**
+
+* Deep navy/charcoal base; neon teal accents.
+* Empty state: *“No one here — yet.”*
+* Permission/GPS‑off states are clear and dignified.
+
+**Visibility & compatibility rules (MVP)**
+
+* Visibility ON → eligible to appear.
+* Skipping all tags → **reduced discoverability** (soft penalty).
+* **Score hints placement**: higher score = closer to center / slightly stronger pulse.
+
+**MVP scoring**
+
+* 🎯 Vibe match (same) → strong boost
+* 🔗 Shared tags → additive boost per tag
+* 🧍 Visibility ON → small boost
+* 🚫 No tags → soft penalty
+* 🛟 Recent panic → **hide** (safety first)
+
+> **Future flag**: Evolve into a "Signal Engine" that can learn from passive feedback (accept/decline, chat duration). Always privacy‑respecting; no message content stored.
+
+---
+
+## 🗨️ Chat — Brief, intentional, ephemeral
+
+**What it is**
+
+* 1:1 real‑time exchange that ends when proximity ends.
+* No history, no threads, no reactions — **say it while it matters.**
+
+**UI language**
+
+* Black background; teal monospaced text.
+* Timestamps `[HH:MM]`; ASCII dividers between bursts.
+* Optional toast when proximity weakens: *“Signal weak — chat may end.”*
+
+**End of moment**
+
+* When range breaks (or Panic): instant close.
+* Copy: *“Connection lost. Chat deleted.”*
+
+> **Future flag**: Client‑side encryption can be added later behind a feature flag; ephemerality stays the same.
+
+---
+
+## 🛟 Panic — Always accessible
+
+* Teal FAB visible on Radar and Chat.
+* Confirm modal: *“Everything okay?”* → **Send alert & exit** / **Never mind**.
+* After action toast: *“You’re safe. Session ended.”*
+
+---
+
+## ♿ Accessibility
+
+* Reduced‑motion disables sweeps, blinks, pulses.
+* High‑contrast brightens teal and ensures WCAG text contrast.
+* Full keyboard paths; ARIA labels on dots, list items, and FAB.
+
+---
+
+## 🧠 Decision rules
+
+1. Presence over profile.
+2. Simplicity over cleverness.
+3. Safety over stickiness.
+4. If a choice risks the vibe, choose the vibe.
+
+---
+
+## ✅ Acceptance (experience‑level)
+
+* Radar handles **empty / denied / GPS‑off** states gracefully.
+* Sorting feels quietly relevant; no one is fully hidden (except for safety).
+* Chat starts in **one tap** and feels instant.
+* Chats **always end** on proximity break or Panic, with clear copy.
+* Reduced‑motion and high‑contrast are respected throughout.
+
+> Build this like a ritual: quiet arrival, brief spark, clean fade.
