@@ -27,7 +27,15 @@
     "postinstall": "node ./tools/postinstall-check.mjs",
     "convert:app": "node ./tools/convert-to-app.mjs",
     "test:personas": "node ./tools/test-persona-activation.mjs",
-    "github:init": "node ./tools/github-init-issues.mjs"
+    "github:init": "node ./tools/github-init-issues.mjs",
+    "dev:guarded": "node ./tools/dev-guarded.mjs",
+    "ports:free": "bash ops/cleanup/kill-ports.sh",
+    "ports:free:win": "powershell -ExecutionPolicy Bypass -File ops/cleanup/kill-ports.ps1",
+    "ports:status": "node ./tools/ports-status.mjs",
+    "guard:lint": "node ./tools/guard-runner.mjs lint",
+    "guard:type": "node ./tools/guard-runner.mjs type",
+    "test": "node ./tools/guard-runner.mjs test",
+    "precommit": "npm run guard:lint && npm run guard:type && npm test"
   },
   "engines": {
     "node": ">=18.0.0"

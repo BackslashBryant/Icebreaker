@@ -97,6 +97,10 @@ Set `CURSOR_AUTO_SETUP=false npm run setup` if you prefer to walk through the wi
 npm run preflight          # Validate workspace scaffolding
 npm run verify             # Run verification suite (lint/test/build)
 npm run test:personas      # Smoke-test persona auto-routing globs
+npm run dev:guarded        # Start dev server only if canonical port is free
+npm run ports:status       # Show listeners on canonical ports
+npm run ports:free         # POSIX cleanup of dev servers
+npm run ports:free:win     # Windows cleanup of dev servers
 npm run mcp:suggest        # Suggest MCP servers based on dependencies
 npm run agents:prompt      # Print agent prompts
 npm run github:labels      # Sync GitHub labels
@@ -168,6 +172,8 @@ See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
 - `docs/FIRST_RUN.md` - Detailed first-time setup walkthrough
 - `docs/agents/PLAYBOOK.md` - Roster playbook and chat handoff cheat sheet
 - `docs/agents/KICKOFF.md` - How to start your first feature
+- `AGENTS.md` - Always/Never guardrails for Cursor agents
+- `ops/docs/AGENT-RUNBOOK.md` - Step-by-step agent operations
 
 ### Guides
 
@@ -256,6 +262,7 @@ Tip: Start with no files open and the orchestrator greets you in Vector’s voic
 - Pick one structure per project—either a monorepo or separate front/back specs—and keep the documentation and plans in sync.
 - Maintain `docs/architecture/ARCHITECTURE_TEMPLATE.md` as the living blueprint; log each session in `docs/context.md` using `/session-summary`.
 - Run `/self-review`, `/data-flow`, and `/predict-breakage` after major changes to catch architectural drift and edge cases.
+- Before opening a PR, run `npm run precommit` and share the output.
 - Prefer familiar stacks (React, Node, Supabase, etc.) unless you have strong justification—models know them best.
 - Test as you go: let Pixel scaffold commands, run them after every checkpoint, and log failures with `/current-issues`.
 

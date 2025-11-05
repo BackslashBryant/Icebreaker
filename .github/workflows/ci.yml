@@ -1,46 +1,27 @@
-name: Template CI
+name: Guardrails CI
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, master ]
 
 jobs:
-  preflight:
-    name: Run Template Preflight
+  checks:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Install dependencies
-        run: npm install --ignore-scripts --no-audit --no-fund
-
-      - name: Verify brains refresh
-        run: npm run brains:refresh -- --check
-
-      - name: Validate agent workflow scaffolding
-        run: npm run preflight -- --ci
-
-      - name: Run verify-all (best-effort)
-        run: |
-          if [ -f scripts/verify-all ]; then
-            node scripts/verify-all || echo "verify-all exited non-zero"
-          else
-            echo "No verify-all script found"
-          fi
-
-      - name: Test persona auto-routing
+      - run: npm ci || npm install
+      - name: Guard Lint
+        run: npm run guard:lint
+      - name: Guard Typecheck
+        run: npm run guard:type
+      - name: Guard Tests
+        run: npm test
+      - name: Persona smoke test
         run: npm run test:personas
-
-      - name: Ensure ConnectionGuide updated with CI/env changes
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Connection Guide check
         run: |
           git fetch --no-tags --depth=1 origin ${{ github.base_ref }}
           CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)

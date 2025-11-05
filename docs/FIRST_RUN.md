@@ -41,7 +41,8 @@ npm run feature:new
 - Create a GitHub issue using the **0 - Spec** template.
 - Follow `docs/process/MVP_LOOP.md` to move from Spec -> Plan -> Build.
 - Complete `docs/architecture/ARCHITECTURE_TEMPLATE.md` so the stack and module plan are explicit before coding.
-- Use `docs/context.md` to track session summaries—run `/session-summary` at the end of each work block and paste the output.
+- Use `docs/context.md` to track session summaries—run `/session-summary` (or `/append-session-summary`) at the end of each work block.
+- Familiarise yourself with the guarded scripts: `npm run dev:guarded`, `npm run ports:status`, `npm run ports:free` (or `ports:free:win`).
 
 ### 1. Check Prerequisites
 
