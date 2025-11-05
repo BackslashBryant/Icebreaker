@@ -1,6 +1,6 @@
-# Cursor Workspace Template
+# Icebreaker
 
-A stack-agnostic starting point for Cursor projects. It focuses on a visible, sequential crew of Cursor agents plus lightweight automation so you always know who is working, what checkpoint they are on, and how to ship safely.
+A proximity-based ephemeral chat application for connecting people nearby. Built with a sequential crew of Cursor agents plus lightweight automation so you always know who is working, what checkpoint they are on, and how to ship safely.
 
 **Foundational habits baked into the repo:**
 - 📄 **Document the vision first** – `docs/vision.md` anchors every chat and plan.

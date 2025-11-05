@@ -1,8 +1,8 @@
 {
-  "name": "cursor-ai-workspace",
-  "version": "0.0.0",
+  "name": "icebreaker",
+  "version": "0.1.0",
   "private": true,
-  "description": "Stack-agnostic Cursor workspace template with sequential Agent workflow and MCP guardrails.",
+  "description": "Icebreaker - A proximity-based ephemeral chat application for connecting people nearby",
   "scripts": {
     "preflight": "node ./tools/preflight.mjs",
     "mcp:suggest": "node ./tools/mcp-suggest.mjs",
