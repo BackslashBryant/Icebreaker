@@ -1,0 +1,12 @@
+---
+description: "Output shaping — enforce persona prefixes"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Output Shape Enforcement
+
+- When a persona rule is active (Vector, Forge, Link, Glide, Apex, Cider, Pixel, Muse, Nexus, Scout, Sentinel), **every** message must begin with the exact prefix `<Name> <Emoji>` (ASCII fallback permitted only if emoji rendering fails).
+- If a response is emitted without the required prefix, immediately restate the same message with the correct prefix and the standard format (`Status`, `Next 3`, `Question`).
+- Preserve the universal message format and hobbyist-friendly tone.
+- When no persona rule is active, obey the orchestrator instructions in `.cursor/rules/06-orchestrator.mdc`.

@@ -101,6 +101,7 @@ npm run mcp:suggest        # Suggest MCP servers based on dependencies
 npm run agents:prompt      # Print agent prompts
 npm run github:labels      # Sync GitHub labels
 npm run github:issue       # Create GitHub issues from templates
+npm run github:init        # Seed starter Spec/Plan/Build/Verify issues (optional)
 npm run github:pr          # Draft a PR from the current feature (use --push to publish)
 ```
 
@@ -112,13 +113,21 @@ npm run github:pr          # Draft a PR from the current feature (use --push to 
 
 Type `/` in chat to insert these helpers. See `.cursor/commands/README.md` for details.
 
-- `/crew` – Survey context and recommend the next persona (with paste‑ready handoff)
+- `/crew` – Survey context and recommend the next persona (with paste-ready handoff)
 - `/resume` – Resume the next checkpoint from the plan
-- `/handoff` – Template for a crisp Plan‑Mode handoff to any persona
-- `/kickoff` – One‑paste kickoff block to start a feature
-- `/vector-plan` – Create or update the numbered plan
-- `/pixel-test` – Scaffold acceptance tests and commands
-- `/scout-research` – Research with sources, tradeoffs, default, rollback
+- `/handoff` – Template for a crisp Plan-Mode handoff to any persona
+- `/kickoff` – One-paste kickoff block to start a feature
+- `/status` – Quick feature status + one recommended action
+- `/current-issues` – Append a structured blocker entry to the feature log
+- `/finish` – Generate Muse/Nexus wrap-up checklists
+- `/vector-plan`, `/pixel-test`, `/scout-research` – Persona-specific helpers
+- `/self-review` – Architecture/code hygiene self-critique
+- `/data-flow` – Explain end-to-end data flow and flag gaps
+- `/predict-breakage` – Anticipate production failures with mitigations
+- `/draft-architecture` – Fill gaps in docs/architecture/ARCHITECTURE_TEMPLATE.md interactively
+- `/append-session-summary` – Auto-append the latest recap to docs/context.md
+- `/session-summary` – Produce a paste-ready session recap for `docs/context.md`
+- `/as-<persona>` – Force a persona voice when you haven’t opened matching files (e.g., `/as-forge`, `/as-link`)
 
 ---
 
@@ -166,6 +175,8 @@ See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
 - `docs/agents/SETUP.md` - Agent setup reference
 - `docs/vision.md` - Source of truth for product intent
 - `docs/ConnectionGuide.md` - Registry of ports, services, and integrations
+- `docs/architecture/ARCHITECTURE_TEMPLATE.md` - Blueprint for stack/modules/data flow
+- `docs/context.md` - Running session summaries for fast context reload
 - `docs/cursor/SETTINGS_GUIDE.md` - Cursor IDE configuration (generated)
 - `docs/cursor/extensions.md` - Extension installation
 - `docs/cursor/models.md` - Model selection guide
@@ -239,6 +250,17 @@ Tip: Start with no files open and the orchestrator greets you in Vector’s voic
 
 ---
 
+## Project Hygiene
+
+- Keep modules around 800 lines or fewer; split or version files (e.g. `auth_service_v2.ts`) instead of overwriting.
+- Pick one structure per project—either a monorepo or separate front/back specs—and keep the documentation and plans in sync.
+- Maintain `docs/architecture/ARCHITECTURE_TEMPLATE.md` as the living blueprint; log each session in `docs/context.md` using `/session-summary`.
+- Run `/self-review`, `/data-flow`, and `/predict-breakage` after major changes to catch architectural drift and edge cases.
+- Prefer familiar stacks (React, Node, Supabase, etc.) unless you have strong justification—models know them best.
+- Test as you go: let Pixel scaffold commands, run them after every checkpoint, and log failures with `/current-issues`.
+
+---
+
 ## Customization
 
 - **Documentation**: Everything under `docs/` is a template--replace or delete once you create project-specific content
@@ -256,7 +278,8 @@ Tip: Start with no files open and the orchestrator greets you in Vector’s voic
 4. ? Enable GitHub MCP in Cursor IDE
 5. ? Set up branch protections (see `docs/github/BRANCH_PROTECTION.md`)
 6. ? Enable PR Auto-Labeler workflow (maps paths → `agent:*` labels)
-7. ? Require checks: Template CI + persona auto-routing test + ConnectionGuide doc check
+7. ? Run `npm run github:init` to seed starter Spec/Plan/Build/Verify issues (optional)
+8. ? Require checks: Template CI + persona auto-routing test + ConnectionGuide doc check
 
 ---
 

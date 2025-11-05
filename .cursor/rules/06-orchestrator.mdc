@@ -21,6 +21,10 @@ Act as the team lead whenever no persona-specific rule is active. Your job is to
 - Tell the user which specialist should take over, why, and what files/tests they must touch.
 - Tag the persona explicitly (`@Vector`, `@Forge`, etc.) and remind them to stay in Plan Mode until approved.
 - Surface any missing artefacts (“Vision file stale”, “Connection Guide missing port”, “No Current Issues log entry yet”).
+- Avoid creating new summary/assessment documents; update existing guides (docs/vision.md, docs/context.md, docs/process/...) unless the user explicitly requests a new file.
+- If docs/architecture/ARCHITECTURE_TEMPLATE.md has empty sections, prompt with `/draft-architecture` or gather answers and update it.
+- Encourage `/append-session-summary` after each work block so docs/context.md stays current.
+- When a human action is required (tokens, external API sign-ups, manual approvals), pause, list the steps, and wait for confirmation before continuing.
 
 ## When a persona rule is active
 - If you see persona-specific guidance in the stack, yield. Let that persona speak in their own voice and only add context when asked.

@@ -51,3 +51,6 @@ Each persona is a specialist developer who owns their lane end to end. They plan
 - No mock data in production paths; confirm user preferences before adding packages, frameworks, or services.
 - Ask before committing or pushing. Surface diff preview and tests so the human caller can approve.
 - Use MCP tools as accelerators, not autopilot. Capture citations in `/docs/research.md` when Scout, Vector, or implementers lean on external guidance.
+- Do not create new summary or assessment files in `docs/` unless explicitly asked; append to existing docs (`docs/context.md`, `docs/process/…`) instead.
+- Use `/draft-architecture` and `/append-session-summary` rather than inventing new files when those docs need updates.
+- When manual prerequisites are required (API keys, sign-ups, tokens), stop and instruct the user on the exact actions before proceeding.

@@ -1,34 +1,35 @@
 {
-    "name":  "cursor-ai-workspace",
-    "version":  "0.0.0",
-    "private":  true,
-    "description":  "Stack-agnostic Cursor workspace template with sequential Agent workflow and MCP guardrails.",
-    "scripts":  {
-                    "preflight":  "node ./tools/preflight.mjs",
-                    "mcp:suggest":  "node ./tools/mcp-suggest.mjs",
-                    "verify":  "node ./scripts/verify-all",
-                    "agents:install-hook":  "node ./tools/install-agent-hook.mjs",
-                    "agents:prompt":  "node ./tools/agent-prompts.mjs",
-                    "github:issue":  "node ./tools/github-issue.mjs",
-                    "github:pr":  "node ./tools/github-pr.mjs",
-                    "github:labels":  "node ./tools/github-labels.mjs",
-                    "cursor:extensions":  "node ./tools/cursor-extensions.mjs",
-                    "status":  "node ./tools/health-check.mjs",
-                    "setup":  "node ./tools/setup.mjs",
-                    "setup:tokens":  "node ./tools/token-wizard.mjs",
-                    "setup:agents":  "node ./tools/agent-helper.mjs",
-                    "setup:extensions":  "node ./tools/cursor-extensions.mjs",
-                    "setup:cursor":  "node ./tools/cursor-settings-gen.mjs",
-                    "detect":  "node ./tools/detection.mjs",
-                    "brains:refresh":  "node ./tools/brains-refresh.mjs",
-                    "personal:bootstrap":  "node ./tools/personal-bootstrap.mjs",
-                    "feature:new":  "node ./tools/feature-new.mjs",
-                    "preset:webapp":  "node ./tools/preset-webapp.mjs",
-                    "postinstall":  "node ./tools/postinstall-check.mjs",
-                    "convert:app":  "node ./tools/convert-to-app.mjs",
-                    "test:personas":  "node ./tools/test-persona-activation.mjs"
-                },
-    "engines":  {
-                    "node":  "\u003e=18.0.0"
-                }
+  "name": "cursor-ai-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Stack-agnostic Cursor workspace template with sequential Agent workflow and MCP guardrails.",
+  "scripts": {
+    "preflight": "node ./tools/preflight.mjs",
+    "mcp:suggest": "node ./tools/mcp-suggest.mjs",
+    "verify": "node ./scripts/verify-all",
+    "agents:install-hook": "node ./tools/install-agent-hook.mjs",
+    "agents:prompt": "node ./tools/agent-prompts.mjs",
+    "github:issue": "node ./tools/github-issue.mjs",
+    "github:pr": "node ./tools/github-pr.mjs",
+    "github:labels": "node ./tools/github-labels.mjs",
+    "cursor:extensions": "node ./tools/cursor-extensions.mjs",
+    "status": "node ./tools/health-check.mjs",
+    "setup": "node ./tools/setup.mjs",
+    "setup:tokens": "node ./tools/token-wizard.mjs",
+    "setup:agents": "node ./tools/agent-helper.mjs",
+    "setup:extensions": "node ./tools/cursor-extensions.mjs",
+    "setup:cursor": "node ./tools/cursor-settings-gen.mjs",
+    "detect": "node ./tools/detection.mjs",
+    "brains:refresh": "node ./tools/brains-refresh.mjs",
+    "personal:bootstrap": "node ./tools/personal-bootstrap.mjs",
+    "feature:new": "node ./tools/feature-new.mjs",
+    "preset:webapp": "node ./tools/preset-webapp.mjs",
+    "postinstall": "node ./tools/postinstall-check.mjs",
+    "convert:app": "node ./tools/convert-to-app.mjs",
+    "test:personas": "node ./tools/test-persona-activation.mjs",
+    "github:init": "node ./tools/github-init-issues.mjs"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }

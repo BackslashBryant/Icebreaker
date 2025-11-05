@@ -18,6 +18,7 @@
     ".cursor/rules/persona-nexus.mdc",
     ".cursor/rules/persona-scout.mdc",
     ".cursor/rules/persona-sentinel.mdc",
+    ".cursor/rules/99-output-shape.mdc",
     ".cursor/rules/07-process-improvement.mdc"
   ],
   "plans": {

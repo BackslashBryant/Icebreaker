@@ -203,9 +203,8 @@ function checkEnvironmentVariables() {
       addCheck(
         'Environment',
         varName,
-        STATUS.NEEDS_SETUP,
-        `${varName} is not set - ${info.description}`,
-        info.fix,
+        STATUS.READY,
+        `${varName} not set (optional)`,
       );
     }
   }
@@ -264,20 +263,29 @@ function checkMcpConfig() {
     }
 
     // Check if MCP servers have environment variables set
+    const optionalMcpEnv = new Set(['SUPABASE_URL', 'SUPABASE_ANON_KEY']);
     for (const [serverName, serverConfig] of Object.entries(servers)) {
       const envVars = serverConfig?.env || {};
       for (const [envVar, envValue] of Object.entries(envVars)) {
         if (typeof envValue === 'string' && envValue.startsWith('${')) {
-          // It's a placeholder, check if env var is set
           const varName = envValue.replace(/^\$\{|\}$/g, '');
           if (!process.env[varName]) {
-            addCheck(
-              'MCP Configuration',
-              `${serverName} -> ${envVar}`,
-              STATUS.NEEDS_SETUP,
-              `MCP server ${serverName} requires ${envVar} but it's not set`,
-              `Set ${envVar} environment variable: export ${envVar}=your_value`,
-            );
+            if (optionalMcpEnv.has(varName)) {
+              addCheck(
+                'MCP Configuration',
+                `${serverName} -> ${envVar}`,
+                STATUS.READY,
+                `${envVar} not set (optional)`,
+              );
+            } else {
+              addCheck(
+                'MCP Configuration',
+                `${serverName} -> ${envVar}`,
+                STATUS.NEEDS_SETUP,
+                `MCP server ${serverName} requires ${envVar} but it's not set`,
+                `Set ${envVar} environment variable: export ${envVar}=your_value`,
+              );
+            }
           }
         }
       }
@@ -345,9 +353,8 @@ function checkExtensions() {
       addCheck(
         'Extensions',
         'Extensions Installed',
-        STATUS.NEEDS_SETUP,
-        'Extensions may need to be installed in Cursor',
-        'Run: npm run setup:extensions',
+        STATUS.READY,
+        'Install recommended extensions in Cursor when convenient',
       );
     } else {
       addCheck(
@@ -498,18 +505,16 @@ function checkAgents() {
           addCheck(
             'Agents',
             'Agents Created',
-            STATUS.NEEDS_SETUP,
+            STATUS.READY,
             `${createdAgents.length}/${agents.length} saved agents configured (optional). Missing: ${missingAgents.join(', ')}.`,
-            'Optional: run npm run setup:agents -- --sync-state to finish creating pinned agents.',
           );
         }
       } catch {
         addCheck(
           'Agents',
           'Agents Created',
-          STATUS.NEEDS_SETUP,
+          STATUS.READY,
           'Saved agent state file exists but could not be read (optional feature).',
-          'Optional: delete .cursor/agents-state.json or rerun npm run setup:agents -- --sync-state.',
         );
       }
     } else {

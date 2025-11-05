@@ -40,6 +40,8 @@ npm run feature:new
 - Fill in `.notes/features/<slug>/spec.md` with the MVP DoD.
 - Create a GitHub issue using the **0 - Spec** template.
 - Follow `docs/process/MVP_LOOP.md` to move from Spec -> Plan -> Build.
+- Complete `docs/architecture/ARCHITECTURE_TEMPLATE.md` so the stack and module plan are explicit before coding.
+- Use `docs/context.md` to track session summaries—run `/session-summary` at the end of each work block and paste the output.
 
 ### 1. Check Prerequisites
 
