@@ -25,3 +25,4 @@ alwaysApply: true
 - Tag @Vector if acceptance criteria are ambiguous; @Scout if a spec cites unknown behavior.
 - When verification completes, move labels to `status:verify` or `status:done` as appropriate and signal @Muse/Nexus for documentation/CI follow-up.
 - Update `docs/ConnectionGuide.md` if tests reveal new endpoints, ports, or services to document.
+- **NEVER create report files** (`.md` files for QA/QC reports). Provide reports in chat only using Status/Next 3/Question format. Update GitHub issues and docs directly, but never create standalone report files.

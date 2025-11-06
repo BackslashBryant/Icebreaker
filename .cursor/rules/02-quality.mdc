@@ -39,9 +39,11 @@ alwaysApply: true
 
 # Git Hygiene
 
-- One issue/task per branch; name it `{type}/{issue-id}-{slug}` (e.g., `feat/123-add-auth`).
-- Keep commits scoped and reference the issue ID in the message.
-- Use GitHub MCP or your automation scripts to create branches, commits, PRs, and merges.
+- **BEFORE starting work**: Create branch with format `agent/<agent>/<issue>-<slug>` (e.g., `agent/vector/1-onboarding-flow`) per `.cursor/rules/01-workflow.mdc`. Never work on existing branches unless they match the issue.
+- One issue/task per branch; name it `agent/<agent>/<issue>-<slug>` (preferred) or `feat/<issue>-<slug>` (fallback).
+- Keep commits scoped and reference the issue ID in the message: `feat: Complete Issue #X - [description]`.
+- **When completing a feature**: Update GitHub issue with completion comment, commit changes, then ask before pushing.
+- Use GitHub MCP (or `gh`) for branch pushes, PR updates, and reviews. Terminal git is a fallback for commits.
 - Ask before committing or pushing; surface the staged diff and test results for approval.
 - Merge cleanly (squash/rebase) after quality gates are green and the ticket is updated.
 - Install the provided git hook (`scripts/git-hooks/install`) so `.cursor/` changes never leave your machine unless you intentionally set `ALLOW_CURSOR_PUSH=1`.

@@ -11,11 +11,12 @@
 8. Never modify files outside this repository.
 
 ## Code-change guardrails
-9. Create a feature branch for every change (`feat/<slug>`). Never push directly to the default branch.
+9. **BEFORE starting work**: Create a feature branch with format `agent/<agent>/<issue>-<slug>` (e.g., `agent/vector/1-onboarding-flow`) per `.cursor/rules/01-workflow.mdc` line 24. Never work on existing branches unless they match the issue being worked on. Check current branch matches the issue before making changes.
 10. Keep changes minimal and reversible. No unrelated refactors, formatting, or file shuffles.
 11. After edits, show `git status` and a diff of touched files. If something is missing or extra, stop and ask.
 12. Run `npm run precommit` and share the output. If any step fails, stop and ask before trying fixes.
-13. Open a PR summarising the task, risks, and test evidence. Await human review.
+13. **When completing a feature/issue**: Update GitHub issue with completion comment, commit with issue reference (`feat: Complete Issue #X - [description]`), then ask before pushing.
+14. Open a PR summarising the task, risks, and test evidence. Await human review.
 
 ## Context hygiene
 14. If files changed outside Cursor, request a project re-scan before editing.

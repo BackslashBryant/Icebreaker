@@ -22,6 +22,10 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 - Fall back to CLI only if MCP is unavailable (document in plan)
 - **Note**: Playwright MCP tools may require Cursor restart to load. If tools not visible, document fallback and note in progress.md
 
+**Rules/Scripts Updated**:
+- ✅ `.cursor/rules/04-integrations.mdc`: Playwright MCP guidance already present
+- ✅ `.cursor/rules/07-process-improvement.mdc`: MCP usage lesson documented with tool list
+
 **Tools Available** (when Playwright MCP is loaded):
 - `browser_navigate` - Navigate to URLs
 - `browser_snapshot` - Accessibility snapshots (preferred over screenshots for a11y)
@@ -41,6 +45,9 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 - Never auto-open HTML reports; provide paths for manual review
 - Document report locations in test configuration comments
 
+**Rules/Scripts Updated**:
+- ✅ `tests/playwright.config.ts`: Already configured with `open: 'never'` and `artifacts/` output directory
+
 ## 2024-12-19: MCP-First Git Operations
 
 **Trigger**: User requested git push, agent used terminal commands instead of GitHub MCP
@@ -52,6 +59,9 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 - Update workflow rules to include MCP trigger check as mandatory first step
 - Add explicit "MCP-first" decision tree in git operations
 - Ensure agent checks MCP availability before terminal fallback
+
+**Rules/Scripts Updated**:
+- ✅ `.cursor/rules/04-integrations.mdc`: Clarified GitHub MCP vs git CLI usage (commits use CLI, branch/PR/issue updates use MCP)
 
 ## 2025-01-XX: No Report Files - Chat Only
 
@@ -67,6 +77,10 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 - Keep reports concise (Status, Next 3, Question format)
 - Delete any report files created
 
+**Rules/Scripts Updated**:
+- ✅ `.cursor/rules/persona-pixel.mdc`: Added guardrail "NEVER create report files"
+- ✅ `.cursor/rules/persona-muse.mdc`: Added guardrail "NEVER create report files"
+
 ## 2025-11-06: Issue Completion Workflow (Git Commit & Push + Branch Naming)
 
 **Trigger**: Agent completed Issue #1 verification but didn't: 1) Use proper branch naming, 2) Update GitHub issue, 3) Commit/push changes
@@ -80,4 +94,13 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 - Commit all changes with message referencing issue number: `feat: Complete Issue #X - [description]`
 - Ask before pushing (per agent rules)
 - Include test results and verification summary in commit message
-- Update workflow rules to make branch naming explicit in completion steps
+
+**Rules/Scripts Updated** (not just documented):
+- ✅ `AGENTS.md` rule #9: Enforce branch creation BEFORE work starts
+- ✅ `AGENTS.md` rule #13: Enforce issue completion checklist (GitHub issue update, commit, push)
+- ✅ `.cursor/rules/01-workflow.mdc` Section 2: MANDATORY branch creation before work
+- ✅ `.cursor/rules/01-workflow.mdc` Section 6: Issue completion checklist
+- ✅ `.cursor/rules/02-quality.mdc`: Git hygiene updated with branch naming requirement
+- ✅ `tools/preflight.mjs`: Added `checkBranchNaming()` function (validates branch format)
+- ✅ `scripts/hooks/pre-commit.sample`: Added branch naming warning (non-blocking)
+- ✅ `.cursor/rules/04-integrations.mdc`: Clarified GitHub MCP vs git CLI usage

@@ -15,7 +15,8 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 - If an MCP fails twice, document it in `.notes/features/<slug>/progress.md` and suggest the fallback.
 
 ## When to Reach for Which Tool
-- **GitHub MCP** – Branch/PR automation, repo search, code examples. First stop for anything "git" or GitHub API shaped.
+- **GitHub MCP** – Branch/PR automation, repo search, code examples, issue comments. First stop for anything "git" or GitHub API shaped (except commits - use git CLI for commits).
+- **Note**: Git commits use CLI (GitHub MCP doesn't have commit tool), but branch creation, PRs, and issue updates should use GitHub MCP.
 - **Ref Tools MCP** – Token-efficient documentation search for APIs, libraries, services. Supports private repos and PDFs. Cite sources in `/docs/research.md`.
 - **Playwright MCP** – UI screenshots, axe/Lighthouse accessibility/perf checks. Attach outputs to the ticket or artifacts.
 - **Supabase MCP Lite** – Database schema diffs, SQL experiments, policy checks (if Supabase is chosen). Update `docs/ConnectionGuide.md` when endpoints change.

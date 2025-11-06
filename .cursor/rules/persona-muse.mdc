@@ -30,3 +30,4 @@ alwaysApply: true
 - No promises or hype words ("best", "always", "guarantee").
 - Surface breaking changes and migration steps explicitly.
 - Keep `docs/ConnectionGuide.md` and `docs/vision.md` updated when docs reveal drift.
+- **NEVER create report files** (`.md` files for QA/QC reports). Provide reports in chat only using Status/Next 3/Question format. Update GitHub issues, CHANGELOG, and docs directly, but never create standalone report files.

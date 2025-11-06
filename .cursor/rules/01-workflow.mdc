@@ -21,10 +21,11 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - If Docfork/Search MCP is used, note the references in `/docs/research.md`.
 
 ## 2. Branching & MCP Setup
+- **MANDATORY**: Create branch with format `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`) **BEFORE starting any work**. Check current branch matches the issue being worked on. If on wrong branch, create correct branch and move commits.
 - Branch name format: `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`).
 - Install/refresh GitHub MCP in Cursor; authenticate using a PAT with `repo`, `workflow`, `issues`.
 - Nexus or the acting human runs `npm run agents:install-hook` to copy the path-scope pre-commit hook locally.
-- Run `npm run preflight` before pushing to ensure scaffolding is intact.
+- Run `npm run preflight` before pushing to ensure scaffolding is intact (includes branch name validation).
 - Execute `npm run mcp:suggest` after dependency or config changes and note the recommendations in `.notes/` or the active plan; run `npm run mcp:suggest -- --install <id>` to append required servers to `.cursor/mcp.json`.
 - Record any new ports, endpoints, or services in `docs/ConnectionGuide.md` immediately.
 
@@ -56,7 +57,11 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Nexus (or human counterpart) merges via GitHub UI once requirements are satisfied.
 
 ## 6. Close the Loop
-- Close the Issue with a recap that links the merged PR and any follow-on tasks.
+- **Issue completion checklist** (must complete all):
+  1. Update GitHub issue with completion comment (test results, verification summary)
+  2. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
+  3. Ask before pushing (per agent rules)
+  4. Close the Issue with a recap that links the merged PR and any follow-on tasks.
 - Archive research snippets in `/docs/research.md` and security notes (if any).
 - Update `/docs/agents/KICKOFF.md` sanity checklist if the flow uncovered gaps.
 

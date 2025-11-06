@@ -322,6 +322,34 @@ function checkRepoMode() {
   addResult('Repo mode', true, `Template mode: Cursor files tracked`);
 }
 
+function checkBranchNaming() {
+  try {
+    const branch = execSync('git rev-parse --abbrev-ref HEAD', { 
+      cwd: repoRoot, 
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
+    
+    // Skip check for main/master branches (allow direct work on main for template updates)
+    if (branch === 'main' || branch === 'master') {
+      addResult('Branch naming', true, `On ${branch} (main branch - allowed)`);
+      return;
+    }
+    
+    // Check format: agent/<agent>/<issue>-<slug> or feat/<issue>-<slug>
+    const validPattern = /^(agent\/\w+\/\d+-[\w-]+|feat\/\d+-[\w-]+)$/;
+    if (validPattern.test(branch)) {
+      addResult('Branch naming', true, `Branch "${branch}" matches required format`);
+      return;
+    }
+    
+    addResult('Branch naming', false, `Branch "${branch}" does not match required format: agent/<agent>/<issue>-<slug> or feat/<issue>-<slug> (e.g., agent/vector/1-onboarding-flow)`);
+  } catch (error) {
+    // Git not initialized or other error - skip check
+    addResult('Branch naming', true, 'Git branch check skipped (not a git repo or git unavailable)');
+  }
+}
+
 function main() {
   checkPlanScaffold();
   checkResearchLog();
@@ -336,6 +364,7 @@ function main() {
   checkFeatureWorkflow();
   checkMvpGuide();
   checkRepoMode();
+  checkBranchNaming();
 
   const rawArgs = process.argv.slice(2);
   const wantsJson = rawArgs.includes('--json') || rawArgs.includes('--ci');
