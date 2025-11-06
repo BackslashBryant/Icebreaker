@@ -66,3 +66,18 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 - Update changelog/docs if needed
 - Keep reports concise (Status, Next 3, Question format)
 - Delete any report files created
+
+## 2025-11-06: Issue Completion Workflow (Git Commit & Push + Branch Naming)
+
+**Trigger**: Agent completed Issue #1 verification but didn't: 1) Use proper branch naming, 2) Update GitHub issue, 3) Commit/push changes
+**Lesson**: When completing a feature/issue, always: 1) Create branch with proper format FIRST (`agent/<agent>/<issue>-<slug>` per `.cursor/rules/01-workflow.mdc`), 2) Update GitHub issue with completion comment, 3) Commit changes with descriptive message referencing issue, 4) Ask before pushing (per rules)
+**Root Cause**: Agent worked on existing branch (`feat/playwright-health-status`) instead of creating proper branch for Issue #1, then didn't complete workflow closure
+**Rule Update**: Feature completion checklist must include: Create proper branch FIRST, GitHub issue update, git commit, push (ask before push per rules)
+
+**Action Required**:
+- **Before starting work**: Create branch with format `agent/<agent>/<issue>-<slug>` (e.g., `agent/vector/1-onboarding-flow`)
+- After verification/implementation complete: Update GitHub issue with completion comment
+- Commit all changes with message referencing issue number: `feat: Complete Issue #X - [description]`
+- Ask before pushing (per agent rules)
+- Include test results and verification summary in commit message
+- Update workflow rules to make branch naming explicit in completion steps
