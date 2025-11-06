@@ -104,3 +104,20 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 - ✅ `tools/preflight.mjs`: Added `checkBranchNaming()` function (validates branch format)
 - ✅ `scripts/hooks/pre-commit.sample`: Added branch naming warning (non-blocking)
 - ✅ `.cursor/rules/04-integrations.mdc`: Clarified GitHub MCP vs git CLI usage
+
+## 2025-01-XX: Windows Git Push Subprocess Limitation
+
+**Trigger**: Git push fails in Cursor subprocess context on Windows with `getaddrinfo() thread failed to start` error  
+**Lesson**: Windows git threading issue affects subprocess contexts. Git push may require manual execution from user's terminal (outside Cursor's subprocess).  
+**Root Cause**: Windows DNS threading bug in git's HTTP client when executed in subprocess context  
+**Rule Update**: If git push fails in Cursor with Windows threading error, document commits are ready and provide manual push command for user's terminal
+
+**Action Required**:
+- When git push fails with threading error, verify commits are ready: `git log --oneline -3`
+- Provide user with manual push command: `git push origin <branch-name>`
+- Document in issue completion: "Commits ready locally, pushed manually due to Windows threading limitation"
+- Update workflow to note Windows subprocess limitation
+
+**Rules/Scripts Updated**:
+- ✅ `docs/research.md`: Documented Windows git push issue with solutions and trade-offs
+- ✅ `.cursor/rules/07-process-improvement.mdc`: Added lesson for Windows subprocess limitation

@@ -27,6 +27,120 @@ Use this file to paste brief citations and summaries when any agent uses Ref Too
 
 ---
 
+## 2025-01-XX: Windows Git Push "getaddrinfo() thread failed to start" Error
+
+**Research Date**: 2025-01-XX  
+**Researcher**: Scout 🔎  
+**Task**: Resolve Windows git push failure preventing Issue #1 completion push  
+**Issue**: Git push fails with `fatal: unable to access 'https://github.com/...': getaddrinfo() thread failed to start`
+
+### Sources
+
+1. **Source**: Stack Overflow - "fatal: unable to access 'link': getaddrinfo() thread failed to start"  
+   **URL**: https://stackoverflow.com/questions/59911649/fatal-unable-to-access-link-getaddrinfo-thread-failed-to-start  
+   **Notes**:
+   - Windows-specific DNS threading issue in git
+   - Often caused by firewall/antivirus blocking git's network operations
+   - Some users resolved by uninstalling firewall software
+   - Workaround: Use IP address instead of hostname in remote URL
+   - Alternative: Switch to SSH protocol instead of HTTPS
+
+2. **Source**: Stack Overflow - "Why does git fail with getaddrinfo thread failed to start when in a subprocess?"  
+   **URL**: https://stackoverflow.com/questions/76654896/why-does-git-fail-with-getaddrinfo-thread-failed-to-start-when-in-a-subproce  
+   **Notes**:
+   - Missing environment variables (e.g., `SystemRoot`) can cause this error
+   - Subprocess execution context may lack required environment variables
+   - PowerShell/CMD environment differences can trigger the issue
+
+3. **Source**: Deepinout - Git Configuration Solutions  
+   **URL**: https://deepinout.com/git/git-questions/53_tk_1702444957.html  
+   **Notes**:
+   - Configure git to use HTTPS instead of git:// protocol
+   - Command: `git config --global url."https://".insteadOf git://`
+   - Proxy settings may need configuration
+   - Update/reinstall Git for Windows may resolve
+
+### Key Findings
+
+**Root Cause**: Windows DNS threading issue in git's HTTP client. Not related to network connectivity (ping works), but to how git spawns DNS resolution threads.
+
+**Common Triggers**:
+- Firewall/antivirus blocking git operations
+- Missing environment variables in subprocess context
+- VPN or network tools interfering
+- Outdated Git for Windows version
+
+**GitHub MCP Limitation**: GitHub MCP does NOT have a git push tool. It handles GitHub API operations (PRs, issues, file contents) but not git commits. The `mcp_github_push_files` tool pushes file contents via API, not git commits, which would create new commits and lose git history.
+
+### Recommended Solutions (Priority Order)
+
+1. **Manual Push (Immediate Fix)**
+   - Push manually from user's terminal where git works
+   - Most reliable workaround
+   - Preserves git history and commit metadata
+
+2. **Check Firewall/Antivirus**
+   - Temporarily disable firewall/antivirus to test
+   - If resolves, add git.exe to firewall exceptions
+   - Some users required complete firewall uninstall
+
+3. **Update Git for Windows**
+   - Download latest from https://git-scm.com/downloads
+   - Newer versions may have fixes for threading issues
+
+4. **Use IP Address Instead of Hostname**
+   - Get GitHub IP: `nslookup github.com`
+   - Update remote: `git remote set-url origin https://<IP>/BackslashBryant/Icebreaker.git`
+   - Bypasses DNS resolution entirely
+
+5. **Switch to SSH Protocol**
+   - Requires SSH key setup: `ssh-keygen` → add to GitHub
+   - Update remote: `git remote set-url origin git@github.com:BackslashBryant/Icebreaker.git`
+   - SSH bypasses HTTP threading issues
+
+6. **Git Configuration Tweaks** (Already attempted)
+   - `http.threads=1` - Limits threading
+   - `http.postBuffer` - Increases buffer size
+   - `http.sslBackend=schannel` - Windows SSL backend
+   - These didn't resolve in our case
+
+### Trade-offs
+
+| Solution | Pros | Cons |
+|----------|------|------|
+| Manual Push | 100% reliable, preserves history | Requires user action |
+| Firewall Exception | Permanent fix if firewall is cause | May not be root cause |
+| IP Address | Bypasses DNS entirely | IP changes, breaks automation |
+| SSH Protocol | Bypasses HTTP threading | Requires SSH setup |
+| GitHub MCP | API-based | Doesn't support git commits |
+
+### Recommendation
+
+**Immediate**: User pushes manually from their terminal (git works in their environment, just not in Cursor's subprocess context).
+
+**Long-term**: 
+1. Add git.exe to firewall exceptions
+2. Update Git for Windows to latest version
+3. If persists, consider SSH protocol setup
+
+**Rollback**: If any solution breaks git entirely, revert remote URL: `git remote set-url origin https://github.com/BackslashBryant/Icebreaker.git`
+
+### Next Steps
+
+1. ✅ Document findings in research log
+2. ⏳ User pushes commits manually (3 commits ready: `564d5e2`, `48de326`, `8ee02e6`)
+3. ⏳ Update `.cursor/rules/07-process-improvement.mdc` with Windows git push workaround lesson
+4. ⏳ Consider adding SSH setup to project docs if issue recurs
+
+### References
+
+- Issue: #1 (Onboarding Flow completion)
+- Branch: `agent/vector/1-onboarding-flow`
+- Commits ready: 3 local commits awaiting push
+- GitHub MCP: Confirmed no git push capability (API-only operations)
+
+---
+
 # Minimum Baseline MCPs for Icebreaker MVP
 
 **Research Date**: 2025-01-27
