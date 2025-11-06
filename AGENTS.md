@@ -9,6 +9,7 @@
 6. Do not kill processes you did not start unless the user confirms.
 7. Use package.json scripts. Do not hand-craft long commands or invoke binaries directly.
 8. Never modify files outside this repository.
+9. **NEVER explain your own commands or tool usage in chat**. Execute commands, report results directly. No meta-commentary about Write-Host, PowerShell syntax, or "what I'm doing" - just communicate results.
 
 ## Code-change guardrails
 9. **BEFORE starting work**: Create a feature branch with format `agent/<agent>/<issue>-<slug>` (e.g., `agent/vector/1-onboarding-flow`) per `.cursor/rules/01-workflow.mdc` line 24. Never work on existing branches unless they match the issue being worked on. Check current branch matches the issue before making changes.
