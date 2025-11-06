@@ -8,7 +8,7 @@
 | Build | Forge/Link | ✅ Complete | Backend: Express.js health endpoint at /api/health. Frontend: React + Vite with HealthStatus component. |
 | Verify | Pixel | ✅ Complete | All tests GREEN: Backend (2/2), Frontend (2/2), E2E (3/3). See test results below. |
 | Docs | Muse | ✅ Complete | README.md updated with "Try It" section, CHANGELOG.md created with MVP release notes |
-| Ship | Nexus | ✅ Complete | CI workflow updated with health-mvp job, runs all tests in CI |
+| Ship | Nexus | ✅ Complete | CI workflow updated with health-mvp job, runs all tests in CI. Repository created: https://github.com/BackslashBryant/Icebreaker |
 
 ## Current Issues
 None.

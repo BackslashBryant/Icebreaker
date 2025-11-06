@@ -320,3 +320,326 @@ Icebreaker MVP requires **3 baseline MCPs** (github, docfork, desktop-commander)
 - If chosen stack conflicts: Document in `.notes/features/bootstrap-web-health-mvp/progress.md` and choose alternative
 - If port conflicts: Use `npm run ports:status` to check, then choose alternative ports
 - If CORS issues: Add CORS middleware to backend (Express: `cors` package, Fastify: `@fastify/cors`)
+
+---
+
+# Tech Stack Research for Icebreaker MVP
+
+**Research Date**: 2025-01-27
+**Researcher**: Scout 🔎
+**Task**: Research and recommend tech stack choices for frontend, backend, real-time communication, and storage aligned with Icebreaker MVP requirements (privacy-first, ephemeral, proximity-based, WCAG AA accessible)
+
+## Research Scope
+
+Evaluated options for:
+1. **Frontend Framework**: UI framework for React-based web app
+2. **Backend Runtime/Framework**: API server and real-time communication
+3. **Real-time Solution**: WebSocket vs Server-Sent Events (SSE) for ephemeral chat
+4. **Session Storage**: Options for ephemeral session data (no message content storage)
+
+## Constraints & Requirements
+
+- **Privacy-first**: No message content storage; approximate location only; session-scoped data
+- **Ephemeral by design**: Sessions expire; no long-term transcripts; visibility is reversible
+- **WCAG AA accessible**: Screen reader support, keyboard navigation, semantic HTML, proper ARIA labels
+- **Performance**: Chat latency < 500ms; Radar updates < 1s
+- **Lightweight**: Simple, explainable code; minimal dependencies for MVP
+
+---
+
+## Frontend Framework
+
+### Recommendation: **React + Vite**
+
+**Rationale**:
+- React is familiar to team (per implementation notes)
+- Vite provides fast dev server and optimized production builds
+- Strong ecosystem for accessibility tooling and patterns
+- TypeScript support for type safety
+- Component-based architecture aligns with Icebreaker's modular features (onboarding, radar, chat)
+
+**Accessibility Considerations**:
+- React supports semantic HTML and ARIA attributes
+- **shadcn/ui component library** (recommended addition):
+  - Built on Radix UI primitives (WCAG AA compliant out of the box)
+  - Accessible components: Button, Checkbox, Input, Dialog, etc.
+  - Keyboard navigation built-in
+  - Screen reader support via ARIA attributes
+  - Works with React+Vite (framework-agnostic component library)
+- WCAG AA compliance achievable with:
+  - Semantic HTML elements (`<nav>`, `<main>`, `<button>`, etc.)
+  - ARIA labels for screen readers (provided by Radix UI)
+  - Keyboard navigation (focus management, tab order - handled by Radix)
+  - Reduced-motion and high-contrast mode support
+- React Testing Library includes accessibility testing utilities
+- Playwright MCP can run axe checks for WCAG AA verification
+
+**Component Library Decision**:
+- **shadcn/ui** recommended (reference mock uses it)
+- Radix UI primitives provide accessibility by default
+- Components are copy-paste (not npm package) - full control over customization
+- Aligns with "terminal meets Game Boy" aesthetic from vision
+- Can extract design patterns from `Docs/Vision/ui_ux_mocks/` reference
+
+**Trade-offs**:
+- ✅ **Pros**: Familiar stack, fast dev experience, strong a11y ecosystem with shadcn/ui
+- ⚠️ **Cons**: SPA requires client-side routing; no SSR (not needed for chat MVP)
+- **Rollback**: If React accessibility concerns arise, Vue.js or Svelte are viable alternatives with similar a11y support
+
+**Note on Next.js Consideration**:
+- Next.js was evaluated (reference mock uses Next.js)
+- Decision: **React+Vite preferred** for MVP because:
+  - Real-time chat is client-heavy (WebSocket requires client components)
+  - SSR doesn't benefit chat/radar views (no SEO needed)
+  - Simpler architecture = faster to ship MVP
+  - shadcn/ui works with both stacks (framework-agnostic)
+- Mock folder (`Docs/Vision/ui_ux_mocks/`) is design reference only
+- Extract component patterns and styles, not Next.js structure
+
+**Sources**:
+- Source title: Vite 4.0 Release
+- URL: https://vite.dev/blog/announcing-vite4
+- Notes:
+  - Vite 4.0 provides fast HMR and optimized builds
+  - React plugin supported via `@vitejs/plugin-react`
+  - TypeScript support included
+- Supports: Scout - Frontend framework selection
+
+- Source title: Next.js vs Vite Migration Guide
+- URL: https://nextjs.org/docs/15/app/guides/migrating/from-vite#why-switch
+- Notes:
+  - Next.js advantages: SSR, automatic code splitting, built-in optimizations
+  - Next.js better for SEO and initial page load (not needed for chat MVP)
+  - Real-time chat apps are client-heavy (WebSocket requires client components)
+  - Next.js adds complexity without clear benefit for ephemeral chat MVP
+- Supports: Scout - Framework comparison for real-time chat
+
+- Source title: shadcn/ui Documentation
+- URL: https://ui.shadcn.com/docs/components/form
+- Notes:
+  - shadcn/ui built on Radix UI primitives
+  - Components are copy-paste (not npm package) - full customization control
+  - Framework-agnostic (works with React, Next.js, Vite, etc.)
+  - WCAG AA compliant via Radix UI accessibility
+- Supports: Scout - Component library selection
+
+- Source title: Radix UI Accessibility
+- URL: https://github.com/radix-ui/website/blob/main/data/primitives/docs/overview/accessibility.mdx
+- Notes:
+  - Radix UI primitives are WCAG AA compliant by default
+  - Built-in keyboard navigation and screen reader support
+  - ARIA attributes included automatically
+- Supports: Scout - Accessibility validation for component library
+
+---
+
+## Backend Runtime/Framework
+
+### Recommendation: **Node.js + Express.js**
+
+**Rationale**:
+- Minimal setup aligns with MVP scope
+- Express.js is mature, well-documented, and lightweight
+- Good ecosystem for WebSocket support (via `ws` package)
+- CORS support for frontend-backend separation
+- Session management via `express-session` with flexible storage backends
+
+**Privacy & Ephemeral Support**:
+- Express middleware allows session-scoped data
+- No built-in persistence (storage backend is configurable)
+- Supports ephemeral session stores (in-memory, Redis with TTL)
+- Minimal dependencies for MVP
+
+**Trade-offs**:
+- ✅ **Pros**: Simple, familiar, fast to prototype, good WebSocket support
+- ⚠️ **Cons**: Single-threaded (Node.js limitation); may need scaling for production
+- **Rollback**: If Node.js limitations block, Fastify (faster) or Deno/Bun (modern alternatives) are options
+
+**Sources**:
+- Source title: Express.js Installation
+- URL: https://github.com/expressjs/express/blob/master/Readme.md
+- Notes:
+  - Express is minimal web framework for Node.js
+  - Session management via `express-session` package
+  - Supports Redis, in-memory, and other storage backends
+- Supports: Scout - Backend framework selection
+
+- Source title: Express Session Store
+- URL: https://github.com/expressjs/session/blob/master/README.md
+- Notes:
+  - `express-session` supports multiple storage backends
+  - Compatible with Redis, in-memory, and database stores
+  - Session data is configurable (ephemeral-friendly)
+- Supports: Scout - Session storage integration
+
+---
+
+## Real-time Communication
+
+### Recommendation: **WebSocket** (primary) with **SSE** (optional for radar updates)
+
+**Rationale for WebSocket**:
+- **Bidirectional communication required** for ephemeral chat (client sends messages, server broadcasts)
+- **Low latency** (< 500ms requirement) for chat messages
+- **Binary and text support** (future-proof for potential features)
+- **No browser connection limits** (unlike SSE's 6-connection limit on HTTP/1.1)
+- **Full control** over reconnection logic (ephemeral sessions need explicit cleanup)
+
+**Why Not SSE for Chat**:
+- SSE is **unidirectional** (server → client only)
+- Chat requires client-to-server message sending (bidirectional)
+- SSE would require separate HTTP POST requests for sending messages (adds complexity and latency)
+
+**Optional SSE for Radar Updates**:
+- Radar proximity updates could use SSE (unidirectional server push)
+- Automatic reconnection is useful for mobile/background scenarios
+- However, WebSocket can handle both chat and radar on single connection (simpler architecture)
+
+**Implementation Approach**:
+- Use `ws` package for Node.js WebSocket server
+- Single WebSocket connection per session (handles chat + radar updates)
+- Session-based connection lifecycle (cleanup on disconnect)
+- No message persistence (ephemeral by design)
+
+**Trade-offs**:
+- ✅ **Pros**: Bidirectional, low latency, full control, handles both chat and radar
+- ⚠️ **Cons**: Manual reconnection logic needed (SSE has automatic reconnection); slightly more complex than SSE
+- **Rollback**: If WebSocket complexity blocks, hybrid approach: SSE for radar + HTTP POST for chat (adds latency)
+
+**Sources**:
+- Source title: WebSockets vs Server-Sent Events (SSE)
+- URL: https://websocket.org/comparisons/sse#websockets-vs-server-sent-events-sse-choosing-your-real-time-protocol
+- Notes:
+  - WebSocket: Bidirectional, full control, no browser limits, binary support
+  - SSE: Unidirectional, automatic reconnection, HTTP/2 multiplexing, 6-connection limit (HTTP/1.1)
+  - **Use WebSocket for chat** (bidirectional required)
+  - **Use SSE for server-push feeds** (unidirectional acceptable)
+  - WebSocket has manual reconnection (SSE has automatic)
+- Supports: Scout - Real-time protocol selection
+
+---
+
+## Session Storage
+
+### Recommendation: **In-memory Map** (MVP) with **Redis + TTL** (production scaling path)
+
+**Rationale for In-memory (MVP)**:
+- **Simplest setup**: No external dependencies, no database setup
+- **Ephemeral by design**: Data lost on server restart (aligns with ephemeral philosophy)
+- **Fast**: No network latency, direct memory access
+- **Privacy-first**: No persistence layer means no accidental data leakage
+- **Session-scoped**: Node.js Map with TTL cleanup (simple timer-based expiration)
+
+**Rationale for Redis (Production)**:
+- **Horizontal scaling**: Multiple server instances can share session store
+- **TTL support**: Built-in expiration (`EXPIRE` command) for ephemeral sessions
+- **Performance**: Still fast (in-memory), but shared across instances
+- **Ephemeral-friendly**: Redis TTL ensures automatic cleanup (no manual timer management)
+
+**Storage Requirements**:
+- **Session data only**: User ID (hashed), vibe, tags, visibility, approximate location (last updated), active chat partner ID
+- **NO message content**: Messages are never stored (ephemeral by design)
+- **Safety metadata**: Separate store (database) for reports/blocking (minimal metadata, no messages)
+
+**Implementation Approach (MVP)**:
+```javascript
+// In-memory session store
+const sessions = new Map();
+const SESSION_TTL = 3600000; // 1 hour
+
+// Auto-cleanup expired sessions
+setInterval(() => {
+  const now = Date.now();
+  for (const [sessionId, session] of sessions.entries()) {
+    if (session.expiresAt < now) {
+      sessions.delete(sessionId);
+    }
+  }
+}, 60000); // Check every minute
+```
+
+**Migration Path to Redis**:
+- Start with in-memory Map (MVP)
+- Add Redis when scaling to multiple instances
+- Use `express-session` with `connect-redis` store (drop-in replacement)
+- Redis TTL ensures ephemeral behavior (automatic expiration)
+
+**Trade-offs**:
+- ✅ **In-memory Pros**: Simple, fast, no dependencies, privacy-friendly (no persistence)
+- ⚠️ **In-memory Cons**: Data lost on restart, single-instance only, manual TTL cleanup
+- ✅ **Redis Pros**: Shared across instances, automatic TTL, production-ready
+- ⚠️ **Redis Cons**: External dependency, requires Redis server setup
+- **Rollback**: If Redis complexity blocks MVP, stay in-memory; add Redis later for scaling
+
+**Sources**:
+- Source title: Redis EXPIRE Command
+- URL: https://redis.io/docs/latest/commands/expire/#keys-with-an-expire
+- Notes:
+  - Redis `EXPIRE` command sets TTL on keys
+  - Automatic expiration ensures ephemeral behavior
+  - Supports session-scoped data with automatic cleanup
+- Supports: Scout - Ephemeral session storage
+
+- Source title: Redis Ephemeral Storage
+- URL: https://redis.io/docs/latest/operate/rs/installing-upgrading/install/plan-deployment/persistent-ephemeral-storage/
+- Notes:
+  - Redis supports ephemeral storage (no persistence)
+  - TTL ensures automatic cleanup
+  - Suitable for session-scoped data
+- Supports: Scout - Storage privacy considerations
+
+---
+
+## Summary & Recommendations
+
+### Recommended Stack for Icebreaker MVP
+
+| Component | Technology | Rationale |
+| --- | --- | --- |
+| **Frontend Framework** | React + Vite | Simpler for real-time chat MVP; fast dev experience; no SSR overhead needed |
+| **UI Component Library** | shadcn/ui (Radix UI) | WCAG AA compliant; works with React+Vite; reference mock uses it |
+| **Backend** | Node.js + Express.js | Minimal setup, good WebSocket support |
+| **Real-time** | WebSocket (`ws` package) | Bidirectional chat required, low latency |
+| **Session Storage** | In-memory Map (MVP), Redis (production) | Simple MVP, scales to Redis with TTL |
+
+### Key Decisions
+
+1. **WebSocket over SSE**: Chat requires bidirectional communication; WebSocket is the right choice
+2. **In-memory over Redis (MVP)**: Simplest setup, no external dependencies, aligns with ephemeral philosophy
+3. **React + Vite**: Simpler for real-time chat MVP; fast dev experience; no SSR overhead needed
+4. **shadcn/ui (Radix UI)**: WCAG AA compliant component library; works with React+Vite; reference mock uses it
+5. **Express.js**: Minimal framework, good ecosystem, WebSocket support
+
+### Privacy & Ephemeral Alignment
+
+- ✅ **No message storage**: WebSocket handles real-time only; no persistence layer for messages
+- ✅ **Session-scoped data**: In-memory Map with TTL ensures ephemeral behavior
+- ✅ **Approximate location**: Browser Geolocation API (no backend storage needed)
+- ✅ **Safety metadata**: Separate minimal store (database) for reports only (no message content)
+
+### WCAG AA Compliance Path
+
+- **shadcn/ui (Radix UI)**: Provides WCAG AA compliant components out of the box
+- React supports semantic HTML and ARIA
+- Radix UI primitives handle keyboard navigation, focus management, and screen reader support automatically
+- Playwright MCP can run axe checks for WCAG AA verification
+- Manual testing required: keyboard navigation, screen reader testing
+- **Accessibility is achievable with Radix UI** (components are accessible by default; custom components need discipline)
+
+### Rollback Paths
+
+1. **Frontend**: If React accessibility concerns arise → Vue.js or Svelte (similar a11y support)
+2. **Backend**: If Node.js limitations block → Fastify (faster) or Deno/Bun (modern)
+3. **Real-time**: If WebSocket complexity blocks → Hybrid: SSE for radar + HTTP POST for chat (adds latency)
+4. **Storage**: If Redis complexity blocks MVP → Stay in-memory; add Redis later for scaling
+
+### Next Steps
+
+1. ✅ Tech stack research complete
+2. ⏭️ Document architecture decisions in `docs/architecture/ARCHITECTURE_TEMPLATE.md`
+3. ⏭️ Create first GitHub issue for MVP onboarding flow
+4. ⏭️ Update Connection Guide with chosen tech stack ports/services
+
+---
+
+**Research Complete**: All acceptance criteria met. Recommendations include trade-offs, rollback paths, and alignment with privacy-first, ephemeral, WCAG AA requirements.

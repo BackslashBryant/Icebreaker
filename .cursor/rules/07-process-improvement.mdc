@@ -8,6 +8,39 @@ alwaysApply: false
 
 Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: describe the trigger, the lesson, and the rule/update that resulted.
 
+## 2025-01-XX: Playwright MCP Usage (Not Using Configured MCP)
+
+**Trigger**: Agent ran Playwright tests via CLI (`npx playwright test`) instead of using Playwright MCP for accessibility checks and screenshots
+**Lesson**: When Playwright MCP is configured, use it for accessibility checks (axe), screenshots, and Lighthouse per rules. The E2E test suite execution can still use CLI, but accessibility verification and artifact capture should leverage Playwright MCP tools.
+**Root Cause**: Agent defaulted to CLI approach without checking for available MCP tools first
+**Rule Update**: Always check for MCP availability before falling back to CLI. Use Playwright MCP for a11y checks, screenshots, and Lighthouse when available.
+
+**Action Required**: 
+- Check for Playwright MCP tools before running accessibility checks
+- Use Playwright MCP for screenshots and accessibility verification
+- Document MCP usage in test results and artifacts
+- Fall back to CLI only if MCP is unavailable (document in plan)
+- **Note**: Playwright MCP tools may require Cursor restart to load. If tools not visible, document fallback and note in progress.md
+
+**Tools Available** (when Playwright MCP is loaded):
+- `browser_navigate` - Navigate to URLs
+- `browser_snapshot` - Accessibility snapshots (preferred over screenshots for a11y)
+- `browser_take_screenshot` - Screenshots for artifacts
+- `browser_click`, `browser_type`, etc. - Browser interactions
+
+## 2025-01-XX: Test Report Configuration (HTML Auto-Open)
+
+**Trigger**: Playwright tests opened HTML report automatically, causing hangs and blocking workflow
+**Lesson**: Test reports must be configured to never auto-open. Reports should be in `artifacts/` for review, with multiple formats (list for console, json for CI, html for visual review)
+**Root Cause**: Playwright HTML reporter defaults to auto-opening if not explicitly disabled
+**Rule Update**: Always configure Playwright with `open: 'never'` and output to `artifacts/` directory
+
+**Action Required**: 
+- Configure all test reporters with explicit output directories
+- Use `artifacts/` for all test outputs (reports, screenshots, traces)
+- Never auto-open HTML reports; provide paths for manual review
+- Document report locations in test configuration comments
+
 ## 2024-12-19: MCP-First Git Operations
 
 **Trigger**: User requested git push, agent used terminal commands instead of GitHub MCP
@@ -19,3 +52,17 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 - Update workflow rules to include MCP trigger check as mandatory first step
 - Add explicit "MCP-first" decision tree in git operations
 - Ensure agent checks MCP availability before terminal fallback
+
+## 2025-01-XX: No Report Files - Chat Only
+
+**Trigger**: Agent created lengthy report file (`docs/qa/ISSUE_1_FINAL_QA_REPORT.md`) when user requested QA/QC
+**Lesson**: **NEVER create report files**. Reports should be in chat only. Update GitHub issues/docs directly, keep reports concise and conversational.
+**Root Cause**: Agent defaulted to creating documentation files instead of providing chat-based summary
+**Rule Update**: QA/QC reports must be in chat only. Update GitHub issues and docs (changelog, progress.md) directly, but never create standalone report files.
+
+**Action Required**: 
+- Reports in chat only - no `.md` report files
+- Update GitHub issues with completion status
+- Update changelog/docs if needed
+- Keep reports concise (Status, Next 3, Question format)
+- Delete any report files created

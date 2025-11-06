@@ -39,9 +39,9 @@ A proximity-based ephemeral chat application for connecting people nearby. Built
 
 A default "Bootstrap Web Health MVP" feature is generated on first install. Run `npm run feature:new` to replace it with your own spec.
 
-## Try It: Health Check MVP
+## Try It: Onboarding Flow
 
-The Bootstrap Web Health MVP is ready to run:
+The MVP Onboarding Flow is complete and ready to run:
 
 1. **Start the backend**:
    ```bash
@@ -59,13 +59,25 @@ The Bootstrap Web Health MVP is ready to run:
    ```
    Frontend runs on `http://localhost:3000`
 
-3. **Verify**:
-   - Visit `http://localhost:3000` to see the health status UI
-   - Or test the API directly: `curl http://localhost:8000/api/health`
-   - Run tests: `cd backend && npx vitest run` and `cd frontend && npx vitest run`
-   - Run E2E: `cd tests && npx playwright test`
+3. **Try the onboarding flow**:
+   - Visit `http://localhost:3000/welcome` to see the Welcome screen
+   - Click "PRESS START" to begin onboarding
+   - Complete the 4 steps: What We Are/Not → 18+ Consent → Location (skip optional) → Vibe & Tags
+   - Submit to create a session and navigate to Radar view
 
-**Test Results**: All 7 tests passing (2 backend, 2 frontend, 3 E2E). See `.notes/features/bootstrap-web-health-mvp/progress.md` for details.
+4. **Verify**:
+   - Test the onboarding API: `curl -X POST http://localhost:8000/api/onboarding -H "Content-Type: application/json" -d '{"vibe":"banter","tags":[],"visibility":true}'`
+   - Run unit tests: `cd backend && npm test` and `cd frontend && npm test`
+   - Run E2E: `cd tests && npm test`
+
+**Test Results** (Issue #1):
+- ✅ Backend: 15/15 unit tests passing
+- ✅ Frontend: 35/35 unit tests passing  
+- ✅ E2E: 8/8 tests passing (complete flow, accessibility, keyboard nav, error handling)
+- ✅ Code coverage: 94.74% average (target: ≥80%)
+- ✅ WCAG AA compliance: Verified via Playwright axe checks
+
+See `.notes/features/onboarding-flow/` for detailed test results and verification.
 
 ---
 

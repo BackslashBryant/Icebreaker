@@ -11,14 +11,18 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 - Startup command: `cd frontend && npm install && npm run dev`
 - Notes: React + Vite, proxy to backend on /api routes
 
-### Backend API (Bootstrap MVP)
+### Backend API (Bootstrap MVP + Onboarding)
 - Name: Icebreaker API Server
-- Purpose: Health endpoint (Bootstrap MVP)
+- Purpose: Health endpoint + Onboarding API
 - Port: 8000
 - Startup command: `cd backend && npm install && npm run dev`
-- Notes: Express.js server, CORS enabled for frontend
+- Notes: Express.js server, CORS enabled for frontend, JSON body parsing
 - Endpoints:
   - `GET /api/health` - Returns `{ status: "ok" }`
+  - `POST /api/onboarding` - Creates session from onboarding data
+    - Request: `{ vibe: string, tags: string[], visibility: boolean, location?: { lat: number, lng: number } }`
+    - Response: `{ sessionId: string, token: string, handle: string }`
+    - Errors: `400` (validation error), `500` (server error)
 
 ### WebSocket Server (TBD - if needed)
 - Name: Real-time Chat Service
@@ -47,12 +51,13 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 
 ## 3. Datastores
 
-### Session Store (TBD)
-- Type: Redis / In-memory / Database (TBD)
-- Connection string / host: TBD
+### Session Store (MVP)
+- Type: In-memory Map (MVP), Redis (production scaling)
+- Connection string / host: N/A (in-memory for MVP)
 - Migration owner: @Forge
-- Backup/rollback procedure: TBD
-- Notes: Session-scoped data only; ephemeral by design; minimal metadata
+- Backup/rollback procedure: Data lost on server restart (ephemeral by design)
+- Notes: Session-scoped data only; ephemeral by design; minimal metadata; TTL cleanup every minute (1 hour default expiration)
+- Session data stored: sessionId, token, handle, vibe, tags, visibility, location (optional), createdAt, expiresAt, activeChatPartnerId, blockedSessionIds, reportCount
 
 ### Safety Metadata Store (TBD)
 - Type: Database (Postgres / SQLite / TBD)

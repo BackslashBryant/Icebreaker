@@ -28,9 +28,9 @@ Adults (18+) in shared spaces who want lightweight, ephemeral proximity-based co
 - [x] Vision documents consolidated into `docs/vision.md`
 - [x] `.notes/features/current.json` initialized
 - [x] `docs/ConnectionGuide.md` updated with Icebreaker placeholders
-- [ ] Tech stack decisions documented
-- [ ] First GitHub issue created for MVP feature
-- [ ] Architecture documented in `docs/architecture/`
+- [x] Tech stack decisions documented (see `docs/research.md` - React+Vite, shadcn/ui, Node.js+Express, WebSocket, in-memory storage)
+- [x] First GitHub issue created for MVP feature (Issue #1: MVP Onboarding Flow)
+- [x] Architecture documented in `docs/architecture/ARCHITECTURE_TEMPLATE.md` (all 10 sections completed)
 
 ## Success Metrics
 - All vision documents accessible and structured

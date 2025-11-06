@@ -1,0 +1,42 @@
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+
+interface ConsentStepProps {
+  consent: boolean;
+  onConsentChange: (consent: boolean) => void;
+  onContinue: () => void;
+}
+
+export function ConsentStep({ consent, onConsentChange, onContinue }: ConsentStepProps) {
+  return (
+    <div className="space-y-6 sm:space-y-8">
+      <div className="space-y-4">
+        <div className="ascii-divider text-center mb-4">▼ ▼ ▼</div>
+        <h2 className="text-xl sm:text-2xl font-bold text-accent font-mono glow-accent">AGE VERIFICATION</h2>
+        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+          IceBreaker is for adults only. We need to confirm you're 18 or older to continue.
+        </p>
+      </div>
+
+      <div className="flex items-start space-x-3 p-3 sm:p-4 border-2 border-accent/50 rounded-xl bg-card">
+        <Checkbox
+          id="consent"
+          checked={consent}
+          onCheckedChange={(checked) => onConsentChange(checked as boolean)}
+          className="mt-1"
+        />
+        <label htmlFor="consent" className="text-xs sm:text-sm leading-relaxed cursor-pointer">
+          I confirm I am 18 or older and agree to use IceBreaker responsibly.
+        </label>
+      </div>
+
+      <Button
+        onClick={onContinue}
+        disabled={!consent}
+        className="w-full rounded-xl bg-accent hover:bg-accent/90 text-background font-mono h-11 sm:h-12 text-sm retro-button border-2 border-accent disabled:opacity-50"
+      >
+        CONTINUE →
+      </Button>
+    </div>
+  );
+}
