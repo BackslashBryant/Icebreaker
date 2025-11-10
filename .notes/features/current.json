@@ -5,8 +5,8 @@
   "status": "complete",
   "vision": "docs/vision.md",
   "description": "MVP Chat - terminal-style ephemeral 1:1 messaging with proximity monitoring",
-  "githubIssue": 3,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/3",
+  "githubIssue": 4,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/4",
   "branch": "feat/3-chat",
   "commit": "bd9ff33",
   "note": "Issue #3 needs to be created manually - GitHub MCP auth failed. See .notes/features/chat/github-comment.md for completion comment to add."
