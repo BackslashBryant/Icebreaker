@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### MVP: UX Review Fixes + Bootup Random Messages (Issue #9)
+- Critical brand fixes: Removed HealthStatus component from Welcome screen, fixed page title to "IceBreaker"
+- UX improvements: Tightened consent checkbox copy (split into "I am 18 or older" + separate agreement text), standardized all button border radius to `rounded-2xl` per brand guide
+- Bootup random messages: Expanded message pool to 106 on-brand messages with random selection (4 messages + "READY" per boot sequence)
+- Message categories: Technical but playful, Relatable to shared spaces, Playful but not trying too hard, Witty terminal vibes, Subtle and confident
+- Brand compliance: All buttons now use `rounded-2xl` consistently across Welcome, Onboarding, LocationStep, ConsentStep, and PanicDialog components
+- Test updates: ConsentStep test updated to match new checkbox label structure
+
+**Technical Details**:
+- Frontend: Welcome page cleanup, ConsentStep copy restructure, button component default radius update, BootSequence random message selection
+- Message pool: `frontend/src/data/bootMessages.ts` with 106 messages, `selectBootMessages()` function for random selection
+- Button standardization: Updated `frontend/src/components/ui/button.tsx` default from `rounded-xl` to `rounded-2xl`, updated 8+ button instances across components
+- Page title: Changed from "Icebreaker Health Check" to "IceBreaker" in `frontend/index.html`
+
+**Verified**:
+- ✅ HealthStatus removed from Welcome screen (no dev-only content visible)
+- ✅ Page title shows "IceBreaker" in browser tab
+- ✅ Consent checkbox label is concise ("I am 18 or older") with separate agreement text
+- ✅ All buttons use `rounded-2xl` consistently (brand guide compliance)
+- ✅ Bootup messages randomly selected from 106-message pool
+- ✅ ConsentStep test updated and passing
+- ✅ No visual regressions from button radius changes
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
 #### MVP: Chat Request Cooldowns (Issue #8)
 - Cooldown system: Session-level cooldowns after 3 declined chat invites within 10 minutes
 - Cooldown duration: 30 minutes default (configurable 15-60 min via environment variables)

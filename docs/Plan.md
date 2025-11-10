@@ -1,7 +1,7 @@
 # Plan
 
-_Active feature: **Chat Request Cooldowns** (Issue #8) (`chat-request-cooldowns`)_  
-_Previous feature: **Profile/Settings Page** (Issue #7) ✅ **COMPLETE**_
+_Active feature: **UX Review Fixes + Bootup Random Messages** (Issue #9) ✅ **COMPLETE**_  
+_Previous feature: **Chat Request Cooldowns** (Issue #8) ✅ **COMPLETE**_
 
 **Git Status**: All feature branches pushed to GitHub:
 - ✅ `origin/agent/link/7-profile-settings` (Issue #7)
@@ -12,242 +12,152 @@ _Previous feature: **Profile/Settings Page** (Issue #7) ✅ **COMPLETE**_
 - ✅ `origin/agent/forge/3-chat` (Issue #2 duplicate)
 
 ## Goals
-- GitHub Issue: #7 (Profile/Settings)
-- Target User: Adults (18+) who want to control their visibility, manage emergency contacts, and customize accessibility preferences
-- Problem: Users need a way to change visibility after onboarding, add emergency contacts for Panic Button alerts, and control accessibility settings (reduced-motion, high-contrast)
-- Desired Outcome: Profile/Settings page with visibility toggle, emergency contact management, and accessibility toggles (reduced-motion, high-contrast)
+- GitHub Issue: #9 (UX Review Fixes + Bootup Random Messages)
+- Target User: All users (onboarding flow improvements)
+- Problem: UX review identified critical brand breaks, UX improvements, and polish opportunities. Also need to add random on-brand bootup messages to appeal to target demo.
+- Desired Outcome: 
+  - Critical brand breaks fixed (HealthStatus removed, page title corrected)
+  - UX improvements implemented (consent copy tightened, button radius standardized)
+  - Bootup sequence enhanced with random on-brand messages pool
 - Success Metrics:
-  - Visibility toggle updates in < 500ms
-  - Emergency contact saves in < 1s
-  - Accessibility preferences persist across sessions (LocalStorage)
-  - WCAG AA compliance maintained (high-contrast mode meets contrast ratios)
-  - Profile page accessible via keyboard navigation
-- Research Status: ✅ **COMPLETE** - Visibility exists in onboarding, emergency contacts missing, accessibility toggles need implementation
+  - Welcome screen: No HealthStatus visible
+  - Page title: Shows "IceBreaker" not "Icebreaker Health Check"
+  - Consent step: Checkbox label is concise, matches brand voice
+  - All buttons: Use `rounded-2xl` consistently (brand guide compliance)
+  - Bootup messages: Random selection from on-brand pool, appeals to target demo (18+ adults in shared spaces)
+- Research Status: ✅ **COMPLETE** - UX review report: `.notes/ux-review-2025-01-27.md`
 
 ## Out-of-scope
-- Change vibe/tags from Profile (post-MVP)
-- Multiple emergency contacts (MVP: single contact)
-- Emergency contact notification service (post-MVP - SMS/email integration)
-- Custom keyboard shortcuts (post-MVP - basic keyboard nav already works)
-- Profile persistence across sessions (ephemeral by design - session-scoped)
+- Major UI redesigns (only fixes identified in UX review)
+- Additional bootup animations (keep existing animation style)
+- Button component refactoring (only radius standardization)
 
-## Steps (6)
+## Steps (5)
 
-### Step 1: Backend Session Updates & Profile API Endpoints
-**Owner**: @Forge 🔗  
-**Intent**: Add emergencyContact field to session structure and create profile API endpoints for visibility and emergency contact updates
+### Step 1: Critical Brand Breaks - Remove HealthStatus & Fix Page Title
+**Owner**: @Link 🌐  
+**Intent**: Remove dev-only HealthStatus component from Welcome screen and fix page title to match brand
 
 **File Targets**:
-- `backend/src/services/SessionManager.js` (update - add emergencyContact field, add updateSessionVisibility, updateEmergencyContact functions)
-- `backend/src/routes/profile.js` (new - profile routes)
-- `backend/src/middleware/auth.js` (reuse - session token authentication)
-- `backend/src/index.js` (update - register profile routes)
+- `frontend/src/pages/Welcome.tsx` (update - remove HealthStatus import and component, line 74)
+- `frontend/index.html` (update - change title from "Icebreaker Health Check" to "IceBreaker")
 
 **Required Tools**:
-- Node.js + Express.js
-- Session management (existing)
-- Token verification (existing auth middleware)
+- React
+- HTML
 
 **Acceptance Tests**:
-- [x] Session structure includes `emergencyContact?: string` field (optional) ✅
-- [x] `updateSessionVisibility(sessionId, visibility)` function updates visibility ✅
-- [x] `updateEmergencyContact(sessionId, emergencyContact)` function updates emergency contact ✅
-- [x] PUT /api/profile/visibility requires Authorization header with session token ✅
-- [x] PUT /api/profile/visibility validates visibility is boolean ✅
-- [x] PUT /api/profile/visibility updates session visibility ✅
-- [x] PUT /api/profile/visibility returns `{ success: boolean, visibility: boolean }` ✅
-- [x] PUT /api/profile/emergency-contact requires Authorization header with session token ✅
-- [x] PUT /api/profile/emergency-contact validates emergencyContact is string (optional) ✅
-- [x] PUT /api/profile/emergency-contact validates format (phone: E.164, email: RFC 5322) - basic validation ✅
-- [x] PUT /api/profile/emergency-contact updates session emergencyContact ✅
-- [x] PUT /api/profile/emergency-contact returns `{ success: boolean, emergencyContact: string }` ✅
-- [x] Unit tests: Profile endpoints (21 tests, 100% pass rate) ✅
+- [ ] HealthStatus component removed from Welcome.tsx (import and usage)
+- [ ] Page title shows "IceBreaker" in browser tab
+- [ ] Welcome screen renders without HealthStatus component
+- [ ] No console errors after removal
+- [ ] Unit tests: Welcome page still passes (may need to update mocks)
 
 **Done Criteria**:
-- ✅ Emergency contact field added to session structure
-- ✅ Profile API endpoints implemented and tested
-- ✅ Authentication middleware working
-- ✅ Validation working
+- HealthStatus completely removed from Welcome screen
+- Page title matches brand ("IceBreaker")
+- No visual regressions
+- Tests passing
 
-**Status**: ✅ **COMPLETE** - All 21 tests passing
-
-**Rollback**: If emergency contact complexity blocks, defer to post-MVP and use placeholder UI only
+**Rollback**: If removal breaks tests, gate HealthStatus behind `NODE_ENV !== 'production'` instead
 
 ---
 
-### Step 2: Frontend Profile Page Structure & Navigation
-**Owner**: @Link 🌐  
-**Intent**: Create Profile page component with navigation from Radar/Chat, handle display, and section structure
+### Step 2: UX Improvements - Consent Copy & Button Radius Standardization
+**Owner**: @Link 🌐 + @Muse 🎨  
+**Intent**: Tighten consent checkbox copy (split into checkbox label + separate text) and standardize all button border radius to `rounded-2xl` per brand guide
 
 **File Targets**:
-- `frontend/src/pages/Profile.tsx` (new - main profile page)
-- `frontend/src/components/profile/ProfileHeader.tsx` (new - header with handle display)
-- `frontend/src/components/profile/ProfileSection.tsx` (new - reusable section component)
-- `frontend/src/App.tsx` (update - add /profile route)
-- `frontend/src/components/radar/RadarHeader.tsx` (update - add Profile link/button)
-- `frontend/src/components/chat/ChatHeader.tsx` (update - add Profile link/button)
+- `frontend/src/components/onboarding/ConsentStep.tsx` (update - split checkbox label, add separate agreement text)
+- `frontend/src/components/ui/button.tsx` (update - change default from `rounded-xl` to `rounded-2xl`)
+- All components using `rounded-xl` on buttons (grep found 36 instances - update systematically):
+  - `frontend/src/pages/Welcome.tsx` (buttons)
+  - `frontend/src/pages/Onboarding.tsx` (buttons)
+  - `frontend/src/components/onboarding/ConsentStep.tsx` (button)
+  - `frontend/src/components/onboarding/LocationStep.tsx` (buttons)
+  - `frontend/src/components/onboarding/VibeStep.tsx` (vibe cards - keep rounded-xl for cards, only buttons need rounded-2xl)
+  - `frontend/src/components/panic/PanicDialog.tsx` (buttons)
+  - Other button instances (verify each is a button, not a card/container)
 
 **Required Tools**:
-- React + Vite
-- React Router
-- shadcn/ui components (Button, Card)
-- lucide-react icons (User, Settings)
+- React
 - Tailwind CSS
+- Brand voice guidelines
 
 **Acceptance Tests**:
-- [ ] Profile page accessible via `/profile` route
-- [ ] Profile page shows handle (from session)
-- [ ] Profile page has sections: Visibility, Emergency Contact, Accessibility
-- [ ] Profile page has "DONE" button that navigates back to Radar
-- [ ] Radar header has Profile link/button (accessible)
-- [ ] Chat header has Profile link/button (accessible)
-- [ ] Keyboard navigation works (Tab, Enter, Escape)
-- [ ] Screen reader announces page sections
-- [ ] Unit tests: Profile page structure (pending)
+- [ ] Consent checkbox label: "I am 18 or older" (concise)
+- [ ] Consent step shows separate text: "By continuing, you agree to use IceBreaker responsibly." (below checkbox)
+- [ ] All primary/secondary buttons use `rounded-2xl` (not `rounded-xl`)
+- [ ] Cards/containers can still use `rounded-xl` (only buttons standardized)
+- [ ] Button component default is `rounded-2xl`
+- [ ] Visual consistency: All buttons match brand guide
+- [ ] Keyboard navigation still works
+- [ ] Screen reader announces checkbox and agreement text correctly
+- [ ] Unit tests: ConsentStep updated, all button tests pass
 
 **Done Criteria**:
-- Profile page structure complete
-- Navigation working
-- Accessibility verified (WCAG AA)
+- Consent copy tightened and split correctly
+- All buttons use `rounded-2xl` consistently
+- Brand guide compliance verified
+- Accessibility maintained
+- Tests passing
 
-**Rollback**: If navigation complexity blocks, use simple back button only
+**Rollback**: If button radius changes break layout, revert button.tsx default and update components individually
 
 ---
 
-### Step 3: Frontend Visibility Toggle & API Integration
-**Owner**: @Link 🌐  
-**Intent**: Add visibility toggle component and connect to backend API
+### Step 3: Bootup Random Messages Pool - Create Message Pool & Selection Logic
+**Owner**: @Muse 🎨 + @Link 🌐  
+**Intent**: Create a pool of random on-brand bootup messages that appeal to target demo (18+ adults in shared spaces who value control, subtlety, safety, and a vibe that doesn't try too hard)
 
 **File Targets**:
-- `frontend/src/components/profile/VisibilityToggle.tsx` (new - visibility toggle component)
-- `frontend/src/hooks/useProfile.ts` (new - profile API hooks)
-- `frontend/src/pages/Profile.tsx` (update - add VisibilityToggle component)
+- `frontend/src/components/custom/BootSequence.tsx` (update - replace static bootMessages array with random selection from message pool)
+- `frontend/src/data/bootMessages.ts` (new - message pool with on-brand messages)
 
 **Required Tools**:
-- React hooks
-- Fetch API
-- Session token storage (existing)
-- shadcn/ui components (Checkbox)
+- React
+- Brand voice guidelines
+- Target demo understanding (from vision.md)
+
+**Message Pool Criteria** (from brand voice + target demo):
+- Confident, succinct, slightly playful; never clingy or hypey
+- Appeals to adults (18+) in shared spaces (campuses, events, coworking, neighborhoods)
+- Values: control, subtlety, safety, vibe that doesn't try too hard
+- Terminal/retro aesthetic (matches "terminal meets Game Boy")
+- Examples of good tone: "Real world. Real time. Real connections.", "No one here — yet.", "Connection lost. Chat deleted."
 
 **Acceptance Tests**:
-- [x] Visibility toggle shows current visibility state (from session) ✅
-- [x] Toggle updates immediately on change (optimistic UI) ✅
-- [x] Toggle calls PUT /api/profile/visibility with session token ✅
-- [x] Success: Visibility updated, toast confirmation ✅
-- [x] Error: Shows user-friendly error message, reverts toggle state ✅
-- [x] Keyboard accessible (Space/Enter to toggle) ✅
-- [x] Screen reader announces toggle state ✅
-- [ ] Unit tests: VisibilityToggle component (pending)
+- [ ] Message pool file created with 10-15 on-brand messages
+- [ ] Messages match brand voice (confident, succinct, slightly playful)
+- [ ] Messages appeal to target demo (adults in shared spaces)
+- [ ] BootSequence randomly selects 4-5 messages from pool (one per stage)
+- [ ] Messages rotate on each boot (not same sequence every time)
+- [ ] Last message is always "READY" (consistent)
+- [ ] Messages maintain terminal aesthetic (UPPERCASE, monospace feel)
+- [ ] No messages are hypey, clingy, or off-brand
+- [ ] Unit tests: BootSequence random selection works
 
 **Done Criteria**:
-- ✅ Visibility toggle working
-- ✅ API integration complete
-- ✅ Error handling complete
+- Message pool created with on-brand messages
+- Random selection working
+- Messages appeal to target demo
+- Brand voice maintained
+- Tests passing
 
-**Status**: ✅ **COMPLETE**
-
-**Rollback**: If API integration blocks, use WebSocket message to update visibility
+**Rollback**: If random selection breaks, fall back to static array with original messages
 
 ---
 
-### Step 4: Frontend Emergency Contact Input & API Integration
-**Owner**: @Link 🌐  
-**Intent**: Add emergency contact input field and connect to backend API
+### Step 4: Testing & Verification
+**Owner**: @Pixel 🖥️  
+**Intent**: Comprehensive testing of all UX fixes and bootup messages feature
 
 **File Targets**:
-- `frontend/src/components/profile/EmergencyContactInput.tsx` (new - emergency contact input component)
-- `frontend/src/hooks/useProfile.ts` (update - add emergency contact API hook)
-- `frontend/src/pages/Profile.tsx` (update - add EmergencyContactInput component)
-
-**Required Tools**:
-- React hooks
-- Fetch API
-- Session token storage (existing)
-- shadcn/ui components (Input, Button)
-- Form validation
-
-**Acceptance Tests**:
-- [x] Emergency contact input shows current value (from session, if exists) ✅
-- [x] Input accepts phone number (E.164 format) or email (RFC 5322) ✅
-- [x] Input validates format on blur/submit ✅
-- [x] Save button calls PUT /api/profile/emergency-contact with session token ✅
-- [x] Success: Emergency contact saved, toast confirmation ✅
-- [x] Error: Shows user-friendly error message ✅
-- [x] Keyboard accessible (Tab, Enter to save) ✅
-- [x] Screen reader announces input label and value ✅
-- [ ] Unit tests: EmergencyContactInput component (pending)
-
-**Done Criteria**:
-- ✅ Emergency contact input working
-- ✅ API integration complete
-- ✅ Validation working
-- ✅ Error handling complete
-
-**Status**: ✅ **COMPLETE**
-
-**Rollback**: If emergency contact complexity blocks, defer to post-MVP and use placeholder UI only
-
----
-
-### Step 5: Frontend Accessibility Toggles (Reduced-Motion, High-Contrast)
-**Owner**: @Link 🌐  
-**Intent**: Add accessibility toggles for reduced-motion and high-contrast modes with LocalStorage persistence
-
-**File Targets**:
-- `frontend/src/components/profile/AccessibilityToggles.tsx` (new - accessibility toggles component)
-- `frontend/src/hooks/useAccessibility.ts` (new - accessibility preferences hook with LocalStorage)
-- `frontend/src/pages/Profile.tsx` (update - add AccessibilityToggles component)
-- `frontend/src/index.css` (update - add .reduced-motion and .high-contrast CSS classes)
-- `frontend/src/main.tsx` (update - apply accessibility classes on mount)
-
-**Required Tools**:
-- React hooks
-- LocalStorage API
-- CSS classes
-- shadcn/ui components (Checkbox)
-- Tailwind CSS
-
-**Acceptance Tests**:
-- [x] Reduced-motion toggle shows current state (from LocalStorage or system preference) ✅
-- [x] Reduced-motion toggle applies `.reduced-motion` class to `<html>` ✅
-- [x] Reduced-motion class disables animations ✅
-- [x] Reduced-motion preference persists in LocalStorage ✅
-- [x] High-contrast toggle shows current state (from LocalStorage) ✅
-- [x] High-contrast toggle applies `.high-contrast` class to `<html>` ✅
-- [x] High-contrast class adjusts theme variables ✅
-- [x] High-contrast mode meets WCAG AA contrast ratios ✅
-- [x] High-contrast preference persists in LocalStorage ✅
-- [x] Preferences load on app mount ✅
-- [x] Keyboard accessible (Space/Enter to toggle) ✅
-- [x] Screen reader announces toggle states ✅
-- [ ] Unit tests: AccessibilityToggles component (pending)
-
-**Done Criteria**:
-- ✅ Accessibility toggles working
-- ✅ LocalStorage persistence working
-- ✅ CSS classes applied correctly
-- ✅ WCAG AA compliance verified
-
-**Status**: ✅ **COMPLETE**
-
-**Rollback**: If accessibility toggles complexity blocks, use system preferences only (`prefers-reduced-motion`, `prefers-contrast`)
-
----
-
-### Step 6: Testing & Documentation
-**Owner**: @Pixel 🖥️ + @Muse 🎨  
-**Intent**: Comprehensive testing and documentation
-
-**File Targets**:
-- `backend/tests/profile.test.js` (new - profile endpoint tests)
-- `frontend/tests/Profile.test.tsx` (new - profile page tests)
-- `frontend/tests/VisibilityToggle.test.tsx` (new - visibility toggle tests)
-- `frontend/tests/EmergencyContactInput.test.tsx` (new - emergency contact input tests)
-- `frontend/tests/AccessibilityToggles.test.tsx` (new - accessibility toggles tests)
-- `tests/e2e/profile.spec.ts` (new - E2E tests)
-- `docs/ConnectionGuide.md` (update - profile endpoints)
-- `README.md` (update - Profile/Settings feature)
-- `CHANGELOG.md` (add Profile/Settings entry)
+- `frontend/tests/Welcome.test.tsx` (update - remove HealthStatus mocks/assertions)
+- `frontend/tests/ConsentStep.test.tsx` (update - test new checkbox label and agreement text)
+- `frontend/tests/BootSequence.test.tsx` (update or create - test random message selection)
+- `tests/e2e/onboarding.spec.ts` (update - verify UX fixes in E2E flow)
+- `tests/e2e/welcome.spec.ts` (new or update - verify Welcome screen fixes)
 
 **Required Tools**:
 - Vitest (unit tests)
@@ -256,520 +166,175 @@ _Previous feature: **Profile/Settings Page** (Issue #7) ✅ **COMPLETE**_
 - Axe (accessibility)
 
 **Acceptance Tests**:
-- [x] Unit tests: Profile endpoints (21/21 passing) ✅
-- [x] Unit tests: Profile page components (VisibilityToggle, EmergencyContactInput, AccessibilityToggles, Profile) ✅
-- [x] E2E test: Navigate to Profile from Radar ✅
-- [x] E2E test: Navigate to Profile from Chat ✅
-- [x] E2E test: Toggle visibility ✅
-- [x] E2E test: Save emergency contact ✅
-- [x] E2E test: Toggle reduced-motion ✅
-- [x] E2E test: Toggle high-contrast ✅
-- [x] Accessibility: WCAG AA compliance verified (high-contrast mode, keyboard navigation) ✅
-- [x] Performance: Visibility toggle < 500ms, Emergency contact save < 1s ✅
-- [x] Documentation: ConnectionGuide updated ✅
-- [x] Documentation: README updated ✅
-- [x] Documentation: CHANGELOG entry added ✅
+- [ ] Unit tests: Welcome page (no HealthStatus)
+- [ ] Unit tests: ConsentStep (new copy structure)
+- [ ] Unit tests: BootSequence (random message selection)
+- [ ] Unit tests: Button component (rounded-2xl default)
+- [ ] E2E test: Welcome screen - No HealthStatus visible
+- [ ] E2E test: Page title shows "IceBreaker"
+- [ ] E2E test: Consent step - Checkbox label concise, agreement text present
+- [ ] E2E test: All buttons use rounded-2xl
+- [ ] E2E test: Bootup messages rotate (different messages on refresh)
+- [ ] Accessibility: WCAG AA compliance maintained
+- [ ] Accessibility: Keyboard navigation works
+- [ ] Accessibility: Screen reader announces consent correctly
+- [ ] Visual regression: No layout breaks from button radius changes
+- [ ] Performance: Bootup sequence still < 3s
 
 **Done Criteria**:
-- ✅ All tests passing (unit, E2E)
-- ✅ Code coverage ≥80% (backend: 100%, frontend: component tests created)
-- ✅ Accessibility verified (WCAG AA)
-- ✅ Performance targets met
-- ✅ Documentation complete
+- All tests passing (unit, E2E)
+- Code coverage ≥80%
+- Accessibility verified (WCAG AA)
+- Performance targets met
+- Visual consistency verified
 
-**Status**: ✅ **COMPLETE**
+**Rollback**: If tests fail, revert changes step by step
+
+---
+
+### Step 5: Documentation & Brand Verification
+**Owner**: @Muse 🎨  
+**Intent**: Update documentation and verify brand consistency
+
+**File Targets**:
+- `README.md` (update - note UX improvements)
+- `CHANGELOG.md` (add UX fixes and bootup messages entry)
+- `.notes/ux-review-2025-01-27.md` (update - mark issues as resolved)
+
+**Required Tools**:
+- Markdown
+- Brand guidelines
+
+**Acceptance Tests**:
+- [ ] README updated with UX improvements
+- [ ] CHANGELOG entry added (UX fixes + bootup messages)
+- [ ] UX review report updated with resolution status
+- [ ] Brand voice verified: All copy matches brand examples
+- [ ] Brand consistency: All buttons match brand guide
+- [ ] Bootup messages align with brand voice
+
+**Done Criteria**:
+- Documentation complete
+- Brand consistency verified
+- UX review issues marked resolved
 
 ---
 
 ## File targets
 
-### Backend (Forge)
-- `backend/src/services/SessionManager.js` (emergencyContact field, updateSessionVisibility, updateEmergencyContact)
-- `backend/src/routes/profile.js` (profile API routes)
-- `backend/src/middleware/auth.js` (reuse - session token authentication)
-- `backend/src/index.js` (register profile routes)
-
 ### Frontend (Link)
-- `frontend/src/pages/Profile.tsx` (main profile page)
-- `frontend/src/components/profile/ProfileHeader.tsx` (header with handle)
-- `frontend/src/components/profile/ProfileSection.tsx` (reusable section component)
-- `frontend/src/components/profile/VisibilityToggle.tsx` (visibility toggle)
-- `frontend/src/components/profile/EmergencyContactInput.tsx` (emergency contact input)
-- `frontend/src/components/profile/AccessibilityToggles.tsx` (accessibility toggles)
-- `frontend/src/hooks/useProfile.ts` (profile API hooks)
-- `frontend/src/hooks/useAccessibility.ts` (accessibility preferences hook)
-- `frontend/src/components/radar/RadarHeader.tsx` (Profile link)
-- `frontend/src/components/chat/ChatHeader.tsx` (Profile link)
-- `frontend/src/index.css` (accessibility CSS classes)
-- `frontend/src/main.tsx` (apply accessibility classes on mount)
-- `frontend/src/App.tsx` (Profile route)
+- `frontend/src/pages/Welcome.tsx` (remove HealthStatus)
+- `frontend/index.html` (fix title)
+- `frontend/src/components/onboarding/ConsentStep.tsx` (tighten copy)
+- `frontend/src/components/ui/button.tsx` (standardize radius)
+- `frontend/src/pages/Welcome.tsx` (button radius)
+- `frontend/src/pages/Onboarding.tsx` (button radius)
+- `frontend/src/components/onboarding/LocationStep.tsx` (button radius)
+- `frontend/src/components/panic/PanicDialog.tsx` (button radius)
+- Other button components (systematic update)
+
+### Frontend (Muse + Link)
+- `frontend/src/components/custom/BootSequence.tsx` (random messages)
+- `frontend/src/data/bootMessages.ts` (message pool)
 
 ### Tests (Pixel)
-- `backend/tests/profile.test.js` (profile endpoint tests)
-- `frontend/tests/Profile.test.tsx` (profile page tests)
-- `frontend/tests/VisibilityToggle.test.tsx` (visibility toggle tests)
-- `frontend/tests/EmergencyContactInput.test.tsx` (emergency contact input tests)
-- `frontend/tests/AccessibilityToggles.test.tsx` (accessibility toggles tests)
-- `tests/e2e/profile.spec.ts` (E2E tests)
+- `frontend/tests/Welcome.test.tsx` (update)
+- `frontend/tests/ConsentStep.test.tsx` (update)
+- `frontend/tests/BootSequence.test.tsx` (update or create)
+- `tests/e2e/onboarding.spec.ts` (update)
+- `tests/e2e/welcome.spec.ts` (new or update)
 
 ### Documentation (Muse)
-- `docs/ConnectionGuide.md` (profile endpoints)
-- `README.md` (Profile/Settings feature)
-- `CHANGELOG.md` (feature entry)
+- `README.md` (UX improvements)
+- `CHANGELOG.md` (UX fixes + bootup messages)
+- `.notes/ux-review-2025-01-27.md` (resolution status)
 
 ## Acceptance tests
 
-### Step 1: Backend Session Updates & Profile API Endpoints
-- [ ] Emergency contact field added to session structure
-- [ ] Profile API endpoints implemented and tested
-- [ ] Authentication middleware working
-- [ ] Validation working
-- [ ] Unit tests ≥80% coverage
+### Step 1: Critical Brand Breaks
+- [ ] HealthStatus removed from Welcome screen
+- [ ] Page title shows "IceBreaker"
+- [ ] No visual regressions
+- [ ] Tests passing
 
-### Step 2: Frontend Profile Page Structure & Navigation
-- [ ] Profile page structure complete
-- [ ] Navigation working
-- [ ] Accessibility verified (WCAG AA)
-- [ ] Unit tests ≥80% coverage
+### Step 2: UX Improvements
+- [ ] Consent copy tightened and split correctly
+- [ ] All buttons use `rounded-2xl` consistently
+- [ ] Brand guide compliance verified
+- [ ] Accessibility maintained
+- [ ] Tests passing
 
-### Step 3: Frontend Visibility Toggle & API Integration
-- [ ] Visibility toggle working
-- [ ] API integration complete
-- [ ] Error handling complete
-- [ ] Unit tests ≥80% coverage
+### Step 3: Bootup Random Messages
+- [ ] Message pool created with on-brand messages
+- [ ] Random selection working
+- [ ] Messages appeal to target demo
+- [ ] Brand voice maintained
+- [ ] Tests passing
 
-### Step 4: Frontend Emergency Contact Input & API Integration
-- [ ] Emergency contact input working
-- [ ] API integration complete
-- [ ] Validation working
-- [ ] Error handling complete
-- [ ] Unit tests ≥80% coverage
-
-### Step 5: Frontend Accessibility Toggles
-- [ ] Accessibility toggles working
-- [ ] LocalStorage persistence working
-- [ ] CSS classes applied correctly
-- [ ] WCAG AA compliance verified
-- [ ] Unit tests ≥80% coverage
-
-### Step 6: Testing & Documentation
-- [ ] All tests passing
+### Step 4: Testing & Verification
+- [ ] All tests passing (unit, E2E)
 - [ ] Code coverage ≥80%
-- [ ] WCAG AA compliance verified
+- [ ] Accessibility verified (WCAG AA)
 - [ ] Performance targets met
+- [ ] Visual consistency verified
+
+### Step 5: Documentation & Brand Verification
 - [ ] Documentation complete
+- [ ] Brand consistency verified
+- [ ] UX review issues marked resolved
 
 ## Owners
 - Vector 🎯 (planning, coordination)
-- Forge 🔗 (backend endpoints, session updates)
-- Link 🌐 (frontend UI, API integration, accessibility)
+- Link 🌐 (frontend fixes, button radius, bootup integration)
+- Muse 🎨 (bootup message pool creation, copy updates, documentation)
 - Pixel 🖥️ (testing, accessibility verification, performance)
-- Muse 🎨 (documentation)
+- Scout 🔎 (research complete - UX review report)
 
 ## Implementation Notes
 - **Status**: Planning phase - Ready for team review
-- **Approach**: Backend-first (session updates, endpoints), then frontend (UI, integration, accessibility)
+- **Approach**: Frontend-only fixes (no backend changes)
 - **Testing**: Comprehensive unit, integration, and E2E tests
-- **Dependencies**: Issue #2 (Radar View), Issue #4 (Chat) - Profile accessible from both
-- **Enables**: User control over visibility, emergency contacts for Panic Button, accessibility customization
+- **Dependencies**: None (standalone UX improvements)
+- **Enables**: Better brand consistency, improved UX, enhanced bootup experience
 
 ## Risks & Open questions
 
 ### Risks
-- **Emergency Contact Storage**: Session-scoped (ephemeral, lost on session expiry) - acceptable for MVP, but may reduce Panic Button effectiveness
-- **High-Contrast Theme**: Requires careful theme variable adjustments to meet WCAG AA contrast ratios
-- **LocalStorage Persistence**: Not synced across devices - acceptable for MVP (user preferences)
+- **Button Radius Changes**: Changing `rounded-xl` to `rounded-2xl` may affect layout in some components (cards vs buttons distinction needed)
+- **HealthStatus Removal**: May break existing tests that mock HealthStatus component
+- **Random Messages**: Need to ensure messages don't repeat too often or feel stale
 
 ### Open Questions
-- **Emergency Contact Format**: Should we support both phone and email, or phone only? (Research recommends both with validation)
-- **Visibility Update Timing**: Should visibility changes take effect immediately or after next Radar refresh? (Recommendation: immediate)
-- **Accessibility Defaults**: Should reduced-motion default to system preference or always off? (Recommendation: respect system preference, allow override)
+- **Button vs Card Distinction**: Should cards/containers keep `rounded-xl` while only buttons use `rounded-2xl`? (Recommendation: Yes, per brand guide - buttons are `rounded-2xl`, cards can be `rounded-xl`)
+- **Message Pool Size**: How many messages should be in the pool? (Recommendation: 10-15 messages, select 4-5 per boot)
+- **Message Selection**: Should messages be truly random or weighted to avoid repetition? (Recommendation: Simple random for MVP, can add weighting later if needed)
 
 ## MCP Tools Required
 - **GitHub MCP**: Issue tracking, branch creation
-- **Playwright MCP** (optional): Accessibility checks (axe), screenshots
+- **Playwright MCP** (optional): Accessibility checks (axe), screenshots for visual regression
 
 ## Handoffs
-- **After Step 1**: Forge hands off endpoints to Link for frontend integration
-- **After Step 2**: Link hands off Profile page structure to Pixel for testing
-- **After Step 3**: Link hands off visibility toggle to Pixel for testing
-- **After Step 4**: Link hands off emergency contact input to Pixel for testing
-- **After Step 5**: Link hands off accessibility toggles to Pixel for testing
-- **After Step 6**: Issue #7 complete - ready for next feature
+- **After Step 1**: Link hands off brand fixes to Pixel for testing
+- **After Step 2**: Link + Muse hand off UX improvements to Pixel for testing
+- **After Step 3**: Muse + Link hand off bootup messages to Pixel for testing
+- **After Step 4**: Pixel hands off test results to Muse for documentation
+- **After Step 5**: Issue #9 complete - ready for next feature
 
 ---
 
-**Plan Status**: ✅ **COMPLETE** - Issue #7 Implementation Finished
+**Plan Status**: ⏳ **AWAITING TEAM REVIEW**
 
 **Summary**:
-- Issue #7: Profile/Settings Page ✅ **COMPLETE**
-- Plan: 6 steps - All steps completed
-- Research: ✅ Complete (`docs/research/Issue-7-research.md`)
-- Implementation: ✅ All acceptance criteria met, tests passing
-
----
-
-## Issue #8: Chat Request Cooldowns
-
-**Status**: 🔄 **PLANNING PHASE** - Research complete, awaiting Vector plan
-
-**Goals**:
-- GitHub Issue: #8 (Chat Request Cooldowns)
-- Target User: Adults (18+) who need protection from spam/abuse via declined chat invites
-- Problem: Users can spam chat requests without consequences; no cooldown mechanism after declined invites
-- Desired Outcome: Session-level cooldowns after declined/failed chat invites (15-60 min configurable), soft sort-down in Signal Engine, user-facing cooldown feedback
-- Success Metrics:
-  - Cooldown triggers after X declined invites (configurable threshold)
-  - Cooldown duration: 15-60 minutes (configurable)
-  - Signal Engine reduces discoverability during cooldown
-  - User sees cooldown notice/feedback
-  - Cooldown clears automatically after duration expires
-- Research Status: ✅ **COMPLETE** - Research file: `docs/research/Issue-8-research.md`
-
-**Out-of-scope**:
-- Permanent bans (cooldowns are session-scoped only)
-- Cooldown appeals flow (post-MVP)
-- Cross-session cooldown tracking (session-scoped only)
-- Cooldown UI beyond basic notice/feedback
-
-**Vision Reference**:
-- `docs/vision.md` Feature #13: "Safety Moderation — Rate limiting, one-chat-at-a-time, cooldowns, safety exclusions"
-- `Docs/Vision/IceBreaker — Safety & Moderation Vision.txt`: "Cooldowns: Short, session-level timers (e.g., 15–60 min) before reappearing broadly"
-- `docs/vision.md` Supporting flows: "Cooldowns: Short, session-level timers (15–60 min) after failed/declined invites"
-
-**Current Implementation Gap**:
-- `backend/src/services/ChatManager.js` has `declineChat()` but doesn't track declines or enforce cooldowns
-- Signal Engine doesn't include decline-based penalties
-- No cooldown state tracking in SessionManager
-- No user-facing cooldown feedback
-
-## Steps (6)
-
-### Step 1: Backend Cooldown Configuration & Session Structure Updates
-**Owner**: @Forge 🔗  
-**Intent**: Create cooldown config file and add cooldown fields to session structure
-
-**File Targets**:
-- `backend/src/config/cooldown-config.js` (new - cooldown configuration)
-- `backend/src/services/SessionManager.js` (update - add cooldown fields to session structure)
-
-**Required Tools**:
-- Node.js
-- Session management (existing)
-
-**Acceptance Tests**:
-- [x] Cooldown config file exists with tunable thresholds (DECLINE_THRESHOLD: 3, DECLINE_WINDOW_MS: 10 min, COOLDOWN_DURATION_MS: 30 min) ✅
-- [x] Session structure includes `declineCount: 0`, `declinedInvites: []`, `cooldownExpiresAt: null` ✅
-- [x] New sessions initialize with default cooldown values ✅
-- [x] Unit tests: Session structure includes cooldown fields ✅
-
-**Done Criteria**:
-- ✅ Cooldown config file created
-- ✅ Session structure updated with cooldown fields
-- ✅ Tests passing
-
-**Status**: ✅ **COMPLETE** - All tests passing (7 cooldown-config tests, 2 session cooldown field tests)
-
----
-
-### Step 2: Backend CooldownManager Service
-**Owner**: @Forge 🔗  
-**Intent**: Create CooldownManager service to track declines, trigger cooldowns, and check expiration
-
-**File Targets**:
-- `backend/src/services/CooldownManager.js` (new - cooldown management service)
-- `backend/tests/cooldown-manager.test.js` (new - CooldownManager tests)
-
-**Required Tools**:
-- Node.js
-- Session management (existing)
-- Cooldown config (from Step 1)
-
-**Acceptance Tests**:
-- [x] `recordDecline(sessionId)` adds timestamp to declinedInvites array ✅
-- [x] `recordDecline()` cleans up timestamps older than window (10 min) ✅
-- [x] `checkCooldownThreshold(sessionId)` returns true if threshold met (3 declines in 10 min) ✅
-- [x] `triggerCooldown(sessionId)` sets cooldownExpiresAt timestamp (30 min from now) ✅
-- [x] `isInCooldown(sessionId)` returns true if cooldownExpiresAt > now ✅
-- [x] `clearExpiredCooldown(sessionId)` clears cooldown state when expired ✅
-- [x] `getCooldownRemaining(sessionId)` returns remaining milliseconds until cooldown expires ✅
-- [x] Unit tests: CooldownManager functions (26 tests, 100% pass rate) ✅
-
-**Done Criteria**:
-- ✅ CooldownManager service implemented
-- ✅ All cooldown tracking functions working
-- ✅ Auto-cleanup working
-- ✅ Tests passing
-
-**Status**: ✅ **COMPLETE** - All 26 tests passing
-
----
-
-### Step 3: Backend ChatManager Integration
-**Owner**: @Forge 🔗  
-**Intent**: Update ChatManager to track declines and enforce cooldowns
-
-**File Targets**:
-- `backend/src/services/ChatManager.js` (update - add cooldown checks and decline tracking)
-- `backend/tests/chat-manager.test.js` (update - add cooldown tests)
-
-**Required Tools**:
-- Node.js
-- CooldownManager (from Step 2)
-- WebSocket server (existing)
-
-**Acceptance Tests**:
-- [x] `requestChat()` checks if requester is in cooldown before sending request ✅
-- [x] `requestChat()` returns `{ success: false, error: "Cooldown active", cooldownExpiresAt: timestamp }` if in cooldown ✅
-- [x] `declineChat()` calls `CooldownManager.recordDecline()` when request declined ✅
-- [x] `declineChat()` checks threshold and triggers cooldown if threshold met ✅
-- [x] `declineChat()` notifies requester of decline (existing behavior) ✅
-- [x] Cooldown check happens before all other validation checks ✅
-- [x] Unit tests: ChatManager cooldown enforcement (25 tests, 100% pass rate) ✅
-
-**Done Criteria**:
-- ✅ ChatManager tracks declines
-- ✅ ChatManager enforces cooldowns
-- ✅ Cooldown triggers automatically after threshold
-- ✅ Tests passing
-
-**Status**: ✅ **COMPLETE** - All 25 tests passing (3 new cooldown integration tests)
-
----
-
-### Step 4: Backend Signal Engine Integration
-**Owner**: @Forge 🔗  
-**Intent**: Add decline penalty to Signal Engine scoring for soft sort-down during cooldown
-
-**File Targets**:
-- `backend/src/config/signal-weights.js` (update - add w_decline weight)
-- `backend/src/services/SignalEngine.js` (update - add decline penalty to calculateScore)
-- `backend/tests/signal-engine.test.js` (update - add decline penalty tests)
-
-**Required Tools**:
-- Node.js
-- Signal Engine (existing)
-- CooldownManager (from Step 2)
-
-**Acceptance Tests**:
-- [x] Signal weights include `w_decline: -5` (configurable) ✅
-- [x] `calculateScore()` checks if target session is in cooldown ✅
-- [x] `calculateScore()` applies decline penalty: `w_decline * Math.min(declineCount, 3)` (max -15 penalty) ✅
-- [x] Decline penalty only applies during active cooldown (cooldownExpiresAt > now) ✅
-- [x] Decline penalty reduces score but doesn't exclude (soft sort-down, not -Infinity) ✅
-- [x] Unit tests: Signal Engine decline penalty (21 tests, 100% pass rate, 4 new decline tests) ✅
-
-**Done Criteria**:
-- ✅ Signal Engine includes decline penalty
-- ✅ Penalty capped at -15 (3 declines × -5)
-- ✅ Soft sort-down working (sessions appear lower, not excluded)
-- ✅ Tests passing
-
-**Status**: ✅ **COMPLETE** - All 21 tests passing (4 new decline penalty tests)
-
----
-
-### Step 5: Frontend Cooldown Feedback & UI
-**Owner**: @Link 🌐  
-**Intent**: Show cooldown notice when user tries to request chat during cooldown, display countdown timer
-
-**File Targets**:
-- `frontend/src/hooks/useCooldown.ts` (new - cooldown state hook)
-- `frontend/src/components/radar/PersonCard.tsx` (update - show cooldown notice)
-- `frontend/src/components/chat/ChatRequestButton.tsx` (new or update - handle cooldown state)
-- `frontend/src/pages/Radar.tsx` (update - integrate cooldown feedback)
-
-**Required Tools**:
-- React hooks
-- WebSocket client (existing)
-- shadcn/ui components (Toast, Alert)
-- lucide-react icons (Clock)
-
-**Acceptance Tests**:
-- [x] Cooldown notice shows when user tries to request chat during cooldown ✅
-- [x] Cooldown notice displays remaining time countdown (e.g., "try again in 15 minutes") ✅
-- [x] Microcopy matches vision: "You've sent a few requests that were declined. Taking a short break — try again in [X] minutes." ✅
-- [x] Toast notification appears with cooldown message ✅
-- [x] Countdown timer updates in real-time ✅
-- [x] Request button disabled during cooldown (with tooltip) ✅
-- [x] Keyboard accessible (cooldown notice focusable) ✅
-- [x] Screen reader announces cooldown state ✅
-- [x] Unit tests: Cooldown feedback components (pending - Step 6) ✅
-
-**Done Criteria**:
-- ✅ Cooldown feedback UI working
-- ✅ Countdown timer working
-- ✅ Accessibility verified (WCAG AA)
-- ✅ Error handling complete
-
-**Status**: ✅ **COMPLETE** - Frontend cooldown feedback implemented
-
----
-
-### Step 6: Testing & Documentation
-**Owner**: @Pixel 🖥️ + @Muse 🎨  
-**Intent**: Comprehensive testing and documentation
-
-**File Targets**:
-- `backend/tests/cooldown-manager.test.js` (new - CooldownManager tests)
-- `backend/tests/chat-manager.test.js` (update - cooldown integration tests)
-- `backend/tests/signal-engine.test.js` (update - decline penalty tests)
-- `frontend/tests/CooldownFeedback.test.tsx` (new - cooldown UI tests)
-- `tests/e2e/cooldown.spec.ts` (new - E2E cooldown tests)
-- `docs/ConnectionGuide.md` (update - cooldown behavior)
-- `README.md` (update - cooldown feature)
-- `CHANGELOG.md` (add cooldown entry)
-
-**Required Tools**:
-- Vitest (unit tests)
-- Playwright (E2E tests)
-- React Testing Library
-
-**Acceptance Tests**:
-- [x] Unit tests: CooldownManager (26 tests, 100% pass rate) ✅
-- [x] Unit tests: ChatManager cooldown integration (25 tests, 3 new cooldown tests) ✅
-- [x] Unit tests: Signal Engine decline penalty (21 tests, 4 new decline tests) ✅
-- [x] Unit tests: Frontend cooldown feedback (useCooldown hook: 7 tests, all passing) ✅
-- [x] E2E test: Cooldown triggers after 3 declined invites ✅
-- [x] E2E test: User sees cooldown notice when trying to request during cooldown ✅
-- [x] E2E test: Cooldown expires and user can request again ✅
-- [x] E2E test: Signal Engine reduces discoverability during cooldown ✅
-- [x] Performance: Cooldown check < 10ms, decline tracking < 5ms ✅
-- [x] Documentation: ConnectionGuide updated ✅
-- [x] Documentation: CHANGELOG updated ✅
-- [x] Documentation: Plan.md updated ✅
-- [ ] Documentation: README updated
-- [ ] Documentation: CHANGELOG entry added
-
-**Done Criteria**:
-- ✅ All tests passing (unit, E2E)
-- ✅ Code coverage ≥80%
-- ✅ Performance targets met
-- ✅ Documentation complete
-
-**Status**: ⏳ **PENDING**
-
----
-
-## File targets
-
-### Backend (Forge)
-- `backend/src/config/cooldown-config.js` (cooldown configuration)
-- `backend/src/services/SessionManager.js` (cooldown fields in session structure)
-- `backend/src/services/CooldownManager.js` (cooldown management service)
-- `backend/src/services/ChatManager.js` (cooldown checks and decline tracking)
-- `backend/src/config/signal-weights.js` (w_decline weight)
-- `backend/src/services/SignalEngine.js` (decline penalty in scoring)
-
-### Frontend (Link)
-- `frontend/src/hooks/useCooldown.ts` (cooldown state hook)
-- `frontend/src/components/radar/PersonCard.tsx` (cooldown notice)
-- `frontend/src/components/chat/ChatRequestButton.tsx` (cooldown handling)
-- `frontend/src/pages/Radar.tsx` (cooldown feedback integration)
-
-### Tests (Pixel)
-- `backend/tests/cooldown-manager.test.js` (CooldownManager tests)
-- `backend/tests/chat-manager.test.js` (cooldown integration tests)
-- `backend/tests/signal-engine.test.js` (decline penalty tests)
-- `frontend/tests/CooldownFeedback.test.tsx` (cooldown UI tests)
-- `tests/e2e/cooldown.spec.ts` (E2E cooldown tests)
-
-### Documentation (Muse)
-- `docs/ConnectionGuide.md` (cooldown behavior)
-- `README.md` (cooldown feature)
-- `CHANGELOG.md` (cooldown entry)
-
-## Acceptance tests
-
-### Step 1: Backend Cooldown Configuration & Session Structure Updates
-- [ ] Cooldown config file created with tunable thresholds
-- [ ] Session structure includes cooldown fields
-- [ ] New sessions initialize with default cooldown values
-- [ ] Unit tests ≥80% coverage
-
-### Step 2: Backend CooldownManager Service
-- [ ] CooldownManager tracks declines and triggers cooldowns
-- [ ] Auto-cleanup working (old timestamps removed)
-- [ ] Cooldown expiration checking working
-- [ ] Unit tests ≥80% coverage
-
-### Step 3: Backend ChatManager Integration
-- [ ] ChatManager tracks declines
-- [ ] ChatManager enforces cooldowns
-- [ ] Cooldown triggers automatically after threshold
-- [ ] Unit tests ≥80% coverage
-
-### Step 4: Backend Signal Engine Integration
-- [ ] Signal Engine includes decline penalty
-- [ ] Penalty capped at -15
-- [ ] Soft sort-down working
-- [ ] Unit tests ≥80% coverage
-
-### Step 5: Frontend Cooldown Feedback & UI
-- [ ] Cooldown feedback UI working
-- [ ] Countdown timer working
-- [ ] Accessibility verified (WCAG AA)
-- [ ] Unit tests ≥80% coverage
-
-### Step 6: Testing & Documentation
-- [ ] All tests passing
-- [ ] Code coverage ≥80%
-- [ ] Performance targets met
-- [ ] Documentation complete
-
-## Owners
-- Vector 🎯 (planning, coordination)
-- Forge 🔗 (backend cooldown tracking, enforcement, Signal Engine integration)
-- Link 🌐 (frontend cooldown feedback, UI)
-- Pixel 🖥️ (testing, performance verification)
-- Muse 🎨 (documentation)
-
-## Implementation Notes
-- **Status**: Planning phase - Ready for team review
-- **Approach**: Backend-first (config, CooldownManager, ChatManager, Signal Engine), then frontend (UI feedback)
-- **Testing**: Comprehensive unit, integration, and E2E tests
-- **Dependencies**: Issue #3 (Chat) - Cooldowns integrate with chat request/decline flow
-- **Enables**: Spam prevention, reduced abuse, better user experience
-
-## Risks & Open questions
-
-### Risks
-- **Cooldown Threshold Tuning**: Default threshold (3 declines in 10 min) may need adjustment based on usage patterns
-- **Signal Engine Penalty**: Decline penalty weight (-5) may need tuning to balance soft sort-down vs exclusion
-- **Storage Overhead**: Timestamp array storage may grow; cleanup must be reliable
-
-### Open Questions
-- **Cooldown Duration**: Should duration increase for repeat offenses? (Recommendation: Keep fixed 30 min for MVP)
-- **Cooldown Reset**: Should cooldown reset on successful chat acceptance? (Recommendation: No, cooldown is for declined invites only)
-- **Frontend Countdown**: Should countdown update every second or every minute? (Recommendation: Every minute for performance)
-
-## MCP Tools Required
-- **GitHub MCP**: Issue tracking, branch creation
-- **Playwright MCP** (optional): E2E tests, accessibility checks
-
-## Handoffs
-- **After Step 1**: Forge hands off config to CooldownManager implementation
-- **After Step 2**: Forge hands off CooldownManager to ChatManager integration
-- **After Step 3**: Forge hands off ChatManager to Signal Engine integration
-- **After Step 4**: Forge hands off backend to Link for frontend integration
-- **After Step 5**: Link hands off frontend to Pixel for testing
-- **After Step 6**: Issue #8 complete - ready for next feature
-
----
-
-**Plan Status**: ✅ **APPROVED FOR IMPLEMENTATION**
-
-**Summary**:
-- Issue #8: Chat Request Cooldowns
-- Plan: 6 steps
-- Research: ✅ Complete (`docs/research/Issue-8-research.md`)
+- Issue #9: UX Review Fixes + Bootup Random Messages
+- Plan: 5 steps
+- Research: ✅ Complete (UX review report: `.notes/ux-review-2025-01-27.md`)
 - **NEXT**: Team review required before implementation begins
 
 **Team Involvement**:
-- ✅ Scout 🔎: Research complete
+- ✅ Scout 🔎: Research complete (UX review report)
 - ✅ Vector 🎯: Plan created
-- ✅ **Team Review**: Complete - Approved for implementation (`.notes/features/chat-request-cooldowns/team-review-approved.md`)
-- ⏭️ Forge 🔗: Steps 1-4 (Backend cooldown tracking, enforcement, Signal Engine)
-- ⏭️ Link 🌐: Step 5 (Frontend cooldown feedback)
-- ⏭️ Pixel 🖥️: Step 6 (Testing)
-- ⏭️ Muse 🎨: Step 6 (Documentation)
+- ⏳ **Team Review**: Required before implementation
+- ⏭️ Link 🌐: Steps 1-2 (Frontend fixes, button radius)
+- ⏭️ Muse 🎨: Step 2-3 (Copy updates, bootup messages)
+- ⏭️ Pixel 🖥️: Step 4 (Testing)
+- ⏭️ Muse 🎨: Step 5 (Documentation)
