@@ -32,7 +32,7 @@ describe("ConsentStep", () => {
       />
     );
 
-    const checkbox = screen.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const checkbox = screen.getByRole("checkbox", { name: /I am 18 or older/i });
     expect(checkbox).toBeInTheDocument();
     expect(checkbox).not.toBeChecked();
   });

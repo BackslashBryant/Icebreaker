@@ -86,7 +86,7 @@ export function PanicDialog({ isOpen, onClose, onConfirm }: PanicDialogProps) {
           <Button
             onClick={handleConfirm}
             disabled={isConfirming}
-            className="w-full rounded-xl bg-accent hover:bg-accent/90 text-accent-foreground font-mono h-11 sm:h-12 text-sm border-2 border-accent"
+            className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-accent-foreground font-mono h-11 sm:h-12 text-sm border-2 border-accent"
             aria-label="Confirm panic and exit"
           >
             {isConfirming ? "Processing..." : "SEND ALERT & EXIT"}
@@ -95,7 +95,7 @@ export function PanicDialog({ isOpen, onClose, onConfirm }: PanicDialogProps) {
             onClick={onClose}
             variant="outline"
             disabled={isConfirming}
-            className="w-full rounded-xl border-2 border-accent/30 text-accent hover:bg-accent/10 font-mono bg-transparent text-sm"
+            className="w-full rounded-2xl border-2 border-accent/30 text-accent hover:bg-accent/10 font-mono bg-transparent text-sm"
             aria-label="Cancel panic"
           >
             Never mind
@@ -171,7 +171,7 @@ export function PanicSuccess({ exclusionExpiresAt, onClose }: PanicSuccessProps)
         <Button
           onClick={onClose}
           variant="outline"
-          className="w-full rounded-xl border-2 border-accent/30 text-accent hover:bg-accent/10 font-mono bg-transparent text-sm"
+          className="w-full rounded-2xl border-2 border-accent/30 text-accent hover:bg-accent/10 font-mono bg-transparent text-sm"
         >
           Continue
         </Button>

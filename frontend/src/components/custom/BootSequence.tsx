@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { selectBootMessages } from "@/data/bootMessages";
 
 interface BootSequenceProps {
   onComplete: () => void;
@@ -7,11 +8,12 @@ interface BootSequenceProps {
 export function BootSequence({ onComplete }: BootSequenceProps) {
   const [stage, setStage] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [bootMessages] = useState(() => selectBootMessages(4)); // Select 4 random messages + "READY"
 
   useEffect(() => {
-    // Stage progression
+    // Stage progression - adjust based on number of messages
     const stageTimer = setTimeout(() => {
-      if (stage < 4) {
+      if (stage < bootMessages.length - 1) {
         setStage(stage + 1);
       } else {
         onComplete();
@@ -30,15 +32,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
       clearTimeout(stageTimer);
       clearInterval(progressInterval);
     };
-  }, [stage, onComplete]);
-
-  const bootMessages = [
-    "INITIALIZING ICEBREAKER v1.0...",
-    "LOADING SIGNAL ENGINE...",
-    "CALIBRATING PROXIMITY SENSORS...",
-    "ESTABLISHING SECURE CONNECTION...",
-    "READY",
-  ];
+  }, [stage, onComplete, bootMessages.length]);
 
   return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-6 relative overflow-hidden">

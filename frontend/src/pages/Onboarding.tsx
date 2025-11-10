@@ -142,7 +142,7 @@ export default function Onboarding() {
 
             <Button
               onClick={() => setStep(1)}
-              className="w-full rounded-xl bg-accent hover:bg-accent/90 text-background font-mono h-11 sm:h-12 text-sm retro-button border-2 border-accent"
+              className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-background font-mono h-11 sm:h-12 text-sm retro-button border-2 border-accent"
             >
               GOT IT →
             </Button>
@@ -185,7 +185,7 @@ export default function Onboarding() {
             <Button
               onClick={handleSubmit}
               disabled={!selectedVibe || loading}
-              className="w-full rounded-xl bg-accent hover:bg-accent/90 text-background font-mono h-11 sm:h-12 text-sm retro-button border-2 border-accent disabled:opacity-50"
+              className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-background font-mono h-11 sm:h-12 text-sm retro-button border-2 border-accent disabled:opacity-50"
             >
               {loading ? "CREATING SESSION..." : "ENTER RADAR →"}
             </Button>
@@ -197,7 +197,7 @@ export default function Onboarding() {
           <Button
             onClick={() => setStep(step - 1)}
             variant="ghost"
-            className="w-full text-muted-foreground hover:text-foreground font-mono border-2 border-transparent hover:border-muted rounded-xl text-sm"
+            className="w-full text-muted-foreground hover:text-foreground font-mono border-2 border-transparent hover:border-muted rounded-2xl text-sm"
           >
             ← BACK
           </Button>

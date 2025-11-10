@@ -54,14 +54,14 @@ export function LocationStep({ onEnable, onSkip }: LocationStepProps) {
         <Button
           onClick={handleEnable}
           disabled={loading}
-          className="w-full rounded-xl bg-accent hover:bg-accent/90 text-background font-mono h-11 sm:h-12 text-sm retro-button border-2 border-accent disabled:opacity-50"
+          className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-background font-mono h-11 sm:h-12 text-sm retro-button border-2 border-accent disabled:opacity-50"
         >
           {loading ? "REQUESTING..." : "ENABLE LOCATION"}
         </Button>
         <Button
           onClick={onSkip}
           variant="ghost"
-          className="w-full rounded-xl text-muted-foreground hover:text-foreground font-mono border-2 border-transparent hover:border-muted text-sm"
+          className="w-full rounded-2xl text-muted-foreground hover:text-foreground font-mono border-2 border-transparent hover:border-muted text-sm"
         >
           Skip for now
         </Button>
