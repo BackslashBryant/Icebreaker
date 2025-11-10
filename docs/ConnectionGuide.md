@@ -55,6 +55,9 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 - Chat Proximity Thresholds: Warning at 80m, termination at 100m (configurable in `backend/src/services/ChatManager.js`)
 - Panic Button: `backend/src/services/PanicManager.js` (safety exclusion, session termination)
 - Panic Exclusion Duration: Default 1 hour (configurable in `backend/src/services/PanicManager.js`)
+- Chat Request Cooldowns: `backend/src/services/CooldownManager.js` (session-level cooldowns after 3 declines in 10 minutes)
+- Cooldown Duration: Default 30 minutes (configurable via `COOLDOWN_DURATION_MS` environment variable)
+- Cooldown Config: `backend/src/config/cooldown-config.js` (threshold: 3, window: 10 min, duration: 30 min, weights)
 
 ## 2. Remote APIs & Integrations
 

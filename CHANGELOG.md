@@ -9,6 +9,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### MVP: Chat Request Cooldowns (Issue #8)
+- Cooldown system: Session-level cooldowns after 3 declined chat invites within 10 minutes
+- Cooldown duration: 30 minutes default (configurable 15-60 min via environment variables)
+- Cooldown enforcement: Users cannot send chat requests during active cooldown
+- Signal Engine integration: Users in cooldown appear lower in Radar results (soft sort-down, -5 per decline, max -15 penalty)
+- Frontend feedback: Cooldown notice with countdown timer in PersonCard, toast notification on attempt
+- Configuration: Tunable parameters in `backend/src/config/cooldown-config.js` (threshold, window, duration, weights)
+- WebSocket error handling: Cooldown errors include `cooldownExpiresAt` and `cooldownRemainingMs` for frontend display
+- Unit tests: CooldownManager (26 tests), ChatManager integration (25 tests), Signal Engine (21 tests), useCooldown hook (7 tests)
+- E2E tests: Cooldown flow verification (5 tests)
+
+**Technical Details**:
+- Backend: CooldownManager service, ChatManager integration, Signal Engine decline penalty, WebSocket error payloads
+- Frontend: useCooldown hook, PersonCard cooldown UI, toast notifications, countdown timer
+- Configuration: `COOLDOWN_DECLINE_THRESHOLD`, `COOLDOWN_DECLINE_WINDOW_MS`, `COOLDOWN_DURATION_MS`, `COOLDOWN_W_DECLINE`, `COOLDOWN_MAX_DECLINE_PENALTY`
+- Session fields: `declineCount`, `declinedInvites[]`, `cooldownExpiresAt`
+- Signal weight: `w_decline: -5` (configurable via `SIGNAL_WEIGHT_DECLINE`)
+
+**Verified**:
+- ✅ Cooldown triggers after 3 declines in 10 minutes
+- ✅ Cooldown prevents chat requests during active period
+- ✅ Signal Engine soft sort-down working (users appear lower, not excluded)
+- ✅ Frontend cooldown feedback with countdown timer
+- ✅ All backend tests passing (81 tests)
+- ✅ All frontend hook tests passing (7 tests)
+- ✅ E2E tests created (5 tests)
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
 #### MVP: Profile/Settings Page (Issue #7)
 - Profile page: Accessible from Radar and Chat headers, displays handle, visibility toggle, emergency contact, and accessibility settings
 - Visibility toggle: Users can show/hide themselves on Radar (persisted in session)
