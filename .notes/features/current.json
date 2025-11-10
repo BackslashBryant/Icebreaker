@@ -1,10 +1,13 @@
 {
-  "slug": "radar-view",
-  "featureName": "Radar View (Proximity-Based Presence Visualization)",
-  "updatedAt": "2025-11-06T00:00:00.000Z",
+  "slug": "chat",
+  "featureName": "Chat (Ephemeral 1:1 Messaging)",
+  "updatedAt": "2025-11-10T00:00:00.000Z",
   "status": "complete",
   "vision": "docs/vision.md",
-  "description": "MVP Radar View - proximity-based presence visualization with Signal Engine integration, sorted by compatibility score",
-  "githubIssue": 2,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/2"
+  "description": "MVP Chat - terminal-style ephemeral 1:1 messaging with proximity monitoring",
+  "githubIssue": 3,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/3",
+  "branch": "feat/3-chat",
+  "commit": "bd9ff33",
+  "note": "Issue #3 needs to be created manually - GitHub MCP auth failed. See .notes/features/chat/github-comment.md for completion comment to add."
 }
