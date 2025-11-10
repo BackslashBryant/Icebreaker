@@ -2,7 +2,7 @@
   "slug": "radar-view",
   "featureName": "Radar View (Proximity-Based Presence Visualization)",
   "updatedAt": "2025-11-06T00:00:00.000Z",
-  "status": "planning",
+  "status": "complete",
   "vision": "docs/vision.md",
   "description": "MVP Radar View - proximity-based presence visualization with Signal Engine integration, sorted by compatibility score",
   "githubIssue": 2,

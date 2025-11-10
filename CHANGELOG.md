@@ -9,6 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### MVP: Chat (Ephemeral 1:1 Messaging) (Issue #3)
+- Terminal-style chat interface: black background, teal monospace text, `[HH:MM]` timestamps
+- Ephemeral messaging: no storage, no history, messages relayed via WebSocket only
+- Chat request flow: one-tap initiation from Radar, accept/decline handling
+- Real-time message relay via WebSocket (`chat:message` message type)
+- Rate limiting: max 10 messages/minute per chat (configurable in `backend/src/lib/rate-limiter.js`)
+- Proximity monitoring: automatic chat termination when distance >100m
+- Proximity warning: shows "Signal weak — chat may end." when distance >80m
+- One-chat-at-a-time enforcement: both sessions must have `activeChatPartnerId === null`
+- Chat termination: user-initiated (`chat:end`) or proximity-based (`proximity_lost`)
+- ASCII dividers between message bursts (>5 minute gap)
+- Keyboard navigation: Enter to send, Escape to end chat
+- WCAG AA compliance: ARIA labels, screen reader support, keyboard navigation
+- Unit tests: ChatManager (21/21), RateLimiter (7/7), Chat components (14/14)
+
+**Technical Details**:
+- Backend: ChatManager service, RateLimiter utility, WebSocket chat handlers
+- Frontend: Chat page (`/chat`), ChatMessage, ChatInput, ChatHeader components, `useChat` hook
+- WebSocket protocol: `chat:request`, `chat:accept`, `chat:decline`, `chat:message`, `chat:end`, `chat:accepted`, `chat:declined`, `chat:request:ack`
+- Chat state management: `activeChatPartnerId` in SessionManager
+- Proximity thresholds: Warning at 80m, termination at 100m (configurable)
+- Rate limit: 10 messages/minute per chat (1-minute sliding window)
+
+**Verified**:
+- ✅ Chat request validates target session and enforces one-chat-at-a-time
+- ✅ Accept/decline flow updates both sessions correctly
+- ✅ Message relay works with rate limiting
+- ✅ Proximity monitoring terminates chats when distance >100m
+- ✅ Terminal-style UI matches brand aesthetic
+- ✅ Keyboard navigation and screen reader support working
+- ✅ All unit tests passing: Backend (117/117), Frontend (14/14 Chat tests)
+- ✅ WCAG AA compliance verified
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
 #### MVP: Radar View (Proximity-Based Presence Visualization) (Issue #2)
 - CRT-style radar sweep visualization with retro aesthetic
 - Accessible list view for keyboard navigation and screen readers

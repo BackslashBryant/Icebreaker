@@ -37,8 +37,14 @@ export default function Radar() {
     requestChat,
   } = useRadar({
     onChatRequest: (targetSessionId) => {
-      // TODO: Navigate to chat (Issue #3)
-      console.log("Chat requested with:", targetSessionId);
+      // Navigate to chat with partner info
+      const partner = people.find((p) => p.sessionId === targetSessionId);
+      navigate("/chat", {
+        state: {
+          partnerSessionId: targetSessionId,
+          partnerHandle: partner?.handle || "Unknown",
+        },
+      });
     },
   });
 

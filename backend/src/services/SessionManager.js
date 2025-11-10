@@ -112,5 +112,49 @@ export function cleanupExpiredSessions() {
   }
 }
 
+/**
+ * Update session's active chat partner
+ * @param {string} sessionId - Session ID
+ * @param {string|null} partnerSessionId - Partner session ID or null to clear
+ * @returns {boolean} Success
+ */
+export function updateActiveChatPartner(sessionId, partnerSessionId) {
+  const session = getSession(sessionId);
+  if (!session) {
+    return false;
+  }
+  
+  session.activeChatPartnerId = partnerSessionId;
+  return true;
+}
+
+/**
+ * Check if session is in an active chat
+ * @param {string} sessionId - Session ID
+ * @returns {boolean} true if in active chat
+ */
+export function isInActiveChat(sessionId) {
+  const session = getSession(sessionId);
+  if (!session) {
+    return false;
+  }
+  
+  return session.activeChatPartnerId !== null;
+}
+
+/**
+ * Get active chat partner ID
+ * @param {string} sessionId - Session ID
+ * @returns {string|null} Partner session ID or null
+ */
+export function getActiveChatPartner(sessionId) {
+  const session = getSession(sessionId);
+  if (!session) {
+    return null;
+  }
+  
+  return session.activeChatPartnerId;
+}
+
 // Run cleanup every minute
 setInterval(cleanupExpiredSessions, 60000);
