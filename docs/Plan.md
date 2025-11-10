@@ -1,429 +1,370 @@
 # Plan
 
-_Active feature: **Radar View (Proximity-Based Presence Visualization)** (`radar-view`)_  
-_Source spec: GitHub Issue #2 - https://github.com/BackslashBryant/Icebreaker/issues/2_
+_Active feature: **Panic Button (Emergency Exit & Safety)** (`panic-button`)_  
+_Source spec: GitHub Issue #5 - https://github.com/BackslashBryant/Icebreaker/issues/5_
 
 ## Goals
-- GitHub Issue: #2 (Radar View)
-- Target User: Adults (18+) who completed onboarding, want to discover nearby connections
-- Problem: Users need a way to see who's open nearby, sorted by lightweight compatibility (vibe match, shared tags, proximity) without pressure or profiles
-- Desired Outcome: Radar View displays proximity-based presence visualization (CRT sweep or accessible list) with Signal Engine integration, sorted by compatibility score. Users can initiate chats with one tap.
+- GitHub Issue: #5 (Panic Button)
+- Target User: Adults (18+) using Radar or Chat who need a quick, calm way to exit and alert contacts if they feel unsafe
+- Problem: Users need an always-accessible emergency exit button that immediately ends their session, alerts emergency contacts, and temporarily hides them from Radar
+- Desired Outcome: Fixed FAB accessible from Radar and Chat screens that ends session, optionally alerts contacts, and triggers safety exclusion
 - Success Metrics:
-  - Performance: Radar updates in < 1s
-  - Accessibility: WCAG AA compliance (keyboard nav, screen reader, reduced-motion)
-  - Test Coverage: ≥80% unit/integration coverage
-  - User Experience: One-tap chat initiation, empty states handled gracefully
-- Research Status: ✅ **COMPLETE** - See `docs/research.md` (2025-11-06: Radar View Implementation Research)
+  - Panic accessible in < 1 tap from any screen
+  - Session termination in < 500ms
+  - Safety exclusion duration: 1 hour (configurable)
+  - Emergency contact notification (if configured) within 5 seconds
+- Research Status: ✅ **COMPLETE** - See `docs/research.md` (2025-11-10: Panic Button Implementation)
 
 ## Out-of-scope
-- Chat functionality (Issue #3 - separate feature, but one-tap chat initiation is in scope)
-- Panic button implementation (Issue #4 - separate feature, but FAB placeholder is in scope)
-- Block/Report full implementation (Issue #5 - separate feature, but 2-tap access is in scope)
-- Profile/Settings page (Issue #6 - separate feature)
-- Social enrichment via OAuth (post-MVP)
-- Personality/archetype mode (post-MVP)
+- Full Settings page for emergency contacts (post-MVP - can use session storage for MVP)
+- SMS/email notification infrastructure (post-MVP - can use simple webhook/API for MVP)
+- Appeals flow (post-MVP)
+- Panic analytics/reporting dashboard (post-MVP)
 
 ## Steps (5-7)
 
-### Step 1: Signal Engine Service Implementation
+### Step 1: Backend Panic Handler
 **Owner**: @Forge 🔗  
-**Intent**: Implement Signal Engine compatibility scoring algorithm with tunable weights, safety exclusions, and proximity calculation
+**Intent**: Implement panic handler that sets safety flag, ends active chat, and triggers safety exclusion
 
 **File Targets**:
-- `backend/src/services/SignalEngine.js` (new)
-- `backend/src/lib/proximity-utils.js` (new - distance calculation)
-- `backend/src/config/signal-weights.js` (new - tunable weights config)
-- `backend/src/services/SessionManager.js` (update - add safety flag checks)
+- `backend/src/services/PanicManager.js` (new)
+- `backend/src/websocket/handlers.js` (update - add `panic:trigger` handler)
+- `backend/src/services/SessionManager.js` (update - add `panicSession` function)
+- `backend/src/services/ChatManager.js` (update - integrate panic termination)
 
 **Required Tools**:
 - Node.js + Express.js
-- Haversine formula or simple distance calculation for proximity tiers
-- Config file for tunable weights (JSON or JS module)
+- WebSocket server (existing)
+- Session management (existing)
 
 **Acceptance Tests**:
-- [ ] Signal Engine calculates score correctly: `score(A,B) = w_vibe * VIBE_MATCH + w_tag * MIN(shared_tags, 3) + w_vis * VISIBILITY_ON + w_tagless * TAGLESS + w_dist * PROXIMITY_TIER`
-- [ ] Default weights applied: `w_vibe = +10`, `w_tag = +5` (max 3), `w_vis = +3`, `w_tagless = -5`, `w_dist = +2`
-- [ ] Safety exclusion: Recent panic → exclude from results
-- [ ] Tie-breakers: Stable random seed per session + alphabetical handle
-- [ ] Proximity tiers calculated correctly (coarse buckets: room/venue/nearby)
-- [ ] Unit tests: ≥80% coverage for Signal Engine service
-- [ ] Config file: Weights tunable without code changes
+- [ ] Panic handler receives `panic:trigger` WebSocket message
+- [ ] Sets `safetyFlag = true` on session
+- [ ] Ends active chat if in progress (calls `endChat` with reason `panic`)
+- [ ] Sets safety exclusion expiration timestamp (default: 1 hour from now)
+- [ ] Returns success confirmation to client
+- [ ] Unit tests: Panic handler logic (≥80% coverage)
 
 **Done Criteria**:
-- Signal Engine service implemented and tested
-- Config file for tunable weights created
-- Unit tests passing with ≥80% coverage
-- Proximity calculation working correctly
+- Panic handler implemented and tested
+- Safety flag set correctly
+- Active chat terminated gracefully
+- Safety exclusion timestamp stored
 
-**Rollback**: If Signal Engine complexity blocks, simplify to basic vibe match + proximity only, iterate later
+**Rollback**: If complexity blocks, simplify to basic safety flag only, add exclusion duration later
 
 ---
 
-### Step 2: WebSocket Server & Radar Updates
+### Step 2: Safety Exclusion Logic
 **Owner**: @Forge 🔗  
-**Intent**: Implement WebSocket server for real-time radar updates, connection management, and message handling
+**Intent**: Implement safety exclusion expiration and automatic cleanup
 
 **File Targets**:
-- `backend/src/websocket/server.js` (new)
-- `backend/src/websocket/handlers.js` (new - message handlers)
-- `backend/src/routes/websocket.js` (new - WebSocket route)
-- `backend/src/server.js` (update - integrate WebSocket server)
-- `backend/src/services/SessionManager.js` (update - WebSocket connection tracking)
+- `backend/src/services/SessionManager.js` (update - add `panicExclusionExpiresAt` field, expiration check)
+- `backend/src/services/SignalEngine.js` (update - check exclusion expiration in addition to safetyFlag)
 
 **Required Tools**:
-- `ws` package (Node.js WebSocket server)
-- Express.js (HTTP upgrade to WebSocket)
-- Session token validation
+- Session management (existing)
+- Signal Engine (existing)
 
 **Acceptance Tests**:
-- [ ] WebSocket connection: `wss://api.icebreaker.app/ws?token=<sessionToken>`
-- [ ] Message types: `radar:subscribe`, `radar:update`, `chat:request`, `location:update`
-- [ ] Server messages: `radar:update` with sorted people array (Signal Engine scores)
-- [ ] Heartbeat: Ping-pong pattern for connection health
-- [ ] Session validation: Invalid token → connection rejected
-- [ ] Connection lifecycle: Cleanup on disconnect
-- [ ] Integration tests: WebSocket connection + radar updates
-- [ ] Performance: Radar updates sent in < 1s
+- [ ] Safety exclusion expires after configured duration (default: 1 hour)
+- [ ] Signal Engine excludes sessions with active safety exclusion
+- [ ] Expired exclusions automatically clear (safetyFlag reset to false)
+- [ ] Unit tests: Exclusion expiration logic (≥80% coverage)
 
 **Done Criteria**:
-- WebSocket server implemented and tested
-- Message protocol defined and documented
-- Integration tests passing
-- Performance target met (< 1s updates)
+- Safety exclusion expiration working
+- Signal Engine integration complete
+- Automatic cleanup implemented
 
-**Rollback**: If WebSocket complexity blocks, use polling as fallback (not ideal, but functional)
+**Rollback**: If expiration complexity blocks, use permanent safety flag until session expires
 
 ---
 
-### Step 3: Radar UI Components (Frontend)
+### Step 3: Frontend PanicButton FAB Component
 **Owner**: @Link 🌐  
-**Intent**: Implement Radar View with CRT sweep visualization, list view toggle, empty states, and accessibility
+**Intent**: Create fixed floating action button accessible from Radar and Chat screens
 
 **File Targets**:
-- `frontend/src/pages/Radar.tsx` (new)
-- `frontend/src/components/radar/RadarSweep.tsx` (new - CRT sweep visualization)
-- `frontend/src/components/radar/RadarList.tsx` (new - accessible list view)
-- `frontend/src/components/radar/PersonCard.tsx` (new - selected person card)
-- `frontend/src/hooks/useWebSocket.ts` (new - WebSocket connection hook)
-- `frontend/src/hooks/useRadar.ts` (new - Radar state management)
-- `frontend/src/lib/websocket-client.ts` (new - WebSocket client utilities)
+- `frontend/src/components/panic/PanicButton.tsx` (new - FAB component)
+- `frontend/src/pages/Radar.tsx` (update - add PanicButton)
+- `frontend/src/pages/Chat.tsx` (update - add PanicButton)
 
 **Required Tools**:
 - React + Vite
-- shadcn/ui components (Button, Dialog for person card)
-- Tailwind CSS (brand colors: deep navy/charcoal, neon teal)
-- Browser WebSocket API
+- shadcn/ui Button component
+- lucide-react icons (AlertTriangle)
+- Tailwind CSS
 
 **Acceptance Tests**:
-- [ ] Radar view displays: CRT sweep OR accessible list (user toggle)
-- [ ] WebSocket connection: Establishes on Radar mount with session token
-- [ ] Radar updates: Receives `radar:update` messages and displays people
-- [ ] Signal display: Higher score → closer to center / stronger pulse
-- [ ] Empty state: "No one here — yet." when no nearby sessions
-- [ ] GPS denied: Clear, dignified permission state
-- [ ] Selected person: Card shows handle, vibe, tags, signal score
-- [ ] One-tap chat: "START CHAT →" button initiates chat request
-- [ ] Accessibility: WCAG AA compliance (keyboard nav, screen reader, reduced-motion)
-- [ ] View toggle: Switch between radar/list view modes
-- [ ] Unit tests: ≥80% coverage for Radar components
+- [ ] PanicButton FAB visible on Radar screen (fixed bottom-right)
+- [ ] PanicButton FAB visible on Chat screen (fixed bottom-right)
+- [ ] FAB styling matches brand (red/destructive, pulsing animation)
+- [ ] Keyboard accessible (Enter to trigger, Escape to cancel)
+- [ ] Screen reader announces "Emergency panic button"
+- [ ] Unit tests: PanicButton component (≥80% coverage)
 
 **Done Criteria**:
-- Radar UI components implemented and tested
-- WebSocket connection working
+- PanicButton FAB component implemented
+- Accessible from Radar and Chat
 - Accessibility verified (WCAG AA)
-- Unit tests passing with ≥80% coverage
 
-**Rollback**: If CRT sweep complexity blocks, start with list view only, add sweep later
+**Rollback**: If FAB complexity blocks, use regular button in header/navigation
 
 ---
 
-### Step 4: Location & Proximity Integration
-**Owner**: @Link 🌐 + @Forge 🔗  
-**Intent**: Integrate browser Geolocation API, proximity calculation, and location updates via WebSocket
+### Step 4: Panic Confirmation Flow
+**Owner**: @Link 🌐  
+**Intent**: Implement confirmation dialog and success state for panic flow
 
 **File Targets**:
-- `frontend/src/hooks/useLocation.ts` (new - browser Geolocation API hook)
-- `frontend/src/lib/location-utils.ts` (new - location helpers)
-- `backend/src/lib/proximity-utils.js` (update - proximity tier calculation)
-- `backend/src/services/SignalEngine.js` (update - proximity tier integration)
+- `frontend/src/components/panic/PanicDialog.tsx` (new - confirmation dialog)
+- `frontend/src/components/panic/PanicSuccess.tsx` (new - success state)
+- `frontend/src/hooks/usePanic.ts` (new - panic state management)
+- `frontend/src/pages/Radar.tsx` (update - integrate panic flow)
+- `frontend/src/pages/Chat.tsx` (update - integrate panic flow)
 
 **Required Tools**:
-- Browser Geolocation API (native)
-- Distance calculation (Haversine formula or simple distance)
-- WebSocket `location:update` message
+- React + Vite
+- shadcn/ui Dialog component
+- WebSocket client (existing)
 
 **Acceptance Tests**:
-- [ ] Location permission: Requested on Radar mount (if not already granted)
-- [ ] Approximate location: Captured and sent via `location:update` WebSocket message
-- [ ] Proximity tiers: Calculated correctly (room/venue/nearby)
-- [ ] GPS denied: Graceful fallback (reduced experience, no proximity matching)
-- [ ] Location updates: Sent periodically (every 30-60s) or on significant movement
-- [ ] Privacy: No precise coordinates stored (approximate only)
-- [ ] Integration tests: Location updates trigger radar recalculation
+- [ ] User taps Panic → Confirmation dialog appears ("Everything okay?")
+- [ ] User confirms → WebSocket sends `panic:trigger` message
+- [ ] Success state shows: "You're safe. Session ended." + notification details
+- [ ] User redirected to Welcome screen after panic
+- [ ] Keyboard navigation works (Enter to confirm, Escape to cancel)
+- [ ] Screen reader announces confirmation and success states
+- [ ] Unit tests: Panic flow components (≥80% coverage)
 
 **Done Criteria**:
-- Location integration working
-- Proximity tiers calculated correctly
-- Privacy requirements met (approximate location only)
-- Integration tests passing
+- Panic confirmation flow implemented
+- Success state working
+- Navigation after panic working
+- Accessibility verified
 
-**Rollback**: If location complexity blocks, defer proximity matching, use visibility-only sorting
+**Rollback**: If dialog complexity blocks, use simple inline confirmation
 
 ---
 
-### Step 5: Accessibility & Testing
-**Owner**: @Pixel 🖥️ + @Link 🌐  
-**Intent**: Verify WCAG AA compliance, keyboard navigation, screen reader support, and comprehensive test coverage
+### Step 5: Emergency Contact Storage (MVP)
+**Owner**: @Forge 🔗 + @Link 🌐  
+**Intent**: Add optional emergency contact storage in session (simple MVP - full Settings page post-MVP)
 
 **File Targets**:
-- `frontend/src/pages/Radar.tsx` (update - accessibility improvements)
-- `frontend/src/components/radar/RadarSweep.tsx` (update - reduced-motion support)
-- `frontend/src/components/radar/RadarList.tsx` (update - ARIA labels)
-- `tests/e2e/radar.spec.ts` (new - E2E tests)
-- `frontend/tests/Radar.test.tsx` (new - unit tests)
-- `backend/tests/signal-engine.test.js` (new - unit tests)
-- `backend/tests/websocket.test.js` (new - integration tests)
+- `backend/src/services/SessionManager.js` (update - add `emergencyContacts` field)
+- `frontend/src/components/panic/PanicDialog.tsx` (update - show contact notification status)
 
 **Required Tools**:
-- Playwright (E2E tests, accessibility checks with axe)
+- Session management (existing)
+- Simple storage (in-memory for MVP)
+
+**Acceptance Tests**:
+- [ ] Emergency contacts stored in session (array of { name, phone/email })
+- [ ] Panic dialog shows contact notification status
+- [ ] Success state shows which contacts were notified
+- [ ] MVP: No actual notification sent (just UI indication - post-MVP: SMS/email integration)
+
+**Done Criteria**:
+- Emergency contact storage working
+- UI shows notification status
+- Ready for post-MVP notification integration
+
+**Rollback**: If contact storage blocks, defer entirely to post-MVP
+
+---
+
+### Step 6: Testing & Accessibility
+**Owner**: @Pixel 🖥️  
+**Intent**: Comprehensive testing and accessibility verification
+
+**File Targets**:
+- `backend/tests/panic-manager.test.js` (new - unit tests)
+- `frontend/tests/PanicButton.test.tsx` (new - component tests)
+- `frontend/tests/PanicDialog.test.tsx` (new - dialog tests)
+- `tests/e2e/panic.spec.ts` (new - E2E tests)
+
+**Required Tools**:
 - Vitest (unit tests)
-- React Testing Library (component tests)
-- Axe (accessibility testing)
+- Playwright (E2E tests)
+- React Testing Library
+- Axe (accessibility)
 
 **Acceptance Tests**:
-- [ ] WCAG AA compliance: Axe checks pass on Radar view
-- [ ] Keyboard navigation: All interactive elements navigable via keyboard
-- [ ] Screen reader: ARIA labels present on dots, list items, buttons
-- [ ] Reduced motion: Sweeps, blinks, pulses disabled when `prefers-reduced-motion`
-- [ ] High contrast: Text contrast meets WCAG AA (brighten teal if needed)
-- [ ] E2E test: Onboarding → Radar → Chat initiation flow
-- [ ] Unit tests: Signal Engine (≥80%), Radar components (≥80%)
-- [ ] Integration tests: WebSocket connection + radar updates
-- [ ] Performance test: Radar updates < 1s (measured)
+- [ ] Unit tests: Panic handler (≥80% coverage)
+- [ ] Unit tests: Panic components (≥80% coverage)
+- [ ] E2E test: Panic flow from Radar screen
+- [ ] E2E test: Panic flow from Chat screen
+- [ ] E2E test: Safety exclusion hides user from Radar
+- [ ] Accessibility: WCAG AA compliance verified
+- [ ] Performance: Panic trigger < 500ms
 
 **Done Criteria**:
-- Accessibility verified (WCAG AA)
-- All tests passing (unit, integration, E2E)
+- All tests passing (unit, E2E)
 - Code coverage ≥80%
+- Accessibility verified (WCAG AA)
 - Performance targets met
 
-**Rollback**: If accessibility gaps found, document and create follow-up issues
+**Rollback**: If test gaps found, document and create follow-up issues
 
 ---
 
-### Step 6: Documentation & Handoff
+### Step 7: Documentation & Handoff
 **Owner**: @Muse 🎨  
-**Intent**: Update documentation (README, CHANGELOG, Connection Guide) and prepare handoff to Issue #3 (Chat)
+**Intent**: Update documentation and prepare handoff
 
 **File Targets**:
-- `README.md` (update - Radar View section)
-- `CHANGELOG.md` (add Radar View feature entry)
-- `docs/ConnectionGuide.md` (update - WebSocket endpoint, Signal Engine config)
-- `.notes/features/radar-view/progress.md` (mark complete)
-- `docs/architecture/ARCHITECTURE_TEMPLATE.md` (update - Radar Module details)
+- `README.md` (update - Panic Button section)
+- `CHANGELOG.md` (add Panic Button feature entry)
+- `docs/ConnectionGuide.md` (update - panic WebSocket message type)
+- `.notes/features/panic-button/progress.md` (mark complete)
 
 **Required Tools**:
-- Reference `docs/vision.md` for Radar context
-- Reference `docs/research.md` for implementation details
-- Reference `docs/architecture/ARCHITECTURE_TEMPLATE.md` for API contracts
+- Reference `docs/vision.md` for Panic context
+- Reference `Docs/Vision/IceBreaker — Safety & Moderation Vision.txt`
 
 **Acceptance Tests**:
-- [x] README updated with Radar View description
-- [x] CHANGELOG entry added: "MVP: Radar View (Proximity-Based Presence Visualization)"
-- [x] Connection Guide updated: WebSocket endpoint (`ws://localhost:8000/ws?token=<sessionToken>`)
-- [x] Connection Guide updated: Signal Engine config file location
-- [x] Progress tracker updated: All stages marked complete
-- [x] Handoff notes: Issue #3 (Chat) can now proceed (one-tap chat initiation ready)
+- [ ] README updated with Panic Button description
+- [ ] CHANGELOG entry added: "MVP: Panic Button (Emergency Exit & Safety)"
+- [ ] Connection Guide updated: `panic:trigger` WebSocket message type
+- [ ] Progress tracker updated: All stages marked complete
 
 **Done Criteria**:
 - Documentation updated and accurate
 - CHANGELOG entry concise and factual
 - Connection Guide accurate
-- Handoff ready for Issue #3
 
 **Rollback**: If documentation gaps found, update before marking complete
 
 ---
 
-### Step 7: Integration & Performance Verification
-**Owner**: @Pixel 🖥️  
-**Intent**: Verify end-to-end Radar flow meets performance targets and integration with onboarding
-
-**File Targets**:
-- `tests/e2e/onboarding-radar.spec.ts` (new - full flow E2E test)
-- `.notes/features/radar-view/performance.md` (new - performance results)
-
-**Required Tools**:
-- Playwright (E2E tests, performance timing)
-- Performance timing APIs
-
-**Acceptance Tests**:
-- [x] E2E test: Onboarding → Radar navigation (< 30s total)
-- [x] E2E test: Radar updates in < 1s (measured from WebSocket message to UI update)
-- [x] E2E test: Signal Engine sorting visible (higher scores appear first)
-- [x] E2E test: One-tap chat initiation works (button click → chat request sent)
-- [x] Performance: Radar view loads in < 2s
-- [x] Performance: WebSocket connection established in < 500ms
-- [x] Performance: Signal Engine calculation for 100 sessions < 100ms
-
-**Done Criteria**:
-- ✅ All performance targets met (< 1s updates, < 2s load, < 500ms connection)
-- ✅ E2E tests implemented and ready
-- ✅ Performance results documented
-
-**Rollback**: If performance targets not met, document bottlenecks and create optimization plan
-
----
-
 ## File targets
 
-### Frontend (Link)
-- `frontend/src/pages/Radar.tsx` (main Radar page)
-- `frontend/src/components/radar/RadarSweep.tsx` (CRT sweep visualization)
-- `frontend/src/components/radar/RadarList.tsx` (accessible list view)
-- `frontend/src/components/radar/PersonCard.tsx` (selected person card)
-- `frontend/src/hooks/useWebSocket.ts` (WebSocket connection hook)
-- `frontend/src/hooks/useRadar.ts` (Radar state management)
-- `frontend/src/hooks/useLocation.ts` (browser Geolocation API hook)
-- `frontend/src/lib/websocket-client.ts` (WebSocket client utilities)
-- `frontend/src/lib/location-utils.ts` (location helpers)
-
 ### Backend (Forge)
-- `backend/src/services/SignalEngine.js` (compatibility scoring algorithm)
-- `backend/src/lib/proximity-utils.js` (distance calculation, proximity tiers)
-- `backend/src/config/signal-weights.js` (tunable weights config)
-- `backend/src/websocket/server.js` (WebSocket server)
-- `backend/src/websocket/handlers.js` (WebSocket message handlers)
-- `backend/src/routes/websocket.js` (WebSocket route)
-- `backend/src/server.js` (update - integrate WebSocket)
-- `backend/src/services/SessionManager.js` (update - safety flags, WebSocket tracking)
+- `backend/src/services/PanicManager.js` (panic handler)
+- `backend/src/websocket/handlers.js` (panic WebSocket handler)
+- `backend/src/services/SessionManager.js` (panic session updates, exclusion expiration)
+- `backend/src/services/SignalEngine.js` (safety exclusion check)
+- `backend/src/services/ChatManager.js` (panic chat termination)
+
+### Frontend (Link)
+- `frontend/src/components/panic/PanicButton.tsx` (FAB component)
+- `frontend/src/components/panic/PanicDialog.tsx` (confirmation dialog)
+- `frontend/src/components/panic/PanicSuccess.tsx` (success state)
+- `frontend/src/hooks/usePanic.ts` (panic state management)
+- `frontend/src/pages/Radar.tsx` (integrate PanicButton)
+- `frontend/src/pages/Chat.tsx` (integrate PanicButton)
 
 ### Tests (Pixel)
-- `tests/e2e/radar.spec.ts` (Radar E2E tests)
-- `tests/e2e/onboarding-radar.spec.ts` (full flow E2E test)
-- `frontend/tests/Radar.test.tsx` (Radar component unit tests)
-- `backend/tests/signal-engine.test.js` (Signal Engine unit tests)
-- `backend/tests/websocket.test.js` (WebSocket integration tests)
+- `backend/tests/panic-manager.test.js` (panic handler tests)
+- `frontend/tests/PanicButton.test.tsx` (FAB component tests)
+- `frontend/tests/PanicDialog.test.tsx` (dialog tests)
+- `tests/e2e/panic.spec.ts` (E2E panic flow tests)
 
 ### Documentation (Muse)
-- `README.md` (Radar View section)
+- `README.md` (Panic Button section)
 - `CHANGELOG.md` (feature entry)
-- `docs/ConnectionGuide.md` (WebSocket endpoint, Signal Engine config)
-- `docs/architecture/ARCHITECTURE_TEMPLATE.md` (Radar Module details)
+- `docs/ConnectionGuide.md` (WebSocket message type)
 
 ## Acceptance tests
 
-### Step 1: Signal Engine
-- [ ] Scoring formula correct
-- [ ] Default weights applied
-- [ ] Safety exclusions work
-- [ ] Proximity tiers calculated
+### Step 1: Backend Panic Handler
+- [ ] Panic handler receives WebSocket message
+- [ ] Safety flag set correctly
+- [ ] Active chat terminated
 - [ ] Unit tests ≥80% coverage
 
-### Step 2: WebSocket Server
-- [ ] Connection established with token
-- [ ] Message types handled correctly
-- [ ] Radar updates sent in < 1s
-- [ ] Heartbeat pattern working
-- [ ] Integration tests passing
+### Step 2: Safety Exclusion Logic
+- [ ] Exclusion expiration working
+- [ ] Signal Engine excludes correctly
+- [ ] Automatic cleanup working
+- [ ] Unit tests ≥80% coverage
 
-### Step 3: Radar UI
-- [ ] CRT sweep OR list view (toggle)
-- [ ] WebSocket connection working
-- [ ] Signal display correct
-- [ ] Empty states handled
-- [ ] One-tap chat initiation
+### Step 3: Frontend PanicButton FAB
+- [ ] FAB visible on Radar and Chat
+- [ ] Styling matches brand
 - [ ] Accessibility verified (WCAG AA)
 - [ ] Unit tests ≥80% coverage
 
-### Step 4: Location Integration
-- [ ] Location permission requested
-- [ ] Approximate location captured
-- [ ] Proximity tiers calculated
-- [ ] GPS denied handled gracefully
-- [ ] Privacy requirements met
+### Step 4: Panic Confirmation Flow
+- [ ] Confirmation dialog working
+- [ ] Success state working
+- [ ] Navigation after panic working
+- [ ] Unit tests ≥80% coverage
 
-### Step 5: Accessibility & Testing
-- [ ] WCAG AA compliance
-- [ ] Keyboard navigation
-- [ ] Screen reader support
-- [ ] Reduced motion support
-- [ ] All tests passing (unit, integration, E2E)
+### Step 5: Emergency Contact Storage
+- [ ] Contact storage working
+- [ ] UI shows notification status
+- [ ] Ready for post-MVP integration
+
+### Step 6: Testing & Accessibility
+- [ ] All tests passing
 - [ ] Code coverage ≥80%
+- [ ] WCAG AA compliance verified
+- [ ] Performance targets met
 
-### Step 6: Documentation
-- [x] README updated
-- [x] CHANGELOG entry added
-- [x] Connection Guide updated
-- [x] Handoff ready for Issue #3
-
-### Step 7: Integration & Performance
-- [x] Onboarding → Radar flow works
-- [x] Radar updates < 1s
-- [x] Performance targets met
-- [x] E2E tests implemented
+### Step 7: Documentation
+- [ ] README updated
+- [ ] CHANGELOG entry added
+- [ ] Connection Guide updated
 
 ## Owners
 - Vector 🎯 (planning, coordination)
-- Forge 🔗 (Signal Engine, WebSocket server, backend integration)
-- Link 🌐 (Radar UI components, WebSocket client, location integration)
+- Forge 🔗 (panic handler, safety exclusion, backend integration)
+- Link 🌐 (PanicButton FAB, confirmation flow, frontend integration)
 - Pixel 🖥️ (testing, accessibility, performance verification)
 - Muse 🎨 (documentation)
 - Scout 🔎 (research - ✅ COMPLETE)
 
 ## Implementation Notes
 - **Status**: Planning phase - Research complete, ready for implementation
-- **Approach**: Backend-first (Signal Engine + WebSocket), then frontend (Radar UI), then integration
+- **Approach**: Backend-first (panic handler, safety exclusion), then frontend (FAB, confirmation flow)
 - **Testing**: Comprehensive unit, integration, and E2E tests
-- **Dependencies**: Issue #1 (Onboarding Flow) - Session creation required
-- **Enables**: Issue #3 (Chat) - One-tap chat initiation ready
+- **Dependencies**: Issue #2 (Radar View), Issue #4 (Chat) - Panic accessible from both screens
+- **Enables**: Safety moderation features (safety exclusion, Signal Engine integration)
 
 ## Risks & Open questions
 
 ### Risks
-- **WebSocket Complexity**: Connection management, reconnection logic, heartbeat pattern
-- **Signal Engine Tuning**: Default weights may need A/B testing
-- **Proximity Accuracy**: Approximate location may be less accurate than desired
-- **Accessibility**: CRT sweep visualization may be challenging for reduced-motion users
+- **Emergency Contact Notifications**: MVP may need to defer actual SMS/email sending to post-MVP
+- **Safety Exclusion Duration**: Default 1 hour may need tuning based on user feedback
+- **Panic False Positives**: Need to monitor and adjust confirmation flow if too many accidental triggers
 
 ### Open Questions
-- **Proximity Tiers**: Exact distance thresholds for room/venue/nearby buckets?
-- **Location Update Frequency**: How often to send location updates (every 30s? 60s? on movement?)?
-- **Signal Engine Weights**: Do default weights need adjustment based on user behavior?
-- **WebSocket Scaling**: How to handle multiple backend instances (Redis pub/sub for future)?
+- **Emergency Contact Storage**: Full Settings page (post-MVP) or simple session storage (MVP)?
+- **Notification Infrastructure**: SMS/email service integration (post-MVP) or webhook/API (MVP)?
+- **Safety Exclusion Duration**: Is 1 hour appropriate, or should it be configurable per user?
 
 ## MCP Tools Required
 - **GitHub MCP**: Issue tracking, branch creation
 - **Playwright MCP** (optional): Accessibility checks (axe), screenshots
-- **Desktop Commander MCP**: Port management, server startup
 
 ## Handoffs
-- **After Step 1**: Forge hands off Signal Engine to Link for frontend integration
-- **After Step 2**: Forge hands off WebSocket server to Link for client connection
-- **After Step 3**: Link hands off Radar UI to Pixel for testing
-- **After Step 4**: Link/Forge hands off location integration to Pixel for verification
-- **After Step 5**: Pixel hands off to Muse for documentation
-- **After Step 6**: Issue #2 complete - ready for Issue #3 (Chat) implementation
-- **After Step 7**: Final verification complete
+- **After Step 1**: Forge hands off panic handler to Link for frontend integration
+- **After Step 2**: Forge hands off safety exclusion to Pixel for verification
+- **After Step 3**: Link hands off PanicButton FAB to Pixel for testing
+- **After Step 4**: Link hands off confirmation flow to Pixel for verification
+- **After Step 5**: Forge/Link hands off emergency contacts to Pixel for testing
+- **After Step 6**: Pixel hands off to Muse for documentation
+- **After Step 7**: Issue #5 complete - ready for next feature
 
 ---
 
-**Plan Status**: ✅ **IMPLEMENTATION COMPLETE - STEP 7 VERIFIED**
+**Plan Status**: ✅ **PLANNING COMPLETE - READY FOR IMPLEMENTATION**
 
 **Summary**:
-- Issue #2: https://github.com/BackslashBryant/Icebreaker/issues/2
+- Issue #5: https://github.com/BackslashBryant/Icebreaker/issues/5
 - Research: ✅ Complete (see `docs/research.md`)
-- Plan: 7 steps - ✅ All complete
-- Implementation: ✅ All steps complete
-- Testing: ✅ Unit, integration, E2E, security, edge cases, performance tests complete
-- Performance: ✅ All targets met
-- Documentation: ✅ Complete
-- Next: Ready for Issue #3 (Chat) implementation
+- Plan: 7 steps - Ready for implementation
+- Next: Begin Step 1 (Backend Panic Handler)
 
 **Team Involvement**:
 - ✅ Scout 🔎: Research complete
-- ✅ Vector 🎯: Plan created and coordinated
-- ✅ Forge 🔗: Steps 1-2 complete (Signal Engine, WebSocket)
-- ✅ Link 🌐: Steps 3-4 complete (Radar UI, Location)
-- ✅ Pixel 🖥️: Steps 5, 7 complete (Testing, Performance)
-- ✅ Muse 🎨: Step 6 complete (Documentation)
+- ✅ Vector 🎯: Plan created
+- ⏭️ Forge 🔗: Steps 1-2 (Panic Handler, Safety Exclusion)
+- ⏭️ Link 🌐: Steps 3-4 (PanicButton FAB, Confirmation Flow)
+- ⏭️ Pixel 🖥️: Step 6 (Testing, Accessibility)
+- ⏭️ Muse 🎨: Step 7 (Documentation)

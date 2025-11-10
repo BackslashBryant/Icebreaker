@@ -669,4 +669,28 @@ Use this file to paste brief citations and summaries when any agent uses Ref Too
  -     C u r s o r   I D E   i s   n o t   p a s s i n g   e n v i r o n m e n t   v a r i a b l e s   t o   M C P   s e r v e r   p r o c e s s e s  
   
  * * S o l u t i o n * * :   R e s t a r t   C u r s o r   c o m p l e t e l y   ( c l o s e   a l l   w i n d o w s ) .   S e e   \ d o c s / t r o u b l e s h o o t i n g / g i t h u b - m c p - a u t h - f i x . m d \   f o r   f u l l   t r o u b l e s h o o t i n g   g u i d e .  
+  
+ - - -  
+  
+ # #   P a n i c   B u t t o n   I m p l e m e n t a t i o n   ( 2 0 2 5 - 1 1 - 1 0 )  
+  
+ * * R e s e a r c h   D a t e * * :   2 0 2 5 - 1 1 - 1 0  
+ * * R e s e a r c h e r * * :   S c o u t    
+ * * T a s k * * :   R e s e a r c h   p a n i c   b u t t o n   p a t t e r n s   a n d   e m e r g e n c y   c o n t a c t   s y s t e m s  
+ * * I s s u e * * :   # 5   -   P a n i c   B u t t o n   i m p l e m e n t a t i o n  
+  
+ # # #   K e y   F i n d i n g s  
+ -   * * S a f e t y   e x c l u s i o n * * :   S i g n a l   E n g i n e   a l r e a d y   e x c l u d e s   s e s s i o n s   w i t h   \ s a f e t y F l a g   = = =   t r u e \   f r o m   R a d a r   r e s u l t s  
+ -   * * S e s s i o n   s t r u c t u r e * * :   S e s s i o n M a n a g e r   h a s   \ s a f e t y F l a g \   f i e l d   b u t   n o   p a n i c   h a n d l e r   y e t  
+ -   * * U I   p a t t e r n s * * :   F i x e d   F A B   ( b o t t o m - r i g h t ) ,   c o n f i r m a t i o n   f l o w ,   s u c c e s s   s t a t e   w i t h   n o t i f i c a t i o n   d e t a i l s  
+ -   * * E m e r g e n c y   c o n t a c t s * * :   O p t i o n a l   M V P   f e a t u r e   -   c a n   b e   s t o r e d   i n   s e s s i o n ,   n o t i f i c a t i o n   v i a   S M S / e m a i l  
+ -   * * P r i v a c y * * :   A p p r o x i m a t e   l o c a t i o n   o n l y ,   m i n i m a l   m e t a d a t a ,   n o   m e s s a g e   c o n t e n t   s t o r e d  
+  
+ # # #   I m p l e m e n t a t i o n   A p p r o a c h  
+ 1 .   B a c k e n d :   P a n i c   h a n d l e r   s e t s   \ s a f e t y F l a g   =   t r u e \ ,   e n d s   a c t i v e   c h a t ,   t r i g g e r s   s a f e t y   e x c l u s i o n  
+ 2 .   S a f e t y   e x c l u s i o n :   C o n f i g u r a b l e   d u r a t i o n   ( d e f a u l t   1   h o u r ) ,   a u t o m a t i c a l l y   e x p i r e s  
+ 3 .   F r o n t e n d :   P a n i c B u t t o n   F A B   c o m p o n e n t ,   c o n f i r m a t i o n   f l o w ,   s u c c e s s   s t a t e  
+ 4 .   E m e r g e n c y   c o n t a c t s :   O p t i o n a l   -   c a n   d e f e r   t o   S e t t i n g s   p a g e   ( p o s t - M V P )   o r   s i m p l e   s e s s i o n   s t o r a g e  
+  
+ * * R e c o m m e n d a t i o n * * :   I m p l e m e n t   c o r e   p a n i c   f l o w   f i r s t   ( F A B ,   c o n f i r m a t i o n ,   s e s s i o n   t e r m i n a t i o n ,   s a f e t y   e x c l u s i o n ) ,   d e f e r   e m e r g e n c y   c o n t a c t   n o t i f i c a t i o n s   t o   p o s t - M V P   o r   s i m p l e   M V P   ( s e s s i o n   s t o r a g e   o n l y ) .  
  
