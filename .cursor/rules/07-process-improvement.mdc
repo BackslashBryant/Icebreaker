@@ -8,6 +8,93 @@ alwaysApply: false
 
 Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: describe the trigger, the lesson, and the rule/update that resulted.
 
+## 2025-01-XX: Testing Infrastructure & Gap Remediation
+
+**Trigger**: Testing gaps identified (security, edge cases, performance), tests hanging without timeouts, no centralized logging infrastructure
+**Lesson**: Comprehensive testing infrastructure requires: timeouts to prevent hangs, centralized logging with overwriting, security test coverage, edge case handling, performance automation, and clear tool selection guidelines.
+
+**Root Cause**:
+- Missing test timeouts causing hangs
+- No centralized logging infrastructure
+- Security testing gaps (token validation, input sanitization)
+- Edge case coverage missing
+- Performance tests not automated
+- No codified testing practices
+
+**Resolution Steps**:
+1. ✅ Added test timeouts to all configs (frontend, backend, e2e) - 10s per test, 10s per hook, 5s teardown
+2. ✅ Created centralized logging infrastructure (`scripts/test-logger.mjs`, `artifacts/test-logs/`)
+3. ✅ Enhanced security implementation (token expiration, input validation, message limits)
+4. ✅ Created security test suite (`backend/tests/security.test.js`)
+5. ✅ Created edge case test suite (`backend/tests/edge-cases.test.js`)
+6. ✅ Enhanced edge case handling (bounds checking, connection limits)
+7. ✅ Automated performance tests (`tests/e2e/performance.spec.ts`)
+8. ✅ Created testing rules document (`.cursor/rules/08-testing.mdc`)
+9. ✅ Updated scripts to use logging (`scripts/run-tests.mjs`, `package.json`)
+10. ✅ Added coverage thresholds (≥80% enforced)
+
+**Rule Update**:
+- All test configs must have timeouts (prevents hangs)
+- All test runs must produce logs in `artifacts/test-logs/` (overwriting previous)
+- Security tests required for authentication, authorization, input validation
+- Edge case tests required for boundary conditions
+- Performance tests automated and integrated into CI
+- Testing tool selection codified in `.cursor/rules/08-testing.mdc`
+
+**Action Required**:
+- Use `npm run test:unit`, `npm run test:security`, `npm run test:e2e`, `npm run test:performance`, `npm run test:all`
+- Check logs in `artifacts/test-logs/` for test results
+- Follow tool selection guide in `.cursor/rules/08-testing.mdc`
+- Ensure coverage thresholds met (≥80%)
+
+**Rules/Scripts Updated**:
+- ✅ `frontend/vite.config.js`: Added timeouts and coverage thresholds
+- ✅ `backend/vitest.config.js`: Added timeouts
+- ✅ `scripts/test-logger.mjs`: Created centralized logging utility
+- ✅ `scripts/run-tests.mjs`: Integrated logging
+- ✅ `package.json`: Added test scripts with logging
+- ✅ `backend/tests/security.test.js`: Created security test suite
+- ✅ `backend/tests/edge-cases.test.js`: Created edge case test suite
+- ✅ `tests/e2e/performance.spec.ts`: Created performance tests
+- ✅ `.cursor/rules/08-testing.mdc`: Created testing practices guide
+- ✅ `.cursor/rules/02-quality.mdc`: Added reference to testing rules
+
+---
+
+## 2025-11-09: Supabase MCP Migration to Hosted Server
+
+**Trigger**: Supabase MCP npm package (`supabase-mcp`) required `MCP_API_KEY` environment variable that wasn't documented, causing connection failures
+**Lesson**: Supabase now provides an official hosted MCP server that doesn't require any environment variables - it uses browser-based authentication. This is simpler, more secure, and officially supported.
+**Root Cause**: Using community npm package instead of official hosted server, which required undocumented `MCP_API_KEY` environment variable
+
+**Resolution Steps**:
+1. ✅ Migrated from npm package to official hosted server at `https://mcp.supabase.com/mcp`
+2. ✅ Updated `.cursor/mcp.json` to use URL-based configuration with `project_ref` and `features` query parameters
+3. ✅ Removed `MCP_API_KEY` from environment variables (no longer needed)
+4. ✅ Updated all documentation to reflect hosted server approach
+
+**Rule Update**:
+- Always use official hosted Supabase MCP server when available (preferred over npm packages)
+- Hosted servers with browser authentication are simpler and more secure than npm packages requiring env vars
+- When migrating MCP servers, update all related documentation (setup guides, troubleshooting, tools)
+
+**Action Required**:
+- Use hosted Supabase MCP server: `https://mcp.supabase.com/mcp?project_ref=YOUR_PROJECT_REF&features=...`
+- No environment variables needed - authentication handled via browser on first use
+- Update documentation when MCP configuration changes (setup guides, troubleshooting, health checks)
+- Remove obsolete environment variables from `.env` and documentation
+
+**Rules/Scripts Updated**:
+- ✅ `.cursor/mcp.json`: Migrated to hosted server URL configuration
+- ✅ `docs/troubleshooting/mcp-setup-guide.md`: Updated with hosted server instructions
+- ✅ `docs/troubleshooting/mcp-env-setup-windows.md`: Removed Supabase env vars from required list
+- ✅ `docs/troubleshooting/supabase-key-setup.md`: Marked as optional (for client libraries only)
+- ✅ `docs/troubleshooting/mcp-troubleshooting.md`: Updated Supabase section with hosted server config
+- ✅ `tools/mcp-self-heal.mjs`: Skip env checks for hosted Supabase server (url-based)
+- ✅ `tools/health-check.mjs`: Recognize hosted server doesn't need env vars
+- ✅ `.env`: Removed `MCP_API_KEY`, added note about hosted server
+- ✅ `docs/research.md`: Documented migration with benefits and trade-offs
+
 ## 2025-01-XX: Playwright MCP Usage (Not Using Configured MCP)
 
 **Trigger**: Agent ran Playwright tests via CLI (`npx playwright test`) instead of using Playwright MCP for accessibility checks and screenshots
@@ -15,7 +102,7 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 **Root Cause**: Agent defaulted to CLI approach without checking for available MCP tools first
 **Rule Update**: Always check for MCP availability before falling back to CLI. Use Playwright MCP for a11y checks, screenshots, and Lighthouse when available.
 
-**Action Required**: 
+**Action Required**:
 - Check for Playwright MCP tools before running accessibility checks
 - Use Playwright MCP for screenshots and accessibility verification
 - Document MCP usage in test results and artifacts
@@ -39,7 +126,7 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 **Root Cause**: Playwright HTML reporter defaults to auto-opening if not explicitly disabled
 **Rule Update**: Always configure Playwright with `open: 'never'` and output to `artifacts/` directory
 
-**Action Required**: 
+**Action Required**:
 - Configure all test reporters with explicit output directories
 - Use `artifacts/` for all test outputs (reports, screenshots, traces)
 - Never auto-open HTML reports; provide paths for manual review
@@ -55,7 +142,7 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 **Root Cause**: Agent didn't check MCP triggers before falling back to terminal commands
 **Rule Update**: Add explicit MCP-first check in workflow rules
 
-**Action Required**: 
+**Action Required**:
 - Update workflow rules to include MCP trigger check as mandatory first step
 - Add explicit "MCP-first" decision tree in git operations
 - Ensure agent checks MCP availability before terminal fallback
@@ -70,7 +157,7 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 **Root Cause**: Agent defaulted to creating documentation files instead of providing chat-based summary
 **Rule Update**: QA/QC reports must be in chat only. Update GitHub issues and docs (changelog, progress.md) directly, but never create standalone report files.
 
-**Action Required**: 
+**Action Required**:
 - Reports in chat only - no `.md` report files
 - Update GitHub issues with completion status
 - Update changelog/docs if needed
@@ -105,19 +192,118 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 - ✅ `scripts/hooks/pre-commit.sample`: Added branch naming warning (non-blocking)
 - ✅ `.cursor/rules/04-integrations.mdc`: Clarified GitHub MCP vs git CLI usage
 
-## 2025-01-XX: Windows Git Push Subprocess Limitation
+## 2025-11-06: Windows Git Push Subprocess Limitation & Authentication Resolution
 
-**Trigger**: Git push fails in Cursor subprocess context on Windows with `getaddrinfo() thread failed to start` error  
-**Lesson**: Windows git threading issue affects subprocess contexts. Git push may require manual execution from user's terminal (outside Cursor's subprocess).  
-**Root Cause**: Windows DNS threading bug in git's HTTP client when executed in subprocess context  
-**Rule Update**: If git push fails in Cursor with Windows threading error, document commits are ready and provide manual push command for user's terminal
+**Trigger**: Git push fails in Cursor subprocess context on Windows with `getaddrinfo() thread failed to start` error, then 403 after PC restart
+**Lesson**: Windows DNS threading issue can be resolved by PC restart. After restart, authentication scopes matter - GitHub CLI keyring token has `repo` scope, PAT tokens may not. Always create branch on GitHub FIRST before attempting push.
+**Root Cause**:
+1. Windows DNS threading bug in git's HTTP client when executed in subprocess context (resolved by PC restart)
+2. Authentication token scope mismatch - PAT token lacked `repo` scope, GitHub CLI keyring token had correct scopes
+3. Agent attempted push before branch existed on GitHub
+
+**Resolution Steps**:
+1. ✅ PC restart resolved DNS threading error
+2. ✅ Switched to GitHub CLI keyring token with `repo` scope: `gh auth refresh -s repo`
+3. ✅ Created branch on GitHub FIRST via GitHub MCP: `mcp_github_create_branch`
+4. ✅ Push succeeded after authentication and branch creation
+
+**Rule Update**:
+- Always create branch on GitHub FIRST (via GitHub MCP) before attempting push
+- If git push fails with DNS error, suggest PC restart
+- If git push fails with 403, check token scopes - use GitHub CLI keyring token if available: `gh auth refresh -s repo`
+- Verify branch exists on GitHub before push: `git ls-remote --heads origin <branch-name>` or use GitHub MCP
 
 **Action Required**:
-- When git push fails with threading error, verify commits are ready: `git log --oneline -3`
-- Provide user with manual push command: `git push origin <branch-name>`
-- Document in issue completion: "Commits ready locally, pushed manually due to Windows threading limitation"
-- Update workflow to note Windows subprocess limitation
+- **Before push**: Create branch on GitHub via GitHub MCP if it doesn't exist
+- If DNS threading error: Suggest PC restart as first troubleshooting step
+- If 403 authentication error: Check token scopes, use `gh auth refresh -s repo` to activate keyring token
+- Document in issue completion: "Branch created on GitHub, commits pushed successfully"
 
 **Rules/Scripts Updated**:
-- ✅ `docs/research.md`: Documented Windows git push issue with solutions and trade-offs
-- ✅ `.cursor/rules/07-process-improvement.mdc`: Added lesson for Windows subprocess limitation
+- ✅ `docs/research.md`: Updated with PC restart and authentication scope solutions
+- ✅ `docs/troubleshooting/windows-git-push-fix.md`: Added firewall check as priority, PC restart solution, authentication scope guidance
+- ✅ `.cursor/rules/07-process-improvement.mdc`: Added comprehensive lesson with resolution steps
+
+## 2025-11-06: Direct Commits Only - No PRs
+
+**Trigger**: User prefers direct commits to feature branches. Always solo work.
+**Lesson**: Always direct commits. No PRs. Commit and push directly to feature branches.
+**Root Cause**: Workflow rules assumed PRs were required, but this is always solo work.
+
+**Rule Update**:
+- Direct commits to feature branches only (no PRs ever)
+- Always ask before pushing (per agent rules)
+- Update GitHub issue with completion comment
+
+**Action Required**:
+- Skip PR creation entirely
+- Commit and push directly to feature branch
+- Update issue completion comments to reflect direct commits
+
+**Rules/Scripts Updated**:
+- ✅ `.cursor/rules/01-workflow.mdc`: Section 3 (removed PR language), Section 5 (replaced with "Direct Commits"), Section 6 (direct commits only)
+- ✅ `AGENTS.md`: Rule #14 updated to "Direct commits only - No PRs"
+
+---
+
+## 2025-01-27: Test Skipping Anti-Pattern & Supertest Timeout Issues
+
+**Trigger**: Tests were skipped (`describe.skip`) instead of fixed when supertest timed out. User explicitly stated "Don't skip shit. Fix the issues."
+
+**Lesson**: **Never skip tests**. Always investigate root causes and fix them. When a testing tool has persistent issues, switch to a proven alternative pattern rather than skipping tests.
+
+**Root Cause**:
+1. **Supertest timeout issues**: Supertest was timing out (`ETIMEDOUT`) even with correct Express app setup (`express.json()`, error handlers). Multiple attempts to fix supertest failed.
+2. **Test skipping instead of fixing**: Tests were marked as `describe.skip` with notes instead of investigating root causes and switching to working patterns.
+3. **Ignoring working patterns**: `onboarding.test.js` already used `fetch()` + test server utilities successfully, but this pattern wasn't applied to other tests.
+4. **Test expectations mismatch**: Some tests expected rejection but actual behavior was sanitization/truncation (tests should match actual behavior, not assumed behavior).
+
+**Resolution Steps**:
+1. ✅ Replaced supertest with `fetch()` + test server utilities (proven pattern from `onboarding.test.js`)
+2. ✅ Removed all `describe.skip` blocks - all tests now run
+3. ✅ Fixed health tests to use test server utilities
+4. ✅ Updated test expectations to match actual behavior (sanitization vs rejection)
+5. ✅ Verified all 89 backend tests pass without skipping
+
+**Rule Update**:
+- **NEVER skip tests** - Always fix root causes or switch to working patterns
+- **Use `fetch()` + test server utilities** for HTTP API integration tests (avoid supertest)
+- **Match test expectations to actual behavior** - Verify behavior first, then write/update tests
+- **Review logs when tests fail** - Investigate root causes systematically
+- **Follow existing working patterns** - If `onboarding.test.js` works, use that pattern elsewhere
+
+**Action Required**:
+- When tests fail: Investigate root cause, review logs, check existing working patterns
+- When a tool has persistent issues: Switch to proven alternative (e.g., `fetch()` instead of supertest)
+- When test expectations don't match behavior: Verify actual behavior, update tests to match
+- Never use `describe.skip` or `it.skip` - Fix or replace instead
+
+**Pattern to Follow**:
+```javascript
+// ✅ CORRECT: Use fetch() + test server utilities
+import { app } from '../src/index.js';
+import { createTestServer, closeTestServer } from './utils/test-server.js';
+
+let server, baseUrl;
+beforeAll(async () => {
+  const result = await createTestServer(app);
+  server = result.server;
+  baseUrl = result.url;
+});
+afterAll(async () => await closeTestServer(server));
+
+it('tests endpoint', async () => {
+  const response = await fetch(`${baseUrl}/api/endpoint`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data: 'test' }),
+  });
+  expect(response.status).toBe(200);
+});
+```
+
+**Rules/Scripts Updated**:
+- ✅ `.cursor/rules/08-testing.mdc`: Updated to prefer `fetch()` + test server, avoid supertest, never skip tests
+- ✅ `backend/tests/security.test.js`: Removed `describe.skip`, switched to `fetch()` pattern
+- ✅ `backend/tests/health.test.ts`: Removed `describe.skip`, uses test server utilities
+- ✅ `.cursor/rules/07-process-improvement.mdc`: Added this lesson
