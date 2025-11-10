@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useWebSocket } from "./useWebSocket";
 import { useSession } from "./useSession";
 import { WebSocketMessage } from "@/lib/websocket-client";
+import { toast } from "sonner";
 
 export interface Person {
   sessionId: string;
@@ -36,7 +37,12 @@ export function useRadar(options: UseRadarOptions = {}) {
         // Subscribe to radar updates on connection
         send({ type: "radar:subscribe" });
       } else if (message.type === "error") {
-        console.error("WebSocket error:", message.payload);
+        const errorPayload = message.payload;
+        // Handle cooldown errors - these are handled by useCooldown hook
+        // Other errors are logged
+        if (errorPayload?.code !== "cooldown_active") {
+          console.error("WebSocket error:", errorPayload);
+        }
       }
     },
     onConnect: () => {

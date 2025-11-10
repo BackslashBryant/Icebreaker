@@ -78,7 +78,20 @@ export function handleChatRequest(ws, session, message) {
 
   const result = requestChat(session.sessionId, targetSessionId);
   if (!result.success) {
-    sendError(ws, result.error || "Failed to request chat", "chat_request_failed");
+    // If cooldown error, include cooldown data
+    if (result.error === "Cooldown active" && result.cooldownExpiresAt) {
+      sendMessage(ws, {
+        type: "error",
+        payload: {
+          code: "cooldown_active",
+          message: result.error,
+          cooldownExpiresAt: result.cooldownExpiresAt,
+          cooldownRemainingMs: result.cooldownRemainingMs,
+        },
+      });
+    } else {
+      sendError(ws, result.error || "Failed to request chat", "chat_request_failed");
+    }
     return;
   }
 

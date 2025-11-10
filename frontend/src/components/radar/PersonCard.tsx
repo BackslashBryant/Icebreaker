@@ -11,6 +11,9 @@ import { Person } from "@/hooks/useRadar";
 import { BlockDialog } from "@/components/safety/BlockDialog";
 import { ReportDialog } from "@/components/safety/ReportDialog";
 import { useSafety } from "@/hooks/useSafety";
+import { useCooldown } from "@/hooks/useCooldown";
+import { toast } from "sonner";
+import { Clock } from "lucide-react";
 
 interface PersonCardProps {
   person: Person | null;
@@ -33,6 +36,7 @@ export function PersonCard({ person, open, onClose, onChatRequest }: PersonCardP
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const { blockUser, reportUser } = useSafety();
+  const { isInCooldown, cooldownRemainingFormatted } = useCooldown();
 
   // Clear timer on unmount or when dialog closes
   useEffect(() => {
@@ -169,12 +173,28 @@ export function PersonCard({ person, open, onClose, onChatRequest }: PersonCardP
                 onClick={handleChatClick}
                 className="w-full"
                 size="lg"
+                disabled={isInCooldown}
+                aria-label={isInCooldown ? `Cooldown active. Try again in ${cooldownRemainingFormatted}.` : "Start chat"}
               >
-                START CHAT →
+                {isInCooldown ? (
+                  <span className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    Cooldown active
+                  </span>
+                ) : (
+                  "START CHAT →"
+                )}
               </Button>
-              <p className="text-xs text-muted-foreground text-center">
-                Long press or right-click for safety options
-              </p>
+              {isInCooldown && (
+                <p className="text-xs text-muted-foreground text-center font-mono">
+                  Try again in {cooldownRemainingFormatted}
+                </p>
+              )}
+              {!isInCooldown && (
+                <p className="text-xs text-muted-foreground text-center">
+                  Long press or right-click for safety options
+                </p>
+              )}
             </div>
           </div>
         </DialogContent>
@@ -241,6 +261,13 @@ export function PersonCard({ person, open, onClose, onChatRequest }: PersonCardP
   );
 
   function handleChatClick() {
+    if (isInCooldown) {
+      toast.error("Cooldown active", {
+        description: `You've sent a few requests that were declined. Taking a short break — try again in ${cooldownRemainingFormatted}.`,
+        duration: 5000,
+      });
+      return;
+    }
     onChatRequest(person.sessionId);
     onClose();
   }
