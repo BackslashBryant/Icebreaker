@@ -35,6 +35,9 @@ export function createSession(data) {
     reportCount: 0,
     safetyFlag: false, // Set to true when panic button used or safety threshold reached
     panicExclusionExpiresAt: null, // Timestamp when panic exclusion expires (null if not excluded)
+    declineCount: 0, // Number of declined invites (tracked for cooldown)
+    declinedInvites: [], // Array of timestamps for declined invites (last 10 minutes)
+    cooldownExpiresAt: null, // Timestamp when cooldown expires (null if not in cooldown)
   };
 
   sessions.set(sessionId, session);

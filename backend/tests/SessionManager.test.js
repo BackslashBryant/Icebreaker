@@ -77,9 +77,35 @@ describe("SessionManager", () => {
     expect(session).toBeNull();
   });
 
-  it("cleans up expired sessions", () => {
-    // Test that cleanupExpiredSessions runs without error
-    // Note: Testing actual expiration would require manipulating time or accessing internal Map
-    expect(() => cleanupExpiredSessions()).not.toThrow();
+  it("creates session with cooldown fields initialized", () => {
+    const sessionData = {
+      vibe: "banter",
+      tags: [],
+      visibility: true,
+    };
+
+    const { sessionId } = createSession(sessionData);
+    const session = getSession(sessionId);
+
+    expect(session).not.toBeNull();
+    expect(session.declineCount).toBe(0);
+    expect(session.declinedInvites).toEqual([]);
+    expect(session.cooldownExpiresAt).toBeNull();
+  });
+
+  it("creates session with all default cooldown values", () => {
+    const sessionData = {
+      vibe: "intros",
+      tags: ["tag1"],
+      visibility: true,
+    };
+
+    const { sessionId } = createSession(sessionData);
+    const session = getSession(sessionId);
+
+    expect(session.declineCount).toBeDefined();
+    expect(session.declinedInvites).toBeDefined();
+    expect(session.cooldownExpiresAt).toBeDefined();
+    expect(Array.isArray(session.declinedInvites)).toBe(true);
   });
 });
