@@ -31,12 +31,14 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 - Startup command: `cd backend && npm run dev` (starts with HTTP server)
 - Endpoint: `ws://localhost:8000/ws?token=<sessionToken>`
 - Message Types:
-  - Client → Server: `radar:subscribe`, `location:update`, `chat:request`, `chat:accept`, `chat:decline`, `chat:message`, `chat:end`
-  - Server → Client: `connected`, `radar:update`, `chat:request`, `chat:request:ack`, `chat:accepted`, `chat:declined`, `chat:message`, `chat:end`, `error`
+  - Client → Server: `radar:subscribe`, `location:update`, `chat:request`, `chat:accept`, `chat:decline`, `chat:message`, `chat:end`, `panic:trigger`
+  - Server → Client: `connected`, `radar:update`, `chat:request`, `chat:request:ack`, `chat:accepted`, `chat:declined`, `chat:message`, `chat:end`, `panic:triggered`, `error`
 - Notes: Session token required for connection; heartbeat ping-pong every 30s
 - Signal Engine Config: `backend/src/config/signal-weights.js` (tunable weights for compatibility scoring)
 - Chat Rate Limiting: `backend/src/lib/rate-limiter.js` (max 10 messages/minute per chat)
 - Chat Proximity Thresholds: Warning at 80m, termination at 100m (configurable in `backend/src/services/ChatManager.js`)
+- Panic Button: `backend/src/services/PanicManager.js` (safety exclusion, session termination)
+- Panic Exclusion Duration: Default 1 hour (configurable in `backend/src/services/PanicManager.js`)
 
 ## 2. Remote APIs & Integrations
 

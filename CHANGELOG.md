@@ -9,6 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### MVP: Panic Button (Emergency Exit & Safety) (Issue #5)
+- Fixed floating action button (FAB): Always accessible from Radar and Chat screens
+- Panic confirmation flow: "Everything okay?" dialog with calm, reassuring copy
+- Safety exclusion: Temporarily hides user from Radar for 1 hour (configurable)
+- Session termination: Immediately ends active chat and clears session
+- Success state: "You're safe. Session ended." with notification details
+- Keyboard navigation: Escape to cancel, Enter to confirm
+- WCAG AA compliance: ARIA labels, screen reader support, keyboard navigation
+- Unit tests: PanicManager (21/21), Panic components (18/18), usePanic hook (9/9)
+
+**Technical Details**:
+- Backend: PanicManager service, WebSocket panic handler, safety exclusion logic
+- Frontend: PanicButton FAB, PanicDialog, PanicSuccess components, `usePanic` hook
+- WebSocket protocol: `panic:trigger` (client → server), `panic:triggered` (server → client)
+- Safety exclusion: Sets `safetyFlag` and `panicExclusionExpiresAt` on session
+- Exclusion duration: Default 1 hour (configurable in `backend/src/services/PanicManager.js`)
+- Signal Engine integration: Excludes sessions with active panic exclusion from Radar results
+- Auto-cleanup: Safety flag cleared when exclusion expires
+
+**Verified**:
+- ✅ Panic button accessible from Radar and Chat screens
+- ✅ Confirmation dialog shows "Everything okay?" (brand copy)
+- ✅ Session termination ends active chat immediately
+- ✅ Safety exclusion hides user from Radar for configured duration
+- ✅ Success state displays notification details
+- ✅ Keyboard navigation (Escape/Enter) works correctly
+- ✅ All unit tests passing: Backend (21/21), Frontend (27/27)
+- ✅ WCAG AA compliance verified (ARIA labels, keyboard nav)
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
 #### MVP: Chat (Ephemeral 1:1 Messaging) (Issue #3)
 - Terminal-style chat interface: black background, teal monospace text, `[HH:MM]` timestamps
 - Ephemeral messaging: no storage, no history, messages relayed via WebSocket only
