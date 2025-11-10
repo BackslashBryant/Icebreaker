@@ -4,6 +4,7 @@ import { getRadarResults } from "../services/SignalEngine.js";
 import { calculateProximityTier as calcProximityTier } from "../lib/proximity-utils.js";
 import { requestChat, acceptChat, declineChat, endChat, validateActiveChat, checkProximityAndTerminate } from "../services/ChatManager.js";
 import { checkRateLimit, clearRateLimit } from "../lib/rate-limiter.js";
+import { triggerPanic } from "../services/PanicManager.js";
 
 /**
  * WebSocket Message Handlers
@@ -239,6 +240,33 @@ export function handleChatEnd(ws, session, message) {
 }
 
 /**
+ * Handle panic:trigger message
+ * Client triggers panic button
+ * Format: { type: "panic:trigger" }
+ */
+export function handlePanicTrigger(ws, session, message) {
+  if (!session) {
+    sendError(ws, "Invalid session");
+    return;
+  }
+
+  const result = triggerPanic(session.sessionId);
+  if (!result.success) {
+    sendError(ws, result.error || "Failed to trigger panic", "panic_failed");
+    return;
+  }
+
+  // Success - notification already sent by triggerPanic
+  sendMessage(ws, {
+    type: "panic:triggered",
+    payload: {
+      exclusionExpiresAt: result.exclusionExpiresAt,
+      message: "Session ended. You're safe.",
+    },
+  });
+}
+
+/**
  * Send radar update to client
  * Calculates compatibility scores and sends sorted list
  */
@@ -347,6 +375,9 @@ export function handleMessage(ws, session, rawMessage) {
         break;
       case "chat:end":
         handleChatEnd(ws, session, message);
+        break;
+      case "panic:trigger":
+        handlePanicTrigger(ws, session, message);
         break;
       default:
         sendError(ws, `Unknown message type: ${message.type}`);

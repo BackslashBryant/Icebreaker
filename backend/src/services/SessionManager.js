@@ -33,6 +33,7 @@ export function createSession(data) {
     blockedSessionIds: [],
     reportCount: 0,
     safetyFlag: false, // Set to true when panic button used or safety threshold reached
+    panicExclusionExpiresAt: null, // Timestamp when panic exclusion expires (null if not excluded)
   };
 
   sessions.set(sessionId, session);
@@ -154,6 +155,38 @@ export function getActiveChatPartner(sessionId) {
   }
   
   return session.activeChatPartnerId;
+}
+
+/**
+ * Update session safety flag
+ * @param {string} sessionId - Session ID
+ * @param {boolean} safetyFlag - Safety flag value
+ * @returns {boolean} Success
+ */
+export function updateSessionSafetyFlag(sessionId, safetyFlag) {
+  const session = getSession(sessionId);
+  if (!session) {
+    return false;
+  }
+  
+  session.safetyFlag = safetyFlag;
+  return true;
+}
+
+/**
+ * Set panic exclusion expiration timestamp
+ * @param {string} sessionId - Session ID
+ * @param {number|null} expiresAt - Expiration timestamp (null to clear)
+ * @returns {boolean} Success
+ */
+export function setPanicExclusion(sessionId, expiresAt) {
+  const session = getSession(sessionId);
+  if (!session) {
+    return false;
+  }
+  
+  session.panicExclusionExpiresAt = expiresAt;
+  return true;
 }
 
 // Run cleanup every minute

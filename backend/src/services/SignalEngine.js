@@ -36,9 +36,24 @@ function getStableRandomSeed(sessionId) {
  * @returns {number} Compatibility score (higher = better match)
  */
 export function calculateScore(sourceSession, targetSession) {
-  // Safety exclusion: exclude sessions with safety_flag
+  // Safety exclusion: exclude sessions with active safety flag
+  // If panicExclusionExpiresAt is set, check expiration; otherwise exclude if safetyFlag is true
+  const now = Date.now();
   if (targetSession.safetyFlag === true) {
-    return -Infinity; // Exclude from results
+    // If panic exclusion timestamp is set, check if it's expired
+    if (targetSession.panicExclusionExpiresAt !== null && targetSession.panicExclusionExpiresAt !== undefined) {
+      if (targetSession.panicExclusionExpiresAt > now) {
+        return -Infinity; // Exclude from results (active exclusion)
+      }
+      // If exclusion expired, clear safety flag
+      if (targetSession.panicExclusionExpiresAt <= now) {
+        targetSession.safetyFlag = false;
+        targetSession.panicExclusionExpiresAt = null;
+      }
+    } else {
+      // Backward compatibility: safetyFlag without panicExclusionExpiresAt still excludes
+      return -Infinity;
+    }
   }
 
   const weights = getSignalWeights();
