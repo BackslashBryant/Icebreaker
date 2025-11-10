@@ -1,13 +1,12 @@
 {
-  "slug": "chat",
-  "featureName": "Chat (Ephemeral 1:1 Messaging)",
+  "slug": "panic-button",
+  "featureName": "Panic Button (Emergency Exit & Safety)",
   "updatedAt": "2025-11-10T00:00:00.000Z",
-  "status": "complete",
+  "status": "in_progress",
   "vision": "docs/vision.md",
-  "description": "MVP Chat - terminal-style ephemeral 1:1 messaging with proximity monitoring",
-  "githubIssue": 4,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/4",
-  "branch": "feat/3-chat",
-  "commit": "bd9ff33",
-  "note": "Issue #3 needs to be created manually - GitHub MCP auth failed. See .notes/features/chat/github-comment.md for completion comment to add."
+  "description": "MVP Panic Button - always-accessible FAB for emergency exit, safety exclusion, and optional contact alerts",
+  "githubIssue": 5,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/5",
+  "branch": "feat/5-panic-button",
+  "note": "Plan complete, ready for Step 1 (Backend Panic Handler)"
 }
