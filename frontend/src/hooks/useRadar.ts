@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useWebSocket } from "./useWebSocket";
 import { useSession } from "./useSession";
 import { WebSocketMessage } from "@/lib/websocket-client";
-import { toast } from "sonner";
 
 export interface Person {
   sessionId: string;
