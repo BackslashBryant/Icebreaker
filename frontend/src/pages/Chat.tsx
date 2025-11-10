@@ -4,6 +4,7 @@ import { useChat } from "@/hooks/useChat";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { ChatHeader } from "@/components/chat/ChatHeader";
+import { PanicButton } from "@/components/panic/PanicButton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -160,6 +161,8 @@ export default function Chat() {
             : "Type a message..."
         }
       />
+      {/* Panic Button FAB */}
+      <PanicButton />
     </div>
   );
 }

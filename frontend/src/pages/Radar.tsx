@@ -6,6 +6,7 @@ import { useLocation } from "@/hooks/useLocation";
 import { RadarSweep } from "@/components/radar/RadarSweep";
 import { RadarList } from "@/components/radar/RadarList";
 import { PersonCard } from "@/components/radar/PersonCard";
+import { PanicButton } from "@/components/panic/PanicButton";
 import { Button } from "@/components/ui/button";
 import { List, Radar as RadarIcon } from "lucide-react";
 
@@ -177,6 +178,9 @@ export default function Radar() {
         onClose={clearSelection}
         onChatRequest={requestChat}
       />
+
+      {/* Panic Button FAB */}
+      <PanicButton />
     </div>
   );
 }
