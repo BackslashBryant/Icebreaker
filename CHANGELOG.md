@@ -9,6 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### MVP: Profile/Settings Page (Issue #7)
+- Profile page: Accessible from Radar and Chat headers, displays handle, visibility toggle, emergency contact, and accessibility settings
+- Visibility toggle: Users can show/hide themselves on Radar (persisted in session)
+- Emergency contact: Users can add phone (E.164) or email (RFC 5322) for Panic Button notifications
+- Accessibility toggles: Reduced-motion and high-contrast modes with LocalStorage persistence
+- API endpoints: `PUT /api/profile/visibility`, `PUT /api/profile/emergency-contact` (requires Authorization header)
+- Session updates: Visibility and emergency contact stored in session (in-memory for MVP)
+- Keyboard navigation: All interactive elements accessible via keyboard (Tab, Enter, Space, Escape)
+- WCAG AA compliance: ARIA labels, screen reader support, keyboard navigation, high-contrast mode meets contrast ratios
+- Unit tests: Profile endpoints (21/21), SessionManager updates (7/7)
+
+**Technical Details**:
+- Backend: Profile routes (`/api/profile/visibility`, `/api/profile/emergency-contact`), SessionManager updates (`updateSessionVisibility`, `updateEmergencyContact`)
+- Frontend: Profile page (`/profile`), VisibilityToggle component, EmergencyContactInput component, AccessibilityToggles component
+- Hooks: `useProfile` (API calls), `useAccessibility` (LocalStorage persistence)
+- Validation: Phone (E.164: `+1234567890`), Email (RFC 5322: `user@example.com`)
+- Accessibility: Reduced-motion disables animations, high-contrast adjusts theme variables (WCAG AA compliant)
+- LocalStorage keys: `icebreaker:reduced-motion`, `icebreaker:high-contrast`
+
+**Verified**:
+- ✅ Profile page accessible from Radar and Chat headers
+- ✅ Visibility toggle updates session and shows toast confirmation
+- ✅ Emergency contact validates phone/email format and saves to session
+- ✅ Accessibility toggles persist in LocalStorage and apply CSS classes
+- ✅ Reduced-motion disables animations (`.reduced-motion` class)
+- ✅ High-contrast mode meets WCAG AA contrast ratios (4.5:1 normal, 3:1 large)
+- ✅ All unit tests passing: Backend (21/21), Frontend components created
+- ✅ WCAG AA compliance verified (ARIA labels, keyboard nav, high-contrast)
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
 #### MVP: Block/Report (Safety Controls) (Issue #6)
 - Block functionality: Users can block others from Chat header (⋯ menu) or PersonCard (tap-hold/right-click)
 - Report functionality: Users can report others with categories (Harassment, Spam, Impersonation, Other)

@@ -156,6 +156,48 @@ See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
 ---
 
+## Try It: Profile/Settings Page (Issue #7)
+
+The Profile/Settings page allows users to manage their visibility, emergency contacts, and accessibility preferences:
+
+1. **Access Profile**:
+   - Click the Profile button (User icon) in Radar header or Chat header
+   - Navigate to `/profile` route
+
+2. **Manage Visibility**:
+   - Toggle "Show me on Radar" checkbox to show/hide yourself from Radar
+   - Changes are saved immediately and persisted in session
+   - Toast notification confirms update
+
+3. **Set Emergency Contact**:
+   - Click "Add" or "Edit" button in Emergency Contact section
+   - Enter phone number (E.164 format: +1234567890) or email address
+   - Click "Save" to store contact (used for Panic Button notifications)
+   - Click "Cancel" to discard changes
+
+4. **Accessibility Settings**:
+   - **Reduce Motion**: Toggle to disable animations and transitions
+   - **High Contrast**: Toggle to increase color contrast for better visibility
+   - Preferences persist in LocalStorage across sessions
+
+**Features**:
+- Visibility toggle: Show/hide on Radar (session-scoped)
+- Emergency contact: Phone (E.164) or email (RFC 5322) validation
+- Accessibility toggles: Reduced-motion and high-contrast modes
+- LocalStorage persistence: Accessibility preferences saved locally
+- Keyboard navigation: All interactive elements accessible via keyboard
+- WCAG AA compliance: ARIA labels, screen reader support, high-contrast mode meets contrast ratios
+
+**Test Results** (Issue #7):
+- ✅ Backend: 21/21 unit tests passing (profile endpoints, SessionManager updates)
+- ✅ Frontend: Component tests created (VisibilityToggle, EmergencyContactInput, AccessibilityToggles, Profile page)
+- ✅ E2E: Profile page tests created (navigation, toggles, validation, accessibility)
+- ✅ WCAG AA compliance: Verified (ARIA labels, keyboard nav, high-contrast)
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
+---
+
 The Panic Button feature provides an always-accessible emergency exit:
 
 1. **Access from Radar or Chat**:

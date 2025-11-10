@@ -4,6 +4,7 @@ import { createServer } from 'http';
 import { healthRouter } from './routes/health.js';
 import { onboardingRouter } from './routes/onboarding.js';
 import { safetyRouter } from './routes/safety.js';
+import profileRouter from './routes/profile.js';
 import { initializeWebSocketServer } from './websocket/server.js';
 
 const app = express();
@@ -23,6 +24,9 @@ app.use('/api/onboarding', onboardingRouter);
 
 // Safety endpoints (block/report)
 app.use('/api/safety', safetyRouter);
+
+// Profile endpoints (visibility, emergency contact)
+app.use('/api/profile', profileRouter);
 
 // Create HTTP server for WebSocket upgrade
 const server = createServer(app);

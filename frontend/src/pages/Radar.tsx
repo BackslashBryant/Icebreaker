@@ -8,7 +8,7 @@ import { RadarList } from "@/components/radar/RadarList";
 import { PersonCard } from "@/components/radar/PersonCard";
 import { PanicButton } from "@/components/panic/PanicButton";
 import { Button } from "@/components/ui/button";
-import { List, Radar as RadarIcon } from "lucide-react";
+import { List, Radar as RadarIcon, User } from "lucide-react";
 
 /**
  * Radar Page
@@ -93,6 +93,15 @@ export default function Radar() {
 
           {/* View Toggle */}
           <div className="flex items-center gap-2">
+            <Button
+              onClick={() => navigate("/profile")}
+              variant="ghost"
+              size="icon"
+              className="font-mono text-xs sm:text-sm text-muted-foreground hover:text-accent border-2 border-transparent hover:border-accent/50"
+              aria-label="Go to profile"
+            >
+              <User className="h-4 w-4" />
+            </Button>
             <Button
               variant={viewMode === "sweep" ? "default" : "outline"}
               size="icon"

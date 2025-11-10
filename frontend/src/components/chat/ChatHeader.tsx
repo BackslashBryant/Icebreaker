@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { X, MoreVertical } from "lucide-react";
+import { X, MoreVertical, User } from "lucide-react";
 import { BlockDialog } from "@/components/safety/BlockDialog";
 import { ReportDialog } from "@/components/safety/ReportDialog";
 import { useSafety } from "@/hooks/useSafety";
@@ -24,6 +25,7 @@ export function ChatHeader({
   onEndChat,
   proximityWarning = false,
 }: ChatHeaderProps) {
+  const navigate = useNavigate();
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -54,6 +56,16 @@ export function ChatHeader({
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {/* Profile button */}
+          <Button
+            onClick={() => navigate("/profile")}
+            variant="ghost"
+            size="icon"
+            className="shrink-0"
+            aria-label="Go to profile"
+          >
+            <User className="h-4 w-4" />
+          </Button>
           {/* Menu button */}
           <div className="relative">
             <Button

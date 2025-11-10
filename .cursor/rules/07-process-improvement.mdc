@@ -307,3 +307,43 @@ it('tests endpoint', async () => {
 - ✅ `backend/tests/security.test.js`: Removed `describe.skip`, switched to `fetch()` pattern
 - ✅ `backend/tests/health.test.ts`: Removed `describe.skip`, uses test server utilities
 - ✅ `.cursor/rules/07-process-improvement.mdc`: Added this lesson
+
+---
+
+## 2025-01-XX: Git Safety Checks - Wrong Directory/Branch Prevention
+
+**Trigger**: Git operations were attempted from wrong directory (parent directory), causing wrong branch detection and git scanning parent directories (AppData, Documents, etc.)
+
+**Lesson**: **MANDATORY GIT SAFETY CHECKS** must be performed before ANY git operation (add, commit, push). Always verify current directory is project root and current branch matches issue number.
+
+**Root Cause**:
+1. Terminal working directory was not verified before git operations
+2. Shell was in parent directory instead of project root
+3. Git scanned parent directories, showing files outside repository
+4. Wrong branch detected due to directory mismatch
+
+**Resolution Steps**:
+1. ✅ Navigated to correct project root directory
+2. ✅ Verified correct branch (`feat/6-block-report`)
+3. ✅ Committed all changes successfully
+4. ✅ Added MANDATORY GIT SAFETY CHECKS to workflow rules
+
+**Rule Update**:
+- **MANDATORY GIT SAFETY CHECKS** before ANY git operation:
+  1. Verify current directory is project root: Run `git rev-parse --show-toplevel` and ensure you're in that exact directory
+  2. Verify current branch matches issue: Run `git branch --show-current` and confirm branch name contains issue number
+  3. Verify no parent directory scanning: `git status` should NOT show files outside repository
+  4. If directory is wrong: Navigate to project root with `cd "$(git rev-parse --show-toplevel)"` (PowerShell: `cd (git rev-parse --show-toplevel)`)
+  5. If branch is wrong: Create correct branch or switch before committing
+- **NEVER** run git commands from parent directories or outside repository
+
+**Action Required**:
+- Before ANY git operation: Run mandatory checks
+- If checks fail: Navigate to project root and re-verify
+- Document directory/branch verification in commit messages when fixing
+
+**Rules/Scripts Updated**:
+- ✅ `.cursor/rules/00-core.mdc`: Added MANDATORY GIT SAFETY CHECKS to Safety Rails section
+- ✅ `.cursor/rules/01-workflow.mdc`: Added checks to Branching & MCP Setup and Direct Commits sections
+- ✅ `.cursor/rules/02-quality.mdc`: Added checks to Git Hygiene section
+- ✅ `.cursor/rules/07-process-improvement.mdc`: Documented this lesson

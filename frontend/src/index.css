@@ -127,6 +127,18 @@
   }
 }
 
+/* User-controlled reduced motion (overrides system preference) */
+.reduced-motion .animate-sweep,
+.reduced-motion .animate-pulse-slow,
+.reduced-motion .animate-radar-ping,
+.reduced-motion .animate-blink {
+  animation: none !important;
+}
+
+.reduced-motion * {
+  transition: none !important;
+}
+
 /* ASCII divider */
 .ascii-divider {
   font-family: monospace;
@@ -171,4 +183,28 @@
     transparent 4px,
     transparent 8px
   );
+}
+
+/* High contrast mode */
+.high-contrast {
+  --background: oklch(0.05 0.02 250); /* Darker navy */
+  --foreground: oklch(0.98 0 0); /* Brighter white */
+  --accent: oklch(0.85 0.15 195); /* Brighter teal */
+  --accent-foreground: oklch(0.05 0.02 250); /* Dark navy on bright teal */
+  --card: oklch(0.08 0.02 250); /* Darker card */
+  --card-foreground: oklch(0.98 0 0); /* Bright white */
+  --border: oklch(0.3 0.02 250); /* Brighter border */
+  --muted-foreground: oklch(0.7 0 0); /* Brighter muted text */
+}
+
+.high-contrast .glow-accent {
+  text-shadow: 0 0 15px oklch(0.85 0.15 195 / 0.8);
+}
+
+.high-contrast .retro-button {
+  box-shadow: 6px 6px 0 0 oklch(0.85 0.15 195), 6px 6px 0 2px oklch(0.3 0.02 250);
+}
+
+.high-contrast .retro-button:active {
+  box-shadow: 3px 3px 0 0 oklch(0.85 0.15 195), 3px 3px 0 2px oklch(0.3 0.02 250);
 }

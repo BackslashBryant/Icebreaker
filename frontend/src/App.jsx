@@ -4,6 +4,7 @@ import Welcome from './pages/Welcome';
 import Onboarding from './pages/Onboarding';
 import Radar from './pages/Radar';
 import Chat from './pages/Chat';
+import Profile from './pages/Profile';
 import DevIndex from './pages/DevIndex';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/radar" element={<Radar />} />
         <Route path="/chat" element={<Chat />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );

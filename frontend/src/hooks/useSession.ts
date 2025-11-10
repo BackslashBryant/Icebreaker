@@ -4,6 +4,8 @@ interface SessionData {
   sessionId: string;
   token: string;
   handle: string;
+  visibility?: boolean;
+  emergencyContact?: string | null;
 }
 
 // Store session in memory (not localStorage - ephemeral)

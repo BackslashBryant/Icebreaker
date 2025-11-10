@@ -11,7 +11,7 @@ const SESSION_TTL = 3600000;
  * Create a new session
  */
 export function createSession(data) {
-  const { vibe, tags = [], visibility = true, location } = data;
+  const { vibe, tags = [], visibility = true, location, emergencyContact } = data;
 
   const sessionId = generateSessionId();
   const token = generateSessionToken(sessionId);
@@ -27,6 +27,7 @@ export function createSession(data) {
     tags,
     visibility,
     location,
+    emergencyContact: emergencyContact || null, // Optional emergency contact (phone or email)
     createdAt: Date.now(),
     expiresAt: Date.now() + SESSION_TTL,
     activeChatPartnerId: null,
@@ -186,6 +187,38 @@ export function setPanicExclusion(sessionId, expiresAt) {
   }
   
   session.panicExclusionExpiresAt = expiresAt;
+  return true;
+}
+
+/**
+ * Update session visibility
+ * @param {string} sessionId - Session ID
+ * @param {boolean} visibility - Visibility value
+ * @returns {boolean} Success
+ */
+export function updateSessionVisibility(sessionId, visibility) {
+  const session = getSession(sessionId);
+  if (!session) {
+    return false;
+  }
+  
+  session.visibility = visibility;
+  return true;
+}
+
+/**
+ * Update session emergency contact
+ * @param {string} sessionId - Session ID
+ * @param {string|null} emergencyContact - Emergency contact (phone or email, null to clear)
+ * @returns {boolean} Success
+ */
+export function updateEmergencyContact(sessionId, emergencyContact) {
+  const session = getSession(sessionId);
+  if (!session) {
+    return false;
+  }
+  
+  session.emergencyContact = emergencyContact || null;
   return true;
 }
 

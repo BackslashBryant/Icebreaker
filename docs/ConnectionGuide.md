@@ -31,6 +31,14 @@ Track every port, endpoint, credential reference, and integration touchpoint her
     - Request: `{ targetSessionId: string, category: 'harassment' | 'spam' | 'impersonation' | 'other' }`
     - Response: `{ success: boolean }`
     - Errors: `400` (validation error), `401` (unauthorized), `500` (server error)
+  - `PUT /api/profile/visibility` - Update session visibility (requires Authorization header with session token)
+    - Request: `{ visibility: boolean }`
+    - Response: `{ success: boolean, visibility: boolean }`
+    - Errors: `400` (validation error), `401` (unauthorized), `500` (server error)
+  - `PUT /api/profile/emergency-contact` - Update session emergency contact (requires Authorization header with session token)
+    - Request: `{ emergencyContact: string | null }` (phone: E.164 format +1234567890, or email: RFC 5322)
+    - Response: `{ success: boolean, emergencyContact: string | null }`
+    - Errors: `400` (validation error), `401` (unauthorized), `500` (server error)
 
 ### WebSocket Server (Radar View)
 - Name: Real-time Radar Service
