@@ -1,9 +1,7 @@
 # Plan
 
-_Active feature: **Profile/Settings Page** (`profile-settings`)_  
-_Source spec: GitHub Issue #7 - Profile/Settings Page_  
-_Research: `docs/research/Issue-7-research.md` ✅_  
-_Team Review: ✅ **COMPLETE - APPROVED FOR IMPLEMENTATION** (see `.notes/features/profile-settings/team-review-approved.md`)_
+_Active feature: **Ready for Issue #8** (`ready-for-issue-8`)_  
+_Previous feature: **Profile/Settings Page** (Issue #7) ✅ **COMPLETE**_
 
 ## Goals
 - GitHub Issue: #7 (Profile/Settings)
