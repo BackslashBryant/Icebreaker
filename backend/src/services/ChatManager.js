@@ -1,6 +1,7 @@
 import { getSession } from "./SessionManager.js";
 import { broadcastToSession } from "../websocket/server.js";
 import { calculateDistance } from "../lib/proximity-utils.js";
+import { isInCooldown, getCooldownRemaining, recordDecline, checkCooldownThreshold, triggerCooldown } from "./CooldownManager.js";
 
 /**
  * Chat Manager
@@ -26,6 +27,18 @@ export function requestChat(requesterSessionId, targetSessionId) {
   const requesterSession = getSession(requesterSessionId);
   if (!requesterSession) {
     return { success: false, error: "Requester session not found" };
+  }
+
+  // Check cooldown FIRST (before all other validation)
+  if (isInCooldown(requesterSessionId)) {
+    const cooldownRemaining = getCooldownRemaining(requesterSessionId);
+    const session = getSession(requesterSessionId);
+    return {
+      success: false,
+      error: "Cooldown active",
+      cooldownExpiresAt: session.cooldownExpiresAt,
+      cooldownRemainingMs: cooldownRemaining,
+    };
   }
 
   // Validate target session
@@ -138,6 +151,21 @@ export function declineChat(declinerSessionId, requesterSessionId) {
 
   if (!declinerSession || !requesterSession) {
     return { success: false, error: "Session not found" };
+  }
+
+  // Record decline for requester (they got declined)
+  const declineResult = recordDecline(requesterSessionId);
+  if (!declineResult.success) {
+    // Log but don't fail decline if tracking fails
+    console.warn(`Failed to record decline: ${declineResult.error}`);
+  }
+
+  // Check if threshold met and trigger cooldown if needed
+  if (declineResult.thresholdMet || checkCooldownThreshold(requesterSessionId)) {
+    const cooldownResult = triggerCooldown(requesterSessionId);
+    if (cooldownResult.success) {
+      console.log(`Cooldown triggered for requester ${requesterSession.handle} (${requesterSessionId}) after decline`);
+    }
   }
 
   // Notify requester of decline

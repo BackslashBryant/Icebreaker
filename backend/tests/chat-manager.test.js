@@ -9,6 +9,7 @@ import {
   checkProximityAndTerminate,
   getProximityWarning,
 } from "../src/services/ChatManager.js";
+import { triggerCooldown, recordDecline } from "../src/services/CooldownManager.js";
 import { broadcastToSession } from "../src/websocket/server.js";
 
 // Mock WebSocket server
@@ -89,12 +90,57 @@ describe("ChatManager", () => {
       expect(result.error).toBe("Target session not found");
     });
 
-    it("fails when target is not visible", () => {
+    it("fails when requester is in cooldown", () => {
       const session1 = createSession({
         vibe: "banter",
         tags: [],
         visibility: true,
       });
+
+      const session2 = createSession({
+        vibe: "intros",
+        tags: [],
+        visibility: true,
+      });
+
+      // Put session1 in cooldown
+      triggerCooldown(session1.sessionId);
+
+      const result = requestChat(session1.sessionId, session2.sessionId);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Cooldown active");
+      expect(result.cooldownExpiresAt).toBeGreaterThan(Date.now());
+      expect(result.cooldownRemainingMs).toBeGreaterThan(0);
+      // Should not send any chat requests
+      expect(broadcastToSession).not.toHaveBeenCalled();
+    });
+
+    it("cooldown check happens before all other validation", () => {
+      const session1 = createSession({
+        vibe: "banter",
+        tags: [],
+        visibility: true,
+      });
+
+      const session2 = createSession({
+        vibe: "intros",
+        tags: [],
+        visibility: false, // Target not visible
+      });
+
+      // Put session1 in cooldown
+      triggerCooldown(session1.sessionId);
+
+      const result = requestChat(session1.sessionId, session2.sessionId);
+
+      // Should fail with cooldown error, not "Target session not visible"
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Cooldown active");
+      expect(broadcastToSession).not.toHaveBeenCalled();
+    });
+
+    it("fails when target is not visible", () => {
 
       const session2 = createSession({
         vibe: "intros",
@@ -311,6 +357,77 @@ describe("ChatManager", () => {
           type: "chat:declined",
         })
       );
+    });
+
+    it("records decline for requester", () => {
+      const session1 = createSession({
+        vibe: "banter",
+        tags: [],
+        visibility: true,
+      });
+
+      const session2 = createSession({
+        vibe: "intros",
+        tags: [],
+        visibility: true,
+      });
+
+      declineChat(session2.sessionId, session1.sessionId);
+
+      const requesterSession = getSession(session1.sessionId);
+      expect(requesterSession.declineCount).toBe(1);
+      expect(requesterSession.declinedInvites).toHaveLength(1);
+    });
+
+    it("triggers cooldown when threshold met (3 declines)", () => {
+      const session1 = createSession({
+        vibe: "banter",
+        tags: [],
+        visibility: true,
+      });
+
+      const session2 = createSession({
+        vibe: "intros",
+        tags: [],
+        visibility: true,
+      });
+
+      const session3 = createSession({
+        vibe: "thinking",
+        tags: [],
+        visibility: true,
+      });
+
+      const session4 = createSession({
+        vibe: "killing-time",
+        tags: [],
+        visibility: true,
+      });
+
+      // Record 2 declines first
+      declineChat(session2.sessionId, session1.sessionId);
+      declineChat(session3.sessionId, session1.sessionId);
+
+      // Third decline should trigger cooldown
+      const result = declineChat(session4.sessionId, session1.sessionId);
+
+      expect(result.success).toBe(true);
+      const requesterSession = getSession(session1.sessionId);
+      expect(requesterSession.cooldownExpiresAt).toBeGreaterThan(Date.now());
+      expect(requesterSession.declineCount).toBe(3);
+    });
+
+    it("fails when session not found", () => {
+      const session1 = createSession({
+        vibe: "banter",
+        tags: [],
+        visibility: true,
+      });
+
+      const result = declineChat("invalid-session-id", session1.sessionId);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe("Session not found");
     });
   });
 
