@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { calculateScore, calculateScores, getRadarResults } from "../src/services/SignalEngine.js";
-import { createSession } from "../src/services/SessionManager.js";
+import { createSession, getSession } from "../src/services/SessionManager.js";
 import { addReport, clearAllReports } from "../src/services/ReportManager.js";
+import { recordDecline, triggerCooldown } from "../src/services/CooldownManager.js";
 
 describe("SignalEngine", () => {
   beforeEach(() => {
@@ -20,6 +21,9 @@ describe("SignalEngine", () => {
       location: null,
       safetyFlag: false,
       reportCount: 0,
+      declineCount: 0,
+      declinedInvites: [],
+      cooldownExpiresAt: null,
       ...overrides,
     };
   }
@@ -159,6 +163,113 @@ describe("SignalEngine", () => {
       // Unreported user should appear first (higher score)
       expect(results[0].session.sessionId).toBe("unreported-1");
       expect(results[1].session.sessionId).toBe("reported-1");
+      expect(results[0].score).toBeGreaterThan(results[1].score);
+    });
+
+    it("applies decline penalty during active cooldown", () => {
+      const source = createTestSession({ vibe: "banter", tags: ["tag1"] });
+      const target = createTestSession({ vibe: "banter", visibility: true });
+
+      // Score without cooldown
+      const scoreBefore = calculateScore(source, target);
+      expect(scoreBefore).toBeGreaterThan(0); // Should be 13 (w_vibe + w_vis)
+
+      // Put target in cooldown and record 3 declines
+      const targetSession = createSession({
+        vibe: "banter",
+        tags: [],
+        visibility: true,
+      });
+      recordDecline(targetSession.sessionId);
+      recordDecline(targetSession.sessionId);
+      recordDecline(targetSession.sessionId);
+      triggerCooldown(targetSession.sessionId);
+
+      // Update target test session with cooldown state
+      const targetWithCooldown = createTestSession({
+        sessionId: targetSession.sessionId,
+        vibe: "banter",
+        visibility: true,
+        declineCount: 3,
+        declinedInvites: [Date.now() - 1000, Date.now() - 500, Date.now()],
+        cooldownExpiresAt: Date.now() + 30 * 60 * 1000, // 30 min from now
+      });
+
+      const scoreAfter = calculateScore(source, targetWithCooldown);
+      expect(scoreAfter).toBeLessThan(scoreBefore);
+      // Should be: scoreBefore + w_decline * 3 = scoreBefore - 15
+      expect(scoreAfter).toBe(scoreBefore - 15);
+    });
+
+    it("does not apply decline penalty when not in cooldown", () => {
+      const source = createTestSession({ vibe: "banter", tags: ["tag1"] });
+      const target = createTestSession({
+        vibe: "banter",
+        visibility: true,
+        declineCount: 3,
+        declinedInvites: [Date.now() - 1000, Date.now() - 500, Date.now()],
+        cooldownExpiresAt: null, // Not in cooldown
+      });
+
+      const score = calculateScore(source, target);
+      // Should have: w_vibe (10) + w_vis (3) = 13 (no decline penalty)
+      expect(score).toBe(13);
+    });
+
+    it("caps decline penalty at MAX_DECLINE_PENALTY", () => {
+      const source = createTestSession({ vibe: "banter", tags: ["tag1"] });
+      
+      // Create actual session with 5 declines
+      const targetSession = createSession({
+        vibe: "banter",
+        tags: [],
+        visibility: true,
+      });
+      
+      // Record 5 declines (more than threshold of 3)
+      recordDecline(targetSession.sessionId);
+      recordDecline(targetSession.sessionId);
+      recordDecline(targetSession.sessionId);
+      recordDecline(targetSession.sessionId);
+      recordDecline(targetSession.sessionId);
+      triggerCooldown(targetSession.sessionId);
+      
+      const targetWithCooldown = getSession(targetSession.sessionId);
+
+      const score = calculateScore(source, targetWithCooldown);
+      // Should cap at 3 declines × -5 = -15, not 5 × -5 = -25
+      // Score: w_vibe (10) + w_vis (3) - max penalty (15) = -2
+      const expectedScore = 13 - 15;
+      expect(score).toBe(expectedScore);
+    });
+
+    it("users in cooldown appear lower in Radar results", () => {
+      const source = createTestSession({ vibe: "banter", tags: ["shared"] });
+      
+      // Create actual sessions
+      const normalSession = createSession({
+        vibe: "banter",
+        tags: ["shared"],
+        visibility: true,
+      });
+      const normal = getSession(normalSession.sessionId);
+      
+      const cooldownSession = createSession({
+        vibe: "banter",
+        tags: ["shared"],
+        visibility: true,
+      });
+      recordDecline(cooldownSession.sessionId);
+      recordDecline(cooldownSession.sessionId);
+      recordDecline(cooldownSession.sessionId);
+      triggerCooldown(cooldownSession.sessionId);
+      const cooldown = getSession(cooldownSession.sessionId);
+
+      const results = calculateScores(source, [normal, cooldown]);
+      expect(results.length).toBe(2);
+      // Normal user should appear first (higher score)
+      expect(results[0].session.sessionId).toBe(normalSession.sessionId);
+      expect(results[1].session.sessionId).toBe(cooldownSession.sessionId);
       expect(results[0].score).toBeGreaterThan(results[1].score);
     });
 

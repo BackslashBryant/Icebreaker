@@ -1,6 +1,8 @@
 import { getSignalWeights } from "../config/signal-weights.js";
 import { calculateProximityTier, getProximityScoreMultiplier } from "../lib/proximity-utils.js";
 import { getUniqueReporterCount } from "./ReportManager.js";
+import { getDeclineCountInWindow } from "./CooldownManager.js";
+import { getCooldownConfig } from "../config/cooldown-config.js";
 
 /**
  * Signal Engine Service
@@ -10,10 +12,11 @@ import { getUniqueReporterCount } from "./ReportManager.js";
  * Scoring formula:
  * score(A,B) = w_vibe * VIBE_MATCH + w_tag * MIN(shared_tags, 3) +
  *              w_vis * VISIBILITY_ON + w_tagless * TAGLESS + w_dist * PROXIMITY_TIER +
- *              w_report * REPORT_COUNT
+ *              w_report * REPORT_COUNT + w_decline * DECLINE_PENALTY
  *
  * Safety exclusion: Sessions with safety_flag == true are excluded from results.
  * Report penalty: Reported users (1-2 unique reporters) appear lower in results.
+ * Decline penalty: Users in cooldown appear lower in results (soft sort-down).
  * Tie-breakers: Stable random seed per session + alphabetical handle.
  */
 
@@ -97,6 +100,16 @@ export function calculateScore(sourceSession, targetSession) {
   const uniqueReporterCount = getUniqueReporterCount(targetSession.sessionId);
   if (uniqueReporterCount > 0) {
     score += weights.w_report * uniqueReporterCount;
+  }
+
+  // 7. Decline penalty (during active cooldown - soft sort-down)
+  // Only applies if target session is in cooldown
+  if (targetSession.cooldownExpiresAt && targetSession.cooldownExpiresAt > now) {
+    const declineCount = getDeclineCountInWindow(targetSession.sessionId);
+    const cooldownConfig = getCooldownConfig();
+    // Cap penalty at MAX_DECLINE_PENALTY (e.g., 3 declines × -5 = -15)
+    const cappedDeclineCount = Math.min(declineCount, Math.abs(cooldownConfig.MAX_DECLINE_PENALTY / weights.w_decline));
+    score += weights.w_decline * cappedDeclineCount;
   }
 
   return score;
