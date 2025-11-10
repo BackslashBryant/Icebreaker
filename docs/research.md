@@ -649,3 +649,24 @@ Use this file to paste brief citations and summaries when any agent uses Ref Too
 **Next Steps**: All MCPs now working with simplified configuration
 
 ---
+ 
+ - - -  
+  
+ # #   G i t H u b   M C P   A u t h e n t i c a t i o n   I s s u e   ( 2 0 2 5 - 1 1 - 1 0 )  
+  
+ * * R e s e a r c h   D a t e * * :   2 0 2 5 - 1 1 - 1 0  
+ * * R e s e a r c h e r * * :   S c o u t    
+ * * T a s k * * :   F i x   G i t H u b   M C P   \  
+ R e q u i r e s  
+ a u t h e n t i c a t i o n \   e r r o r  
+ * * I s s u e * * :   G i t H u b   M C P   a u t h e n t i c a t i o n   f a i l i n g   d e s p i t e   v a l i d   t o k e n  
+  
+ # # #   F i n d i n g s  
+ -     T o k e n   i s   v a l i d   ( t e s t e d   w i t h   G i t H u b   A P I )  
+ -     T o k e n   i s   s e t   i n   W i n d o w s   U s e r   e n v i r o n m e n t   v a r i a b l e s  
+ -     M C P   c o n f i g   f o r m a t   i s   c o r r e c t  
+ -     M C P   s e r v e r   s t a r t s   c o r r e c t l y   w h e n   r u n   d i r e c t l y  
+ -     C u r s o r   I D E   i s   n o t   p a s s i n g   e n v i r o n m e n t   v a r i a b l e s   t o   M C P   s e r v e r   p r o c e s s e s  
+  
+ * * S o l u t i o n * * :   R e s t a r t   C u r s o r   c o m p l e t e l y   ( c l o s e   a l l   w i n d o w s ) .   S e e   \ d o c s / t r o u b l e s h o o t i n g / g i t h u b - m c p - a u t h - f i x . m d \   f o r   f u l l   t r o u b l e s h o o t i n g   g u i d e .  
+ 
