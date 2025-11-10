@@ -41,6 +41,12 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 
 ## 2. Branching & MCP Setup
 - **MANDATORY**: Create branch with format `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`) **BEFORE starting any work**. Check current branch matches the issue being worked on. If on wrong branch, create correct branch and move commits.
+- **CRITICAL**: Before ANY git operation (add, commit, push), verify:
+  1. Current directory is the project root (contains `.git` folder)
+  2. Current branch matches the issue being worked on (check with `git branch --show-current`)
+  3. If directory is wrong, navigate to project root: `cd "$(git rev-parse --show-toplevel)"`
+  4. If branch is wrong, create correct branch or switch: `git checkout -b agent/<agent>/<issue>-<slug>`
+- **NEVER** run git commands from parent directories or outside the repository
 - Branch name format: `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`).
 - Install/refresh GitHub MCP in Cursor; authenticate using a PAT with `repo`, `workflow`, `issues`.
 - Nexus or the acting human runs `npm run agents:install-hook` to copy the path-scope pre-commit hook locally.
@@ -73,6 +79,11 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 ## 5. Direct Commits (No PRs)
 - Direct commits to feature branches. No PRs needed.
 - Commit messages should reference the issue: `feat: Complete Issue #X - [description]`
+- **MANDATORY PRE-COMMIT CHECKS** (must pass ALL before committing):
+  1. Verify current directory is project root: Run `git rev-parse --show-toplevel` and ensure you're in that directory
+  2. Verify current branch matches issue: Run `git branch --show-current` and confirm branch name contains issue number
+  3. Verify no parent directory scanning: `git status` should NOT show files outside the repository
+  4. If ANY check fails: Navigate to project root with `cd "$(git rev-parse --show-toplevel)"` and re-verify
 - Always ask before pushing (per agent rules).
 
 ## 6. Close the Loop

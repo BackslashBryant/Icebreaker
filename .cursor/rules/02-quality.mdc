@@ -49,6 +49,14 @@ alwaysApply: true
     3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
   - **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any files. Report which check failed and coordinate with Vector.
   - Create branch with format `agent/<agent>/<issue>-<slug>` (e.g., `agent/vector/1-onboarding-flow`) per `.cursor/rules/01-workflow.mdc`. Never work on existing branches unless they match the issue.
+- **BEFORE ANY GIT OPERATION** (add, commit, push):
+  - **MANDATORY GIT SAFETY CHECKS** (must pass ALL):
+    1. Verify current directory is project root: Run `git rev-parse --show-toplevel` and ensure you're in that exact directory
+    2. Verify current branch matches issue: Run `git branch --show-current` and confirm branch name contains the issue number
+    3. Verify no parent directory scanning: `git status` should NOT show files outside the repository (no warnings about AppData, Documents, etc.)
+    4. If directory is wrong: Navigate to project root with `cd "$(git rev-parse --show-toplevel)"` (PowerShell: `cd (git rev-parse --show-toplevel)`)
+    5. If branch is wrong: Create correct branch or switch before committing
+  - **NEVER** run git commands from parent directories or outside the repository
 - One issue/task per branch; name it `agent/<agent>/<issue>-<slug>` (preferred) or `feat/<issue>-<slug>` (fallback).
 - Keep commits scoped and reference the issue ID in the message: `feat: Complete Issue #X - [description]`.
 - **When completing a feature**: Update GitHub issue with completion comment, commit changes, then ask before pushing.
