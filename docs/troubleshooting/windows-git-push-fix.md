@@ -77,16 +77,32 @@ Common culprits:
 
 ## If All Else Fails
 
-Push manually from your PowerShell terminal (outside Cursor):
+### Option 6: Use System Git from Terminal (RECOMMENDED)
+
+**Diagnosis**: If `git ls-remote origin` works from PowerShell terminal, DNS/connectivity is fine - the issue is Cursor's bundled Git.
+
+**Solution**: Push from PowerShell terminal using system Git:
 ```powershell
 cd 'C:\Users\OrEo2\Desktop\DevOps\1. Projects\Icebreaker'
-git push origin agent/vector/1-onboarding-flow
+git push origin <branch-name>
 ```
 
 Token is already configured in Windows Credential Manager, so it will work automatically.
 
+**Why This Works**: System Git (`C:\Program Files\Git\bin\git.exe`) is not sandboxed and can spawn DNS threads properly. Cursor's bundled Git may be blocked by security software or have threading limitations.
+
+**Permanent Fix**: Configure Cursor to use system Git:
+1. Cursor Settings → Search "git.path"
+2. Set to: `C:\Program Files\Git\bin\git.exe`
+3. Restart Cursor
+
 ## Root Cause
 
-Windows DNS threading bug in git's HTTP client when executed in Cursor's subprocess context. Not a network or authentication issue - git can't spawn DNS resolution threads in the subprocess environment.
+Windows DNS threading bug in git's HTTP client when executed in Cursor's bundled Git binary. The bundled Git may be:
+- Corrupted or outdated
+- Blocked by security software from creating threads
+- Running in a sandboxed context that prevents thread creation
+
+System Git works because it's not sandboxed and can create DNS resolution threads normally.
 
 
