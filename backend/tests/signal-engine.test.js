@@ -1,8 +1,14 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { calculateScore, calculateScores, getRadarResults } from "../src/services/SignalEngine.js";
 import { createSession } from "../src/services/SessionManager.js";
+import { addReport, clearAllReports } from "../src/services/ReportManager.js";
 
 describe("SignalEngine", () => {
+  beforeEach(() => {
+    // Clear reports before each test to ensure isolation
+    clearAllReports();
+  });
+
   // Helper to create test session object
   function createTestSession(overrides = {}) {
     return {
@@ -13,6 +19,7 @@ describe("SignalEngine", () => {
       visibility: true,
       location: null,
       safetyFlag: false,
+      reportCount: 0,
       ...overrides,
     };
   }
@@ -84,6 +91,75 @@ describe("SignalEngine", () => {
       const score = calculateScore(source, target);
       // Should have: w_vis (3) only (no vibe match, no proximity)
       expect(score).toBe(3);
+    });
+
+    it("applies report penalty for reported users", () => {
+      const source = createTestSession({ vibe: "banter", tags: ["tag1"] });
+      const target = createTestSession({ vibe: "banter", visibility: true });
+
+      // Score without reports
+      const scoreBefore = calculateScore(source, target);
+      expect(scoreBefore).toBeGreaterThan(0);
+
+      // Add 1 report
+      addReport("reporter-1", target.sessionId, "harassment");
+      const scoreAfter1 = calculateScore(source, target);
+      expect(scoreAfter1).toBeLessThan(scoreBefore);
+      // Should be: scoreBefore + w_report * 1 = scoreBefore - 3
+      expect(scoreAfter1).toBe(scoreBefore - 3);
+
+      // Add second report from different reporter
+      addReport("reporter-2", target.sessionId, "spam");
+      const scoreAfter2 = calculateScore(source, target);
+      expect(scoreAfter2).toBeLessThan(scoreAfter1);
+      // Should be: scoreBefore + w_report * 2 = scoreBefore - 6
+      expect(scoreAfter2).toBe(scoreBefore - 6);
+    });
+
+    it("does not apply report penalty for unreported users", () => {
+      const source = createTestSession({ vibe: "banter", tags: ["tag1"] });
+      const target = createTestSession({ vibe: "banter", visibility: true });
+
+      const score = calculateScore(source, target);
+      // Should have: w_vibe (10) + w_vis (3) = 13
+      expect(score).toBe(13);
+    });
+
+    it("safety exclusion still works for ≥3 unique reports", () => {
+      const source = createTestSession({ vibe: "banter", tags: ["tag1"] });
+      const target = createTestSession({ 
+        vibe: "banter", 
+        visibility: true,
+        safetyFlag: true, // Set by SafetyManager when ≥3 unique reports
+      });
+
+      // Even with reports, safety exclusion should exclude entirely
+      const score = calculateScore(source, target);
+      expect(score).toBe(-Infinity);
+    });
+
+    it("reported users appear lower in Radar results", () => {
+      const source = createTestSession({ vibe: "banter", tags: ["shared"] });
+      const unreported = createTestSession({ 
+        vibe: "banter", 
+        tags: ["shared"],
+        sessionId: "unreported-1",
+      });
+      const reported = createTestSession({ 
+        vibe: "banter", 
+        tags: ["shared"],
+        sessionId: "reported-1",
+      });
+
+      // Add 1 report to reported user
+      addReport("reporter-1", reported.sessionId, "harassment");
+
+      const results = calculateScores(source, [unreported, reported]);
+      expect(results.length).toBe(2);
+      // Unreported user should appear first (higher score)
+      expect(results[0].session.sessionId).toBe("unreported-1");
+      expect(results[1].session.sessionId).toBe("reported-1");
+      expect(results[0].score).toBeGreaterThan(results[1].score);
     });
 
     it("calculates complete score with all factors", () => {

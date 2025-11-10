@@ -114,7 +114,47 @@ See `docs/Plan.md` for complete implementation details.
 
 ---
 
-## Try It: Panic Button (Issue #5)
+## Try It: Block/Report (Safety Controls) (Issue #6)
+
+The Block/Report feature provides safety controls for users to block or report others:
+
+1. **From Chat Header**:
+   - Click the ⋯ menu button (right side of header)
+   - Select "Block" or "Report"
+   - Block: Confirmation dialog → ends chat and blocks user
+   - Report: Category selection (Harassment, Spam, Impersonation, Other) → submits report
+
+2. **From PersonCard** (Radar view):
+   - Long-press (500ms) or right-click on PersonCard dialog
+   - Menu appears with "Block" and "Report" options
+   - Keyboard alternative: Shift+Enter when PersonCard is focused
+   - Same Block/Report dialogs as Chat header
+
+3. **What happens**:
+   - **Block**: User added to blocked list, active chat ended (if any), user won't appear in Radar
+   - **Report**: Report stored with category, target's report count incremented
+   - **Safety Exclusion**: When ≥3 unique users report the same person, they're temporarily hidden from Radar (1 hour default)
+   - **Signal Engine Penalty**: Reported users (1-2 unique reports) appear lower in Radar results (negative weight applied)
+
+**Features**:
+- Authentication required: All safety endpoints require session token
+- Duplicate prevention: Can't block/report yourself, can't duplicate reports
+- Privacy-first: No message content stored, only report metadata
+- Safety exclusion: Automatic temporary hiding for users with ≥3 unique reports
+- Signal Engine integration: Reported users deprioritized in Radar results
+- Accessibility: Keyboard navigation, ARIA labels, screen reader support
+- WCAG AA compliant: All dialogs and menus accessible
+
+**Test Results** (Issue #6):
+- ✅ Backend: 66/66 unit tests passing (safety endpoints, SafetyManager, ReportManager, Signal Engine)
+- ✅ Frontend: Tests created (BlockDialog, ReportDialog, useSafety, PersonCard tap-hold)
+- ✅ Safety exclusion: Verified (≥3 unique reports triggers exclusion)
+- ✅ Signal Engine integration: Verified (report penalty applied correctly)
+- ✅ WCAG AA compliance: Verified (ARIA labels, keyboard nav)
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
+---
 
 The Panic Button feature provides an always-accessible emergency exit:
 

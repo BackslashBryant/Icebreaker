@@ -11,14 +11,14 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 ## Principles
 - Stay in ticket scope. Propose the exact command/query before running it and wait for approval.
 - Prefer scripted helpers (see `tools/` and `examples/automation/`) so operations are reproducible.
-- Log meaningful results (links, summaries, screenshots) in `/docs/research.md`, `artifacts/`, or the relevant doc.
+- Log meaningful results (links, summaries, screenshots) in issue-specific research files (`docs/research/Issue-<#>-research.md`), `artifacts/`, or the relevant doc.
 - If an MCP fails twice, document it in `.notes/features/<slug>/progress.md` and suggest the fallback.
 
 ## When to Reach for Which Tool
 - **GitHub MCP** (`@modelcontextprotocol/server-github`) – Branch/PR automation, repo search, code examples, issue comments. First stop for anything "git" or GitHub API shaped (except commits - use git CLI for commits).
   - **Note**: Git commits use CLI (GitHub MCP doesn't have commit tool), but branch creation, PRs, and issue updates should use GitHub MCP.
   - **Requires**: `GITHUB_TOKEN` environment variable
-- **Ref Tools MCP** (`ref-tools-mcp`) – Token-efficient documentation search for APIs, libraries, services. Supports private repos and PDFs. Cite sources in `/docs/research.md`.
+- **Ref Tools MCP** (`ref-tools-mcp`) – Token-efficient documentation search for APIs, libraries, services. Supports private repos and PDFs. Cite sources in issue-specific research files (`docs/research/Issue-<#>-research.md`).
   - **Requires**: No configuration needed (runs on stdio)
 - **Playwright MCP** (`@playwright/mcp`) – UI screenshots, axe/Lighthouse accessibility/perf checks. Attach outputs to the ticket or artifacts.
   - **Requires**: `GITHUB_TOKEN` environment variable
@@ -31,7 +31,7 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 ## Plan vs Act Expectations
 1. **Plan Mode** – State which MCP you intend to use, the command/query, expected outcome, and rollback. Await approval.
 2. **Act Mode** – Execute exactly what was approved. Share the raw output (trimmed) plus a one-line interpretation.
-3. **Log** – Place citations or artifacts where the next agent will find them (`/docs/research.md`, `artifacts/<issue>/…`, README updates via Muse, etc.).
+3. **Log** – Place citations or artifacts where the next agent will find them (issue-specific research files `docs/research/Issue-<#>-research.md`, `artifacts/<issue>/…`, README updates via Muse, etc.).
 
 ## Health Checks
 - Run `npm run preflight` at the start of a session to confirm baseline MCP servers respond.

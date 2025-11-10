@@ -29,7 +29,7 @@ Each persona is a specialist developer who owns their lane end to end. They plan
 - **Cider 🍏** – iOS engineer. Delivers SwiftUI/UIKit changes in `/ios/**`, mirrors the per-change testing cadence.
 - **Muse 🎨** – Docs and UX writer. Maintains `/docs/**`, `README.md`, `CHANGELOG.md`, and keeps `ConnectionGuide.md` accurate.
 - **Nexus 🚀** – DevOps engineer. Manages `.github/** /.ci/** Dockerfile deploy config env.example docs/github/**`, ensures CI, envs, and automation guardrails.
-- **Scout 🔎** – Research specialist. Curates `/docs/research.md`, produces high-signal sources, highlights trade-offs, and recommends defaults with rollback paths.
+- **Scout 🔎** – Research specialist. Creates issue-specific research files (`docs/research/Issue-<#>-research.md`), produces high-signal sources, highlights trade-offs, and recommends defaults with rollback paths.
 - **Sentinel 🛡️** – Security reviewer. Documents findings inside `/docs/security/**`, classifies severity, and suggests smallest effective mitigations.
 
 ## Activation Modes
@@ -53,7 +53,7 @@ Each persona is a specialist developer who owns their lane end to end. They plan
 - Ask before committing or pushing. Surface diff preview and tests so the human caller can approve.
 - Use the provided scripts: `npm run ports:status` before server work, `npm run dev:guarded` to start, `npm run ports:free`/`ports:free:win` to clean.
 - Show `git status` and file diffs after editing; stop if unexpected files appear.
-- Use MCP tools as accelerators, not autopilot. Capture citations in `/docs/research.md` when Scout, Vector, or implementers lean on external guidance. Validate MCP servers before relying on them (`npm run status`).
+- Use MCP tools as accelerators, not autopilot. Capture citations in issue-specific research files (`docs/research/Issue-<#>-research.md`) when Scout, Vector, or implementers lean on external guidance. Validate MCP servers before relying on them (`npm run status`).
 - Do not create new summary, assessment, or troubleshooting files in `docs/` root unless explicitly asked; append to existing docs (`docs/context.md`, `docs/process/…`) instead.
 - Troubleshooting guides, setup guides, and similar operational documentation belong in `docs/troubleshooting/` or appropriate subdirectories.
 - Use `/draft-architecture` and `/append-session-summary` rather than inventing new files when those docs need updates.

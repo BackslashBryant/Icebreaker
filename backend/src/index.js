@@ -3,6 +3,7 @@ import cors from 'cors';
 import { createServer } from 'http';
 import { healthRouter } from './routes/health.js';
 import { onboardingRouter } from './routes/onboarding.js';
+import { safetyRouter } from './routes/safety.js';
 import { initializeWebSocketServer } from './websocket/server.js';
 
 const app = express();
@@ -19,6 +20,9 @@ app.use('/api', healthRouter);
 
 // Onboarding endpoint
 app.use('/api/onboarding', onboardingRouter);
+
+// Safety endpoints (block/report)
+app.use('/api/safety', safetyRouter);
 
 // Create HTTP server for WebSocket upgrade
 const server = createServer(app);

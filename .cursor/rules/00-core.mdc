@@ -13,6 +13,11 @@ alwaysApply: true
 - Keep prompts conversational; voice input, queued messages (Ctrl+Enter), and saved plans are all welcome.
 
 ## Safety Rails We Keep Even When Vibing
+- **MANDATORY WORKFLOW CHECKPOINTS**: Before starting ANY implementation work, verify:
+  1. Research file exists: `docs/research/Issue-<#>-research.md`
+  2. Plan file exists: `docs/Plan.md` with checkpoints
+  3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
+- **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any implementation files. Coordinate with Vector for team review.
 - Never ship code you have not read; sanity-check diffs and run the quickest meaningful verification.
 - Flag real secrets, prod data, or compliance-sensitive areas before asking the agent to touch them.
 - Document gotchas in `.notes/` or the active plan so the next session inherits your context.

@@ -14,11 +14,30 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - If none exists, open one with the appropriate template (`/.github/ISSUE_TEMPLATE/`).
 - Reference the issue URL in `/docs/Plan.md`, commits, and PR description.
 
-## 1. Plan (Vector)
-- Use Cursor Plan Mode with the issue context plus `docs/vision.md`.
-- Save the plan to `/docs/Plan.md` (3-7 numbered checkpoints, acceptance tests, owners). Include “Do not continue past step _n_ without approval.”
+## 0.5. Research (Scout) - MANDATORY FIRST STEP
+- **MANDATORY**: Scout must research the feature/issue BEFORE planning begins.
+- Create issue-specific research file: `docs/research/Issue-<#>-research.md`
+- Research question, sources, findings, recommendations, rollback options
+- **PAUSE**: Research must be complete and documented before Vector creates plan.
+- **NO EXCEPTIONS**: Do not proceed to planning without completed research.
+
+## 1. Plan (Vector) - MANDATORY AFTER RESEARCH
+- **MANDATORY**: Vector must wait for Scout's research to be complete.
+- Reference Scout's research file: `docs/research/Issue-<#>-research.md`
+- Use Cursor Plan Mode with the issue context plus `docs/vision.md` and research findings.
+- Save the plan to `/docs/Plan.md` (3-7 numbered checkpoints, acceptance tests, owners). Include "Do not continue past step _n_ without approval."
 - Add labels: `agent:vector`, relevant implementer labels, and `status:plan`.
-- If Docfork/Search MCP is used, note the references in `/docs/research.md`.
+- **PAUSE**: Plan must be reviewed by team before implementation begins.
+- **NO EXCEPTIONS**: Do not proceed to implementation without team review of plan.
+
+## 1.5. Team Review - MANDATORY BEFORE EXECUTION
+- **MANDATORY**: All agents review the plan and provide notes/feedback.
+- Vector coordinates team review session.
+- Address any concerns or gaps before proceeding.
+- **CRITICAL CHECKPOINT**: Create `.notes/features/<slug>/team-review-approved.md` file ONLY after all agents have reviewed and approved the plan.
+- **PAUSE**: Implementation cannot begin until plan is approved by team AND approval file exists.
+- **NO EXCEPTIONS**: Do not proceed to implementation without team approval AND approval file.
+- **VERIFICATION**: Before starting any implementation work, check that `.notes/features/<slug>/team-review-approved.md` exists. If missing, STOP and coordinate team review.
 
 ## 2. Branching & MCP Setup
 - **MANDATORY**: Create branch with format `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`) **BEFORE starting any work**. Check current branch matches the issue being worked on. If on wrong branch, create correct branch and move commits.
@@ -29,7 +48,13 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Execute `npm run mcp:suggest` after dependency or config changes and note the recommendations in `.notes/` or the active plan; run `npm run mcp:suggest -- --install <id>` to append required servers to `.cursor/mcp.json`.
 - Record any new ports, endpoints, or services in `docs/ConnectionGuide.md` immediately.
 
-## 3. Implement (Forge/Link/Glide/Apex/Cider)
+## 2. Implement (Forge/Link/Glide/Apex/Cider) - MANDATORY AFTER PLAN APPROVAL
+- **MANDATORY PRE-FLIGHT CHECKS** (must pass ALL before starting):
+  1. Research file exists: `docs/research/Issue-<#>-research.md`
+  2. Plan file exists: `docs/Plan.md` with checkpoints
+  3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
+  4. Plan explicitly states "Team review complete - approved for implementation"
+- **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any implementation files. Report which check failed and coordinate with Vector.
 - Stay in Plan Mode until the caller says "Proceed." Once approved, execute one checkpoint at a time.
 - Work within your agent branch and path scope.
 - Commit early/often; reference the issue (`#1234`) in commit messages.
@@ -56,7 +81,8 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
   2. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
   3. Ask before pushing (per agent rules)
   4. Close the Issue with a recap noting direct commits
-- Archive research snippets in `/docs/research.md` and security notes (if any).
+- Research file already exists at `docs/research/Issue-<#>-research.md` (created during research phase).
+- Archive security notes (if any) in `/docs/security/`.
 - Update `/docs/agents/KICKOFF.md` sanity checklist if the flow uncovered gaps.
 
 ## Tooling & Automation

@@ -6,7 +6,8 @@
  * 
  * Scoring formula:
  * score(A,B) = w_vibe * VIBE_MATCH + w_tag * MIN(shared_tags, 3) + 
- *              w_vis * VISIBILITY_ON + w_tagless * TAGLESS + w_dist * PROXIMITY_TIER
+ *              w_vis * VISIBILITY_ON + w_tagless * TAGLESS + w_dist * PROXIMITY_TIER +
+ *              w_report * REPORT_COUNT
  */
 
 export const SIGNAL_WEIGHTS = {
@@ -24,6 +25,9 @@ export const SIGNAL_WEIGHTS = {
 
   // Proximity tier bonus (applied based on distance tier)
   w_dist: 2,
+
+  // Report penalty (per report count - negative weight to lower reported users in results)
+  w_report: -3,
 };
 
 /**
@@ -36,6 +40,7 @@ export function getSignalWeights() {
     w_vis: Number(process.env.SIGNAL_WEIGHT_VIS) || SIGNAL_WEIGHTS.w_vis,
     w_tagless: Number(process.env.SIGNAL_WEIGHT_TAGLESS) || SIGNAL_WEIGHTS.w_tagless,
     w_dist: Number(process.env.SIGNAL_WEIGHT_DIST) || SIGNAL_WEIGHTS.w_dist,
+    w_report: Number(process.env.SIGNAL_WEIGHT_REPORT) || SIGNAL_WEIGHTS.w_report,
   };
 }
 

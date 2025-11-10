@@ -23,6 +23,14 @@ Track every port, endpoint, credential reference, and integration touchpoint her
     - Request: `{ vibe: string, tags: string[], visibility: boolean, location?: { lat: number, lng: number } }`
     - Response: `{ sessionId: string, token: string, handle: string }`
     - Errors: `400` (validation error), `500` (server error)
+  - `POST /api/safety/block` - Block a user (requires Authorization header with session token)
+    - Request: `{ targetSessionId: string }`
+    - Response: `{ success: boolean }`
+    - Errors: `400` (validation error), `401` (unauthorized), `500` (server error)
+  - `POST /api/safety/report` - Report a user (requires Authorization header with session token)
+    - Request: `{ targetSessionId: string, category: 'harassment' | 'spam' | 'impersonation' | 'other' }`
+    - Response: `{ success: boolean }`
+    - Errors: `400` (validation error), `401` (unauthorized), `500` (server error)
 
 ### WebSocket Server (Radar View)
 - Name: Real-time Radar Service

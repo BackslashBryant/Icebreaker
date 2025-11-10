@@ -120,6 +120,7 @@ export default function Chat() {
     <div className="h-screen flex flex-col bg-background text-foreground font-mono">
       <ChatHeader
         partnerHandle={partnerHandle}
+        partnerSessionId={partnerSessionId || ""}
         onEndChat={endChat}
         proximityWarning={proximityWarning}
       />

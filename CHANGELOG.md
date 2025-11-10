@@ -9,6 +9,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### MVP: Block/Report (Safety Controls) (Issue #6)
+- Block functionality: Users can block others from Chat header (⋯ menu) or PersonCard (tap-hold/right-click)
+- Report functionality: Users can report others with categories (Harassment, Spam, Impersonation, Other)
+- Safety exclusion: Users with ≥3 unique reports temporarily hidden from Radar (1 hour default)
+- Signal Engine integration: Reported users (1-2 unique reports) appear lower in Radar results (negative weight: -3 per reporter)
+- Authentication: All safety endpoints require session token (Authorization header)
+- Duplicate prevention: Can't block/report yourself, can't duplicate reports from same reporter
+- Privacy-first: No message content stored, only report metadata (category, timestamp, reporterId, targetId)
+- Chat header menu: ⋯ button with Block/Report options (keyboard accessible)
+- PersonCard tap-hold: Long-press (500ms) or right-click opens Block/Report menu
+- Keyboard alternatives: Shift+Enter opens menu in PersonCard, Escape/Enter in dialogs
+- WCAG AA compliance: ARIA labels, keyboard navigation, screen reader support
+- Unit tests: Safety endpoints (19/19), SafetyManager (14/14), ReportManager (16/16), Signal Engine report penalty (17/17)
+
+**Technical Details**:
+- Backend: SafetyManager service, ReportManager service, authentication middleware, safety routes
+- Frontend: BlockDialog, ReportDialog components, useSafety hook, ChatHeader menu, PersonCard tap-hold
+- API endpoints: `POST /api/safety/block`, `POST /api/safety/report` (requires Authorization header)
+- Report storage: In-memory Map (MVP) with unique reporter tracking
+- Safety exclusion threshold: 3 unique reporters (configurable in SafetyManager)
+- Signal Engine penalty: `w_report = -3` per unique reporter (configurable in signal-weights.js)
+- Block behavior: Ends active chat if target is current partner, adds to blockedSessionIds array
+
+**Verified**:
+- ✅ Block endpoint requires authentication and validates inputs
+- ✅ Report endpoint requires authentication, validates category, prevents duplicates
+- ✅ Safety exclusion triggered when ≥3 unique reporters report same target
+- ✅ Signal Engine applies negative weight for reported users (1-2 reports)
+- ✅ Block ends chat when target is current partner
+- ✅ Chat header menu accessible (keyboard navigation, ARIA labels)
+- ✅ PersonCard tap-hold works (touch, mouse, right-click, keyboard)
+- ✅ All unit tests passing: Backend (66/66), Frontend tests created
+- ✅ WCAG AA compliance verified (ARIA labels, keyboard nav)
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
 #### MVP: Panic Button (Emergency Exit & Safety) (Issue #5)
 - Fixed floating action button (FAB): Always accessible from Radar and Chat screens
 - Panic confirmation flow: "Everything okay?" dialog with calm, reassuring copy

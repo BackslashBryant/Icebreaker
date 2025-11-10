@@ -1,5 +1,6 @@
 import { getSignalWeights } from "../config/signal-weights.js";
 import { calculateProximityTier, getProximityScoreMultiplier } from "../lib/proximity-utils.js";
+import { getUniqueReporterCount } from "./ReportManager.js";
 
 /**
  * Signal Engine Service
@@ -8,9 +9,11 @@ import { calculateProximityTier, getProximityScoreMultiplier } from "../lib/prox
  *
  * Scoring formula:
  * score(A,B) = w_vibe * VIBE_MATCH + w_tag * MIN(shared_tags, 3) +
- *              w_vis * VISIBILITY_ON + w_tagless * TAGLESS + w_dist * PROXIMITY_TIER
+ *              w_vis * VISIBILITY_ON + w_tagless * TAGLESS + w_dist * PROXIMITY_TIER +
+ *              w_report * REPORT_COUNT
  *
  * Safety exclusion: Sessions with safety_flag == true are excluded from results.
+ * Report penalty: Reported users (1-2 unique reporters) appear lower in results.
  * Tie-breakers: Stable random seed per session + alphabetical handle.
  */
 
@@ -86,6 +89,14 @@ export function calculateScore(sourceSession, targetSession) {
   if (proximityTier) {
     const proximityMultiplier = getProximityScoreMultiplier(proximityTier);
     score += weights.w_dist * proximityMultiplier;
+  }
+
+  // 6. Report penalty (negative weight applied per unique reporter count)
+  // This lowers reported users in Radar results without excluding them entirely
+  // Safety exclusion (≥3 unique reports) still excludes via safetyFlag check above
+  const uniqueReporterCount = getUniqueReporterCount(targetSession.sessionId);
+  if (uniqueReporterCount > 0) {
+    score += weights.w_report * uniqueReporterCount;
   }
 
   return score;
