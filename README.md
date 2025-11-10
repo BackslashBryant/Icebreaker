@@ -114,6 +114,46 @@ See `docs/Plan.md` for complete implementation details.
 
 ---
 
+## Try It: Panic Button (Issue #5)
+
+The Panic Button feature provides an always-accessible emergency exit:
+
+1. **Access from Radar or Chat**:
+   - Fixed floating action button (FAB) in bottom-right corner
+   - Teal accent color, AlertTriangle icon
+   - Always visible and accessible
+
+2. **Trigger panic**:
+   - Click the panic button FAB
+   - Confirmation dialog appears: "Everything okay?"
+   - Click "SEND ALERT & EXIT" or press Enter to confirm
+   - Press Escape or "Never mind" to cancel
+
+3. **What happens**:
+   - Session ends immediately
+   - Active chat terminated (if any)
+   - User hidden from Radar for 1 hour (safety exclusion)
+   - Success screen: "You're safe. Session ended."
+   - Auto-redirects to Welcome screen after 3 seconds
+
+**Features**:
+- Always accessible: Fixed FAB on Radar and Chat screens
+- Calm confirmation: "Everything okay?" dialog (brand voice)
+- Safety exclusion: Temporarily hides user from Radar (1 hour default)
+- Session termination: Ends active chat and clears session
+- Keyboard accessible: Escape to cancel, Enter to confirm
+- WCAG AA compliant: ARIA labels, screen reader support
+
+**Test Results** (Issue #5):
+- ✅ Backend: 21/21 PanicManager tests passing
+- ✅ Frontend: 27/27 panic tests passing (components + hook)
+- ✅ Safety exclusion: Verified in Signal Engine tests
+- ✅ WCAG AA compliance: Verified (ARIA labels, keyboard nav)
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
+---
+
 ## What You Get
 
 - **Automated Setup**: One-command setup wizard (`npm run setup`)
