@@ -23,11 +23,20 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './tests/setup.js',
+    testTimeout: 10000, // 10s per test - prevents hangs
+    hookTimeout: 10000, // 10s per hook - prevents setup/teardown hangs
+    teardownTimeout: 5000, // 5s teardown - ensures cleanup completes
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       include: ['src/**/*.{ts,tsx,js,jsx}'],
       exclude: ['src/**/*.test.{ts,tsx}', 'src/**/*.spec.{ts,tsx}', 'src/main.jsx'],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+      },
     },
   },
 });

@@ -11,12 +11,15 @@ alwaysApply: true
 - Keep validations fast and deterministic so they can run locally and in CI.
 - When adding a new stack, update `scripts/verify-all` or your package scripts to include lint, test, build, type, and audit steps appropriate to that stack.
 - Run the smallest useful test suite immediately after every code change. Post the command and result in chat so reviewers can trace regressions to a single edit.
+- **Testing practices**: See `.cursor/rules/08-testing.mdc` for tool selection, logging requirements, and timeout configuration.
 
 ## Manual Validation
 - Document any manual verification performed (UI walkthroughs, API calls, accessibility checks).
 - Capture screenshots, console output, or logs; attach them to the ticket/PR.
 - Note residual risk or missing coverage so it can be automated later.
 - When a loop occurs (same fix attempted twice without progress), stop, document it in `.notes/features/<slug>/progress.md` under **Current Issues**, and reset the chat before trying again.
+- **For comprehensive reviews**: Use domain team commands (`/team-testing`, `/team-security`, `/team-accessibility`, `/team-userexperience`) when multiple perspectives are needed.
+- **Before release**: Use `/team-release` for final readiness check (tests, security, docs).
 
 ## CI Expectations
 - `Template CI` currently runs the preflight check and best-effort verification helper.

@@ -1,10 +1,10 @@
 {
-  "slug": "onboarding-flow",
-  "featureName": "Onboarding Flow (Welcome → 18+ Consent → Location → Vibe & Tags)",
+  "slug": "radar-view",
+  "featureName": "Radar View (Proximity-Based Presence Visualization)",
   "updatedAt": "2025-11-06T00:00:00.000Z",
   "status": "planning",
   "vision": "docs/vision.md",
-  "description": "MVP Onboarding Flow - user completes onboarding in under 30 seconds and reaches Radar with session established",
-  "githubIssue": 1,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/1"
+  "description": "MVP Radar View - proximity-based presence visualization with Signal Engine integration, sorted by compatibility score",
+  "githubIssue": 2,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/2"
 }

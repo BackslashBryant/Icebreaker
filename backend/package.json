@@ -7,11 +7,14 @@
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:security": "vitest run tests/security.test.js",
+    "test:edge-cases": "vitest run tests/edge-cases.test.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

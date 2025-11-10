@@ -1,86 +1,44 @@
 {
   "mcpServers": {
-    "desktop-commander": {
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@wonderwhy-er/desktop-commander",
-        "--key",
-        "0faa80d7-4649-4752-aa02-89680cfadf07"
-      ]
-    },
     "github": {
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@smithery-ai/github",
-        "--key",
-        "0faa80d7-4649-4752-aa02-89680cfadf07",
-        "--profile",
-        "spectacular-piranha-CUJgZQ"
-      ]
-    },
-    "playwright-mcp": {
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@microsoft/playwright-mcp",
-        "--key",
-        "0faa80d7-4649-4752-aa02-89680cfadf07"
-      ]
-    },
-    "ref-tools-mcp": {
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@ref-tools/ref-tools-mcp",
-        "--key",
-        "0faa80d7-4649-4752-aa02-89680cfadf07",
-        "--profile",
-        "spectacular-piranha-CUJgZQ"
-      ]
-    },
-    "supabase-mcp-lite": {
       "command": "npx",
       "args": [
         "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@pinion05/supabase-mcp-lite",
-        "--key",
-        "0faa80d7-4649-4752-aa02-89680cfadf07",
-        "--profile",
-        "spectacular-piranha-CUJgZQ"
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}"
+      }
+    },
+    "desktop-commander": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@wonderwhy-er/desktop-commander"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}"
+      }
+    },
+    "playwright-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}"
+      }
+    },
+    "ref-tools-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "ref-tools-mcp"
       ]
     },
-    "toolbox": {
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@smithery/toolbox",
-        "--key",
-        "0faa80d7-4649-4752-aa02-89680cfadf07"
-      ]
+    "supabase": {
+      "url": "https://mcp.supabase.com/mcp?project_ref=awqcctsqyrlgaygpmgrq&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cstorage"
     }
   }
 }

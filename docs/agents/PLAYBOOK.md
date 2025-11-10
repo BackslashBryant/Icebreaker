@@ -54,6 +54,16 @@ This is the quick-start guide for working with your in-chat engineering team. Ke
 - Personas auto-activate when you open their files; use these commands when you need them outside scope.
 - `/vector-plan` – Generate or update the numbered plan.
 - `/pixel-test` – Scaffold test cases for the current acceptance criteria.
+- **Domain Team Commands** – Use multi-persona teams for comprehensive reviews:
+  - `/team-userexperience` – UI/UX review (Link + Muse)
+  - `/team-security` – Security audit (Sentinel + Scout)
+  - `/team-testing` – Test infrastructure review (Pixel + Sentinel + Scout)
+  - `/team-accessibility` – Accessibility audit (Link + Pixel)
+  - `/team-documentation` – Docs alignment (Muse + Link)
+  - `/team-architecture` – Tech decisions (Vector + Scout + Sentinel)
+  - `/team-release` – Release readiness (Pixel + Sentinel + Muse)
+  - `/team-planning` – Test strategy (Vector + Pixel)
+  - `/team-research` – Research with domain context (Scout + expert)
 - `npm run agents:prompt -- all` – Print full system prompts when you need to copy them into Cursor.
 - `npm run status` – Verify setup health before a new session.
 

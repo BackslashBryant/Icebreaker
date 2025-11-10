@@ -17,11 +17,11 @@
 11. After edits, show `git status` and a diff of touched files. If something is missing or extra, stop and ask.
 12. Run `npm run precommit` and share the output. If any step fails, stop and ask before trying fixes.
 13. **When completing a feature/issue**: Update GitHub issue with completion comment, commit with issue reference (`feat: Complete Issue #X - [description]`), then ask before pushing.
-14. Open a PR summarising the task, risks, and test evidence. Await human review.
+14. **Direct commits only**: No PRs. Commit and push directly to feature branches.
 
 ## Context hygiene
 14. If files changed outside Cursor, request a project re-scan before editing.
-15. One task per PR. If asked to combine scopes, confirm explicitly.
+15. One task per branch. If asked to combine scopes, confirm explicitly.
 16. Between tasks, reset context: summarise task, constraints, and changed files again.
 17. When manual prerequisites are required (tokens, API accounts, approvals), stop and list the steps for the user, then wait.
 

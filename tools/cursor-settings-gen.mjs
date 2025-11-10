@@ -234,7 +234,7 @@ After configuring settings:
 - \`docs/cursor/symbols.md\` - @symbol reference
 - \`docs/cursor/models.md\` - Model selection guide
 - \`docs/cursor/agent-tools.md\` - Agent tools configuration
-- \`docs/MCP_SETUP_GUIDE.md\` - MCP server setup
+- \`docs/troubleshooting/mcp-setup-guide.md\` - MCP server setup
 
 ---
 

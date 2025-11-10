@@ -32,6 +32,7 @@ export function createSession(data) {
     activeChatPartnerId: null,
     blockedSessionIds: [],
     reportCount: 0,
+    safetyFlag: false, // Set to true when panic button used or safety threshold reached
   };
 
   sessions.set(sessionId, session);
@@ -67,6 +68,36 @@ export function getSessionByToken(token) {
   }
 
   return getSession(sessionId);
+}
+
+/**
+ * Update session location
+ * @param {string} sessionId - Session ID
+ * @param {Object} location - { lat, lng }
+ */
+export function updateSessionLocation(sessionId, location) {
+  const session = getSession(sessionId);
+  if (!session) {
+    return false;
+  }
+  
+  session.location = location;
+  return true;
+}
+
+/**
+ * Get all active sessions (for Signal Engine / Radar)
+ * Returns array of all non-expired sessions
+ */
+export function getAllSessions() {
+  const now = Date.now();
+  const activeSessions = [];
+  for (const [sessionId, session] of sessions.entries()) {
+    if (session.expiresAt >= now) {
+      activeSessions.push(session);
+    }
+  }
+  return activeSessions;
 }
 
 /**

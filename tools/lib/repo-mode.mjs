@@ -43,13 +43,17 @@ export function detectRepoMode() {
       if (name.includes('template') || description.includes('template')) {
         return 'template';
       }
+      
+      // If name/description don't contain "template", it's likely an app repo
+      // Default to app mode for application repositories
+      return 'app';
     } catch (error) {
       // Fall through to default
     }
   }
 
-  // Default to template mode (safest for template repos)
-  return 'template';
+  // Default to app mode (most repos are apps, not templates)
+  return 'app';
 }
 
 /**

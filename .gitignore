@@ -128,6 +128,8 @@ public
 # .cursor/*
 # !.cursorignore
 # The pre-commit hook will also block .cursor/ commits in app mode.
+.cursor/*
+!.cursorignore
 # Run `npm run convert:app` to automatically configure this.
 
 # OS generated files

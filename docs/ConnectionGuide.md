@@ -24,12 +24,17 @@ Track every port, endpoint, credential reference, and integration touchpoint her
     - Response: `{ sessionId: string, token: string, handle: string }`
     - Errors: `400` (validation error), `500` (server error)
 
-### WebSocket Server (TBD - if needed)
-- Name: Real-time Chat Service
-- Purpose: Ephemeral chat messaging, proximity monitoring
-- Port: TBD (typically 3002 or separate WebSocket port)
-- Startup command: TBD
-- Notes: No message content storage; session-based connections only
+### WebSocket Server (Radar View)
+- Name: Real-time Radar Service
+- Purpose: Radar updates, proximity monitoring, chat requests
+- Port: 8000 (same as HTTP server, WebSocket upgrade on /ws)
+- Startup command: `cd backend && npm run dev` (starts with HTTP server)
+- Endpoint: `ws://localhost:8000/ws?token=<sessionToken>`
+- Message Types:
+  - Client → Server: `radar:subscribe`, `location:update`, `chat:request`
+  - Server → Client: `connected`, `radar:update`, `chat:request:ack`, `error`
+- Notes: Session token required for connection; heartbeat ping-pong every 30s
+- Signal Engine Config: `backend/src/config/signal-weights.js` (tunable weights for compatibility scoring)
 
 ## 2. Remote APIs & Integrations
 

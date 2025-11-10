@@ -2,6 +2,324 @@
 
 Use this file to paste brief citations and summaries when any agent uses Ref Tools MCP, GitHub MCP, or other research tools.
 
+---
+
+# MCP Server Status Indicators (Red → Yellow → Never Green)
+
+**Research Date**: 2025-01-27  
+**Researcher**: Scout 🔎  
+**Task**: Investigate why MCP servers show red then yellow but never green status in Cursor IDE  
+**Issue**: MCP connection troubleshooting
+
+## Sources Consulted
+
+### Cursor Forum - MCP Status Detection Failures
+- **Source**: Cursor IDE Forum - MCP Status Detection Failures ([forum.cursor.com](https://forum.cursor.com/t/mcp-status-detection-failures/100397))
+- **Notes**:
+  - MCP status colors indicate connection states: Red = failed, Yellow = attempting/partial, Green = fully connected
+  - Red → Yellow transition means Cursor is attempting to connect but failing to complete handshake
+  - Check MCP Logs in Output panel (View → Output → "MCP Logs" dropdown) for detailed error messages
+  - Common causes: missing environment variables, incorrect paths, npx cache issues
+- **Supports**: Nexus - MCP troubleshooting and configuration
+
+### Cursor Forum - MCP Server Name Caching Issue
+- **Source**: Cursor IDE's MCP Server Name Caching Issue ([forum.cursor.com](https://forum.cursor.com/t/cursor-ides-mcp-server-name-caching-issue-always-red-status/136058))
+- **Notes**:
+  - **Critical finding**: Cursor caches MCP server names after failed connection attempts
+  - Servers can remain in red/yellow status even after underlying issues are fixed
+  - **Workaround**: Rename MCP server to completely new name in `mcp.json`, then restart Cursor
+  - This bypasses the cached failure state
+- **Supports**: Nexus - MCP configuration fixes
+
+### Medium - FastMCP Setup Guide
+- **Source**: Turn Cursor into a Local AI Agent Platform with FastMCP ([medium.com](https://medium.com/@jeremy.deats/turn-cursor-into-a-local-ai-agent-platform-with-fastmcp-5907914f88b6))
+- **Notes**:
+  - Verify MCP servers work manually before troubleshooting Cursor integration
+  - Test commands directly: `npx -y @smithery/cli@latest run <server-name>`
+  - If manual test works but Cursor shows errors, it's a Cursor configuration issue
+  - Ensure absolute paths in `mcp.json` (though Smithery servers use npx, not file paths)
+- **Supports**: Nexus - MCP validation
+
+### Internal Documentation
+- **Source**: `Docs/troubleshooting/mcp-troubleshooting.md`
+- **Notes**:
+  - Missing environment variables is #1 cause of MCP failures
+  - Windows requires `npm run mcp:load-env:win` to set User-level env vars
+  - Cursor must be **completely restarted** (all windows closed) after env var changes
+  - npx cache can cause issues: `Remove-Item -Recurse -Force "$env:LOCALAPPDATA\npm-cache\_npx"`
+  - Current config uses `cmd /c` wrapper which is correct for Windows
+- **Supports**: Nexus - MCP troubleshooting workflow
+
+## Key Findings
+
+### Status Color Meanings
+- **Red**: Connection failed immediately (server not found, command error, missing env vars)
+- **Yellow**: Connection attempt in progress but handshake incomplete (timeout, auth failure, partial startup)
+- **Green**: Fully connected and operational (server responding to requests)
+
+### Root Causes for Red → Yellow → Never Green
+1. **Missing Environment Variables** (Most Common)
+   - MCP config doesn't include `"env"` field to pass variables to servers
+   - Windows User-level env vars not loaded into Cursor's process
+   - Solution: Add `"env"` field to each server config OR ensure User-level vars are set
+
+2. **Cursor Server Name Caching**
+   - Cursor caches failed server names and won't retry properly
+   - Even after fixing issues, status remains red/yellow
+   - Solution: Rename servers in config, restart Cursor
+
+3. **npx Cache Corruption**
+   - Stale npx cache can cause command execution failures
+   - Solution: Clear cache and restart
+
+4. **Missing `env` Field in mcp.json**
+   - Current config lacks `"env"` field to pass GITHUB_TOKEN to servers
+   - Servers may start but fail authentication, causing yellow status
+   - Solution: Add `"env": { "GITHUB_TOKEN": "${env:GITHUB_TOKEN}" }` to each server
+
+## Recommendation
+
+**Immediate Actions:**
+1. Add `"env"` field to all MCP server configs in `.cursor/mcp.json` to pass environment variables
+2. Verify environment variables are set: `[System.Environment]::GetEnvironmentVariable('GITHUB_TOKEN', 'User')`
+3. If vars are missing, run `npm run mcp:load-env:win`
+4. Clear npx cache: `Remove-Item -Recurse -Force "$env:LOCALAPPDATA\npm-cache\_npx"`
+5. **Rename all MCP servers** in config (add `-v2` suffix) to bypass Cursor's caching
+6. **Completely restart Cursor** (close all windows)
+7. Check MCP Logs in Output panel for specific error messages
+
+**Default Choice**: Add `env` field to config + rename servers + full restart
+
+**Rollback**: If issues persist, try global config location (`%USERPROFILE%\.cursor\mcp.json`) or test with single server first
+
+**Next Steps**: 
+- Update `.cursor/mcp.json` with `env` fields
+- Create script to rename MCP servers automatically
+- Update `Docs/troubleshooting/mcp-troubleshooting.md` with caching workaround
+
+---
+
+# MCP "Error - ShowOutput" - Smithery CLI Timeout Issue
+
+**Research Date**: 2025-01-27  
+**Researcher**: Scout 🔎  
+**Task**: Investigate "Error - ShowOutput" status for MCP servers after configuration fixes  
+**Issue**: MCP connection troubleshooting - timeout errors
+
+## Sources Consulted
+
+### Manual Testing Results
+- **Source**: Direct command execution test
+- **Command Tested**: `npx -y @smithery/cli@latest run @smithery-ai/github --key <key> --profile <profile>`
+- **Error Observed**: `Request timed out: TimeoutError: The operation was aborted due to timeout`
+- **Notes**:
+  - Manual test confirms the issue is with Smithery CLI connection, not Cursor configuration
+  - Timeout occurs when Smithery CLI tries to connect to Smithery's servers
+  - This explains "Error - ShowOutput" - the timeout error is in stderr output
+- **Supports**: Nexus - Network/connectivity troubleshooting
+
+### Cursor GitHub Issues - Network Connectivity
+- **Source**: Cursor GitHub Issues - MCP Connection Problems ([github.com](https://github.com/cursor/cursor/issues/3314))
+- **Notes**:
+  - Cursor's sandboxed environment may restrict network requests to `127.0.0.1`
+  - Some MCP servers require external network access which may be blocked
+  - Smithery CLI needs to connect to Smithery's servers to authenticate and fetch server configs
+- **Supports**: Nexus - Network configuration
+
+### Cursor Forum - MCP Update Issues
+- **Source**: Cursor Forum - MCP Error with Latest Update ([forum.cursor.com](https://forum.cursor.com/t/im-getting-mcp-error-with-the-latest-update/72733))
+- **Notes**:
+  - Users report MCP errors after Cursor updates
+  - Some issues resolved by checking network connectivity
+  - Smithery CLI requires internet connection to function
+- **Supports**: Nexus - Update-related troubleshooting
+
+## Key Findings
+
+### Root Cause: Smithery CLI Timeout
+The "Error - ShowOutput" status indicates:
+1. **Smithery CLI Connection Failure**: The CLI is timing out when trying to connect to Smithery's servers
+2. **Network/Connectivity Issue**: Either network is blocked, Smithery service is down, or firewall is blocking
+3. **Authentication Timeout**: The key/profile combination may be invalid, expired, or the auth service is unreachable
+
+### Error Flow
+1. Cursor starts MCP server via `cmd /c npx @smithery/cli@latest run ...`
+2. Smithery CLI attempts to connect to Smithery servers for authentication/config
+3. Connection times out (no response from Smithery servers)
+4. Error is written to stderr
+5. Cursor shows "Error - ShowOutput" (indicating stderr output available)
+
+## Recommendations
+
+### Immediate Actions
+1. **Check Network Connectivity**:
+   - Test if Smithery servers are reachable: `curl https://smithery.ai` or `ping smithery.ai`
+   - Check if behind corporate firewall/proxy that blocks external connections
+   - Verify internet connection is active
+
+2. **Verify Smithery Key/Profile**:
+   - Check if Smithery key is still valid (may have expired)
+   - Verify profile name is correct
+   - Try regenerating key/profile in Smithery dashboard
+
+3. **Test Without Profile**:
+   - Try removing `--profile` argument to see if that's causing the timeout
+   - Some servers may work without profile parameter
+
+4. **Check Firewall/Proxy Settings**:
+   - Windows Firewall may be blocking npx/node connections
+   - Corporate proxy may require configuration
+   - Antivirus may be blocking network requests
+
+5. **Alternative: Use Direct MCP Servers**:
+   - Instead of Smithery CLI, use direct MCP server installations
+   - Example: `npx -y @modelcontextprotocol/server-github` instead of Smithery wrapper
+   - This bypasses Smithery's authentication layer
+
+### Default Choice
+1. Test network connectivity to Smithery servers
+2. Verify key/profile validity
+3. If timeout persists, switch to direct MCP server installations (bypass Smithery)
+
+### Rollback
+- If direct MCP servers work, migrate config to use direct installations
+- Keep Smithery config as backup if service becomes available
+
+### Next Steps
+- Create network connectivity test script
+- Document direct MCP server installation as alternative
+- Update troubleshooting guide with timeout-specific solutions
+- Consider adding timeout detection to self-healing tool
+
+---
+
+# Smithery CLI Connection Method Research
+
+**Research Date**: 2025-01-27  
+**Researcher**: Scout 🔎  
+**Task**: Research Smithery documentation to understand correct connection method and diagnose timeout issues  
+**Issue**: MCP timeout errors with Smithery CLI  
+**Source**: [Smithery Documentation](https://smithery.ai/docs)
+
+## Sources Consulted
+
+### Smithery Documentation - Connection Methods
+- **Source**: Smithery Documentation - Connect to servers ([smithery.ai/docs](https://smithery.ai/docs))
+- **Notes**:
+  - Smithery servers use **Streamable HTTP** connections, not STDIO
+  - Correct URL format: `https://server.smithery.ai/@org/server/mcp?api_key=YOUR_API_KEY&profile=YOUR_PROFILE`
+  - Example config shows HTTP-based connection, not command-line execution
+  - The `@smithery/cli` command may be attempting STDIO when HTTP is required
+- **Supports**: Nexus - MCP configuration correction
+
+### GitHub Issues - Authentication Errors
+- **Source**: Smithery CLI GitHub Issues - 401 Unauthorized ([github.com/smithery-ai/cli/issues/292](https://github.com/smithery-ai/cli/issues/292))
+- **Notes**:
+  - Users report 401 Unauthorized errors during connection attempts
+  - Timeout errors may mask underlying authentication failures
+  - OAuth-style authentication flow required for some servers
+  - Token exchange and user redirects must be handled correctly
+- **Supports**: Nexus - Authentication troubleshooting
+
+### Smithery Service Status
+- **Source**: Smithery Status Page ([smithery.instatus.com](https://smithery.instatus.com))
+- **Notes**:
+  - Service reported operational as of November 2025
+  - No recent outages reported
+  - However, critical vulnerability was patched in June 2025 affecting 3000+ servers
+  - API key rotations may have invalidated old keys
+- **Supports**: Nexus - Service availability verification
+
+### Alternative Connection Methods
+- **Source**: Sammy Labs Documentation - MCP Configuration ([docs.sammylabs.com](https://docs.sammylabs.com/features/mcp))
+- **Notes**:
+  - Shows correct HTTP-based configuration format
+  - Uses `streamableHttp` type with URL including `api_key` and `profile` parameters
+  - Example: `https://server.smithery.ai/@BlackSand-Software/hubspot-mcp/mcp?api_key=YOUR_API_KEY&profile=YOUR_PROFILE`
+  - Debug mode available: `debug: true` for verbose logging
+- **Supports**: Nexus - Configuration format correction
+
+## Key Findings
+
+### Root Cause: STDIO Support Discontinued
+**CRITICAL FINDING**: Smithery discontinued STDIO support as of September 7, 2025 ([blog.apify.com](https://blog.apify.com/smithery-alternative/))
+
+The timeout issue is caused by:
+1. **Deprecated Connection Method**: The `@smithery/cli run` command uses STDIO, which Smithery no longer supports
+2. **Required Migration**: All MCP servers must use Streamable HTTP protocols, not STDIO
+3. **CLI Command Obsolete**: The `npx @smithery/cli run` approach is no longer functional for production connections
+4. **Timeout Explanation**: CLI attempts STDIO connection → Smithery rejects it → Connection times out waiting for response
+
+### Correct Smithery Connection Method
+Based on documentation:
+- **HTTP/Streamable HTTP**: Smithery servers are accessed via HTTP endpoints
+- **URL Format**: `https://server.smithery.ai/@org/server/mcp?api_key=KEY&profile=PROFILE`
+- **Not STDIO**: The servers don't use standard input/output communication
+- **Direct URL Access**: Can be tested with `curl` to verify connectivity
+
+### Authentication Requirements
+- **OAuth Flow**: Some servers require OAuth-style login and token exchange
+- **Client Handling**: Client must manage OAuth flow, token storage, and redirects
+- **401 Errors**: Unauthorized errors may be masked as timeouts if authentication fails silently
+
+## Recommendations
+
+### Immediate Actions
+1. **Test Direct HTTP Connection**:
+   ```powershell
+   curl "https://server.smithery.ai/@smithery-ai/github/mcp?api_key=361d670b-15ef-4f3e-9b93-16d7839e6e8b&profile=spectacular-piranha-CUJgZQ"
+   ```
+   This will verify if the HTTP endpoint is reachable and if authentication works.
+
+2. **Check if CLI Command is Correct**:
+   - Review Smithery CLI documentation for correct usage
+   - The `run` command may be for local development, not production connections
+   - Verify if CLI should use HTTP endpoints instead of STDIO
+
+3. **Enable Debug Mode**:
+   - If using HTTP-based config, enable `debug: true`
+   - This will show detailed connection logs
+
+4. **Verify API Key Permissions**:
+   - Check if key has correct permissions for the servers being accessed
+   - Verify profile name matches exactly (case-sensitive)
+
+### Default Choice
+**Immediate Action Required**: Migrate from STDIO-based CLI commands to HTTP/Streamable HTTP endpoints
+
+1. **Option A: Use Direct HTTP Endpoints** (Recommended if staying with Smithery):
+   - Update MCP config to use HTTP URLs instead of CLI commands
+   - Format: `https://server.smithery.ai/@org/server/mcp?api_key=KEY&profile=PROFILE`
+   - Requires finding correct server paths for each MCP
+
+2. **Option B: Migrate to Direct MCP Servers** (Recommended for reliability):
+   - Use `@modelcontextprotocol/server-*` packages directly
+   - Bypasses Smithery entirely, uses STDIO locally
+   - More reliable and doesn't depend on Smithery service
+
+3. **Option C: Migrate to Apify** (If need cloud hosting):
+   - Apify still supports STDIO-based MCP servers
+   - Full compatibility without code changes
+   - Alternative to Smithery for cloud deployment
+
+### Rollback
+- If Smithery CLI method doesn't work, switch to direct MCP server installations
+- Use `@modelcontextprotocol/server-*` packages directly (bypasses Smithery entirely)
+- Keep Smithery config as backup if service becomes available
+
+### Next Steps
+- **URGENT**: Update MCP config to remove STDIO-based CLI commands
+- Migrate to direct MCP server installations (`@modelcontextprotocol/server-*`)
+- OR update to HTTP/Streamable HTTP endpoints if staying with Smithery
+- Document migration path in troubleshooting guide
+- Update self-healing tool to detect and fix STDIO-based configs
+
+---
+
+# Research Log (Ref Tools/Search MCP)
+
+Use this file to paste brief citations and summaries when any agent uses Ref Tools MCP, GitHub MCP, or other research tools.
+
 ## How to record
 - Source title: <name>
 - URL: <link>
@@ -27,733 +345,307 @@ Use this file to paste brief citations and summaries when any agent uses Ref Too
 
 ---
 
-## 2025-01-XX: Windows Git Push "getaddrinfo() thread failed to start" Error
+# Radar View Implementation Research
 
-**Research Date**: 2025-01-XX  
-**Researcher**: Scout 🔎  
-**Task**: Resolve Windows git push failure preventing Issue #1 completion push  
-**Issue**: Git push fails with `fatal: unable to access 'https://github.com/...': getaddrinfo() thread failed to start`
-
-### Sources
-
-1. **Source**: Stack Overflow - "fatal: unable to access 'link': getaddrinfo() thread failed to start"  
-   **URL**: https://stackoverflow.com/questions/59911649/fatal-unable-to-access-link-getaddrinfo-thread-failed-to-start  
-   **Notes**:
-   - Windows-specific DNS threading issue in git
-   - Often caused by firewall/antivirus blocking git's network operations
-   - Some users resolved by uninstalling firewall software
-   - Workaround: Use IP address instead of hostname in remote URL
-   - Alternative: Switch to SSH protocol instead of HTTPS
-
-2. **Source**: Stack Overflow - "Why does git fail with getaddrinfo thread failed to start when in a subprocess?"  
-   **URL**: https://stackoverflow.com/questions/76654896/why-does-git-fail-with-getaddrinfo-thread-failed-to-start-when-in-a-subproce  
-   **Notes**:
-   - Missing environment variables (e.g., `SystemRoot`) can cause this error
-   - Subprocess execution context may lack required environment variables
-   - PowerShell/CMD environment differences can trigger the issue
-
-3. **Source**: Deepinout - Git Configuration Solutions  
-   **URL**: https://deepinout.com/git/git-questions/53_tk_1702444957.html  
-   **Notes**:
-   - Configure git to use HTTPS instead of git:// protocol
-   - Command: `git config --global url."https://".insteadOf git://`
-   - Proxy settings may need configuration
-   - Update/reinstall Git for Windows may resolve
-
-### Key Findings
-
-**Root Cause**: Windows DNS threading issue in git's HTTP client. Not related to network connectivity (ping works), but to how git spawns DNS resolution threads.
-
-**Common Triggers**:
-- Firewall/antivirus blocking git operations
-- Missing environment variables in subprocess context
-- VPN or network tools interfering
-- Outdated Git for Windows version
-
-**GitHub MCP Limitation**: GitHub MCP does NOT have a git push tool. It handles GitHub API operations (PRs, issues, file contents) but not git commits. The `mcp_github_push_files` tool pushes file contents via API, not git commits, which would create new commits and lose git history.
-
-### Recommended Solutions (Priority Order)
-
-1. **Manual Push (Immediate Fix)**
-   - Push manually from user's terminal where git works
-   - Most reliable workaround
-   - Preserves git history and commit metadata
-
-2. **Check Firewall/Antivirus**
-   - Temporarily disable firewall/antivirus to test
-   - If resolves, add git.exe to firewall exceptions
-   - Some users required complete firewall uninstall
-
-3. **Update Git for Windows**
-   - Download latest from https://git-scm.com/downloads
-   - Newer versions may have fixes for threading issues
-
-4. **Use IP Address Instead of Hostname**
-   - Get GitHub IP: `nslookup github.com`
-   - Update remote: `git remote set-url origin https://<IP>/BackslashBryant/Icebreaker.git`
-   - Bypasses DNS resolution entirely
-
-5. **Switch to SSH Protocol**
-   - Requires SSH key setup: `ssh-keygen` → add to GitHub
-   - Update remote: `git remote set-url origin git@github.com:BackslashBryant/Icebreaker.git`
-   - SSH bypasses HTTP threading issues
-
-6. **Git Configuration Tweaks** (Already attempted)
-   - `http.threads=1` - Limits threading
-   - `http.postBuffer` - Increases buffer size
-   - `http.sslBackend=schannel` - Windows SSL backend
-   - These didn't resolve in our case
-
-### Trade-offs
-
-| Solution | Pros | Cons |
-|----------|------|------|
-| Manual Push | 100% reliable, preserves history | Requires user action |
-| Firewall Exception | Permanent fix if firewall is cause | May not be root cause |
-| IP Address | Bypasses DNS entirely | IP changes, breaks automation |
-| SSH Protocol | Bypasses HTTP threading | Requires SSH setup |
-| GitHub MCP | API-based | Doesn't support git commits |
-
-### Recommendation
-
-**Immediate**: User pushes manually from their terminal (git works in their environment, just not in Cursor's subprocess context).
-
-**Long-term**: 
-1. Add git.exe to firewall exceptions
-2. Update Git for Windows to latest version
-3. If persists, consider SSH protocol setup
-
-**Rollback**: If any solution breaks git entirely, revert remote URL: `git remote set-url origin https://github.com/BackslashBryant/Icebreaker.git`
-
-### Next Steps
-
-1. ✅ Document findings in research log
-2. ⏳ User pushes commits manually (3 commits ready: `564d5e2`, `48de326`, `8ee02e6`)
-3. ⏳ Update `.cursor/rules/07-process-improvement.mdc` with Windows git push workaround lesson
-4. ⏳ Consider adding SSH setup to project docs if issue recurs
-
-### References
-
-- Issue: #1 (Onboarding Flow completion)
-- Branch: `agent/vector/1-onboarding-flow`
-- Commits ready: 3 local commits awaiting push
-- GitHub MCP: Confirmed no git push capability (API-only operations)
-
----
-
-# Minimum Baseline MCPs for Icebreaker MVP
-
-**Research Date**: 2025-01-27
+**Research Date**: 2025-11-06  
 **Researcher**: Scout 🔎
-**Task**: Identify minimum baseline MCP servers required for Icebreaker MVP development
-
-## Executive Summary
-
-Icebreaker MVP requires **3 baseline MCPs** (workflow essential) and **2 optional MCPs** (feature-specific). Core Icebreaker features (proximity matching, real-time chat, location services) use native browser/device APIs and do not require MCP support.
-
-## MCP-to-Feature Mapping
-
-| Icebreaker MVP Feature | MCP Support | MCP Server | Notes |
-| --- | --- | --- | --- |
-| **Workflow Management** | ✅ Required | GitHub MCP | Branches, PRs, issues, labels - core agent workflow |
-| **Research & Documentation** | ✅ Required | DocFork MCP | Official docs lookup, code samples for stack decisions |
-| **Local Operations** | ✅ Required | Desktop Commander MCP | Shell/file automation, port management |
-| **UI Testing** | ⚠️ Optional | Playwright MCP | Accessibility (axe), screenshots, Lighthouse - MVP needs this |
-| **Database Operations** | ⚠️ Conditional | Supabase MCP | Only if using Supabase (not decided yet) |
-| **Real-time Chat** | ❌ None | N/A | WebSocket/SSE implementation - native API, no MCP |
-| **Location Services** | ❌ None | N/A | Browser Geolocation API - native browser API, no MCP |
-| **Signal Engine** | ❌ None | N/A | Backend logic - no MCP needed |
-| **Accessibility Testing** | ⚠️ Optional | Playwright MCP | axe checks for WCAG AA compliance |
-
-## Baseline MCPs (Required)
-
-### 1. GitHub MCP
-- **Status**: ✅ Required (workflow essential)
-- **Purpose**: Agent workflow automation (branching, PRs, issues, labels)
-- **Required Env**: `GITHUB_TOKEN` (PAT with `repo`, `workflow`, `issues` permissions)
-- **Use Cases**:
-  - Vector: Create branches, update issues, manage labels
-  - Forge/Link/Glide/Apex/Cider: Branch pushes, PR creation
-  - Nexus: CI/CD automation, workflow updates
-- **Fallback**: GitHub web UI or `gh` CLI; log deviation in plan
-- **Rollback**: Remove from config if GitHub workflow changes; agents use terminal git as fallback
-- **Source**: `.cursor/mcp.json`, `.cursor/mcp.README.md`, `tools/health-check.mjs` (line 230)
-
-### 2. DocFork MCP
-- **Status**: ✅ Required (workflow essential)
-- **Purpose**: Official documentation lookups, code examples, version notes
-- **Required Env**: `GITHUB_TOKEN`
-- **Use Cases**:
-  - Scout: Research stack options, cite official docs
-  - Forge: Backend framework documentation
-  - Link: Frontend framework documentation
-  - All agents: Reference official API docs during implementation
-- **Fallback**: Vendor docs in browser; cite links manually in `/docs/research.md`
-- **Rollback**: Remove if research workflow changes; manual doc lookup remains viable
-- **Source**: `.cursor/mcp.json`, `.cursor/rules/04-integrations.mdc` (line 19), `tools/health-check.mjs` (line 230)
-
-### 3. Desktop Commander MCP
-- **Status**: ✅ Required (workflow essential)
-- **Purpose**: Local shell/file automation with guardrails
-- **Required Env**: `GITHUB_TOKEN`
-- **Use Cases**:
-  - Nexus: Port management, server startup/cleanup
-  - All agents: File operations within `.cursor/tools/policy.md` allowlist
-  - Local automation tasks (guarded by policy)
-- **Fallback**: Local terminal manually; respect `.cursor/tools/policy.md` allowlist
-- **Rollback**: Remove if automation needs change; terminal commands remain available
-- **Source**: `.cursor/mcp.json`, `.cursor/rules/04-integrations.mdc` (line 22), `tools/health-check.mjs` (line 230)
-
-## Optional MCPs (Feature-Specific)
-
-### 4. Playwright MCP
-- **Status**: ⚠️ Optional (highly recommended for MVP)
-- **Purpose**: UI testing, accessibility checks (axe), screenshots, Lighthouse
-- **Required Env**: `GITHUB_TOKEN`
-- **Use Cases**:
-  - Pixel: Accessibility testing (WCAG AA compliance required)
-  - Pixel: UI screenshots for PR artifacts
-  - Pixel: Lighthouse performance checks
-  - Link: Visual regression testing
-- **Fallback**: Run Playwright locally (`npx playwright test`); attach artifacts manually
-- **Recommendation**: **Keep for MVP** - Accessibility is a core requirement (WCAG AA minimum)
-- **Rollback**: Remove if testing strategy changes; local Playwright remains functional
-- **Source**: `.cursor/mcp.json`, `.cursor/rules/02-quality.mdc` (line 53), `tools/health-check.mjs` (line 253)
-
-### 5. Supabase MCP
-- **Status**: ⚠️ Conditional (only if using Supabase)
-- **Purpose**: Database schema diffs, SQL advisors, policy checks, Edge Functions
-- **Required Env**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`
-- **Use Cases**:
-  - Forge: Database schema management
-  - Forge: SQL query validation
-  - Forge: Migration assistance
-  - Sentinel: Security policy checks
-- **Condition**: Only needed if tech stack decision includes Supabase
-- **Fallback**: Supabase dashboard or SQL CLI; capture notes in `/docs/research.md`
-- **Recommendation**: **Defer decision** - Wait for tech stack research to determine if Supabase is chosen
-- **Rollback**: Remove if different database chosen; no impact if Supabase not used
-- **Source**: `.cursor/mcp.json`, `.cursor/rules/02-quality.mdc` (line 54), `tools/health-check.mjs` (line 253)
-
-## Gaps Identified (No MCP Support Available)
-
-### Real-time Chat
-- **Feature**: Ephemeral 1:1 messaging via WebSocket/SSE
-- **MCP Support**: ❌ None available
-- **Solution**: Native implementation (WebSocket API, Server-Sent Events)
-- **Impact**: No MCP needed; backend implementation handles real-time
-
-### Location Services
-- **Feature**: Approximate proximity matching via browser Geolocation API
-- **MCP Support**: ❌ None available
-- **Solution**: Native browser Geolocation API (user permission-based)
-- **Impact**: No MCP needed; frontend handles location with user consent
-
-### Signal Engine
-- **Feature**: Lightweight compatibility scoring (vibe match, tags, proximity)
-- **MCP Support**: ❌ None available
-- **Solution**: Backend logic implementation
-- **Impact**: No MCP needed; backend algorithm handles scoring
-
-## Recommendations
-
-### Minimum Baseline (Keep These)
-1. ✅ **GitHub MCP** - Required for agent workflow
-2. ✅ **DocFork MCP** - Required for research/documentation
-3. ✅ **Desktop Commander MCP** - Required for local automation
-
-### Recommended for MVP (Keep These)
-4. ⚠️ **Playwright MCP** - Highly recommended; accessibility testing is core requirement (WCAG AA)
-
-### Conditional (Defer Decision)
-5. ⚠️ **Supabase MCP** - Only if tech stack includes Supabase (wait for stack research)
-
-### Remove/Defer
-- None - All currently configured MCPs serve a purpose
-
-## Configuration Decision
-
-**Current Config**: `.cursor/mcp.json` has 5 MCPs configured
-- ✅ Keep: github, docfork, desktop-commander, playwright
-- ⚠️ Keep conditionally: supabase (only if Supabase chosen)
-
-**Action Items**:
-1. Keep all 5 MCPs for now
-2. Document Supabase MCP as conditional in Connection Guide
-3. Revisit Supabase MCP after tech stack decisions complete
-
-## Environment Variables Required
-
-| Variable | MCP Server(s) | Required For | Notes |
-| --- | --- | --- | --- |
-| `GITHUB_TOKEN` | github, playwright, desktop-commander, docfork | All baseline MCPs | PAT with `repo`, `workflow`, `issues` permissions |
-| `SUPABASE_URL` | supabase | Conditional | Only if Supabase chosen |
-| `SUPABASE_ANON_KEY` | supabase | Conditional | Only if Supabase chosen |
-
-## Rollback Paths
-
-### If GitHub MCP Fails
-1. Use GitHub web UI for branch/PR management
-2. Use `gh` CLI for automation
-3. Log deviation in plan (`.notes/features/<slug>/progress.md`)
-4. Update `.cursor/rules/07-process-improvement.mdc` if workflow gap identified
-
-### If DocFork MCP Fails
-1. Use vendor documentation in browser
-2. Cite links manually in `/docs/research.md`
-3. Continue research workflow without MCP
-
-### If Desktop Commander MCP Fails
-1. Use local terminal manually
-2. Respect `.cursor/tools/policy.md` allowlist
-3. Continue automation tasks via terminal
-
-### If Playwright MCP Fails
-1. Run Playwright locally: `npx playwright test`
-2. Attach artifacts manually to PRs
-3. Continue accessibility testing workflow
-
-### If Supabase MCP Fails (if used)
-1. Use Supabase dashboard for schema management
-2. Use SQL CLI for queries
-3. Capture notes in `/docs/research.md`
+**Task**: Research Radar View requirements, WebSocket patterns, Signal Engine implementation, and proximity matching for Issue #2  
+**Issue**: #2 (Radar View - Proximity-Based Presence Visualization)
 
 ## Sources Consulted
 
-- Source title: MCP Configuration
-- URL: `.cursor/mcp.json`
-- Notes:
-  - Current config shows 5 MCPs: github, supabase, playwright, desktop-commander, docfork
-  - All use Smithery CLI (`@smithery/cli@latest`)
-- Supports: Scout - MCP baseline identification
+### Vision Documents (Internal)
+- **Source**: Radar & Chat Vision (`Docs/Vision/IceBreaker — Radar & Chat Vision.txt`)
+- **Notes**:
+  - Radar displays proximity-based presence (CRT sweep or accessible list)
+  - No avatars, no profiles, no pressure
+  - Sorted by lightweight compatibility (Signal Engine)
+  - Empty state: "No one here — yet."
+  - Visibility ON → eligible to appear
+  - Skipping tags → reduced discoverability (soft penalty)
+  - Score hints: higher score = closer to center / stronger pulse
+- **Supports**: Link - Radar UI implementation
 
-- Source title: Health Check Baseline Requirements
-- URL: `tools/health-check.mjs` (lines 230-263)
-- Notes:
-  - Identifies 3 required baseline: github, docfork, desktop-commander
-  - Identifies 2 optional: supabase, playwright
-  - Confirms baseline vs optional distinction
-- Supports: Scout - Baseline MCP identification
+- **Source**: Signal Engine Vision (`Docs/Vision/IceBreaker — Signal Engine Vision.txt`)
+- **Notes**:
+  - MVP scoring formula: `score(A,B) = w_vibe * VIBE_MATCH + w_tag * MIN(shared_tags, 3) + w_vis * VISIBILITY_ON + w_tagless * TAGLESS + w_dist * PROXIMITY_TIER`
+  - Default weights: `w_vibe = +10`, `w_tag = +5` (per tag, max 3), `w_vis = +3`, `w_tagless = -5`, `w_dist = +2`
+  - Safety rule: if `safety_flag == true` → exclude from results
+  - Tie-breakers: stable random seed per session, then alphabetical handle
+  - Higher score → closer to center of Radar / stronger pulse
+- **Supports**: Forge - Signal Engine service implementation
 
-- Source title: MCP Integration Rules
-- URL: `.cursor/rules/04-integrations.mdc`
-- Notes:
-  - Documents when to use each MCP (GitHub first, DocFork second, etc.)
-  - Defines fallback protocols for each MCP
-  - Establishes Plan Mode → Act Mode workflow for MCP usage
-- Supports: Scout - MCP usage patterns and fallbacks
+- **Source**: Product Vision (`docs/vision.md`)
+- **Notes**:
+  - Radar success criteria: Radar updates in < 1s
+  - Accessibility: WCAG AA compliance, reduced-motion, high-contrast, keyboard navigation
+  - Performance: Radar updates < 1s
+  - Brand vibe: "terminal meets Game Boy" - deep navy/charcoal base, neon teal accents
+- **Supports**: All agents - Success criteria and constraints
 
-- Source title: MCP Server Documentation
-- URL: `.cursor/mcp.README.md`
-- Notes:
-  - Documents all 5 configured MCPs with use cases
-  - Provides fallback paths for each server
-  - Includes environment variable requirements
-- Supports: Scout - MCP capabilities and requirements
+- **Source**: Architecture Template (`docs/architecture/ARCHITECTURE_TEMPLATE.md`)
+- **Notes**:
+  - WebSocket protocol: `wss://api.icebreaker.app/ws?token=<sessionToken>`
+  - Message types: `radar:subscribe`, `radar:update`, `chat:request`, etc.
+  - Signal Engine: `backend/src/services/SignalEngine.ts`
+  - Radar Module: `frontend/src/pages/radar/`
+  - Session data: vibe, tags, visibility, approximate location, active chat partner
+- **Supports**: Forge + Link - Implementation architecture
 
-- Source title: Icebreaker Vision Document
-- URL: `docs/vision.md`
-- Notes:
-  - Lists 14 MVP features (onboarding, radar, chat, safety, etc.)
-  - Identifies accessibility as core requirement (WCAG AA)
-  - Confirms no MCP needed for location/real-time (native APIs)
-- Supports: Scout - Feature-to-MCP mapping
+- **Source**: UI Mock (`Docs/Vision/ui_ux_mocks/app/radar/page.tsx`)
+- **Notes**:
+  - React component with CRT sweep visualization
+  - Toggle between radar/list view modes
+  - Selected person card with handle, vibe, tags, signal score
+  - One-tap chat initiation: "START CHAT →" button
+  - PanicButton component (always accessible FAB)
+  - RetroHeader with view toggle and PROFILE link
+- **Supports**: Link - Component structure and UI patterns
 
-- Source title: MCP Suggest Tool
-- URL: `tools/mcp-suggest.mjs`
-- Notes:
-  - Shows heuristics for detecting Supabase, Playwright, Vercel, Stripe
-  - Confirms no MCPs exist for location/real-time services
-  - Provides auto-detection for optional MCPs
-- Supports: Scout - Available MCP ecosystem research
+### Technical Research (External)
 
-## Conclusion
+- **Source**: WebSocket.org - Building a WebSocket App
+- **URL**: https://websocket.org/guides/building-a-websocket-app
+- **Notes**:
+  - WebSocket patterns for real-time applications
+  - Connection lifecycle management
+  - Heartbeat/ping-pong pattern for connection health
+  - Scaling considerations for WebSocket applications
+- **Supports**: Forge - WebSocket server implementation
 
-Icebreaker MVP requires **3 baseline MCPs** (github, docfork, desktop-commander) for workflow automation. **Playwright MCP is highly recommended** for accessibility testing (core requirement). **Supabase MCP is conditional** and depends on tech stack decisions. Core Icebreaker features (proximity, real-time chat, location) use native APIs and do not require MCP support.
+- **Source**: WebSocket API Reference - Heartbeat/Ping-Pong Pattern
+- **URL**: https://websocket.org/reference/websocket-api#heartbeatping-pong-pattern
+- **Notes**:
+  - Ping-pong pattern maintains connection health
+  - Prevents connection timeouts
+  - Useful for ephemeral sessions (detect stale connections)
+- **Supports**: Forge - WebSocket connection management
 
-**Next Steps**:
-1. ✅ MCP baseline research complete
-2. ⏭️ Proceed with tech stack research (will inform Supabase MCP decision)
-3. ⏭️ Update Connection Guide with MCP requirements
+## Key Findings
+
+### Radar View Requirements
+1. **Visualization**: CRT sweep style OR accessible list view (user toggle)
+2. **Real-time Updates**: WebSocket connection for proximity updates
+3. **Signal Engine**: Compatibility scoring (vibe match, shared tags, visibility, proximity, safety)
+4. **Empty States**: "No one here — yet." when no nearby sessions
+5. **GPS States**: Graceful handling of denied/off location permissions
+6. **One-tap Chat**: Tap person on radar → initiate chat request
+7. **Accessibility**: WCAG AA, reduced-motion, high-contrast, keyboard navigation
+
+### Signal Engine Implementation
+1. **Scoring Formula**: Weighted sum of compatibility factors
+2. **Default Weights**: Tunable via config file (A/B testing capability)
+3. **Safety Exclusion**: Recent panic → hide from Radar
+4. **Proximity Tiers**: Coarse buckets (within room / venue / nearby)
+5. **Tie-breakers**: Stable random seed + alphabetical handle
+
+### WebSocket Protocol
+1. **Connection**: `wss://api.icebreaker.app/ws?token=<sessionToken>`
+2. **Client Messages**: `radar:subscribe`, `chat:request`, `location:update`
+3. **Server Messages**: `radar:update`, `chat:request`, `chat:accepted`, `error`
+4. **Heartbeat**: Ping-pong pattern for connection health
+5. **Session-based**: Connection lifecycle tied to session token
+
+### Proximity Matching
+1. **Approximate Location**: Browser Geolocation API (user permission)
+2. **Privacy-first**: No precise coordinates stored
+3. **Proximity Tiers**: Coarse buckets (room/venue/nearby)
+4. **Distance Calculation**: Haversine formula or simple distance (approximate)
+5. **GPS Denied**: Graceful fallback (reduced experience)
+
+### Performance Requirements
+1. **Radar Updates**: < 1s (real-time proximity updates)
+2. **Signal Engine**: Efficient scoring for all visible sessions
+3. **WebSocket Latency**: < 500ms for chat initiation
+4. **Accessibility**: No performance degradation for screen readers
+
+### Accessibility Requirements
+1. **WCAG AA**: Minimum compliance standard
+2. **Reduced Motion**: Disable sweeps, blinks, pulses
+3. **High Contrast**: Brighten teal, ensure text contrast
+4. **Keyboard Navigation**: Full keyboard paths
+5. **Screen Reader**: ARIA labels on dots, list items, FAB
+
+## Implementation Recommendations
+
+### Frontend (Link)
+1. **Radar Component**: CRT sweep visualization with toggle to list view
+2. **WebSocket Hook**: `useWebSocket` for connection management
+3. **Signal Display**: Visual hints (closer to center = higher score)
+4. **Empty States**: Clear messaging for no nearby sessions
+5. **Accessibility**: Keyboard navigation, screen reader support, reduced-motion
+
+### Backend (Forge)
+1. **Signal Engine Service**: Compatibility scoring algorithm
+2. **WebSocket Server**: Connection handler for radar updates
+3. **Proximity Calculation**: Distance-based proximity tiers
+4. **Safety Exclusions**: Filter out blocked/reported sessions
+5. **Configurable Weights**: Tunable Signal Engine weights
+
+### Testing (Pixel)
+1. **Unit Tests**: Signal Engine scoring algorithm
+2. **Integration Tests**: WebSocket connection + radar updates
+3. **E2E Tests**: Onboarding → Radar → Chat flow
+4. **Accessibility Tests**: WCAG AA compliance, keyboard navigation
+5. **Performance Tests**: Radar update latency < 1s
+
+## Trade-offs
+
+| Decision | Pros | Cons |
+|----------|------|------|
+| WebSocket for Radar | Real-time updates, single connection | Manual reconnection logic |
+| Approximate Location | Privacy-first, no precise tracking | Less accurate proximity matching |
+| Signal Engine Scoring | Explainable, tunable weights | May need A/B testing for optimal weights |
+| CRT Sweep Visualization | Unique brand aesthetic | May be challenging for accessibility |
+
+## Next Steps
+
+1. ✅ Research complete
+2. ⏭️ Vector creates comprehensive plan with all agents
+3. ⏭️ Forge implements Signal Engine service
+4. ⏭️ Link implements Radar UI components
+5. ⏭️ Pixel creates test suite
+6. ⏭️ Muse updates documentation
 
 ---
 
-# Bootstrap Web Health MVP Research
+## 2025-11-06: Radar View Implementation Research
 
-**Research Date**: 2025-01-27
-**Researcher**: Vector 🎯
-**Task**: Health endpoint patterns and best practices for framework-agnostic bootstrap MVP
-
-## Health Endpoint Patterns
-
-### Source title: Health Check Endpoint Best Practices
-- URL: General industry practice (no single source)
-- Notes:
-  - Health endpoints should return 200 OK with simple JSON response
-  - Common response shape: `{ "status": "ok" }` or `{ "status": "healthy" }`
-  - Should be lightweight, no database or external service checks for MVP
-  - Typically served at `/health` or `/api/health` route
-- Supports: Forge - Health endpoint implementation guidance
-
-### Source title: Framework-Agnostic Health Endpoint Examples
-- URL: Stack-agnostic approach
-- Notes:
-  - **Node.js**: Express/Fastify/Hono minimal route handler
-  - **Response**: `res.json({ status: "ok" })` with 200 status code
-  - **Frontend**: Simple fetch to `/api/health` and display status
-  - **CORS**: May need to configure CORS if frontend and backend on different ports
-- Supports: Forge/Link - Implementation guidance for bootstrap MVP
-
-### Source title: Playwright E2E Testing for Health Checks
-- URL: Playwright documentation (general practice)
-- Notes:
-  - Test should fetch API endpoint and verify JSON response
-  - Test should navigate to frontend page and verify health status is displayed
-  - Use `page.goto()` and `page.request.get()` for API + UI coverage
-  - Minimal smoke test: verify response shape and UI contains status text
-- Supports: Pixel - Playwright smoke test scaffolding
-
-### Source title: Minimal Viable Stack Selection
-- URL: Project template architecture
-- Notes:
-  - Backend: Choose minimal framework (Express.js for Node.js is common default)
-  - Frontend: Choose minimal framework (React/Vite, Vue, or vanilla JS acceptable)
-  - Testing: Vitest/Jest for unit tests, Playwright for E2E
-  - Shared types: TypeScript shared types in `shared/` directory (optional for MVP)
-- Supports: Implementers - Stack selection guidance
-
-## Recommendations
-
-1. **Health Endpoint**: Keep it simple - return `{ "status": "ok" }` with 200 status. No database checks, no external dependencies.
-2. **Frontend Component**: Display the status text from API response. No styling required for MVP.
-3. **Testing**: Unit test for API route, component test for UI, Playwright E2E for full flow.
-4. **Stack Choice**: Use minimal viable stack (Express + React/Vite recommended for speed).
-
-## Rollback Paths
-
-- If chosen stack conflicts: Document in `.notes/features/bootstrap-web-health-mvp/progress.md` and choose alternative
-- If port conflicts: Use `npm run ports:status` to check, then choose alternative ports
-- If CORS issues: Add CORS middleware to backend (Express: `cors` package, Fastify: `@fastify/cors`)
-
----
-
-# Tech Stack Research for Icebreaker MVP
-
-**Research Date**: 2025-01-27
+**Research Date**: 2025-11-06  
 **Researcher**: Scout 🔎
-**Task**: Research and recommend tech stack choices for frontend, backend, real-time communication, and storage aligned with Icebreaker MVP requirements (privacy-first, ephemeral, proximity-based, WCAG AA accessible)
+**Task**: Research Radar View requirements, WebSocket patterns, Signal Engine implementation, and proximity matching for Issue #2  
+**Issue**: #2 (Radar View - Proximity-Based Presence Visualization)
 
-## Research Scope
+### Sources Consulted
 
-Evaluated options for:
-1. **Frontend Framework**: UI framework for React-based web app
-2. **Backend Runtime/Framework**: API server and real-time communication
-3. **Real-time Solution**: WebSocket vs Server-Sent Events (SSE) for ephemeral chat
-4. **Session Storage**: Options for ephemeral session data (no message content storage)
+**Vision Documents (Internal)**:
+- Radar & Chat Vision: CRT sweep or list view, Signal Engine sorting, empty states, one-tap chat
+- Signal Engine Vision: MVP scoring formula with tunable weights, safety exclusions, tie-breakers
+- Architecture Template: WebSocket protocol, message types, module structure
+- UI Mock: React component patterns, view toggle, selected person card
+- Product Vision: Performance targets, accessibility requirements, brand vibe
 
-## Constraints & Requirements
+**Technical Research (External)**:
+- WebSocket.org: Real-time app patterns, connection lifecycle, heartbeat/ping-pong
+- WebSocket API Reference: Heartbeat pattern for connection health
 
-- **Privacy-first**: No message content storage; approximate location only; session-scoped data
-- **Ephemeral by design**: Sessions expire; no long-term transcripts; visibility is reversible
-- **WCAG AA accessible**: Screen reader support, keyboard navigation, semantic HTML, proper ARIA labels
-- **Performance**: Chat latency < 500ms; Radar updates < 1s
-- **Lightweight**: Simple, explainable code; minimal dependencies for MVP
+### Key Findings
 
----
+**Radar View Requirements**:
+1. CRT sweep OR accessible list view (user toggle)
+2. WebSocket for real-time proximity updates
+3. Signal Engine compatibility scoring
+4. Empty states, GPS denied handling
+5. One-tap chat initiation
+6. WCAG AA accessibility
 
-## Frontend Framework
+**Signal Engine**:
+- Formula: `score(A,B) = w_vibe * VIBE_MATCH + w_tag * MIN(shared_tags, 3) + w_vis * VISIBILITY_ON + w_tagless * TAGLESS + w_dist * PROXIMITY_TIER`
+- Default weights: `w_vibe = +10`, `w_tag = +5` (max 3), `w_vis = +3`, `w_tagless = -5`, `w_dist = +2`
+- Safety: Recent panic → exclude from results
+- Tie-breakers: Stable random seed + alphabetical handle
 
-### Recommendation: **React + Vite**
+**WebSocket Protocol**:
+- Connection: `wss://api.icebreaker.app/ws?token=<sessionToken>`
+- Messages: `radar:subscribe`, `radar:update`, `chat:request`, `location:update`
+- Heartbeat: Ping-pong pattern for connection health
 
-**Rationale**:
-- React is familiar to team (per implementation notes)
-- Vite provides fast dev server and optimized production builds
-- Strong ecosystem for accessibility tooling and patterns
-- TypeScript support for type safety
-- Component-based architecture aligns with Icebreaker's modular features (onboarding, radar, chat)
+**Proximity Matching**:
+- Approximate location (Browser Geolocation API)
+- Coarse proximity tiers (room/venue/nearby)
+- Privacy-first: No precise coordinates stored
 
-**Accessibility Considerations**:
-- React supports semantic HTML and ARIA attributes
-- **shadcn/ui component library** (recommended addition):
-  - Built on Radix UI primitives (WCAG AA compliant out of the box)
-  - Accessible components: Button, Checkbox, Input, Dialog, etc.
-  - Keyboard navigation built-in
-  - Screen reader support via ARIA attributes
-  - Works with React+Vite (framework-agnostic component library)
-- WCAG AA compliance achievable with:
-  - Semantic HTML elements (`<nav>`, `<main>`, `<button>`, etc.)
-  - ARIA labels for screen readers (provided by Radix UI)
-  - Keyboard navigation (focus management, tab order - handled by Radix)
-  - Reduced-motion and high-contrast mode support
-- React Testing Library includes accessibility testing utilities
-- Playwright MCP can run axe checks for WCAG AA verification
+### Implementation Recommendations
 
-**Component Library Decision**:
-- **shadcn/ui** recommended (reference mock uses it)
-- Radix UI primitives provide accessibility by default
-- Components are copy-paste (not npm package) - full control over customization
-- Aligns with "terminal meets Game Boy" aesthetic from vision
-- Can extract design patterns from `Docs/Vision/ui_ux_mocks/` reference
+**Frontend (Link)**: Radar component, WebSocket hook, signal display, empty states, accessibility  
+**Backend (Forge)**: Signal Engine service, WebSocket server, proximity calculation, safety exclusions  
+**Testing (Pixel)**: Unit tests, integration tests, E2E tests, accessibility tests, performance tests
 
-**Trade-offs**:
-- ✅ **Pros**: Familiar stack, fast dev experience, strong a11y ecosystem with shadcn/ui
-- ⚠️ **Cons**: SPA requires client-side routing; no SSR (not needed for chat MVP)
-- **Rollback**: If React accessibility concerns arise, Vue.js or Svelte are viable alternatives with similar a11y support
+### Trade-offs
 
-**Note on Next.js Consideration**:
-- Next.js was evaluated (reference mock uses Next.js)
-- Decision: **React+Vite preferred** for MVP because:
-  - Real-time chat is client-heavy (WebSocket requires client components)
-  - SSR doesn't benefit chat/radar views (no SEO needed)
-  - Simpler architecture = faster to ship MVP
-  - shadcn/ui works with both stacks (framework-agnostic)
-- Mock folder (`Docs/Vision/ui_ux_mocks/`) is design reference only
-- Extract component patterns and styles, not Next.js structure
+- WebSocket: Real-time updates vs manual reconnection
+- Approximate Location: Privacy-first vs less accurate matching
+- Signal Engine: Explainable/tunable vs may need A/B testing
+- CRT Sweep: Unique aesthetic vs accessibility challenges
 
-**Sources**:
-- Source title: Vite 4.0 Release
-- URL: https://vite.dev/blog/announcing-vite4
-- Notes:
-  - Vite 4.0 provides fast HMR and optimized builds
-  - React plugin supported via `@vitejs/plugin-react`
-  - TypeScript support included
-- Supports: Scout - Frontend framework selection
-
-- Source title: Next.js vs Vite Migration Guide
-- URL: https://nextjs.org/docs/15/app/guides/migrating/from-vite#why-switch
-- Notes:
-  - Next.js advantages: SSR, automatic code splitting, built-in optimizations
-  - Next.js better for SEO and initial page load (not needed for chat MVP)
-  - Real-time chat apps are client-heavy (WebSocket requires client components)
-  - Next.js adds complexity without clear benefit for ephemeral chat MVP
-- Supports: Scout - Framework comparison for real-time chat
-
-- Source title: shadcn/ui Documentation
-- URL: https://ui.shadcn.com/docs/components/form
-- Notes:
-  - shadcn/ui built on Radix UI primitives
-  - Components are copy-paste (not npm package) - full customization control
-  - Framework-agnostic (works with React, Next.js, Vite, etc.)
-  - WCAG AA compliant via Radix UI accessibility
-- Supports: Scout - Component library selection
-
-- Source title: Radix UI Accessibility
-- URL: https://github.com/radix-ui/website/blob/main/data/primitives/docs/overview/accessibility.mdx
-- Notes:
-  - Radix UI primitives are WCAG AA compliant by default
-  - Built-in keyboard navigation and screen reader support
-  - ARIA attributes included automatically
-- Supports: Scout - Accessibility validation for component library
+**Next Steps**: Vector creates comprehensive plan with all agents involved
 
 ---
 
-## Backend Runtime/Framework
+## 2025-11-09: Supabase MCP Migration to Hosted Server
 
-### Recommendation: **Node.js + Express.js**
+**Research Date**: 2025-11-09  
+**Researcher**: Nexus 🚀  
+**Task**: Migrate from npm package `supabase-mcp` to official hosted Supabase MCP server  
+**Issue**: Supabase MCP configuration simplification
 
-**Rationale**:
-- Minimal setup aligns with MVP scope
-- Express.js is mature, well-documented, and lightweight
-- Good ecosystem for WebSocket support (via `ws` package)
-- CORS support for frontend-backend separation
-- Session management via `express-session` with flexible storage backends
+### Sources Consulted
 
-**Privacy & Ephemeral Support**:
-- Express middleware allows session-scoped data
-- No built-in persistence (storage backend is configurable)
-- Supports ephemeral session stores (in-memory, Redis with TTL)
-- Minimal dependencies for MVP
+**Official Supabase Documentation**:
+- **Source**: [Supabase MCP Documentation](https://supabase.com/docs/guides/getting-started/mcp)
+- **Notes**:
+  - Supabase now provides official hosted MCP server at `https://mcp.supabase.com/mcp`
+  - Uses dynamic client registration for authentication (no PAT needed)
+  - Browser-based authentication flow
+  - Project-scoped access via `project_ref` query parameter
+  - Feature groups: docs, account, database, debugging, development, functions, branching, storage
+  - No environment variables required
+  - Previously required `MCP_API_KEY` (npm package only)
 
-**Trade-offs**:
-- ✅ **Pros**: Simple, familiar, fast to prototype, good WebSocket support
-- ⚠️ **Cons**: Single-threaded (Node.js limitation); may need scaling for production
-- **Rollback**: If Node.js limitations block, Fastify (faster) or Deno/Bun (modern alternatives) are options
+### Key Findings
 
-**Sources**:
-- Source title: Express.js Installation
-- URL: https://github.com/expressjs/express/blob/master/Readme.md
-- Notes:
-  - Express is minimal web framework for Node.js
-  - Session management via `express-session` package
-  - Supports Redis, in-memory, and other storage backends
-- Supports: Scout - Backend framework selection
+**Hosted Server Benefits**:
+1. **No environment variables** - Authentication handled automatically via browser
+2. **Simpler configuration** - Just a URL, no command/args/env needed
+3. **Official support** - Maintained by Supabase team
+4. **Project scoping** - Limited to specific project via `project_ref`
+5. **Feature control** - Enable/disable specific tool groups
 
-- Source title: Express Session Store
-- URL: https://github.com/expressjs/session/blob/master/README.md
-- Notes:
-  - `express-session` supports multiple storage backends
-  - Compatible with Redis, in-memory, and database stores
-  - Session data is configurable (ephemeral-friendly)
-- Supports: Scout - Session storage integration
+**Configuration Change**:
+- **Before**: npm package `supabase-mcp` with `MCP_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- **After**: Hosted server URL with `project_ref` and `features` query parameters
 
----
+**Migration Steps**:
+1. Update `.cursor/mcp.json` to use hosted server URL
+2. Remove `MCP_API_KEY` from environment variables (no longer needed)
+3. Remove Supabase env vars from MCP config (still useful for client libraries)
+4. Restart Cursor - browser authentication prompt on first use
 
-## Real-time Communication
+### Implementation
 
-### Recommendation: **WebSocket** (primary) with **SSE** (optional for radar updates)
-
-**Rationale for WebSocket**:
-- **Bidirectional communication required** for ephemeral chat (client sends messages, server broadcasts)
-- **Low latency** (< 500ms requirement) for chat messages
-- **Binary and text support** (future-proof for potential features)
-- **No browser connection limits** (unlike SSE's 6-connection limit on HTTP/1.1)
-- **Full control** over reconnection logic (ephemeral sessions need explicit cleanup)
-
-**Why Not SSE for Chat**:
-- SSE is **unidirectional** (server → client only)
-- Chat requires client-to-server message sending (bidirectional)
-- SSE would require separate HTTP POST requests for sending messages (adds complexity and latency)
-
-**Optional SSE for Radar Updates**:
-- Radar proximity updates could use SSE (unidirectional server push)
-- Automatic reconnection is useful for mobile/background scenarios
-- However, WebSocket can handle both chat and radar on single connection (simpler architecture)
-
-**Implementation Approach**:
-- Use `ws` package for Node.js WebSocket server
-- Single WebSocket connection per session (handles chat + radar updates)
-- Session-based connection lifecycle (cleanup on disconnect)
-- No message persistence (ephemeral by design)
-
-**Trade-offs**:
-- ✅ **Pros**: Bidirectional, low latency, full control, handles both chat and radar
-- ⚠️ **Cons**: Manual reconnection logic needed (SSE has automatic reconnection); slightly more complex than SSE
-- **Rollback**: If WebSocket complexity blocks, hybrid approach: SSE for radar + HTTP POST for chat (adds latency)
-
-**Sources**:
-- Source title: WebSockets vs Server-Sent Events (SSE)
-- URL: https://websocket.org/comparisons/sse#websockets-vs-server-sent-events-sse-choosing-your-real-time-protocol
-- Notes:
-  - WebSocket: Bidirectional, full control, no browser limits, binary support
-  - SSE: Unidirectional, automatic reconnection, HTTP/2 multiplexing, 6-connection limit (HTTP/1.1)
-  - **Use WebSocket for chat** (bidirectional required)
-  - **Use SSE for server-push feeds** (unidirectional acceptable)
-  - WebSocket has manual reconnection (SSE has automatic)
-- Supports: Scout - Real-time protocol selection
-
----
-
-## Session Storage
-
-### Recommendation: **In-memory Map** (MVP) with **Redis + TTL** (production scaling path)
-
-**Rationale for In-memory (MVP)**:
-- **Simplest setup**: No external dependencies, no database setup
-- **Ephemeral by design**: Data lost on server restart (aligns with ephemeral philosophy)
-- **Fast**: No network latency, direct memory access
-- **Privacy-first**: No persistence layer means no accidental data leakage
-- **Session-scoped**: Node.js Map with TTL cleanup (simple timer-based expiration)
-
-**Rationale for Redis (Production)**:
-- **Horizontal scaling**: Multiple server instances can share session store
-- **TTL support**: Built-in expiration (`EXPIRE` command) for ephemeral sessions
-- **Performance**: Still fast (in-memory), but shared across instances
-- **Ephemeral-friendly**: Redis TTL ensures automatic cleanup (no manual timer management)
-
-**Storage Requirements**:
-- **Session data only**: User ID (hashed), vibe, tags, visibility, approximate location (last updated), active chat partner ID
-- **NO message content**: Messages are never stored (ephemeral by design)
-- **Safety metadata**: Separate store (database) for reports/blocking (minimal metadata, no messages)
-
-**Implementation Approach (MVP)**:
-```javascript
-// In-memory session store
-const sessions = new Map();
-const SESSION_TTL = 3600000; // 1 hour
-
-// Auto-cleanup expired sessions
-setInterval(() => {
-  const now = Date.now();
-  for (const [sessionId, session] of sessions.entries()) {
-    if (session.expiresAt < now) {
-      sessions.delete(sessionId);
+**Updated Configuration**:
+```json
+{
+  "mcpServers": {
+    "supabase": {
+      "url": "https://mcp.supabase.com/mcp?project_ref=awqcctsqyrlgaygpmgrq&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cstorage"
     }
   }
-}, 60000); // Check every minute
+}
 ```
 
-**Migration Path to Redis**:
-- Start with in-memory Map (MVP)
-- Add Redis when scaling to multiple instances
-- Use `express-session` with `connect-redis` store (drop-in replacement)
-- Redis TTL ensures ephemeral behavior (automatic expiration)
+**Documentation Updates**:
+- Updated `docs/troubleshooting/mcp-setup-guide.md` - Reflect hosted server
+- Updated `docs/troubleshooting/mcp-env-setup-windows.md` - Remove Supabase env vars
+- Updated `docs/troubleshooting/supabase-key-setup.md` - Mark as optional/for other uses
+- Updated `docs/troubleshooting/mcp-troubleshooting.md` - Update Supabase section
+- Updated `tools/mcp-self-heal.mjs` - Skip env checks for hosted server
+- Updated `tools/health-check.mjs` - Recognize hosted server doesn't need env vars
+- Updated `.env` - Removed `MCP_API_KEY`, added note about hosted server
 
-**Trade-offs**:
-- ✅ **In-memory Pros**: Simple, fast, no dependencies, privacy-friendly (no persistence)
-- ⚠️ **In-memory Cons**: Data lost on restart, single-instance only, manual TTL cleanup
-- ✅ **Redis Pros**: Shared across instances, automatic TTL, production-ready
-- ⚠️ **Redis Cons**: External dependency, requires Redis server setup
-- **Rollback**: If Redis complexity blocks MVP, stay in-memory; add Redis later for scaling
+### Trade-offs
 
-**Sources**:
-- Source title: Redis EXPIRE Command
-- URL: https://redis.io/docs/latest/commands/expire/#keys-with-an-expire
-- Notes:
-  - Redis `EXPIRE` command sets TTL on keys
-  - Automatic expiration ensures ephemeral behavior
-  - Supports session-scoped data with automatic cleanup
-- Supports: Scout - Ephemeral session storage
+**Pros**:
+- Simpler setup (no env vars)
+- Official support
+- Better security (browser-based auth)
+- Project scoping built-in
 
-- Source title: Redis Ephemeral Storage
-- URL: https://redis.io/docs/latest/operate/rs/installing-upgrading/install/plan-deployment/persistent-ephemeral-storage/
-- Notes:
-  - Redis supports ephemeral storage (no persistence)
-  - TTL ensures automatic cleanup
-  - Suitable for session-scoped data
-- Supports: Scout - Storage privacy considerations
+**Cons**:
+- Requires browser for authentication
+- Less control over authentication flow
+- Requires internet connection
+
+**Next Steps**: All MCPs now working with simplified configuration
 
 ---
-
-## Summary & Recommendations
-
-### Recommended Stack for Icebreaker MVP
-
-| Component | Technology | Rationale |
-| --- | --- | --- |
-| **Frontend Framework** | React + Vite | Simpler for real-time chat MVP; fast dev experience; no SSR overhead needed |
-| **UI Component Library** | shadcn/ui (Radix UI) | WCAG AA compliant; works with React+Vite; reference mock uses it |
-| **Backend** | Node.js + Express.js | Minimal setup, good WebSocket support |
-| **Real-time** | WebSocket (`ws` package) | Bidirectional chat required, low latency |
-| **Session Storage** | In-memory Map (MVP), Redis (production) | Simple MVP, scales to Redis with TTL |
-
-### Key Decisions
-
-1. **WebSocket over SSE**: Chat requires bidirectional communication; WebSocket is the right choice
-2. **In-memory over Redis (MVP)**: Simplest setup, no external dependencies, aligns with ephemeral philosophy
-3. **React + Vite**: Simpler for real-time chat MVP; fast dev experience; no SSR overhead needed
-4. **shadcn/ui (Radix UI)**: WCAG AA compliant component library; works with React+Vite; reference mock uses it
-5. **Express.js**: Minimal framework, good ecosystem, WebSocket support
-
-### Privacy & Ephemeral Alignment
-
-- ✅ **No message storage**: WebSocket handles real-time only; no persistence layer for messages
-- ✅ **Session-scoped data**: In-memory Map with TTL ensures ephemeral behavior
-- ✅ **Approximate location**: Browser Geolocation API (no backend storage needed)
-- ✅ **Safety metadata**: Separate minimal store (database) for reports only (no message content)
-
-### WCAG AA Compliance Path
-
-- **shadcn/ui (Radix UI)**: Provides WCAG AA compliant components out of the box
-- React supports semantic HTML and ARIA
-- Radix UI primitives handle keyboard navigation, focus management, and screen reader support automatically
-- Playwright MCP can run axe checks for WCAG AA verification
-- Manual testing required: keyboard navigation, screen reader testing
-- **Accessibility is achievable with Radix UI** (components are accessible by default; custom components need discipline)
-
-### Rollback Paths
-
-1. **Frontend**: If React accessibility concerns arise → Vue.js or Svelte (similar a11y support)
-2. **Backend**: If Node.js limitations block → Fastify (faster) or Deno/Bun (modern)
-3. **Real-time**: If WebSocket complexity blocks → Hybrid: SSE for radar + HTTP POST for chat (adds latency)
-4. **Storage**: If Redis complexity blocks MVP → Stay in-memory; add Redis later for scaling
-
-### Next Steps
-
-1. ✅ Tech stack research complete
-2. ⏭️ Document architecture decisions in `docs/architecture/ARCHITECTURE_TEMPLATE.md`
-3. ⏭️ Create first GitHub issue for MVP onboarding flow
-4. ⏭️ Update Connection Guide with chosen tech stack ports/services
-
----
-
-**Research Complete**: All acceptance criteria met. Recommendations include trade-offs, rollback paths, and alignment with privacy-first, ephemeral, WCAG AA requirements.

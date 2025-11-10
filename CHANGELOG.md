@@ -9,6 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### MVP: Radar View (Proximity-Based Presence Visualization) (Issue #2)
+- CRT-style radar sweep visualization with retro aesthetic
+- Accessible list view for keyboard navigation and screen readers
+- Real-time WebSocket connection for radar updates (`ws://localhost:8000/ws?token=<sessionToken>`)
+- Signal Engine service for compatibility scoring (vibe match, shared tags, visibility, proximity)
+- Proximity calculation using Haversine formula (ROOM, VENUE, NEARBY, FAR tiers)
+- Location integration with browser Geolocation API (approximate location, 30s updates)
+- Person card component showing handle, vibe, tags, signal score, and proximity
+- View toggle between sweep and list modes
+- Safety exclusions (sessions with safety flags excluded from radar results)
+- WCAG AA compliance: ARIA labels, keyboard navigation, reduced motion support, screen reader announcements
+- Unit tests: Signal Engine (13/13), Proximity Utils (11/11), WebSocket (10/10), Radar components (31/31)
+- E2E test scaffold with accessibility checks (Playwright + Axe)
+
+**Technical Details**:
+- Backend: WebSocket server on `/ws` endpoint, Signal Engine service, proximity utilities
+- Frontend: `useRadar` hook, `useWebSocket` hook, `useLocation` hook, Radar components
+- WebSocket protocol: `radar:subscribe`, `location:update`, `chat:request`, `radar:update`, `connected`, `error`
+- Signal weights: Configurable in `backend/src/config/signal-weights.js`
+- Proximity thresholds: ROOM (10m), VENUE (100m), NEARBY (1000m), FAR (>1000m)
+- Location privacy: Approximate coordinates only (3 decimal places ≈ 100m precision)
+
+**Verified**:
+- ✅ Radar view displays people sorted by compatibility score
+- ✅ CRT sweep visualization renders correctly with reduced motion support
+- ✅ List view is keyboard navigable and screen reader friendly
+- ✅ WebSocket connection establishes and maintains heartbeat
+- ✅ Location updates trigger radar recalculation
+- ✅ Person card displays correct information
+- ✅ Safety flags exclude sessions from results
+- ✅ All unit tests passing: Backend (37/37), Frontend (31/31)
+- ✅ WCAG AA compliance verified (ARIA labels, keyboard nav, reduced motion)
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
 #### MVP Onboarding Flow (Issue #1)
 - Welcome screen with retro logo, brand moment ("Real world. Real time. Real connections."), and CTAs
 - 4-step onboarding flow: What We Are/Not → 18+ Consent → Location Explainer → Vibe & Tags

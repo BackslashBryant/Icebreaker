@@ -11,6 +11,7 @@ Custom commands are reusable prompts that you can invoke in Cursor chat using th
 
 ## Available Commands
 
+### Workflow Commands
 - `/crew` - Survey context and recommend the next persona with a paste-ready handoff
 - `/resume` - Identify the next checkpoint and owner, producing a ready-to-paste handoff
 - `/handoff` - Template to hand off a specific checkpoint to a specific persona
@@ -18,14 +19,33 @@ Custom commands are reusable prompts that you can invoke in Cursor chat using th
 - `/status` - Quick status snapshot and recommended next action
 - `/current-issues` - Append a structured blocker entry to the active feature log
 - `/finish` - Generate Muse/Nexus wrap-up checklists
-- `/vector-plan`, `/pixel-test`, `/scout-research` - Persona-specific helpers
+
+### Persona-Specific Commands
+- `/vector-plan` - Generate or update the numbered plan
+- `/pixel-test` - Scaffold test cases for acceptance criteria
+- `/scout-research` - Research a topic with citations
+- `/as-<persona>` - Force a persona voice when you haven't opened matching files (e.g., `/as-forge`, `/as-link`)
+
+### Domain Team Commands (Multi-Persona)
+- `/team-userexperience` - Link + Muse: UI/UX review, copy, brand consistency
+- `/team-security` - Sentinel + Scout: Security audit and vulnerability research
+- `/team-testing` - Pixel + Sentinel + Scout: Test infrastructure, coverage, tooling
+- `/team-accessibility` - Link + Pixel: WCAG compliance, keyboard navigation, screen readers
+- `/team-documentation` - Muse + Link: Docs alignment with implementation
+- `/team-architecture` - Vector + Scout + Sentinel: Tech decisions with security implications
+- `/team-release` - Pixel + Sentinel + Muse: Release readiness check
+- `/team-planning` - Vector + Pixel: Test strategy and acceptance criteria alignment
+- `/team-research` - Scout + [domain expert]: Research with domain context
+
+### Review & Analysis Commands
 - `/self-review` - Architecture/code hygiene self-critique
 - `/data-flow` - Explain end-to-end data flow and flag gaps
 - `/predict-breakage` - Anticipate production failures with mitigations
 - `/draft-architecture` - Fill gaps in docs/architecture/ARCHITECTURE_TEMPLATE.md interactively
+
+### Documentation Commands
 - `/append-session-summary` - Auto-append the latest recap to docs/context.md
 - `/session-summary` - Produce a paste-ready session recap for `docs/context.md`
-- `/as-<persona>` - Force a persona voice when you haven’t opened matching files (e.g., `/as-forge`, `/as-link`)
 
 ## Creating Your Own Commands
 

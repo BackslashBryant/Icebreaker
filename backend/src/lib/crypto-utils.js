@@ -29,6 +29,7 @@ export function generateSessionToken(sessionId) {
 
 /**
  * Verify session token
+ * Returns sessionId if valid, null if invalid or expired
  */
 export function verifySessionToken(token) {
   try {
@@ -46,6 +47,13 @@ export function verifySessionToken(token) {
 
     if (signature !== expectedSignature) {
       return null;
+    }
+
+    // Check token expiration (1 hour default, same as session TTL)
+    const TOKEN_TTL = 3600000; // 1 hour in milliseconds
+    const tokenAge = Date.now() - payload.timestamp;
+    if (tokenAge > TOKEN_TTL) {
+      return null; // Token expired
     }
 
     return payload.sessionId;

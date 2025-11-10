@@ -30,13 +30,13 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Record any new ports, endpoints, or services in `docs/ConnectionGuide.md` immediately.
 
 ## 3. Implement (Forge/Link/Glide/Apex/Cider)
-- Stay in Plan Mode until the caller says “Proceed.” Once approved, execute one checkpoint at a time.
+- Stay in Plan Mode until the caller says "Proceed." Once approved, execute one checkpoint at a time.
 - Work within your agent branch and path scope.
 - Commit early/often; reference the issue (`#1234`) in commit messages.
 - Run targeted tests right after each change; paste the command/output in chat.
 - Update `.notes/features/<slug>/progress.md` with **Current Issues** if something fails or loops.
-- Push to GitHub and open a Draft PR immediately. Assign labels per agent (`agent:forge` etc.) and set status `status:build`.
-- Use GitHub MCP (or `gh`) for branch pushes, PR updates, and reviews. Terminal git is a fallback.
+- Push directly to GitHub branch (no PR needed). Commit and push when ready.
+- Use GitHub MCP (or `gh`) for branch creation. Terminal git is used for commits and pushes.
 
 ## 4. Verify (Pixel, Muse, Nexus, Sentinel)
 - Pixel runs `npm run verify` (or agreed scripts) after every checkpoint; report GREEN/RED with file:line references and repro commands. If red, halt and assign back.
@@ -45,23 +45,17 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Nexus confirms GitHub Actions succeeded, configures environment variables/Secrets, and keeps status checks enforced. Record every change in the Connection Guide.
 - Sentinel jumps in for auth/secret/PII-sensitive work, leaving notes under `/docs/security/`.
 
-## 5. Pull Request Expectations
-- PR template (see `.github/PULL_REQUEST_TEMPLATE.md`) must include:
-  - Summary with issue link.
-  - Local verification commands + results.
-  - Checklist: Plan updated, Tests run, Docs updated, Research logged.
-- Require:
-  - Passing `Template CI` workflow.
-  - Approvals from owners defined in `CODEOWNERS`.
-  - Labels updated to `status:done` before merge.
-- Nexus (or human counterpart) merges via GitHub UI once requirements are satisfied.
+## 5. Direct Commits (No PRs)
+- Direct commits to feature branches. No PRs needed.
+- Commit messages should reference the issue: `feat: Complete Issue #X - [description]`
+- Always ask before pushing (per agent rules).
 
 ## 6. Close the Loop
 - **Issue completion checklist** (must complete all):
   1. Update GitHub issue with completion comment (test results, verification summary)
   2. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
   3. Ask before pushing (per agent rules)
-  4. Close the Issue with a recap that links the merged PR and any follow-on tasks.
+  4. Close the Issue with a recap noting direct commits
 - Archive research snippets in `/docs/research.md` and security notes (if any).
 - Update `/docs/agents/KICKOFF.md` sanity checklist if the flow uncovered gaps.
 

@@ -14,9 +14,16 @@
 **For GitHub, DocFork, Desktop Commander, and Playwright MCPs:**
 - `GITHUB_TOKEN` - Your GitHub Personal Access Token
 
-**For Supabase MCP (if using):**
-- `SUPABASE_URL` - Your Supabase project URL
-- `SUPABASE_ANON_KEY` - Your Supabase anonymous key
+**For Supabase MCP:**
+- **No environment variables needed** - The official hosted Supabase MCP server uses browser-based authentication
+- See `docs/troubleshooting/mcp-setup-guide.md` for configuration instructions
+
+**Optional (for other Supabase integrations):**
+- `SUPABASE_URL` - Your Supabase project URL (e.g., `https://xxxxx.supabase.co`)
+- `SUPABASE_ANON_KEY` - Your Supabase anonymous key (starts with `eyJ...`)
+- `SUPABASE_ACCESS_TOKEN` - Personal Access Token for Supabase Management API (starts with `sbp_...`)
+  - These are only needed if you're using Supabase client libraries directly in your code
+  - Not required for the hosted Supabase MCP server
 
 ---
 
@@ -38,9 +45,7 @@
      - **Variable value:** `your_token_here` (paste your actual token)
      - Click "OK"
 
-3. **Repeat for Supabase (if needed):**
-   - Add `SUPABASE_URL` with your Supabase project URL
-   - Add `SUPABASE_ANON_KEY` with your Supabase anonymous key
+3. **Supabase MCP**: No environment variables needed - uses browser-based authentication
 
 4. **Restart Cursor:**
    - Close Cursor completely
@@ -112,12 +117,11 @@ This will:
 6. **Copy the token immediately** (you won't see it again)
 7. Use this token as your `GITHUB_TOKEN` value
 
-### Supabase Credentials:
-1. Go to your Supabase project dashboard
-2. Settings → API
-3. Copy:
-   - **Project URL** → `SUPABASE_URL`
-   - **anon/public key** → `SUPABASE_ANON_KEY`
+### Supabase MCP Setup:
+1. **No credentials needed** - The hosted Supabase MCP server uses browser-based authentication
+2. Get your project reference from the Supabase dashboard URL
+3. Configure in `.cursor/mcp.json` (see `docs/troubleshooting/mcp-setup-guide.md`)
+4. Restart Cursor - you'll be prompted to authenticate via browser on first use
 
 ---
 
@@ -128,8 +132,7 @@ After setting environment variables:
 1. **Verify they're set (PowerShell):**
 ```powershell
 echo $env:GITHUB_TOKEN
-echo $env:SUPABASE_URL
-echo $env:SUPABASE_ANON_KEY
+# Supabase MCP doesn't need environment variables
 ```
 
 2. **Restart Cursor completely**
@@ -145,9 +148,10 @@ echo $env:SUPABASE_ANON_KEY
 ### MCPs Still Not Working After Setting Variables
 
 1. **Restart Cursor completely** - Close all Cursor windows and reopen
-2. **Check variable names** - Must be exactly: `GITHUB_TOKEN`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`
+2. **Check variable names** - Must be exactly: `GITHUB_TOKEN` (Supabase MCP doesn't need env vars)
 3. **Check token validity** - Test GitHub token at: https://api.github.com/user (use Authorization header)
 4. **Check Cursor logs** - Look for MCP error messages in Cursor's output panel
+5. **Supabase MCP**: If authentication fails, check browser popup was allowed and you granted organization access
 
 ### Variables Not Persisting
 

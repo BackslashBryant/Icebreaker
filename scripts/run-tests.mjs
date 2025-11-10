@@ -2,6 +2,7 @@
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createLogger } from './test-logger.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -9,38 +10,63 @@ const repoRoot = path.resolve(__dirname, '..');
 const steps = [
   {
     name: 'backend unit tests',
+    type: 'unit',
     cwd: path.join(repoRoot, 'backend'),
     command: 'npm',
     args: ['run', 'test'],
   },
   {
     name: 'frontend unit tests',
+    type: 'unit',
     cwd: path.join(repoRoot, 'frontend'),
     command: 'npm',
     args: ['run', 'test'],
   },
   {
     name: 'e2e tests',
+    type: 'e2e',
     cwd: path.join(repoRoot, 'tests'),
     command: 'npm',
     args: ['test'],
   },
 ];
 
+const logger = createLogger('all-tests');
+
 for (const step of steps) {
-  console.log(`\n▶️  Running ${step.name}...`);
+  logger.log(`\n▶️  Running ${step.name}...`);
+  const stepLogger = createLogger(step.type);
+  
   const result = spawnSync(step.command, step.args, {
     cwd: step.cwd,
-    stdio: 'inherit',
+    stdio: 'pipe', // Capture output for logging
     shell: process.platform === 'win32',
+    encoding: 'utf8',
   });
 
+  // Log output
+  if (result.stdout) {
+    stepLogger.log(result.stdout);
+    logger.log(result.stdout);
+  }
+  if (result.stderr) {
+    stepLogger.error(result.stderr);
+    logger.error(result.stderr);
+  }
+
+  const logPath = stepLogger.close();
+  logger.log(`Logs written to: ${logPath}`);
+
   if (result.status !== 0) {
-    console.error(`❌ ${step.name} failed.`);
+    logger.error(`❌ ${step.name} failed.`);
+    const finalLogPath = logger.close();
+    console.error(`\nTest logs available at: ${finalLogPath}`);
     process.exit(result.status ?? 1);
   }
 
-  console.log(`✅ ${step.name} passed.`);
+  logger.log(`✅ ${step.name} passed.`);
 }
 
-console.log('\n🎉 All test suites passed.');
+logger.log('\n🎉 All test suites passed.');
+const finalLogPath = logger.close();
+console.log(`\nTest logs available at: ${finalLogPath}`);

@@ -54,6 +54,7 @@ Each persona is a specialist developer who owns their lane end to end. They plan
 - Use the provided scripts: `npm run ports:status` before server work, `npm run dev:guarded` to start, `npm run ports:free`/`ports:free:win` to clean.
 - Show `git status` and file diffs after editing; stop if unexpected files appear.
 - Use MCP tools as accelerators, not autopilot. Capture citations in `/docs/research.md` when Scout, Vector, or implementers lean on external guidance. Validate MCP servers before relying on them (`npm run status`).
-- Do not create new summary or assessment files in `docs/` unless explicitly asked; append to existing docs (`docs/context.md`, `docs/process/…`) instead.
+- Do not create new summary, assessment, or troubleshooting files in `docs/` root unless explicitly asked; append to existing docs (`docs/context.md`, `docs/process/…`) instead.
+- Troubleshooting guides, setup guides, and similar operational documentation belong in `docs/troubleshooting/` or appropriate subdirectories.
 - Use `/draft-architecture` and `/append-session-summary` rather than inventing new files when those docs need updates.
 - When manual prerequisites are required (API keys, sign-ups, tokens), stop and instruct the user on the exact actions before proceeding.

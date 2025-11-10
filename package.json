@@ -6,6 +6,8 @@
   "scripts": {
     "preflight": "node ./tools/preflight.mjs",
     "mcp:suggest": "node ./tools/mcp-suggest.mjs",
+    "mcp:heal": "node ./tools/mcp-self-heal.mjs",
+    "mcp:test-connectivity": "node ./tools/test-mcp-connectivity.mjs",
     "verify": "node ./scripts/verify-all",
     "agents:install-hook": "node ./tools/install-agent-hook.mjs",
     "agents:prompt": "node ./tools/agent-prompts.mjs",
@@ -37,9 +39,17 @@
     "guard:lint": "node ./tools/guard-runner.mjs lint",
     "guard:type": "node ./tools/guard-runner.mjs type",
     "test": "node ./tools/guard-runner.mjs test",
+    "test:unit": "node ./scripts/run-tests.mjs",
+    "test:security": "cd backend && npm run test -- tests/security.test.js",
+    "test:e2e": "cd tests && npm test",
+    "test:performance": "cd tests && npm test -- performance.spec.ts",
+    "test:all": "node ./scripts/run-tests.mjs && npm run test:security",
     "precommit": "npm run guard:lint && npm run guard:type && npm test"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.0"
   }
 }

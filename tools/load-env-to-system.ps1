@@ -45,7 +45,7 @@ foreach ($line in $lines) {
         # Skip placeholder values (empty, "your-*", "placeholder", etc.)
         if (-not $value -or
             $value -match '^your-.*' -or
-            $value -match '^placeholder' -i -or
+            $value -match '^placeholder' -or
             $value -match '^<.*>$' -or
             $value -eq '') {
             continue
@@ -60,7 +60,7 @@ foreach ($line in $lines) {
         if ($key -and $value -and $value.Trim() -ne '') {
             # Set as user environment variable (persistent)
             [System.Environment]::SetEnvironmentVariable($key, $value, 'User')
-            Write-Host "  ✓ Set $key" -ForegroundColor Green
+            Write-Host "  [OK] Set $key" -ForegroundColor Green
             $varsSet++
         }
     }
@@ -69,7 +69,10 @@ foreach ($line in $lines) {
 if ($varsSet -eq 0) {
     Write-Host "Warning: No environment variables found in .env file." -ForegroundColor Yellow
 } else {
-    Write-Host "`n✅ Set $varsSet environment variable(s) in your user profile." -ForegroundColor Green
-    Write-Host "`n⚠️  IMPORTANT: You must restart Cursor for these to take effect!" -ForegroundColor Yellow
-    Write-Host "`nAfter restarting Cursor, your MCP servers should work." -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "[SUCCESS] Set $varsSet environment variable(s) in your user profile." -ForegroundColor Green
+    Write-Host ""
+    Write-Host "[WARNING] IMPORTANT: You must restart Cursor for these to take effect!" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "After restarting Cursor, your MCP servers should work." -ForegroundColor Cyan
 }

@@ -1,0 +1,131 @@
+import { getSignalWeights } from "../config/signal-weights.js";
+import { calculateProximityTier, getProximityScoreMultiplier } from "../lib/proximity-utils.js";
+
+/**
+ * Signal Engine Service
+ *
+ * Calculates compatibility scores between sessions for Radar View sorting.
+ *
+ * Scoring formula:
+ * score(A,B) = w_vibe * VIBE_MATCH + w_tag * MIN(shared_tags, 3) +
+ *              w_vis * VISIBILITY_ON + w_tagless * TAGLESS + w_dist * PROXIMITY_TIER
+ *
+ * Safety exclusion: Sessions with safety_flag == true are excluded from results.
+ * Tie-breakers: Stable random seed per session + alphabetical handle.
+ */
+
+/**
+ * Generate a stable random seed for a session
+ * Uses sessionId as seed for consistent randomization
+ */
+function getStableRandomSeed(sessionId) {
+  // Simple hash function for stable seed generation
+  let hash = 0;
+  for (let i = 0; i < sessionId.length; i++) {
+    const char = sessionId.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+}
+
+/**
+ * Calculate compatibility score between two sessions
+ * @param {Object} sourceSession - Source session (viewer)
+ * @param {Object} targetSession - Target session (person being scored)
+ * @returns {number} Compatibility score (higher = better match)
+ */
+export function calculateScore(sourceSession, targetSession) {
+  // Safety exclusion: exclude sessions with safety_flag
+  if (targetSession.safetyFlag === true) {
+    return -Infinity; // Exclude from results
+  }
+
+  const weights = getSignalWeights();
+  let score = 0;
+
+  // 1. Vibe match bonus
+  if (sourceSession.vibe === targetSession.vibe) {
+    score += weights.w_vibe;
+  }
+
+  // 2. Shared tag bonus (max 3 tags)
+  const sourceTags = sourceSession.tags || [];
+  const targetTags = targetSession.tags || [];
+  const sharedTags = sourceTags.filter((tag) => targetTags.includes(tag));
+  const sharedTagCount = Math.min(sharedTags.length, 3);
+  score += weights.w_tag * sharedTagCount;
+
+  // 3. Visibility bonus (target user has visibility ON)
+  if (targetSession.visibility === true) {
+    score += weights.w_vis;
+  }
+
+  // 4. Tagless penalty (source user has no tags)
+  if (sourceTags.length === 0) {
+    score += weights.w_tagless;
+  }
+
+  // 5. Proximity tier bonus
+  const proximityTier = calculateProximityTier(sourceSession.location, targetSession.location);
+  if (proximityTier) {
+    const proximityMultiplier = getProximityScoreMultiplier(proximityTier);
+    score += weights.w_dist * proximityMultiplier;
+  }
+
+  return score;
+}
+
+/**
+ * Calculate scores for all target sessions from a source session
+ * @param {Object} sourceSession - Source session (viewer)
+ * @param {Array<Object>} targetSessions - Array of target sessions to score
+ * @returns {Array<Object>} Array of { session, score } objects, sorted by score (descending)
+ */
+export function calculateScores(sourceSession, targetSessions) {
+  // Filter out source session itself
+  const otherSessions = targetSessions.filter(
+    (session) => session.sessionId !== sourceSession.sessionId
+  );
+
+  // Calculate scores
+  const scoredSessions = otherSessions.map((session) => ({
+    session,
+    score: calculateScore(sourceSession, session),
+  }));
+
+  // Filter out excluded sessions (safety_flag)
+  const validSessions = scoredSessions.filter((item) => item.score !== -Infinity);
+
+  // Sort by score (descending), then apply tie-breakers
+  validSessions.sort((a, b) => {
+    // Primary sort: score (descending)
+    if (a.score !== b.score) {
+      return b.score - a.score;
+    }
+
+    // Tie-breaker 1: Stable random seed (deterministic but pseudo-random)
+    const seedA = getStableRandomSeed(a.session.sessionId);
+    const seedB = getStableRandomSeed(b.session.sessionId);
+    if (seedA !== seedB) {
+      return seedB - seedA; // Higher seed first
+    }
+
+    // Tie-breaker 2: Alphabetical handle
+    return a.session.handle.localeCompare(b.session.handle);
+  });
+
+  return validSessions;
+}
+
+/**
+ * Get radar results for a source session
+ * Returns sorted list of nearby sessions with scores
+ * @param {Object} sourceSession - Source session (viewer)
+ * @param {Array<Object>} allSessions - Array of all active sessions
+ * @returns {Array<Object>} Array of { session, score } objects, sorted by compatibility
+ */
+export function getRadarResults(sourceSession, allSessions) {
+  return calculateScores(sourceSession, allSessions);
+}
+

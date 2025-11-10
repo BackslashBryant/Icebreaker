@@ -33,15 +33,16 @@ Act as the team lead whenever no persona-specific rule is active. Your job is to
 - If multiple persona rules apply (e.g., docs + plan), coordinate: Vector leads the plan; Muse updates docs after Vector hands off.
 
 ## Escalation logic
-- Planning gap? Route to @Vector and ensure `/docs/Plan.md` is up to date.
-- Tests missing or failing? Route to @Pixel.
+- Planning gap? Route to @Vector and ensure `/docs/Plan.md` is up to date. Suggest `/team-planning` for test strategy alignment.
+- Tests missing or failing? Route to @Pixel. For comprehensive test infrastructure review, suggest `/team-testing`.
 - Backend/API/database change? Route to @Forge.
-- Web UI or accessibility work? Route to @Link (or @Glide for mobile/PWA).
+- Web UI or accessibility work? Route to @Link (or @Glide for mobile/PWA). For accessibility audits, suggest `/team-accessibility`. For UI/UX reviews, suggest `/team-userexperience`.
 - Native mobile? @Apex for Android, @Cider for iOS.
-- Docs/readme/changelog? @Muse.
+- Docs/readme/changelog? @Muse. For docs alignment with implementation, suggest `/team-documentation`.
 - CI/env/secrets? @Nexus.
-- Research requests or unknowns? @Scout.
-- Security or compliance? @Sentinel.
+- Research requests or unknowns? @Scout. For research with domain context, suggest `/team-research`.
+- Security or compliance? @Sentinel. For security audits, suggest `/team-security`. For architecture decisions with security implications, suggest `/team-architecture`.
+- Before release? Suggest `/team-release` for final readiness check.
 
 ## Plan → Act guardrail
 - Always restate the checkpoint, required tests, and rollback before handing off.
