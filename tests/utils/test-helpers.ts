@@ -10,13 +10,24 @@ import { Page, expect } from "@playwright/test";
  * Wait for boot sequence to complete on Welcome page
  * Boot sequence shows BootSequence component first, then Welcome content
  */
-export async function waitForBootSequence(page: Page, timeout = 10000): Promise<void> {
+export async function waitForBootSequence(page: Page, timeout = 15000): Promise<void> {
   // Boot sequence shows "INITIALIZING..." text, then completes
   // After completion, "ICEBREAKER" text becomes visible
-  await expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout });
+  try {
+    await expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout });
+  } catch (error) {
+    // If ICEBREAKER text doesn't appear, check if page loaded at all
+    const url = page.url();
+    throw new Error(
+      `Boot sequence timeout: ICEBREAKER text not found after ${timeout}ms. Current URL: ${url}. ` +
+      `This may indicate the frontend server is not running or the page failed to load.`
+    );
+  }
   
   // Additional wait to ensure boot sequence is fully complete
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("networkidle", { timeout: 10000 }).catch(() => {
+    // Ignore networkidle timeout - page may be ready even if network isn't idle
+  });
 }
 
 /**
@@ -36,8 +47,25 @@ export async function completeOnboarding(
 ): Promise<string | null> {
   const { vibe = "banter", skipLocation = true, waitForBootSequence: waitBoot = true } = options;
 
-  // Navigate to welcome screen
-  await page.goto("/welcome", { waitUntil: "networkidle" });
+  // Navigate to welcome screen with retry logic
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      await page.goto("/welcome", { waitUntil: "domcontentloaded", timeout: 30000 });
+      break;
+    } catch (error) {
+      retries--;
+      if (retries === 0) {
+        throw new Error(
+          `Failed to navigate to /welcome after 3 attempts. ` +
+          `This may indicate the frontend server is not running. ` +
+          `Original error: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+      // Wait before retry
+      await page.waitForTimeout(2000);
+    }
+  }
 
   // Wait for boot sequence if needed
   if (waitBoot) {

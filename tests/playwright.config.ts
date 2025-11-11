@@ -38,33 +38,38 @@ export default defineConfig({
       use: { ...devices['Desktop Edge'] },
     },
   ],
-  // Web servers - set SKIP_WEB_SERVER=1 to use manually started servers
-  // Otherwise, Playwright will start servers automatically
+  // Web servers - automatically start backend and frontend servers for tests
+  // Set SKIP_WEB_SERVER=1 to use manually started servers instead
+  // Servers are started in parallel, but backend must be ready before frontend can proxy
   webServer: process.env.SKIP_WEB_SERVER ? undefined : [
+    // Backend server - must start first (frontend proxies to it)
     {
       command: 'npm run dev',
       cwd: '../backend',
       url: 'http://localhost:8000/api/health',
       reuseExistingServer: !process.env.CI, // Reuse in local dev, start fresh in CI
-      timeout: 90000, // 90s for initial compile
-      stdout: 'ignore',
-      stderr: 'ignore', // Suppress stderr to prevent node process warnings
+      timeout: 120000, // 120s for initial compile (backend may need more time)
+      stdout: process.env.DEBUG ? 'pipe' : 'ignore',
+      stderr: process.env.DEBUG ? 'pipe' : 'ignore',
       env: {
         NODE_ENV: 'test',
+        PORT: '8000',
         // Suppress Node.js warnings about process termination and deprecations
         NODE_OPTIONS: '--no-warnings --no-deprecation',
       },
     },
+    // Frontend server - starts after backend is ready
     {
       command: 'npm run dev',
       cwd: '../frontend',
       url: 'http://localhost:3000',
       reuseExistingServer: !process.env.CI, // Reuse in local dev, start fresh in CI
-      timeout: 90000, // 90s for initial compile
-      stdout: 'ignore',
-      stderr: 'ignore', // Suppress stderr to prevent node process warnings
+      timeout: 120000, // 120s for initial compile (Vite may need time)
+      stdout: process.env.DEBUG ? 'pipe' : 'ignore',
+      stderr: process.env.DEBUG ? 'pipe' : 'ignore',
       env: {
         NODE_ENV: 'test',
+        VITE_API_URL: 'http://localhost:8000',
         // Suppress Node.js warnings about process termination and deprecations
         NODE_OPTIONS: '--no-warnings --no-deprecation',
       },
