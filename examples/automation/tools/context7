@@ -55,7 +55,7 @@ function showHelp() {
   log('  scripts/tools/context7 nextjs routing --verbose', 'green');
   log('\nSetup:', 'blue');
   log('  This tool requires MCP services to be configured in .cursor/mcp.json', 'yellow');
-  log('  See docs/troubleshooting/mcp-setup-guide.md for setup instructions', 'yellow');
+  log('  See docs/guides/setup/mcp-setup.md for setup instructions', 'yellow');
 }
 
 function ensureArtifactsDir() {
@@ -135,7 +135,7 @@ async function fetchDocumentation(library, topic) {
   if (!mcpStatus.available) {
     log(`\n⚠️  ${mcpStatus.reason}`, 'yellow');
     log(`💡 ${mcpStatus.suggestion}`, 'yellow');
-    log('📚 See docs/troubleshooting/mcp-setup-guide.md for setup instructions', 'blue');
+    log('📚 See docs/guides/setup/mcp-setup.md for setup instructions', 'blue');
     
     // Generate placeholder content
     const placeholderContent = generatePlaceholderContent(library, topic, mcpStatus);

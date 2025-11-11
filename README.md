@@ -406,7 +406,7 @@ See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
 - `docs/cursor/SETTINGS_GUIDE.md` - Cursor IDE configuration (generated)
 - `docs/cursor/extensions.md` - Extension installation
 - `docs/cursor/models.md` - Model selection guide
-- `docs/troubleshooting/mcp-setup-guide.md` - MCP server configuration
+- `docs/guides/setup/mcp-setup.md` - MCP server configuration
 
 ### Workflow
 
