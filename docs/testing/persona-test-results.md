@@ -21,6 +21,9 @@
 - ✅ Fixed checkbox selector: Changed from `/I confirm I am 18 or older/i` to `/I am 18 or older/i`
 - ✅ Fixed panic button selector: Changed from `/panic|emergency|help/i` to `/Emergency panic button/i`
 - ✅ Fixed visibility toggle: Updated to navigate to Profile page (visibility toggle is on Profile, not Radar)
+- ✅ **Fixed server setup**: Playwright config now automatically starts/stops backend and frontend servers
+- ✅ **Improved error handling**: Better timeout messages, retry logic for page navigation
+- ✅ **Increased timeouts**: Server startup timeout increased to 120s for slower systems
 
 ---
 
