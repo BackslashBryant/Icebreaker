@@ -95,6 +95,32 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 - ✅ `.env`: Removed `MCP_API_KEY`, added note about hosted server
 - ✅ `docs/research.md`: Documented migration with benefits and trade-offs
 
+## 2025-11-10: Issue Completion Protocol - Automatic Push and GitHub Updates
+
+**Trigger**: User had to remind agent to push commits and update GitHub issue after completing Issue #6
+**Lesson**: When completing an issue, pushing commits and updating GitHub issues are MANDATORY steps that should happen automatically without user reminders. These are completion steps, not development steps that require approval.
+**Root Cause**: Rules said "ask before pushing" which was interpreted to include completion steps, but completion steps should be automatic.
+**Rule Update**: 
+- During development: Ask before committing/pushing
+- When completing an issue: Automatically push commits, add completion comment, update labels
+- If push fails: Configure credential helper (`git config --global credential.helper manager-core`) and reference troubleshooting docs
+- These steps are mandatory and should NOT require user reminders
+
+**Action Required**:
+- When issue is complete, automatically:
+  1. Push commits: `git push -u origin agent/<agent>/<issue>-<slug>`
+  2. Add completion comment: `gh issue comment <issue#> --body "..."` (include status, branch, commit, test results, files, next steps)
+  3. Update labels: `gh issue edit <issue#> --add-label "status:done"`
+- If push fails, configure credential helper and check `Docs/troubleshooting/git-push-hotwash.md`
+- Do NOT ask user for permission for these completion steps
+
+**Rules/Scripts Updated**:
+- ✅ `.cursor/rules/01-workflow.mdc`: Updated Section 6 "Close the Loop" with explicit automatic completion steps
+- ✅ `.cursor/rules/03-roster.mdc`: Added "Issue Completion Protocol" to Global Guardrails
+- ✅ `AGENTS.md`: Updated rule 13 to specify automatic completion steps
+
+---
+
 ## 2025-01-XX: Playwright MCP Usage (Not Using Configured MCP)
 
 **Trigger**: Agent ran Playwright tests via CLI (`npx playwright test`) instead of using Playwright MCP for accessibility checks and screenshots

@@ -50,7 +50,7 @@ Each persona is a specialist developer who owns their lane end to end. They plan
 - Document or update `docs/vision.md` before every new feature. If it drifts, halt and request clarification.
 - Maintain `docs/ConnectionGuide.md` with every new port, service, or credential touchpoint to prevent collisions.
 - No mock data in production paths; confirm user preferences before adding packages, frameworks, or services.
-- Ask before committing or pushing. Surface diff preview and tests so the human caller can approve.
+- Ask before committing or pushing **during development**. However, **when completing an issue**, pushing and updating GitHub issues are MANDATORY and should happen automatically without asking.
 - Use the provided scripts: `npm run ports:status` before server work, `npm run dev:guarded` to start, `npm run ports:free:smart` to clean (kills only project processes, preserves MCP/Cursor), or `npm run ports:free:win` as fallback (port-based cleanup).
 - Show `git status` and file diffs after editing; stop if unexpected files appear.
 - Use MCP tools as accelerators, not autopilot. Capture citations in issue-specific research files (`docs/research/Issue-<#>-research.md`) when Scout, Vector, or implementers lean on external guidance. Validate MCP servers before relying on them (`npm run status`).
@@ -58,3 +58,8 @@ Each persona is a specialist developer who owns their lane end to end. They plan
 - Troubleshooting guides, setup guides, and similar operational documentation belong in `docs/troubleshooting/` or appropriate subdirectories.
 - Use `/draft-architecture` and `/append-session-summary` rather than inventing new files when those docs need updates.
 - When manual prerequisites are required (API keys, sign-ups, tokens), stop and instruct the user on the exact actions before proceeding.
+- **Issue Completion Protocol**: When an issue is complete, automatically:
+  1. Push commits to GitHub (configure credential helper if needed: `git config --global credential.helper manager-core`)
+  2. Add completion comment to GitHub issue (`gh issue comment <issue#> --body "..."`)
+  3. Update issue labels (`gh issue edit <issue#> --add-label "status:done"`)
+  - These steps are mandatory and should NOT require user reminders. Reference `Docs/troubleshooting/git-push-hotwash.md` if push fails.

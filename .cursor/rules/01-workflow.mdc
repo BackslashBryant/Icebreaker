@@ -87,14 +87,22 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Always ask before pushing (per agent rules).
 
 ## 6. Close the Loop
-- **Issue completion checklist** (must complete all):
-  1. Update GitHub issue with completion comment (test results, verification summary)
-  2. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
-  3. Ask before pushing (per agent rules)
-  4. Close the Issue with a recap noting direct commits
+- **Issue completion checklist** (must complete all - NO EXCEPTIONS):
+  1. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
+  2. **MANDATORY**: Push to GitHub: `git push -u origin agent/<agent>/<issue>-<slug>` 
+     - If authentication fails, configure credential helper: `git config --global credential.helper manager-core`
+     - If push still fails, check `Docs/troubleshooting/git-push-hotwash.md` for solutions
+     - **DO NOT** ask user for permission - this is a mandatory completion step
+  3. **MANDATORY**: Update GitHub issue with completion comment using `gh issue comment <issue#> --body "..."`:
+     - Include: Status summary, branch name, commit hash, test results, files created/modified, next steps
+     - **DO NOT** ask user for permission - this is a mandatory completion step
+  4. **MANDATORY**: Update GitHub issue labels: `gh issue edit <issue#> --add-label "status:done" --remove-label "status:in-progress"`
+     - **DO NOT** ask user for permission - this is a mandatory completion step
+  5. Close the Issue with a recap noting direct commits (optional - can leave open for tracking)
 - Research file already exists at `docs/research/Issue-<#>-research.md` (created during research phase).
 - Archive security notes (if any) in `/docs/security/`.
 - Update `/docs/agents/KICKOFF.md` sanity checklist if the flow uncovered gaps.
+- **CRITICAL**: Never complete an issue without pushing commits and updating the GitHub issue. This is mandatory, not optional. These steps should happen automatically without user reminders.
 
 ## Tooling & Automation
 - `npm run agents:prompt -- all` prints prompt bodies for all agents.
