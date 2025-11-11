@@ -16,7 +16,12 @@
 10. Keep changes minimal and reversible. No unrelated refactors, formatting, or file shuffles.
 11. After edits, show `git status` and a diff of touched files. If something is missing or extra, stop and ask.
 12. Run `npm run precommit` and share the output. If any step fails, stop and ask before trying fixes.
-13. **When completing a feature/issue**: Update GitHub issue with completion comment, commit with issue reference (`feat: Complete Issue #X - [description]`), then ask before pushing.
+13. **When completing a feature/issue**: 
+    - Commit with issue reference (`feat: Complete Issue #X - [description]`)
+    - **MANDATORY**: Push to GitHub automatically (`git push -u origin agent/<agent>/<issue>-<slug>`)
+    - **MANDATORY**: Update GitHub issue with completion comment (`gh issue comment <issue#> --body "..."`)
+    - **MANDATORY**: Update GitHub issue labels (`gh issue edit <issue#> --add-label "status:done"`)
+    - These completion steps are mandatory and should happen automatically without asking the user. If push fails, configure credential helper (`git config --global credential.helper manager-core`) and reference `Docs/troubleshooting/git-push-hotwash.md`.
 14. **Direct commits only**: No PRs. Commit and push directly to feature branches.
 
 ## Context hygiene

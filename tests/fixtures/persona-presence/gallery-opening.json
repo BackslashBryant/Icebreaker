@@ -1,0 +1,30 @@
+{
+  "venue": "gallery-opening",
+  "personas": [
+    {
+      "sessionId": "casey-session",
+      "handle": "CreativeFlow23",
+      "vibe": "banter",
+      "tags": ["Creative Energy", "Here for the humans"],
+      "visible": true,
+      "geo": {
+        "lat": 37.7849,
+        "lon": -122.4094,
+        "floor": 1
+      }
+    },
+    {
+      "sessionId": "alex-session",
+      "handle": "TechNet45",
+      "vibe": "banter",
+      "tags": ["Tech curious", "Builder brain"],
+      "visible": true,
+      "geo": {
+        "lat": 37.7849,
+        "lon": -122.4094,
+        "floor": 1
+      }
+    }
+  ]
+}
+

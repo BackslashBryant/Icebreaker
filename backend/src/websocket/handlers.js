@@ -8,7 +8,7 @@ import { triggerPanic } from "../services/PanicManager.js";
 
 /**
  * WebSocket Message Handlers
- * 
+ *
  * Handles incoming WebSocket messages from clients.
  * Message format: { type: string, payload?: any }
  */
@@ -313,7 +313,7 @@ function calculateProximityTier(loc1, loc2) {
   if (!loc1 || !loc2) {
     return null;
   }
-  
+
   return calcProximityTier(loc1, loc2);
 }
 

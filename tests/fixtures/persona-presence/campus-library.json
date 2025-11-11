@@ -1,0 +1,30 @@
+{
+  "venue": "campus-library",
+  "personas": [
+    {
+      "sessionId": "maya-session",
+      "handle": "QuietThinker42",
+      "vibe": "thinking",
+      "tags": ["Quietly Curious", "Overthinking Things"],
+      "visible": true,
+      "geo": {
+        "lat": 37.8716,
+        "lon": -122.2727,
+        "floor": 2
+      }
+    },
+    {
+      "sessionId": "zoe-session",
+      "handle": "MellowWildcard56",
+      "vibe": "surprise",
+      "tags": ["Overthinking Things", "Lo-fi head"],
+      "visible": true,
+      "geo": {
+        "lat": 37.8716,
+        "lon": -122.2727,
+        "floor": 3
+      }
+    }
+  ]
+}
+

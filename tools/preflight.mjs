@@ -399,6 +399,21 @@ function checkBranchNaming() {
   }
 }
 
+function checkDependencies() {
+  try {
+    execSync('node tools/check-dependencies.mjs', {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    addResult('Dependency imports', true, 'All imports match installed dependencies');
+  } catch (error) {
+    const output = (error.stdout || error.stderr || '').toString();
+    const errorLines = output.split('\n').filter(line => line.trim()).slice(0, 3);
+    addResult('Dependency imports', false, 'Some imports reference missing dependencies', errorLines.join('; '));
+  }
+}
+
 function main() {
   checkPlanScaffold();
   checkResearchLog();
@@ -414,6 +429,7 @@ function main() {
   checkMvpGuide();
   checkRepoMode();
   checkBranchNaming();
+  checkDependencies();
 
   const rawArgs = process.argv.slice(2);
   const wantsJson = rawArgs.includes('--json') || rawArgs.includes('--ci');

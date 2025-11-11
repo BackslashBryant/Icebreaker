@@ -60,7 +60,7 @@ export function PanicDialog({ isOpen, onClose, onConfirm }: PanicDialogProps) {
         }
       }}
     >
-      <div className="max-w-md w-full space-y-6 bg-card border-2 border-accent/30 rounded-xl p-6">
+      <div className="max-w-md w-full space-y-6 bg-card border-2 border-accent/30 rounded-xl p-6" data-testid="panic-dialog">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto border-4 border-accent bg-accent/10 flex items-center justify-center">
             <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-accent" aria-hidden="true" />
@@ -88,6 +88,7 @@ export function PanicDialog({ isOpen, onClose, onConfirm }: PanicDialogProps) {
             disabled={isConfirming}
             className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-accent-foreground font-mono h-11 sm:h-12 text-sm border-2 border-accent"
             aria-label="Confirm panic and exit"
+            data-testid="panic-confirm"
           >
             {isConfirming ? "Processing..." : "SEND ALERT & EXIT"}
           </Button>
@@ -97,6 +98,7 @@ export function PanicDialog({ isOpen, onClose, onConfirm }: PanicDialogProps) {
             disabled={isConfirming}
             className="w-full rounded-2xl border-2 border-accent/30 text-accent hover:bg-accent/10 font-mono bg-transparent text-sm"
             aria-label="Cancel panic"
+            data-testid="panic-cancel"
           >
             Never mind
           </Button>

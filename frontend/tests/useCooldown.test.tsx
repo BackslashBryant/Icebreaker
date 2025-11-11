@@ -93,7 +93,9 @@ describe("useCooldown", () => {
     });
 
     await waitFor(() => {
-      expect(result.current.cooldownRemainingFormatted).toBe("15 minutes");
+      // Hook recalculates based on Date.now(), so allow small timing difference
+      const formatted = result.current.cooldownRemainingFormatted;
+      expect(formatted).toMatch(/^(14|15) minutes$/);
     });
   });
 

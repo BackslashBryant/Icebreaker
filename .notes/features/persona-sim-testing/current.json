@@ -1,0 +1,13 @@
+{
+  "slug": "persona-sim-testing",
+  "featureName": "Persona-Simulated User Testing with Look-and-Feel Validation",
+  "updatedAt": "2025-11-11T00:00:00.000Z",
+  "status": "complete",
+  "vision": "docs/vision.md",
+  "description": "Transform existing E2E persona tests into realistic, simulated multi-user testing with look-and-feel validation, UX telemetry, and deterministic testing without live backend.",
+  "githubIssue": 18,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/18",
+  "branch": "agent/codex/18-persona-sim-testing",
+  "note": "Issue #18 complete. All 7 steps implemented: WebSocket mock, geolocation helpers, multi-user scenarios, data-testid selectors, visual regression, telemetry capture, CI integration. Ready for verification and monitoring."
+}
+

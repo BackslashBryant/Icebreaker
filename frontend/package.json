@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
+    "@sentry/node": "^10.24.0",
+    "@sentry/react": "^10.24.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.454.0",

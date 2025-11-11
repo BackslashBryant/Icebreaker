@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { completeOnboarding } from "../utils/test-helpers";
 
 test.describe("Profile/Settings Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -37,14 +38,22 @@ test.describe("Profile/Settings Page", () => {
     });
 
     // Complete onboarding to create session
-    await page.goto("http://localhost:3000/welcome");
+    await page.goto("/welcome");
+    await page.waitForLoadState("networkidle");
+    // Wait for boot sequence
+    await expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout: 10000 });
     await page.getByRole("link", { name: /PRESS START/i }).click();
     await page.getByRole("button", { name: /GOT IT/i }).click();
-    await page.getByRole("checkbox", { name: /I confirm I am 18 or older/i }).check();
+    // Wait for consent step to fully load before interacting with checkbox
+    await expect(page.getByText("AGE VERIFICATION")).toBeVisible({ timeout: 10000 });
+    await page.waitForLoadState("networkidle");
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
+    await expect(consentCheckbox).toBeVisible({ timeout: 10000 });
+    await consentCheckbox.check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
     await page.getByRole("button", { name: /Skip for now/i }).click();
     await page.getByText(/Up for banter/i).click();
-    await page.getByRole("button", { name: /START/i }).click();
+    await page.getByRole("button", { name: /ENTER RADAR/i }).click();
 
     // Wait for navigation to Radar
     await expect(page).toHaveURL(/.*\/radar/);
@@ -64,12 +73,12 @@ test.describe("Profile/Settings Page", () => {
     // Navigate to Chat (would need a chat partner, but for E2E we'll mock)
     // For now, just verify Profile button exists in Chat header
     // This test assumes Chat page is accessible
-    await page.goto("http://localhost:3000/profile");
+    await page.goto("/profile");
     await expect(page.getByText("PROFILE")).toBeVisible();
   });
 
   test("toggle visibility", async ({ page }) => {
-    await page.goto("http://localhost:3000/profile");
+    await page.goto("/profile");
 
     // Find visibility toggle checkbox
     const visibilityCheckbox = page.getByLabelText(/Show on Radar|Hide from Radar/);
@@ -83,7 +92,7 @@ test.describe("Profile/Settings Page", () => {
   });
 
   test("save emergency contact (phone)", async ({ page }) => {
-    await page.goto("http://localhost:3000/profile");
+    await page.goto("/profile");
 
     // Click Add button
     await page.getByRole("button", { name: /Add|Edit/i }).click();
@@ -100,7 +109,7 @@ test.describe("Profile/Settings Page", () => {
   });
 
   test("save emergency contact (email)", async ({ page }) => {
-    await page.goto("http://localhost:3000/profile");
+    await page.goto("/profile");
 
     // Click Add button
     await page.getByRole("button", { name: /Add|Edit/i }).click();
@@ -117,7 +126,7 @@ test.describe("Profile/Settings Page", () => {
   });
 
   test("validate emergency contact format", async ({ page }) => {
-    await page.goto("http://localhost:3000/profile");
+    await page.goto("/profile");
 
     // Click Add button
     await page.getByRole("button", { name: /Add|Edit/i }).click();
@@ -141,7 +150,7 @@ test.describe("Profile/Settings Page", () => {
   });
 
   test("toggle reduced-motion", async ({ page }) => {
-    await page.goto("http://localhost:3000/profile");
+    await page.goto("/profile");
 
     // Find reduced-motion toggle
     const reducedMotionCheckbox = page.getByLabelText("Reduce motion");
@@ -163,7 +172,7 @@ test.describe("Profile/Settings Page", () => {
   });
 
   test("toggle high-contrast", async ({ page }) => {
-    await page.goto("http://localhost:3000/profile");
+    await page.goto("/profile");
 
     // Find high-contrast toggle
     const highContrastCheckbox = page.getByLabelText("High contrast mode");
@@ -185,7 +194,7 @@ test.describe("Profile/Settings Page", () => {
   });
 
   test("navigate back to Radar with DONE button", async ({ page }) => {
-    await page.goto("http://localhost:3000/profile");
+    await page.goto("/profile");
 
     // Click DONE button
     await page.getByRole("button", { name: /DONE/i }).click();
@@ -195,7 +204,7 @@ test.describe("Profile/Settings Page", () => {
   });
 
   test("keyboard navigation", async ({ page }) => {
-    await page.goto("http://localhost:3000/profile");
+    await page.goto("/profile");
 
     // Tab through interactive elements
     await page.keyboard.press("Tab");
@@ -208,8 +217,23 @@ test.describe("Profile/Settings Page", () => {
   });
 
   test("accessibility: WCAG AA compliance", async ({ page }) => {
-    await page.goto("http://localhost:3000/profile");
-
+    // Complete onboarding to ensure session is set
+    await completeOnboarding(page, { vibe: "banter" });
+    
+    // Wait for radar page to fully load (ensures session is set in React state)
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("heading", { name: "RADAR" })).toBeVisible({ timeout: 10000 });
+    
+    // Navigate to profile using React Router (preserves JavaScript context/session)
+    // Click the Profile button in the header instead of using page.goto()
+    await page.getByRole("button", { name: /Go to profile/i }).click();
+    await page.waitForLoadState("networkidle");
+    
+    // Wait for React to render - check for visible content
+    await expect(page.getByRole("heading", { name: "Profile Settings" })).toBeVisible({ timeout: 10000 });
+    // Wait for main element to be in DOM
+    await expect(page.locator("main")).toBeVisible({ timeout: 10000 });
+    
     // Run axe accessibility check
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
 
@@ -218,14 +242,14 @@ test.describe("Profile/Settings Page", () => {
   });
 
   test("accessibility: high-contrast mode meets contrast ratios", async ({ page }) => {
-    await page.goto("http://localhost:3000/profile");
+    await page.goto("/profile");
 
     // Enable high-contrast mode
     const highContrastCheckbox = page.getByLabelText("High contrast mode");
     await highContrastCheckbox.click();
 
-    // Wait for class to be applied
-    await page.waitForTimeout(100);
+    // Wait for high-contrast class to be applied (check for class on body or root element)
+    await expect(page.locator("body.high-contrast, html.high-contrast, [data-high-contrast]")).toBeVisible({ timeout: 2000 });
 
     // Run axe accessibility check with high-contrast enabled
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();

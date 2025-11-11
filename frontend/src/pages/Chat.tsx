@@ -88,10 +88,10 @@ export default function Chat() {
             {partnerHandle} wants to chat
           </p>
           <div className="flex gap-4">
-            <Button onClick={acceptChat} className="font-mono">
+            <Button onClick={acceptChat} className="font-mono" data-testid="chat-accept">
               Accept
             </Button>
-            <Button onClick={declineChat} variant="outline" className="font-mono">
+            <Button onClick={declineChat} variant="outline" className="font-mono" data-testid="chat-decline">
               Decline
             </Button>
           </div>

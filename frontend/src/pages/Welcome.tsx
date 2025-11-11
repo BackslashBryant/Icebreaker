@@ -56,6 +56,7 @@ export default function Welcome() {
             asChild
             size="lg"
             className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-background font-mono text-base sm:text-lg h-12 sm:h-14 retro-button border-2 border-accent"
+            data-testid="cta-press-start"
           >
             <Link to="/onboarding">PRESS START</Link>
           </Button>
@@ -65,6 +66,7 @@ export default function Welcome() {
             variant="ghost"
             size="lg"
             className="w-full rounded-2xl text-muted-foreground hover:text-foreground font-mono border-2 border-transparent hover:border-muted text-sm sm:text-base"
+            data-testid="cta-not-for-me"
           >
             <Link to="/">Not for me</Link>
           </Button>

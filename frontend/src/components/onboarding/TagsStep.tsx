@@ -51,6 +51,9 @@ export function TagsStep({
             <button
               key={tag}
               onClick={() => onTagToggle(tag)}
+              aria-pressed={selectedTags.includes(tag)}
+              aria-label={`${tag}${selectedTags.includes(tag) ? " (selected)" : ""}`}
+              data-testid={`tag-${tag}`}
               className={`px-2.5 sm:px-3 py-1.5 sm:py-2 border-2 text-xs sm:text-sm font-mono transition-all ${
                 selectedTags.includes(tag)
                   ? "border-accent bg-accent/10 text-accent"
@@ -63,19 +66,23 @@ export function TagsStep({
         </div>
         {selectedTags.length === 0 && (
           <p className="text-xs text-muted-foreground/60 font-mono">
-            ⚠ No tags = reduced discoverability on radar
+            No tags = reduced discoverability on radar
           </p>
         )}
       </div>
 
-      <div className="flex items-center justify-between p-3 sm:p-4 border-2 border-accent/30 rounded-xl bg-card">
+      <div className="flex items-center justify-between p-3 sm:p-4 border-2 border-accent/30 rounded-xl bg-card" data-testid="visibility-toggle">
         <div className="flex-1 pr-3">
           <span className="font-mono text-xs sm:text-sm block mb-1">Show me on the radar</span>
           <span className="text-[10px] sm:text-xs text-muted-foreground/60">
             Others can see and chat with you
           </span>
         </div>
-        <Checkbox checked={visibility} onCheckedChange={(checked) => onVisibilityChange(checked as boolean)} />
+        <Checkbox 
+          checked={visibility} 
+          onCheckedChange={(checked) => onVisibilityChange(checked as boolean)}
+          data-testid="visibility-toggle-checkbox"
+        />
       </div>
     </div>
   );

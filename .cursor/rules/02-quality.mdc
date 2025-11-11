@@ -6,6 +6,70 @@ alwaysApply: true
 
 # Verification & Quality Gates
 
+## Debugging & Problem-Solving Protocol
+
+**MANDATORY**: Before fixing any bug or test failure, you MUST research the problem first:
+
+1. **Gather Evidence**:
+   - Read error messages, stack traces, and test output completely
+   - Check error context files (`artifacts/test-results/*/error-context.md`)
+   - Review network requests (check browser DevTools or Playwright network logs)
+   - Check console logs for JavaScript errors
+   - Review server logs if backend is involved
+   - Take screenshots if UI-related
+
+2. **Understand Root Cause**:
+   - Identify what's actually failing (not just symptoms)
+   - Check if similar issues exist in codebase
+   - Review related code paths and dependencies
+   - Understand expected vs actual behavior
+
+3. **Research Solutions**:
+   - Check existing tests for working patterns
+   - Review documentation and code comments
+   - Search codebase for similar implementations
+   - Consider edge cases and error conditions
+
+4. **Then Fix**:
+   - Only after understanding root cause, implement fix
+   - Test fix immediately
+   - Document what was wrong and why the fix works
+
+**NEVER**: Jump to fixes without understanding the problem first. Research → Understand → Fix.
+
+## Dependency Import Safety
+
+**MANDATORY**: Before committing code, validate that all imports match installed dependencies:
+
+1. **Run dependency check**: `npm run check:dependencies`
+2. **Optional dependencies**: Never use static imports - always use dynamic `import()` with try-catch
+3. **Preflight validation**: Preflight automatically checks dependencies before commits
+
+**Pattern for Optional Dependencies**:
+```javascript
+// ❌ BAD: Static import of optional dependency
+import * as Sentry from "@sentry/node";
+
+// ✅ GOOD: Dynamic import with fallback
+let Sentry = null;
+async function loadSentry() {
+  if (Sentry) return Sentry;
+  try {
+    const sentryModule = await import("@sentry/node");
+    Sentry = sentryModule.default || sentryModule;
+    return Sentry;
+  } catch (e) {
+    console.log("[Sentry] Package not installed, skipping");
+    return null;
+  }
+}
+```
+
+**Server Startup Validation**:
+- Run `backend/tests/server-startup.test.js` to verify server can start
+- E2E tests should verify server starts before running tests
+- Never commit code that crashes on import if optional dependency is missing
+
 ## Automated Checks
 - Prefer scripted checks whenever possible; expose them via the repository's package runner (npm/pnpm/yarn/uv/etc.) so `scripts/verify-all` can discover and execute them.
 - Keep validations fast and deterministic so they can run locally and in CI.
@@ -59,9 +123,13 @@ alwaysApply: true
   - **NEVER** run git commands from parent directories or outside the repository
 - One issue/task per branch; name it `agent/<agent>/<issue>-<slug>` (preferred) or `feat/<issue>-<slug>` (fallback).
 - Keep commits scoped and reference the issue ID in the message: `feat: Complete Issue #X - [description]`.
-- **When completing a feature**: Update GitHub issue with completion comment, commit changes, then ask before pushing.
-- Use GitHub MCP (or `gh`) for branch pushes, PR updates, and reviews. Terminal git is a fallback for commits.
-- Ask before committing or pushing; surface the staged diff and test results for approval.
+- **When completing a feature** (MANDATORY workflow - NO EXCEPTIONS):
+  1. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
+  2. **MANDATORY**: Push to GitHub: `git push -u origin agent/<agent>/<issue>-<slug>` (if auth fails, use credential helper: `git config --global credential.helper manager-core`)
+  3. **MANDATORY**: Update GitHub issue with completion comment (test results, verification summary, branch name, commit hash)
+  4. **MANDATORY**: Update GitHub issue labels: Add `status:done`, remove `status:in-progress` (if present)
+- Use GitHub MCP (or `gh`) for branch creation, issue comments, and label updates. Terminal git is used for commits and pushes.
+- Ask before committing (surface the staged diff and test results for approval), but pushing and issue updates are mandatory when completing a feature.
 - Merge cleanly (squash/rebase) after quality gates are green and the ticket is updated.
 - Install the provided git hook (`scripts/git-hooks/install`) so `.cursor/` changes never leave your machine unless you intentionally set `ALLOW_CURSOR_PUSH=1`.
 
@@ -90,8 +158,9 @@ Document the MCP run outputs or link to transcripts so reviewers can see what wa
 
 # Lessons Learned & Rule Updates
 - Treat every bug, regression, or avoided incident as an opportunity to harden the rules.
-- Append actionable notes to `.cursor/rules/07-process-improvement.mdc`; when a theme recurs, evolve or add a rule file so the fix becomes default behavior.
-- Reference evidence (logs, PRs, incidents) when writing lessons so future agents understand the context.
+- Append concise notes to `.cursor/rules/07-process-improvement.mdc` (2-3 sentences max: trigger, lesson, rule update); when a theme recurs, evolve or add a rule file so the fix becomes default behavior.
+- Keep entries brief - no verbose sections, just essential facts.
+- **Date format**: Always use the current system date in YYYY-MM-DD format when creating new entries. Check system date before adding entries. Never use placeholder dates like "2025-01-XX" or future dates.
 
 # Quality Checklist
 

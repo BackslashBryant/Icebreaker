@@ -81,6 +81,7 @@ describe("BlockDialog", () => {
     const blockButton = screen.getByLabelText("Confirm block");
     await user.click(blockButton);
 
+    // Component should show loading state while promise is pending
     await waitFor(() => {
       expect(screen.getByText("Blocking...")).toBeInTheDocument();
     });

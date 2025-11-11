@@ -1,12 +1,12 @@
 {
-  "slug": "block-report",
-  "featureName": "Block/Report (Safety Controls)",
+  "slug": "persona-testing-polish",
+  "featureName": "Persona-Based Testing & Polish",
   "updatedAt": "2025-01-27T00:00:00.000Z",
-  "status": "complete",
+  "status": "in-progress",
   "vision": "docs/vision.md",
-  "description": "MVP Block/Report - safety controls accessible from Chat header and PersonCard, with backend endpoints and Signal Engine integration",
-  "githubIssue": 6,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/6",
-  "branch": "feat/6-block-report",
-  "note": "Implementation complete - pending push (blocked by Windows DNS error, requires PC restart)"
+  "description": "Comprehensive persona-based testing and app polish using 10 user personas to ensure real-world user scenario validation and refinement.",
+  "githubIssue": 10,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/10",
+  "branch": "agent/vector/10-persona-testing-polish",
+  "note": "Issue #10 in progress. Research complete, plan approved. Starting Step 1: Persona Journey Mapping."
 }

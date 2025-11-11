@@ -5,6 +5,7 @@
   "description": "Icebreaker - A proximity-based ephemeral chat application for connecting people nearby",
   "scripts": {
     "preflight": "node ./tools/preflight.mjs",
+    "check:dependencies": "node ./tools/check-dependencies.mjs",
     "mcp:suggest": "node ./tools/mcp-suggest.mjs",
     "mcp:heal": "node ./tools/mcp-self-heal.mjs",
     "mcp:test-connectivity": "node ./tools/test-mcp-connectivity.mjs",
@@ -35,6 +36,8 @@
     "dev:guarded": "node ./tools/dev-guarded.mjs",
     "ports:free": "bash ops/cleanup/kill-ports.sh",
     "ports:free:win": "powershell -ExecutionPolicy Bypass -File ops/cleanup/kill-ports.ps1",
+    "ports:free:smart": "powershell -ExecutionPolicy Bypass -File ops/cleanup/kill-processes-smart.ps1",
+    "ports:free:smart:dry": "powershell -ExecutionPolicy Bypass -File ops/cleanup/kill-processes-smart.ps1 -DryRun",
     "ports:status": "node ./tools/ports-status.mjs",
     "guard:lint": "node ./tools/guard-runner.mjs lint",
     "guard:type": "node ./tools/guard-runner.mjs type",

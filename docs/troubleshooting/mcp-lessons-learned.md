@@ -1,6 +1,6 @@
 # MCP Configuration Lessons Learned
 
-**Date**: 2025-01-27  
+**Date**: 2025-11-10  
 **Summary**: Key learnings from migrating MCP servers from Smithery CLI to direct installations
 
 ## Critical Changes

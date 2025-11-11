@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { BrowserRouter } from "react-router-dom";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { ChatHeader } from "@/components/chat/ChatHeader";
@@ -116,9 +117,30 @@ describe("ChatInput", () => {
 });
 
 describe("ChatHeader", () => {
+  // Mock useSafety hook
+  vi.mock("@/hooks/useSafety", () => ({
+    useSafety: () => ({
+      blockUser: vi.fn().mockResolvedValue({ success: true }),
+      reportUser: vi.fn().mockResolvedValue({ success: true }),
+    }),
+  }));
+
+  const defaultProps = {
+    partnerHandle: "TestUser",
+    partnerSessionId: "test-session-id",
+    onEndChat: vi.fn(),
+  };
+
+  const renderWithRouter = (props = {}) => {
+    return render(
+      <BrowserRouter>
+        <ChatHeader {...defaultProps} {...props} />
+      </BrowserRouter>
+    );
+  };
+
   it("renders partner handle", () => {
-    const onEndChat = vi.fn();
-    render(<ChatHeader partnerHandle="TestUser" onEndChat={onEndChat} />);
+    renderWithRouter();
 
     expect(screen.getByText("TestUser")).toBeInTheDocument();
     expect(screen.getByLabelText("End chat")).toBeInTheDocument();
@@ -126,7 +148,7 @@ describe("ChatHeader", () => {
 
   it("calls onEndChat when button clicked", () => {
     const onEndChat = vi.fn();
-    render(<ChatHeader partnerHandle="TestUser" onEndChat={onEndChat} />);
+    renderWithRouter({ onEndChat });
 
     const button = screen.getByLabelText("End chat");
     fireEvent.click(button);
@@ -135,27 +157,13 @@ describe("ChatHeader", () => {
   });
 
   it("shows proximity warning when proximityWarning is true", () => {
-    const onEndChat = vi.fn();
-    render(
-      <ChatHeader
-        partnerHandle="TestUser"
-        onEndChat={onEndChat}
-        proximityWarning={true}
-      />
-    );
+    renderWithRouter({ proximityWarning: true });
 
     expect(screen.getByText("Signal weak — chat may end.")).toBeInTheDocument();
   });
 
   it("does not show proximity warning when proximityWarning is false", () => {
-    const onEndChat = vi.fn();
-    render(
-      <ChatHeader
-        partnerHandle="TestUser"
-        onEndChat={onEndChat}
-        proximityWarning={false}
-      />
-    );
+    renderWithRouter({ proximityWarning: false });
 
     expect(screen.queryByText("Signal weak — chat may end.")).not.toBeInTheDocument();
   });

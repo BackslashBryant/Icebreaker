@@ -1,6 +1,6 @@
 # MCP Troubleshooting Guide
 
-> **Last Updated**: 2025-01-27  
+> **Last Updated**: 2025-11-10  
 > **Key Changes**: Migrated from Smithery CLI to direct MCP server installations after STDIO support was discontinued.
 
 ## Quick Checks

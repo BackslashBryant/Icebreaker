@@ -14,9 +14,9 @@ function ProfileHeader({ onDone }: { onDone: () => void }) {
   return (
     <header className="border-b border-border p-4 sm:p-6" role="banner">
       <div className="max-w-4xl mx-auto flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-accent font-mono glow-accent">
+        <div className="text-2xl font-bold text-accent font-mono glow-accent">
           PROFILE
-        </h1>
+        </div>
         <Button
           onClick={onDone}
           variant="ghost"
@@ -76,8 +76,13 @@ export default function Profile() {
     <div className="min-h-screen bg-background flex flex-col">
       <ProfileHeader onDone={handleDone} />
 
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6" role="main">
         <div className="w-full max-w-2xl mx-auto space-y-6 sm:space-y-8 pb-8">
+          {/* Page heading - visible h1 for accessibility */}
+          <h1 className="text-2xl font-bold text-accent font-mono glow-accent mb-4">
+            Profile Settings
+          </h1>
+          
           {/* Handle Display */}
           <div className="space-y-4">
             <div className="ascii-divider text-center">▼ ▼ ▼</div>
@@ -107,7 +112,7 @@ export default function Profile() {
             <AccessibilityToggles />
           </ProfileSection>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

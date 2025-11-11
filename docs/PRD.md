@@ -42,4 +42,4 @@ _Template placeholder. Replace with the PRD for your real project once the stack
 - **Audit Trail**: Research log and kickoff template encourage explicit citations and acceptance criteria before code lands.
 
 ## 7. Change Log
-- **2025-01-30**: Pivoted from Spec Kit flows to Cursor 2.0 sequential agents, added preflight + hook/prompt helpers, refreshed documentation to match the new workflow.
+- **2025-11-10**: Pivoted from Spec Kit flows to Cursor 2.0 sequential agents, added preflight + hook/prompt helpers, refreshed documentation to match the new workflow.

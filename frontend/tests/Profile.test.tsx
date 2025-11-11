@@ -29,11 +29,12 @@ vi.mock("sonner", () => ({
     error: vi.fn(),
   },
 }));
+const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
   return {
     ...actual,
-    useNavigate: () => vi.fn(),
+    useNavigate: () => mockNavigate,
   };
 });
 
@@ -85,15 +86,6 @@ describe("Profile Page", () => {
   });
 
   it("redirects to onboarding when no session", () => {
-    const mockNavigate = vi.fn();
-    vi.mock("react-router-dom", async () => {
-      const actual = await vi.importActual("react-router-dom");
-      return {
-        ...actual,
-        useNavigate: () => mockNavigate,
-      };
-    });
-
     mockUseSession.mockReturnValue({
       session: null,
       setSession: vi.fn(),
@@ -107,6 +99,7 @@ describe("Profile Page", () => {
 
     // Component should redirect (returns null)
     expect(screen.queryByText("PROFILE")).not.toBeInTheDocument();
+    expect(mockNavigate).toHaveBeenCalledWith("/onboarding");
   });
 });
 

@@ -1,11 +1,14 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { getBackendURL } from "../utils/test-helpers";
 
 /**
  * Helper function to complete onboarding and return session token
  */
 async function completeOnboarding(page: any, vibe: string = "banter") {
   await page.goto("/welcome", { waitUntil: "networkidle" });
+  await page.waitForLoadState("networkidle");
+  // Wait for boot sequence
   await expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout: 10000 });
   
   await page.getByRole("link", { name: /PRESS START/i }).click();
@@ -35,7 +38,9 @@ test.describe("Chat Request Cooldowns", () => {
 
     // Wait for Radar connection
     await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
-    await page.waitForTimeout(2000); // Wait for radar to populate
+    // Wait for radar content to be available (people list or empty state)
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one here/i))).toBeVisible({ timeout: 5000 });
 
     // Create 3 target sessions that will decline
     const contexts = [];
@@ -56,7 +61,7 @@ test.describe("Chat Request Cooldowns", () => {
     }
 
     // Get requester session ID from backend (via API)
-    const requesterSessionResponse = await page.request.get("http://localhost:8000/api/health");
+    const requesterSessionResponse = await page.request.get(`${getBackendURL()}/api/health`);
     expect(requesterSessionResponse.ok()).toBeTruthy();
 
     // Simulate 3 chat requests that get declined via API
@@ -68,7 +73,7 @@ test.describe("Chat Request Cooldowns", () => {
     for (let i = 0; i < 3; i++) {
       // Request chat (this will fail if target doesn't exist, but decline will still be recorded)
       // For E2E, we'll directly call the decline API to simulate declines
-      const declineResponse = await page.request.post("http://localhost:8000/api/chat/decline", {
+      const declineResponse = await page.request.post(`${getBackendURL()}/api/chat/decline`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${tokens[i]}`,
@@ -122,7 +127,9 @@ test.describe("Chat Request Cooldowns", () => {
 
     // Wait for Radar connection
     await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
-    await page.waitForTimeout(2000);
+    // Wait for radar content to be available
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one here/i))).toBeVisible({ timeout: 5000 });
 
     // Simulate cooldown by sending WebSocket error message
     // Note: In real E2E, we'd trigger actual cooldown via backend
@@ -196,7 +203,9 @@ test.describe("Chat Request Cooldowns", () => {
 
     // Wait for Radar connection
     await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
-    await page.waitForTimeout(2000);
+    // Wait for radar content to be available
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one here/i))).toBeVisible({ timeout: 5000 });
 
     // Navigate to Radar
     await page.goto("/radar");
@@ -234,7 +243,9 @@ test.describe("Chat Request Cooldowns", () => {
 
     // Wait for Radar connection
     await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
-    await page.waitForTimeout(2000);
+    // Wait for radar content to be available
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one here/i))).toBeVisible({ timeout: 5000 });
 
     // Navigate to Radar
     await page.goto("/radar");

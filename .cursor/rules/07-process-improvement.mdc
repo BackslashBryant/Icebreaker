@@ -6,381 +6,80 @@ alwaysApply: false
 
 # Lessons Learned
 
-Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: describe the trigger, the lesson, and the rule/update that resulted.
+**Format**: Keep entries to 2-3 sentences max. Include: trigger, lesson, rule update. No verbose sections. **Date format**: Always use the current system date in YYYY-MM-DD format when creating new entries. Never use placeholder dates like "2025-01-XX" or future dates. Check system date before adding entries.
 
-## 2025-01-XX: Testing Infrastructure & Gap Remediation
+## 2025-11-11: GitHub Issue Number Sync
 
-**Trigger**: Testing gaps identified (security, edge cases, performance), tests hanging without timeouts, no centralized logging infrastructure
-**Lesson**: Comprehensive testing infrastructure requires: timeouts to prevent hangs, centralized logging with overwriting, security test coverage, edge case handling, performance automation, and clear tool selection guidelines.
+**Trigger**: Issue #11 conflict - main planning issue existed in docs but was never created on GitHub, causing Phase 2 backlog items to get wrong numbers. **Lesson**: Always verify GitHub issue numbers before creating, sync docs immediately after creation, check for conflicts when creating multiple issues. **Rule**: Added mandatory pre-creation verification step in `.cursor/rules/01-workflow.mdc`, created `tools/verify-github-issue.mjs` safeguard script, updated `tools/github-issue.mjs` with pre-check.
 
-**Root Cause**:
-- Missing test timeouts causing hangs
-- No centralized logging infrastructure
-- Security testing gaps (token validation, input sanitization)
-- Edge case coverage missing
-- Performance tests not automated
-- No codified testing practices
+## 2025-11-11: GitHub API Authentication Fallback
 
-**Resolution Steps**:
-1. ✅ Added test timeouts to all configs (frontend, backend, e2e) - 10s per test, 10s per hook, 5s teardown
-2. ✅ Created centralized logging infrastructure (`scripts/test-logger.mjs`, `artifacts/test-logs/`)
-3. ✅ Enhanced security implementation (token expiration, input validation, message limits)
-4. ✅ Created security test suite (`backend/tests/security.test.js`)
-5. ✅ Created edge case test suite (`backend/tests/edge-cases.test.js`)
-6. ✅ Enhanced edge case handling (bounds checking, connection limits)
-7. ✅ Automated performance tests (`tests/e2e/performance.spec.ts`)
-8. ✅ Created testing rules document (`.cursor/rules/08-testing.mdc`)
-9. ✅ Updated scripts to use logging (`scripts/run-tests.mjs`, `package.json`)
-10. ✅ Added coverage thresholds (≥80% enforced)
+**Trigger**: GitHub API 401 errors when creating issues via Node.js scripts or `gh` CLI despite token being set. **Lesson**: PowerShell direct API calls reading token from `.env` file are most reliable on Windows - bypass Node.js env var issues and CLI keyring conflicts. **Rule**: Always try PowerShell `Invoke-RestMethod` with token parsed from `.env` as fallback when GitHub operations fail. See `Docs/troubleshooting/github-api-auth.md`.
 
-**Rule Update**:
-- All test configs must have timeouts (prevents hangs)
-- All test runs must produce logs in `artifacts/test-logs/` (overwriting previous)
-- Security tests required for authentication, authorization, input validation
-- Edge case tests required for boundary conditions
-- Performance tests automated and integrated into CI
-- Testing tool selection codified in `.cursor/rules/08-testing.mdc`
+## 2025-11-10: Missing Dependency Import Crash
 
-**Action Required**:
-- Use `npm run test:unit`, `npm run test:security`, `npm run test:e2e`, `npm run test:performance`, `npm run test:all`
-- Check logs in `artifacts/test-logs/` for test results
-- Follow tool selection guide in `.cursor/rules/08-testing.mdc`
-- Ensure coverage thresholds met (≥80%)
+**Trigger**: Backend crashed on startup because `@sentry/node` was imported but not installed. **Lesson**: Never use static imports for optional dependencies - use dynamic `import()` with try-catch. **Rule**: Added dependency check to preflight, use dynamic imports for optional packages.
 
-**Rules/Scripts Updated**:
-- ✅ `frontend/vite.config.js`: Added timeouts and coverage thresholds
-- ✅ `backend/vitest.config.js`: Added timeouts
-- ✅ `scripts/test-logger.mjs`: Created centralized logging utility
-- ✅ `scripts/run-tests.mjs`: Integrated logging
-- ✅ `package.json`: Added test scripts with logging
-- ✅ `backend/tests/security.test.js`: Created security test suite
-- ✅ `backend/tests/edge-cases.test.js`: Created edge case test suite
-- ✅ `tests/e2e/performance.spec.ts`: Created performance tests
-- ✅ `.cursor/rules/08-testing.mdc`: Created testing practices guide
-- ✅ `.cursor/rules/02-quality.mdc`: Added reference to testing rules
+## 2025-11-10: Research Before Fixing
 
----
+**Trigger**: Agent fixed tests without researching root cause first. **Lesson**: Mandatory research protocol: gather evidence (errors, logs, network) → understand root cause → research solutions → then fix. **Rule**: Added to `.cursor/rules/02-quality.mdc` - never jump to fixes without investigation.
 
-## 2025-11-09: Supabase MCP Migration to Hosted Server
+## 2025-11-10: Testing Infrastructure Gaps
 
-**Trigger**: Supabase MCP npm package (`supabase-mcp`) required `MCP_API_KEY` environment variable that wasn't documented, causing connection failures
-**Lesson**: Supabase now provides an official hosted MCP server that doesn't require any environment variables - it uses browser-based authentication. This is simpler, more secure, and officially supported.
-**Root Cause**: Using community npm package instead of official hosted server, which required undocumented `MCP_API_KEY` environment variable
+**Trigger**: Tests hanging without timeouts, missing security/edge case coverage. **Lesson**: All tests need timeouts, centralized logging, security/edge case tests, performance automation. **Rule**: Created `.cursor/rules/08-testing.mdc` with tool selection and timeout requirements.
 
-**Resolution Steps**:
-1. ✅ Migrated from npm package to official hosted server at `https://mcp.supabase.com/mcp`
-2. ✅ Updated `.cursor/mcp.json` to use URL-based configuration with `project_ref` and `features` query parameters
-3. ✅ Removed `MCP_API_KEY` from environment variables (no longer needed)
-4. ✅ Updated all documentation to reflect hosted server approach
+## 2025-11-09: Supabase MCP Migration
 
-**Rule Update**:
-- Always use official hosted Supabase MCP server when available (preferred over npm packages)
-- Hosted servers with browser authentication are simpler and more secure than npm packages requiring env vars
-- When migrating MCP servers, update all related documentation (setup guides, troubleshooting, tools)
+**Trigger**: Supabase MCP npm package required undocumented `MCP_API_KEY`. **Lesson**: Use official hosted server (`https://mcp.supabase.com/mcp`) - simpler, more secure, browser auth. **Rule**: Updated `.cursor/mcp.json` to use URL-based config, removed env var requirement.
 
-**Action Required**:
-- Use hosted Supabase MCP server: `https://mcp.supabase.com/mcp?project_ref=YOUR_PROJECT_REF&features=...`
-- No environment variables needed - authentication handled via browser on first use
-- Update documentation when MCP configuration changes (setup guides, troubleshooting, health checks)
-- Remove obsolete environment variables from `.env` and documentation
+## 2025-11-10: Issue Completion Protocol
 
-**Rules/Scripts Updated**:
-- ✅ `.cursor/mcp.json`: Migrated to hosted server URL configuration
-- ✅ `docs/troubleshooting/mcp-setup-guide.md`: Updated with hosted server instructions
-- ✅ `docs/troubleshooting/mcp-env-setup-windows.md`: Removed Supabase env vars from required list
-- ✅ `docs/troubleshooting/supabase-key-setup.md`: Marked as optional (for client libraries only)
-- ✅ `docs/troubleshooting/mcp-troubleshooting.md`: Updated Supabase section with hosted server config
-- ✅ `tools/mcp-self-heal.mjs`: Skip env checks for hosted Supabase server (url-based)
-- ✅ `tools/health-check.mjs`: Recognize hosted server doesn't need env vars
-- ✅ `.env`: Removed `MCP_API_KEY`, added note about hosted server
-- ✅ `docs/research.md`: Documented migration with benefits and trade-offs
+**Trigger**: User had to remind agent to push commits and update GitHub issue. **Lesson**: Completion steps (push, GitHub comment, labels) are mandatory and automatic - no user reminders needed. **Rule**: Updated `.cursor/rules/01-workflow.mdc` Section 6 - automatic completion steps.
 
-## 2025-01-XX: Playwright MCP Usage (Not Using Configured MCP)
+## 2025-11-10: Playwright MCP Usage
 
-**Trigger**: Agent ran Playwright tests via CLI (`npx playwright test`) instead of using Playwright MCP for accessibility checks and screenshots
-**Lesson**: When Playwright MCP is configured, use it for accessibility checks (axe), screenshots, and Lighthouse per rules. The E2E test suite execution can still use CLI, but accessibility verification and artifact capture should leverage Playwright MCP tools.
-**Root Cause**: Agent defaulted to CLI approach without checking for available MCP tools first
-**Rule Update**: Always check for MCP availability before falling back to CLI. Use Playwright MCP for a11y checks, screenshots, and Lighthouse when available.
+**Trigger**: Agent used CLI instead of Playwright MCP for accessibility checks. **Lesson**: When MCP is configured, use it for a11y checks, screenshots, Lighthouse - check MCP availability before CLI fallback. **Rule**: Documented in `.cursor/rules/04-integrations.mdc`.
 
-**Action Required**:
-- Check for Playwright MCP tools before running accessibility checks
-- Use Playwright MCP for screenshots and accessibility verification
-- Document MCP usage in test results and artifacts
-- Fall back to CLI only if MCP is unavailable (document in plan)
-- **Note**: Playwright MCP tools may require Cursor restart to load. If tools not visible, document fallback and note in progress.md
+## 2025-11-10: Test Report Auto-Open
 
-**Rules/Scripts Updated**:
-- ✅ `.cursor/rules/04-integrations.mdc`: Playwright MCP guidance already present
-- ✅ `.cursor/rules/07-process-improvement.mdc`: MCP usage lesson documented with tool list
-
-**Tools Available** (when Playwright MCP is loaded):
-- `browser_navigate` - Navigate to URLs
-- `browser_snapshot` - Accessibility snapshots (preferred over screenshots for a11y)
-- `browser_take_screenshot` - Screenshots for artifacts
-- `browser_click`, `browser_type`, etc. - Browser interactions
-
-## 2025-01-XX: Test Report Configuration (HTML Auto-Open)
-
-**Trigger**: Playwright tests opened HTML report automatically, causing hangs and blocking workflow
-**Lesson**: Test reports must be configured to never auto-open. Reports should be in `artifacts/` for review, with multiple formats (list for console, json for CI, html for visual review)
-**Root Cause**: Playwright HTML reporter defaults to auto-opening if not explicitly disabled
-**Rule Update**: Always configure Playwright with `open: 'never'` and output to `artifacts/` directory
-
-**Action Required**:
-- Configure all test reporters with explicit output directories
-- Use `artifacts/` for all test outputs (reports, screenshots, traces)
-- Never auto-open HTML reports; provide paths for manual review
-- Document report locations in test configuration comments
-
-**Rules/Scripts Updated**:
-- ✅ `tests/playwright.config.ts`: Already configured with `open: 'never'` and `artifacts/` output directory
+**Trigger**: Playwright HTML reports auto-opened, causing hangs. **Lesson**: Configure all reporters with `open: 'never'` and output to `artifacts/`. **Rule**: Updated `tests/playwright.config.ts` with explicit no-auto-open config.
 
 ## 2024-12-19: MCP-First Git Operations
 
-**Trigger**: User requested git push, agent used terminal commands instead of GitHub MCP
-**Lesson**: The rules clearly state that git operations should use GitHub MCP first (line 36 in 04-integrations.mdc: "git", "commit", "push", "branch", "pr", "pull request" → GitHub MCP)
-**Root Cause**: Agent didn't check MCP triggers before falling back to terminal commands
-**Rule Update**: Add explicit MCP-first check in workflow rules
+**Trigger**: Agent used terminal instead of GitHub MCP for git operations. **Lesson**: Check MCP triggers first - GitHub MCP for branch/PR/issue updates, git CLI for commits. **Rule**: Clarified in `.cursor/rules/04-integrations.mdc`.
 
-**Action Required**:
-- Update workflow rules to include MCP trigger check as mandatory first step
-- Add explicit "MCP-first" decision tree in git operations
-- Ensure agent checks MCP availability before terminal fallback
+## 2025-11-10: No Report Files
 
-**Rules/Scripts Updated**:
-- ✅ `.cursor/rules/04-integrations.mdc`: Clarified GitHub MCP vs git CLI usage (commits use CLI, branch/PR/issue updates use MCP)
+**Trigger**: Agent created lengthy report file when user requested QA. **Lesson**: Never create report files - reports in chat only, update GitHub issues/docs directly. **Rule**: Added guardrails to Pixel and Muse personas.
 
-## 2025-01-XX: No Report Files - Chat Only
+## 2025-11-06: Issue Completion Workflow
 
-**Trigger**: Agent created lengthy report file (`docs/qa/ISSUE_1_FINAL_QA_REPORT.md`) when user requested QA/QC
-**Lesson**: **NEVER create report files**. Reports should be in chat only. Update GitHub issues/docs directly, keep reports concise and conversational.
-**Root Cause**: Agent defaulted to creating documentation files instead of providing chat-based summary
-**Rule Update**: QA/QC reports must be in chat only. Update GitHub issues and docs (changelog, progress.md) directly, but never create standalone report files.
+**Trigger**: Agent didn't create proper branch or update GitHub issue. **Lesson**: Create branch FIRST (`agent/<agent>/<issue>-<slug>`), then update GitHub issue, commit, push. **Rule**: Enforced in `AGENTS.md` and `.cursor/rules/01-workflow.mdc`.
 
-**Action Required**:
-- Reports in chat only - no `.md` report files
-- Update GitHub issues with completion status
-- Update changelog/docs if needed
-- Keep reports concise (Status, Next 3, Question format)
-- Delete any report files created
+## 2025-11-06: Windows Git Push Issues
 
-**Rules/Scripts Updated**:
-- ✅ `.cursor/rules/persona-pixel.mdc`: Added guardrail "NEVER create report files"
-- ✅ `.cursor/rules/persona-muse.mdc`: Added guardrail "NEVER create report files"
+**Trigger**: Git push failed with DNS threading error, then 403 after restart. **Lesson**: Create branch on GitHub FIRST via MCP, use system Git if Cursor's bundled Git fails, check token scopes for 403 errors. **Rule**: Updated troubleshooting docs with PC restart and auth scope solutions.
 
-## 2025-11-06: Issue Completion Workflow (Git Commit & Push + Branch Naming)
+## 2025-11-06: Direct Commits Only
 
-**Trigger**: Agent completed Issue #1 verification but didn't: 1) Use proper branch naming, 2) Update GitHub issue, 3) Commit/push changes
-**Lesson**: When completing a feature/issue, always: 1) Create branch with proper format FIRST (`agent/<agent>/<issue>-<slug>` per `.cursor/rules/01-workflow.mdc`), 2) Update GitHub issue with completion comment, 3) Commit changes with descriptive message referencing issue, 4) Ask before pushing (per rules)
-**Root Cause**: Agent worked on existing branch (`feat/playwright-health-status`) instead of creating proper branch for Issue #1, then didn't complete workflow closure
-**Rule Update**: Feature completion checklist must include: Create proper branch FIRST, GitHub issue update, git commit, push (ask before push per rules)
+**Trigger**: User prefers direct commits, no PRs. **Lesson**: Always direct commits to feature branches - no PRs ever. **Rule**: Updated `.cursor/rules/01-workflow.mdc` Section 5.
 
-**Action Required**:
-- **Before starting work**: Create branch with format `agent/<agent>/<issue>-<slug>` (e.g., `agent/vector/1-onboarding-flow`)
-- After verification/implementation complete: Update GitHub issue with completion comment
-- Commit all changes with message referencing issue number: `feat: Complete Issue #X - [description]`
-- Ask before pushing (per agent rules)
-- Include test results and verification summary in commit message
+## 2025-11-10: Test Skipping Anti-Pattern
 
-**Rules/Scripts Updated** (not just documented):
-- ✅ `AGENTS.md` rule #9: Enforce branch creation BEFORE work starts
-- ✅ `AGENTS.md` rule #13: Enforce issue completion checklist (GitHub issue update, commit, push)
-- ✅ `.cursor/rules/01-workflow.mdc` Section 2: MANDATORY branch creation before work
-- ✅ `.cursor/rules/01-workflow.mdc` Section 6: Issue completion checklist
-- ✅ `.cursor/rules/02-quality.mdc`: Git hygiene updated with branch naming requirement
-- ✅ `tools/preflight.mjs`: Added `checkBranchNaming()` function (validates branch format)
-- ✅ `scripts/hooks/pre-commit.sample`: Added branch naming warning (non-blocking)
-- ✅ `.cursor/rules/04-integrations.mdc`: Clarified GitHub MCP vs git CLI usage
+**Trigger**: Tests were skipped instead of fixed when supertest timed out. **Lesson**: Never skip tests - fix root causes or switch to working patterns (use `fetch()` + test server instead of supertest). **Rule**: Updated `.cursor/rules/08-testing.mdc` - never skip, use proven patterns.
 
-## 2025-11-06: Windows Git Push Subprocess Limitation & Authentication Resolution
+## 2025-11-10: Cursor Bundled Git Issues
 
-**Trigger**: Git push fails in Cursor subprocess context on Windows with `getaddrinfo() thread failed to start` error, then 403 after PC restart
-**Lesson**: Windows DNS threading issue can be resolved by PC restart. After restart, authentication scopes matter - GitHub CLI keyring token has `repo` scope, PAT tokens may not. Always create branch on GitHub FIRST before attempting push.
-**Root Cause**:
-1. Windows DNS threading bug in git's HTTP client when executed in subprocess context (resolved by PC restart)
-2. Authentication token scope mismatch - PAT token lacked `repo` scope, GitHub CLI keyring token had correct scopes
-3. Agent attempted push before branch existed on GitHub
+**Trigger**: Cursor's Git push failed with DNS threading error, system Git worked fine. **Lesson**: When Cursor's bundled Git fails, use system Git from terminal - it works reliably on Windows. **Rule**: Added to troubleshooting docs - use system Git as fallback.
 
-**Resolution Steps**:
-1. ✅ PC restart resolved DNS threading error
-2. ✅ Switched to GitHub CLI keyring token with `repo` scope: `gh auth refresh -s repo`
-3. ✅ Created branch on GitHub FIRST via GitHub MCP: `mcp_github_create_branch`
-4. ✅ Push succeeded after authentication and branch creation
+## 2025-11-10: Git Safety Checks
 
-**Rule Update**:
-- Always create branch on GitHub FIRST (via GitHub MCP) before attempting push
-- If git push fails with DNS error, suggest PC restart
-- If git push fails with 403, check token scopes - use GitHub CLI keyring token if available: `gh auth refresh -s repo`
-- Verify branch exists on GitHub before push: `git ls-remote --heads origin <branch-name>` or use GitHub MCP
+**Trigger**: Git operations attempted from wrong directory, wrong branch detected. **Lesson**: Mandatory checks before ANY git operation: verify project root directory, verify branch matches issue number. **Rule**: Added to `.cursor/rules/01-workflow.mdc` - never run git from parent directories.
 
-**Action Required**:
-- **Before push**: Create branch on GitHub via GitHub MCP if it doesn't exist
-- If DNS threading error: Suggest PC restart as first troubleshooting step
-- If 403 authentication error: Check token scopes, use `gh auth refresh -s repo` to activate keyring token
-- Document in issue completion: "Branch created on GitHub, commits pushed successfully"
+## 2025-11-10: Issue Completion Status Tracking
 
-**Rules/Scripts Updated**:
-- ✅ `docs/research.md`: Updated with PC restart and authentication scope solutions
-- ✅ `docs/troubleshooting/windows-git-push-fix.md`: Added firewall check as priority, PC restart solution, authentication scope guidance
-- ✅ `.cursor/rules/07-process-improvement.mdc`: Added comprehensive lesson with resolution steps
+**Trigger**: Issue marked complete in commit but progress.md/current.json showed incomplete. **Lesson**: Status files are source of truth - update progress.md and current.json BEFORE committing completion. **Rule**: Added mandatory status file updates to completion checklist in `.cursor/rules/01-workflow.mdc`.
 
-## 2025-11-06: Direct Commits Only - No PRs
+## 2025-11-10: Smart Process Cleanup
 
-**Trigger**: User prefers direct commits to feature branches. Always solo work.
-**Lesson**: Always direct commits. No PRs. Commit and push directly to feature branches.
-**Root Cause**: Workflow rules assumed PRs were required, but this is always solo work.
-
-**Rule Update**:
-- Direct commits to feature branches only (no PRs ever)
-- Always ask before pushing (per agent rules)
-- Update GitHub issue with completion comment
-
-**Action Required**:
-- Skip PR creation entirely
-- Commit and push directly to feature branch
-- Update issue completion comments to reflect direct commits
-
-**Rules/Scripts Updated**:
-- ✅ `.cursor/rules/01-workflow.mdc`: Section 3 (removed PR language), Section 5 (replaced with "Direct Commits"), Section 6 (direct commits only)
-- ✅ `AGENTS.md`: Rule #14 updated to "Direct commits only - No PRs"
-
----
-
-## 2025-01-27: Test Skipping Anti-Pattern & Supertest Timeout Issues
-
-**Trigger**: Tests were skipped (`describe.skip`) instead of fixed when supertest timed out. User explicitly stated "Don't skip shit. Fix the issues."
-
-**Lesson**: **Never skip tests**. Always investigate root causes and fix them. When a testing tool has persistent issues, switch to a proven alternative pattern rather than skipping tests.
-
-**Root Cause**:
-1. **Supertest timeout issues**: Supertest was timing out (`ETIMEDOUT`) even with correct Express app setup (`express.json()`, error handlers). Multiple attempts to fix supertest failed.
-2. **Test skipping instead of fixing**: Tests were marked as `describe.skip` with notes instead of investigating root causes and switching to working patterns.
-3. **Ignoring working patterns**: `onboarding.test.js` already used `fetch()` + test server utilities successfully, but this pattern wasn't applied to other tests.
-4. **Test expectations mismatch**: Some tests expected rejection but actual behavior was sanitization/truncation (tests should match actual behavior, not assumed behavior).
-
-**Resolution Steps**:
-1. ✅ Replaced supertest with `fetch()` + test server utilities (proven pattern from `onboarding.test.js`)
-2. ✅ Removed all `describe.skip` blocks - all tests now run
-3. ✅ Fixed health tests to use test server utilities
-4. ✅ Updated test expectations to match actual behavior (sanitization vs rejection)
-5. ✅ Verified all 89 backend tests pass without skipping
-
-**Rule Update**:
-- **NEVER skip tests** - Always fix root causes or switch to working patterns
-- **Use `fetch()` + test server utilities** for HTTP API integration tests (avoid supertest)
-- **Match test expectations to actual behavior** - Verify behavior first, then write/update tests
-- **Review logs when tests fail** - Investigate root causes systematically
-- **Follow existing working patterns** - If `onboarding.test.js` works, use that pattern elsewhere
-
-**Action Required**:
-- When tests fail: Investigate root cause, review logs, check existing working patterns
-- When a tool has persistent issues: Switch to proven alternative (e.g., `fetch()` instead of supertest)
-- When test expectations don't match behavior: Verify actual behavior, update tests to match
-- Never use `describe.skip` or `it.skip` - Fix or replace instead
-
-**Pattern to Follow**:
-```javascript
-// ✅ CORRECT: Use fetch() + test server utilities
-import { app } from '../src/index.js';
-import { createTestServer, closeTestServer } from './utils/test-server.js';
-
-let server, baseUrl;
-beforeAll(async () => {
-  const result = await createTestServer(app);
-  server = result.server;
-  baseUrl = result.url;
-});
-afterAll(async () => await closeTestServer(server));
-
-it('tests endpoint', async () => {
-  const response = await fetch(`${baseUrl}/api/endpoint`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: 'test' }),
-  });
-  expect(response.status).toBe(200);
-});
-```
-
-**Rules/Scripts Updated**:
-- ✅ `.cursor/rules/08-testing.mdc`: Updated to prefer `fetch()` + test server, avoid supertest, never skip tests
-- ✅ `backend/tests/security.test.js`: Removed `describe.skip`, switched to `fetch()` pattern
-- ✅ `backend/tests/health.test.ts`: Removed `describe.skip`, uses test server utilities
-- ✅ `.cursor/rules/07-process-improvement.mdc`: Added this lesson
-
----
-
-## 2025-01-27: Cursor Bundled Git vs System Git - Push Resolution
-
-**Trigger**: Git push failed in Cursor with `getaddrinfo() thread failed to start` error, but system Git worked fine from terminal
-
-**Lesson**: Cursor's bundled Git binary may have DNS threading issues on Windows. When Cursor's Git fails, use system Git from terminal (PowerShell/cmd) - it works reliably because it can spawn DNS threads properly.
-
-**Root Cause**:
-1. Cursor uses a bundled Git binary that may be corrupted or blocked by security software
-2. Windows DNS threading requires thread creation, which may be blocked for sandboxed apps
-3. System Git (`C:\Program Files\Git\bin\git.exe`) works because it's not sandboxed and can create threads normally
-4. Local CLI networking works fine (`git ls-remote` succeeds), confirming DNS/connectivity is healthy
-
-**Resolution Steps**:
-1. ✅ Diagnosed that system Git works (`git ls-remote origin` succeeded)
-2. ✅ Used system Git from PowerShell terminal instead of Cursor's bundled Git
-3. ✅ Successfully pushed all branches using terminal Git
-4. ✅ Configured Git credentials using token from `.env` file
-
-**Rule Update**:
-- **When Cursor's Git push fails with DNS/threading errors**: Use system Git from terminal instead
-- **Diagnosis**: Run `git ls-remote origin` from terminal - if it works, DNS is fine, use system Git
-- **Solution**: Push from PowerShell/cmd terminal using system Git (`C:\Program Files\Git\bin\git.exe`)
-- **Alternative**: Configure Cursor to use system Git: Settings → `git.path` → `C:\Program Files\Git\bin\git.exe`
-- **Fallback**: If security tools block thread creation, whitelist Cursor's install directory or temporarily disable network inspection
-
-**Action Required**:
-- If Cursor Git push fails with `getaddrinfo() thread failed to start`: Use terminal Git instead
-- Verify system Git works: `git ls-remote origin` from PowerShell
-- Push from terminal: `git push origin <branch-name>` (credentials already configured)
-- Consider configuring Cursor to use system Git to prevent future issues
-
-**Rules/Scripts Updated**:
-- ✅ `Docs/troubleshooting/windows-git-push-fix.md`: Added system Git solution
-- ✅ `.cursor/rules/07-process-improvement.mdc`: Documented this lesson
-
----
-
-## 2025-01-XX: Git Safety Checks - Wrong Directory/Branch Prevention
-
-**Trigger**: Git operations were attempted from wrong directory (parent directory), causing wrong branch detection and git scanning parent directories (AppData, Documents, etc.)
-
-**Lesson**: **MANDATORY GIT SAFETY CHECKS** must be performed before ANY git operation (add, commit, push). Always verify current directory is project root and current branch matches issue number.
-
-**Root Cause**:
-1. Terminal working directory was not verified before git operations
-2. Shell was in parent directory instead of project root
-3. Git scanned parent directories, showing files outside repository
-4. Wrong branch detected due to directory mismatch
-
-**Resolution Steps**:
-1. ✅ Navigated to correct project root directory
-2. ✅ Verified correct branch (`feat/6-block-report`)
-3. ✅ Committed all changes successfully
-4. ✅ Added MANDATORY GIT SAFETY CHECKS to workflow rules
-
-**Rule Update**:
-- **MANDATORY GIT SAFETY CHECKS** before ANY git operation:
-  1. Verify current directory is project root: Run `git rev-parse --show-toplevel` and ensure you're in that exact directory
-  2. Verify current branch matches issue: Run `git branch --show-current` and confirm branch name contains issue number
-  3. Verify no parent directory scanning: `git status` should NOT show files outside repository
-  4. If directory is wrong: Navigate to project root with `cd "$(git rev-parse --show-toplevel)"` (PowerShell: `cd (git rev-parse --show-toplevel)`)
-  5. If branch is wrong: Create correct branch or switch before committing
-- **NEVER** run git commands from parent directories or outside repository
-
-**Action Required**:
-- Before ANY git operation: Run mandatory checks
-- If checks fail: Navigate to project root and re-verify
-- Document directory/branch verification in commit messages when fixing
-
-**Rules/Scripts Updated**:
-- ✅ `.cursor/rules/00-core.mdc`: Added MANDATORY GIT SAFETY CHECKS to Safety Rails section
-- ✅ `.cursor/rules/01-workflow.mdc`: Added checks to Branching & MCP Setup and Direct Commits sections
-- ✅ `.cursor/rules/02-quality.mdc`: Added checks to Git Hygiene section
-- ✅ `.cursor/rules/07-process-improvement.mdc`: Documented this lesson
+**Trigger**: Process cleanup needed to preserve MCP/Cursor processes while killing project dev servers. **Lesson**: Identify processes by command-line patterns (project path, dev commands) while excluding MCP and Cursor processes. **Rule**: Created smart cleanup script with pattern matching, updated cleanup guidance.

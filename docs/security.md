@@ -47,5 +47,5 @@ _Template placeholder. Replace or remove once your project defines this content.
 
 ---
 
-**Last Updated:** 2025-01-27  
-**Next Review:** 2025-04-27
+**Last Updated:** 2025-11-10  
+**Next Review:** 2026-02-10

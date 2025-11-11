@@ -64,6 +64,11 @@
   color: var(--foreground) !important;
 }
 
+/* Ensure toast description text meets WCAG AA contrast (4.5:1) */
+[data-sonner-toast] [data-description] {
+  color: var(--foreground) !important; /* Use foreground instead of muted-foreground for better contrast */
+}
+
 /* IceBreaker custom animations for retro terminal aesthetic */
 @keyframes sweep {
   0% {
