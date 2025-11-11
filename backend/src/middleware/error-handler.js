@@ -5,12 +5,35 @@
  * Returns user-friendly error responses.
  */
 
-import * as Sentry from "@sentry/node";
+// Lazy-loaded Sentry (only if package is installed)
+let Sentry = null;
+let sentryLoaded = false;
+
+async function loadSentry() {
+  if (sentryLoaded) return Sentry;
+  sentryLoaded = true;
+  
+  try {
+    const sentryModule = await import("@sentry/node");
+    Sentry = sentryModule.default || sentryModule;
+    return Sentry;
+  } catch (e) {
+    // Sentry not installed - that's OK, we'll skip it
+    console.log("[Sentry] Package not installed, skipping Sentry integration");
+    return null;
+  }
+}
 
 /**
  * Initialize Sentry for backend error tracking
  */
-export function initSentry() {
+export async function initSentry() {
+  const sentry = await loadSentry();
+  if (!sentry) {
+    console.log("[Sentry] Not available, skipping initialization");
+    return;
+  }
+
   const dsn = process.env.SENTRY_DSN;
   const environment = process.env.NODE_ENV || "development";
 
@@ -20,11 +43,11 @@ export function initSentry() {
     return;
   }
 
-  Sentry.init({
+  sentry.init({
     dsn,
     environment,
     integrations: [
-      Sentry.httpIntegration(),
+      sentry.httpIntegration(),
     ],
     // Performance Monitoring
     tracesSampleRate: environment === "production" ? 0.1 : 1.0, // 10% in prod, 100% in dev
@@ -48,20 +71,31 @@ export function initSentry() {
  * Catches errors and sends them to Sentry
  */
 export function errorHandler(err, req, res, next) {
-  // Send error to Sentry
-  Sentry.captureException(err, {
-    tags: {
-      route: req.path,
-      method: req.method,
-    },
-    extra: {
-      sessionId: req.session?.sessionId,
-      body: req.body,
-      query: req.query,
-    },
+  // Send error to Sentry (only if initialized and available) - non-blocking
+  loadSentry().then(sentry => {
+    if (sentry && process.env.SENTRY_DSN) {
+      try {
+        sentry.captureException(err, {
+          tags: {
+            route: req.path,
+            method: req.method,
+          },
+          extra: {
+            sessionId: req.session?.sessionId,
+            body: req.body,
+            query: req.query,
+          },
+        });
+      } catch (sentryError) {
+        console.error("Sentry capture failed:", sentryError);
+      }
+    }
+  }).catch(() => {
+    // Sentry not available - ignore
   });
 
   console.error("Error handler caught:", err);
+  console.error("Error stack:", err.stack);
 
   // Return user-friendly error response
   const statusCode = err.statusCode || err.status || 500;

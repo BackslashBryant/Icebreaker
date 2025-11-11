@@ -1,6 +1,6 @@
 # Architecture Overview - Icebreaker MVP
 
-**Last Updated**: 2025-01-27
+**Last Updated**: 2025-11-10
 **Status**: Planning Phase - MVP Architecture
 **Reference**: `docs/vision.md`, `docs/research.md`, `docs/architecture/monorepo-decision.md`
 

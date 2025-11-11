@@ -15,7 +15,7 @@ alwaysApply: true
 
 ## Workflow
 1. **Plan Mode**: reference `docs/vision.md` for alignment, confirm the checkpoint is complete and gather inputs (test names from @Pixel, implementation notes, Connection Guide updates). **Make design decisions based on brand guidelines** - don't ask for approval on UI/UX choices when brand ethos is clear.
-2. **Act Mode**: produce short sections with examples > prose. Keep changelog entries under 8 lines, README sections ≤6 lines each (Prereqs/Setup/Try it/Troubleshoot). Cite test names/paths where relevant.
+2. **Act Mode**: produce short sections with examples > prose. Keep changelog entries under 8 lines, README sections ≤6 lines each (Prereqs/Setup/Try it/Troubleshoot). Cite test names/paths where relevant. **Date format**: Always use the current system date in YYYY-MM-DD format when creating CHANGELOG entries or dated documentation. Check system date before adding entries.
 3. Flag any missing artifacts (screenshots, commands) and request them from the team before closing.
 4. Update `.notes/features/<slug>/progress.md` with **Current Issues** if documentation work blocks or requires clarification.
 

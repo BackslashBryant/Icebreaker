@@ -5,6 +5,7 @@
   "description": "Icebreaker - A proximity-based ephemeral chat application for connecting people nearby",
   "scripts": {
     "preflight": "node ./tools/preflight.mjs",
+    "check:dependencies": "node ./tools/check-dependencies.mjs",
     "mcp:suggest": "node ./tools/mcp-suggest.mjs",
     "mcp:heal": "node ./tools/mcp-self-heal.mjs",
     "mcp:test-connectivity": "node ./tools/test-mcp-connectivity.mjs",

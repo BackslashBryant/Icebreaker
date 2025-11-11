@@ -59,12 +59,75 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     // Maya verifies handle is displayed (anxious user verification)
     await expect(page.getByText(/Your anonymous handle/i)).toBeVisible();
     
+    // RESEARCH: Capture network requests and console logs before submitting
+    const networkErrors: string[] = [];
+    const consoleErrors: string[] = [];
+    const requestPayloads: string[] = [];
+    
+    page.on('request', (request) => {
+      if (request.url().includes('/api/onboarding')) {
+        const postData = request.postData();
+        if (postData) {
+          requestPayloads.push(postData);
+          console.log('Onboarding request payload:', postData);
+        }
+      }
+    });
+    
+    page.on('response', async (response) => {
+      if (response.url().includes('/api/onboarding')) {
+        const status = response.status();
+        if (status >= 400) {
+          let errorBody = '';
+          try {
+            errorBody = await response.text();
+          } catch {}
+          networkErrors.push(`${status} ${response.url()} - ${errorBody}`);
+          console.log(`Network error: ${status} ${response.url()}`, errorBody);
+        } else {
+          const body = await response.text().catch(() => '');
+          console.log(`Onboarding response (${status}):`, body);
+        }
+      }
+    });
+    
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') {
+        consoleErrors.push(msg.text());
+      }
+    });
+    
     // Submit form - wait for API call and navigation
     const enterRadarButton = page.getByRole("button", { name: /ENTER RADAR/i });
     await enterRadarButton.click();
     
-    // Wait for button to not be disabled (API call started)
+    // Wait for button to be disabled (API call started)
     await expect(enterRadarButton).toBeDisabled({ timeout: 2000 }).catch(() => {});
+    
+    // RESEARCH: Check for error messages on page
+    await page.waitForTimeout(2000); // Wait a bit for API call to complete or fail
+    const errorElement = page.locator('text=/Failed|Error|error/i');
+    const hasError = await errorElement.isVisible({ timeout: 2000 }).catch(() => false);
+    
+    if (hasError) {
+      const errorText = await errorElement.textContent();
+      throw new Error(`Onboarding API call failed - Error displayed: ${errorText}. Network errors: ${networkErrors.join(', ')}. Console errors: ${consoleErrors.join(', ')}`);
+    }
+    
+    // RESEARCH: Check if still on onboarding page (API call may have failed silently)
+    const currentUrl = page.url();
+    if (currentUrl.includes('/onboarding')) {
+      // Check network errors
+      if (networkErrors.length > 0) {
+        throw new Error(`Onboarding API call failed - Network errors: ${networkErrors.join(', ')}. Console errors: ${consoleErrors.join(', ')}`);
+      }
+      // Check console errors
+      if (consoleErrors.length > 0) {
+        throw new Error(`Onboarding API call failed - Console errors: ${consoleErrors.join(', ')}`);
+      }
+      // No errors detected but still on onboarding - API call may have timed out
+      throw new Error(`Onboarding API call appears to have timed out or failed silently. Still on ${currentUrl}. Network errors: ${networkErrors.join(', ') || 'none'}. Console errors: ${consoleErrors.join(', ') || 'none'}`);
+    }
     
     // Wait for navigation to radar (onboarding has 500ms delay + API call time)
     await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
@@ -80,7 +143,8 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Maya appears on Radar
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -114,7 +178,8 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads (Maya would see Zoe if both were active)
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -131,7 +196,8 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify panic button is accessible (always-accessible FAB)
     // Panic button has aria-label="Emergency panic button"
@@ -139,8 +205,26 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     await expect(panicButton).toBeVisible({ timeout: 5000 });
     
     // Verify panic button is keyboard accessible
+    // Tab through to find the panic button
     await page.keyboard.press("Tab");
-    await expect(panicButton.or(page.locator("button:focus"))).toBeVisible();
+    // Check if panic button is focused (may need multiple tabs)
+    const focusedButton = page.locator("button:focus");
+    const focusedAriaLabel = await focusedButton.getAttribute("aria-label").catch(() => null);
+    
+    // If panic button isn't focused yet, tab more times
+    if (focusedAriaLabel !== "Emergency panic button") {
+      // Tab through other focusable elements to reach panic button
+      for (let i = 0; i < 5; i++) {
+        await page.keyboard.press("Tab");
+        const currentAriaLabel = await page.locator("button:focus").getAttribute("aria-label").catch(() => null);
+        if (currentAriaLabel === "Emergency panic button") {
+          break;
+        }
+      }
+    }
+    
+    // Verify panic button is now focused
+    await expect(panicButton).toBeFocused({ timeout: 2000 });
   });
 
   test("accessibility: WCAG AA compliance for anxious users", async ({ page }) => {
@@ -151,7 +235,8 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Run accessibility check
     const accessibilityScanResults = await new AxeBuilder({ page })
@@ -218,7 +303,8 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -235,7 +321,8 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -252,7 +339,8 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify panic button is accessible
     const panicButton = page.getByRole("button", { name: /panic|emergency|help/i });
@@ -315,7 +403,8 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -332,7 +421,8 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -349,7 +439,8 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -366,7 +457,8 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Zoe may toggle visibility off if overwhelmed
     // Note: Visibility toggle is on Profile page, not Radar page
@@ -447,7 +539,8 @@ test.describe("Cross-Persona: College Students", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();

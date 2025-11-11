@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/index.js",
+    "dev:e2e": "node src/index.js",
     "start": "node src/index.js",
     "test": "vitest run",
     "test:watch": "vitest",

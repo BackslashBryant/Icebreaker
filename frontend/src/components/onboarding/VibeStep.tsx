@@ -26,13 +26,15 @@ export function VibeStep({ selectedVibe, onVibeSelect }: VibeStepProps) {
           <button
             key={vibe.id}
             onClick={() => onVibeSelect(vibe.id)}
+            aria-pressed={selectedVibe === vibe.id}
+            aria-label={`${vibe.label}${selectedVibe === vibe.id ? " (selected)" : ""}`}
             className={`w-full p-3 sm:p-4 rounded-xl border-2 transition-all text-left font-mono text-sm sm:text-base ${
               selectedVibe === vibe.id
                 ? "border-accent bg-accent/10 text-accent"
                 : "border-muted/50 hover:border-accent/50"
             }`}
           >
-            <span className="mr-2">{vibe.emoji}</span>
+            <span className="mr-2" aria-hidden="true">{vibe.emoji}</span>
             {vibe.label}
           </button>
         ))}

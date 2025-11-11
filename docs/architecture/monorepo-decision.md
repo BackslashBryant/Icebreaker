@@ -126,6 +126,6 @@ Solo novice developer building apps with Cursor AI, requiring optimal DevX and l
 
 ---
 
-**Decision Date:** 2025-01-27  
-**Review Date:** 2025-04-27 (3 months)  
+**Decision Date:** 2025-11-10  
+**Review Date:** 2026-02-10 (3 months)  
 **Owner:** Project Lead

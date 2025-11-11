@@ -11,8 +11,7 @@ import { waitForBootSequence, completeOnboarding, setupSession } from "../../uti
 
 test.describe("Persona: River Martinez - Urban Neighborhood Resident", () => {
   test("completes onboarding with urban neighborhood pattern", async ({ page }) => {
-    await page.goto("/welcome");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/welcome", { waitUntil: "domcontentloaded", timeout: 30000 });
     await waitForBootSequence(page);
 
     // River reads carefully, appreciates clear messaging
@@ -64,7 +63,8 @@ test.describe("Persona: River Martinez - Urban Neighborhood Resident", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -81,7 +81,8 @@ test.describe("Persona: River Martinez - Urban Neighborhood Resident", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -98,7 +99,8 @@ test.describe("Persona: River Martinez - Urban Neighborhood Resident", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Run accessibility check
     const accessibilityScanResults = await new AxeBuilder({ page })
@@ -111,8 +113,7 @@ test.describe("Persona: River Martinez - Urban Neighborhood Resident", () => {
 
 test.describe("Persona: Alex Kim - Tech Conference Attendee", () => {
   test("completes onboarding with tech conference pattern", async ({ page }) => {
-    await page.goto("/welcome");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/welcome", { waitUntil: "domcontentloaded", timeout: 30000 });
     await waitForBootSequence(page);
 
     // Alex reads quickly, clicks PRESS START (conference efficiency)
@@ -164,7 +165,8 @@ test.describe("Persona: Alex Kim - Tech Conference Attendee", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -181,7 +183,8 @@ test.describe("Persona: Alex Kim - Tech Conference Attendee", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -198,7 +201,8 @@ test.describe("Persona: Alex Kim - Tech Conference Attendee", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -215,7 +219,8 @@ test.describe("Persona: Alex Kim - Tech Conference Attendee", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Run accessibility check
     const accessibilityScanResults = await new AxeBuilder({ page })
@@ -228,8 +233,7 @@ test.describe("Persona: Alex Kim - Tech Conference Attendee", () => {
 
 test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
   test("completes onboarding with privacy-focused pattern", async ({ page }) => {
-    await page.goto("/welcome");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/welcome", { waitUntil: "domcontentloaded", timeout: 30000 });
     await waitForBootSequence(page);
 
     // Jordan reads very carefully, appreciates privacy messaging
@@ -281,7 +285,8 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -314,7 +319,8 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -347,7 +353,8 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -364,7 +371,8 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -381,7 +389,8 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Run accessibility check
     const accessibilityScanResults = await new AxeBuilder({ page })
@@ -394,8 +403,7 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
 
 test.describe("Persona: Sam Taylor - Outgoing Introvert", () => {
   test("completes onboarding with outgoing introvert pattern", async ({ page }) => {
-    await page.goto("/welcome");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/welcome", { waitUntil: "domcontentloaded", timeout: 30000 });
     await waitForBootSequence(page);
 
     // Sam reads quickly, clicks PRESS START (event-focused)
@@ -447,7 +455,8 @@ test.describe("Persona: Sam Taylor - Outgoing Introvert", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -464,7 +473,8 @@ test.describe("Persona: Sam Taylor - Outgoing Introvert", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -481,7 +491,8 @@ test.describe("Persona: Sam Taylor - Outgoing Introvert", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -498,7 +509,8 @@ test.describe("Persona: Sam Taylor - Outgoing Introvert", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Run accessibility check
     const accessibilityScanResults = await new AxeBuilder({ page })
@@ -511,8 +523,7 @@ test.describe("Persona: Sam Taylor - Outgoing Introvert", () => {
 
 test.describe("Persona: Morgan Davis - Graduate Student & Researcher", () => {
   test("completes onboarding with academic researcher pattern", async ({ page }) => {
-    await page.goto("/welcome");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/welcome", { waitUntil: "domcontentloaded", timeout: 30000 });
     await waitForBootSequence(page);
 
     // Morgan reads carefully, appreciates clear messaging (academic thoroughness)
@@ -564,7 +575,8 @@ test.describe("Persona: Morgan Davis - Graduate Student & Researcher", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -581,7 +593,8 @@ test.describe("Persona: Morgan Davis - Graduate Student & Researcher", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -598,7 +611,8 @@ test.describe("Persona: Morgan Davis - Graduate Student & Researcher", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Verify Radar loads
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -615,7 +629,8 @@ test.describe("Persona: Morgan Davis - Graduate Student & Researcher", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Run accessibility check
     const accessibilityScanResults = await new AxeBuilder({ page })
@@ -646,7 +661,7 @@ test.describe("Cross-Persona: Market Research Personas", () => {
 
       await page.getByRole("button", { name: /GOT IT/i }).click();
       
-      const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+      const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
       await consentCheckbox.check();
       await page.getByRole("button", { name: /CONTINUE/i }).click();
       
@@ -693,8 +708,9 @@ test.describe("Cross-Persona: Market Research Personas", () => {
         handle: persona.handle,
       });
 
-      await page.goto("/radar");
-      await page.waitForLoadState("networkidle");
+    await page.goto("/radar");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads for each use case
       await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -718,7 +734,8 @@ test.describe("Cross-Persona: Market Research Personas", () => {
     });
 
     await page.goto("/radar");
-    await page.waitForLoadState("networkidle");
+    // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
 
     // Test frequent visibility toggling (Jordan's edge case)
     const visibilityToggle = page.getByRole("button", { name: /visibility|toggle/i });

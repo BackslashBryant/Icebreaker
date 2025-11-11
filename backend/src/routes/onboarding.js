@@ -14,6 +14,9 @@ router.post("/", (req, res) => {
   try {
     const { vibe, tags, visibility, location } = req.body;
 
+    // Log request for debugging
+    console.log("Onboarding request:", { vibe, tags, visibility, location, body: req.body });
+
     // Validate required fields
     if (!vibe) {
       return res.status(400).json({
@@ -37,6 +40,7 @@ router.post("/", (req, res) => {
 
     // Validate visibility is boolean
     if (typeof visibility !== "boolean") {
+      console.error("Visibility validation failed:", { visibility, type: typeof visibility });
       return res.status(400).json({
         error: {
           code: "VALIDATION_ERROR",
@@ -124,6 +128,8 @@ router.post("/", (req, res) => {
     };
 
     const { sessionId, token, handle } = createSession(sessionData);
+    
+    console.log("Session created successfully:", { sessionId, handle });
 
     res.status(201).json({
       sessionId,
@@ -132,6 +138,7 @@ router.post("/", (req, res) => {
     });
   } catch (error) {
     console.error("Error creating session:", error);
+    console.error("Error stack:", error.stack);
     res.status(500).json({
       error: {
         code: "SERVER_ERROR",

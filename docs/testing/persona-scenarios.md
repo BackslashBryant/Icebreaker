@@ -445,6 +445,6 @@ After each persona test scenario, complete the persona-specific questionnaire:
 
 ---
 
-**Last Updated**: 2025-01-27  
+**Last Updated**: 2025-11-10  
 **Next Steps**: Implement E2E tests (`tests/e2e/personas/`) and integrate questionnaire completion
 

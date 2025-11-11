@@ -21,6 +21,7 @@ export function RadarSweep({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
   const sweepAngleRef = useRef(0);
+  const selectedIndexRef = useRef(0);
   // Check for reduced motion preference (with fallback for test environments)
   const prefersReducedMotion =
     typeof window !== "undefined" &&
@@ -185,6 +186,11 @@ export function RadarSweep({
     };
   }, [people, onSelectPerson, prefersReducedMotion]);
 
+  // Reset selected index when people list changes
+  useEffect(() => {
+    selectedIndexRef.current = 0;
+  }, [people]);
+
   if (people.length === 0) {
     return (
       <div
@@ -206,10 +212,25 @@ export function RadarSweep({
         role="img"
         tabIndex={0}
         onKeyDown={(e) => {
-          // Keyboard navigation: Enter or Space to select first person
-          if ((e.key === "Enter" || e.key === " ") && people.length > 0) {
+          if (people.length === 0) return;
+          
+          // Arrow key navigation: left/right to cycle through people
+          if (e.key === "ArrowLeft") {
             e.preventDefault();
-            onSelectPerson(people[0]);
+            selectedIndexRef.current = (selectedIndexRef.current - 1 + people.length) % people.length;
+            // Announce selection to screen readers
+            const person = people[selectedIndexRef.current];
+            canvasRef.current?.setAttribute("aria-label", `Radar visualization. Selected: ${person.handle}, signal score ${person.signal.toFixed(1)}. Press Enter to open.`);
+          } else if (e.key === "ArrowRight") {
+            e.preventDefault();
+            selectedIndexRef.current = (selectedIndexRef.current + 1) % people.length;
+            // Announce selection to screen readers
+            const person = people[selectedIndexRef.current];
+            canvasRef.current?.setAttribute("aria-label", `Radar visualization. Selected: ${person.handle}, signal score ${person.signal.toFixed(1)}. Press Enter to open.`);
+          } else if (e.key === "Enter" || e.key === " ") {
+            // Enter or Space to select current person
+            e.preventDefault();
+            onSelectPerson(people[selectedIndexRef.current]);
           }
         }}
       />

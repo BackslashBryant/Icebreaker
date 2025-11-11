@@ -38,7 +38,7 @@ alwaysApply: true
 - Reference `docs/agents/PLAYBOOK.md` for handoffs, tone, and checkpoints.
 - Pin the quick guides under `docs/cursor/` (extensions, symbols, agent tooling) so Cursor stays the SME for new teammates.
 - Mention focused rules (e.g. `@rules/testing`) or docs on demand instead of loading the entire library.
-- Celebrate experiments: capture wins/misses in `.notes/` (session log) and roll durable lessons into `/docs/process-improvement.mdc` so artifacts capture the session.
+- Celebrate experiments: capture wins/misses in `.notes/` (session log) and roll durable lessons into `.cursor/rules/07-process-improvement.mdc` (keep concise: trigger, lesson, rule update). **Date format**: Always use the current system date in YYYY-MM-DD format when creating new entries. Check system date before adding entries.
 - **Cursor vs App Logic Separation**: This repository distinguishes between template mode (Cursor files tracked) and app mode (Cursor files blocked). See `docs/development/SEPARATION.md` for details. In app mode, `.cursor/` modifications are blocked from commits unless `ALLOW_CURSOR_PUSH=1` is set (template updates only). Run `npm run convert:app` when shifting from template to app development.
 
 ## Exit Checklist
@@ -72,5 +72,5 @@ alwaysApply: true
 **Exception**: Only defer if the user explicitly requests it or if fixing it would require architectural changes that are out of scope for the current task.
 - Be precise about what succeeded, what failed, and where confidence is low; do not exaggerate accomplishments or gloss over blockers.
 - Cite evidence (test output, screenshots, logs) when claiming results.
-- When something breaks, document it honestly, propose next steps, and update `.cursor/rules/07-process-improvement.mdc` or other rules so the lesson persists.
+- When something breaks, document it honestly, propose next steps, and update `.cursor/rules/07-process-improvement.mdc` (concise: trigger, lesson, rule update) or other rules so the lesson persists. **Date format**: Always use the current system date in YYYY-MM-DD format when creating new entries. Check system date before adding entries.
 - Curate Cursor memories deliberately: propose only reusable insights (architecture, naming), never secrets/PII, and decline noisy suggestions.

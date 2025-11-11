@@ -80,7 +80,7 @@ export default function Onboarding() {
         navigate("/radar");
       }, 500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create session");
+      setError(err instanceof Error ? err.message : "Failed to create session. Try again?");
       setLoading(false);
     }
   };
@@ -106,7 +106,7 @@ export default function Onboarding() {
               <div className="ascii-divider text-center mb-4">▼ ▼ ▼</div>
               <h2 className="text-xl sm:text-2xl font-bold text-accent font-mono glow-accent">WHAT IS ICEBREAKER?</h2>
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                Before we start, let's be clear about what this is and what it isn't.
+                Let's be clear: what this is, and what it isn't.
               </p>
             </div>
 
@@ -178,7 +178,7 @@ export default function Onboarding() {
               username={username}
             />
             {error && (
-              <div className="p-3 border-2 border-destructive/50 rounded-xl bg-destructive/10">
+              <div className="p-3 border-2 border-destructive/50 rounded-xl bg-destructive/10" role="alert">
                 <p className="text-xs text-destructive font-mono">{error}</p>
               </div>
             )}

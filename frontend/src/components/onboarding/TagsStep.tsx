@@ -51,6 +51,8 @@ export function TagsStep({
             <button
               key={tag}
               onClick={() => onTagToggle(tag)}
+              aria-pressed={selectedTags.includes(tag)}
+              aria-label={`${tag}${selectedTags.includes(tag) ? " (selected)" : ""}`}
               className={`px-2.5 sm:px-3 py-1.5 sm:py-2 border-2 text-xs sm:text-sm font-mono transition-all ${
                 selectedTags.includes(tag)
                   ? "border-accent bg-accent/10 text-accent"
@@ -63,7 +65,7 @@ export function TagsStep({
         </div>
         {selectedTags.length === 0 && (
           <p className="text-xs text-muted-foreground/60 font-mono">
-            ⚠ No tags = reduced discoverability on radar
+            No tags = reduced discoverability on radar
           </p>
         )}
       </div>
