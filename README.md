@@ -407,6 +407,8 @@ See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
 - `docs/cursor/extensions.md` - Extension installation
 - `docs/cursor/models.md` - Model selection guide
 - `docs/guides/setup/mcp-setup.md` - MCP server configuration
+- `docs/guides/reference/supabase-keys.md` - Supabase key reference guide
+- `docs/troubleshooting/mcp-troubleshooting.md` - MCP troubleshooting guide
 
 ### Workflow
 

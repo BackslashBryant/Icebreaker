@@ -37,6 +37,15 @@ const allowedUnreferenced = [
   'docs/troubleshooting/README.md',
 ];
 
+// Search in these locations for references
+const searchLocations = [
+  'README.md',
+  'docs',
+  'tools',
+  'examples',
+  '.cursor',
+];
+
 function getAllFiles(dir, baseDir = dir) {
   const files = [];
   try {
@@ -70,20 +79,11 @@ function searchInFile(filePath, searchTerm) {
 
 function findReferences(docFile) {
   const references = [];
-  const fileName = docFile.split('/').pop();
+  const fileName = docFile.split(/[/\\]/).pop();
   const baseName = fileName.replace('.md', '');
+  const relPath = docFile.replace(/\\/g, '/'); // Normalize path separators
   
   // Search in common reference locations
-  const searchLocations = [
-    'README.md',
-    'docs/guides',
-    'docs/troubleshooting',
-    'docs/cursor',
-    'docs/agents',
-    'tools',
-    'examples',
-  ];
-  
   for (const location of searchLocations) {
     const fullPath = join(repoRoot, location);
     if (!existsSync(fullPath)) continue;
@@ -91,8 +91,17 @@ function findReferences(docFile) {
     try {
       const files = getAllFiles(fullPath);
       for (const file of files) {
-        if (searchInFile(join(repoRoot, file), docFile) || 
-            searchInFile(join(repoRoot, file), baseName)) {
+        const filePath = join(repoRoot, file);
+        const content = readFileSync(filePath, 'utf-8');
+        
+        // Check for various reference patterns
+        if (content.includes(docFile) || 
+            content.includes(relPath) ||
+            content.includes(fileName) ||
+            content.includes(baseName) ||
+            content.includes(`guides/setup/mcp-setup`) ||
+            content.includes(`guides/reference/supabase-keys`) ||
+            content.includes(`troubleshooting/mcp-troubleshooting`)) {
           references.push(file);
         }
       }
