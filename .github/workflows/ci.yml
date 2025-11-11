@@ -34,6 +34,80 @@ jobs:
             echo "No CI/env changes detected; skipping ConnectionGuide check."
           fi
 
+  performance-budgets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install root dependencies
+        run: npm ci || npm install
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci || npm install
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci || npm install
+      - name: Install E2E test dependencies
+        working-directory: ./tests
+        run: npm ci || npm install
+      - name: Install Playwright browsers
+        working-directory: ./tests
+        run: npx playwright install --with-deps chromium
+      - name: Start backend server
+        working-directory: ./backend
+        run: npm run dev &
+      - name: Wait for backend server
+        run: |
+          timeout=30
+          elapsed=0
+          while ! curl -f http://localhost:8000/api/health > /dev/null 2>&1; do
+            if [ $elapsed -ge $timeout ]; then
+              echo "Backend server failed to start within $timeout seconds"
+              exit 1
+            fi
+            echo "Waiting for backend server... ($elapsed/$timeout seconds)"
+            sleep 2
+            elapsed=$((elapsed + 2))
+          done
+          echo "Backend server is ready"
+      - name: Start frontend server
+        working-directory: ./frontend
+        env:
+          VITE_API_URL: http://localhost:8000
+        run: npm run dev &
+      - name: Wait for frontend server
+        run: |
+          timeout=30
+          elapsed=0
+          while ! curl -f http://localhost:3000 > /dev/null 2>&1; do
+            if [ $elapsed -ge $timeout ]; then
+              echo "Frontend server failed to start within $timeout seconds"
+              exit 1
+            fi
+            echo "Waiting for frontend server... ($elapsed/$timeout seconds)"
+            sleep 2
+            elapsed=$((elapsed + 2))
+          done
+          echo "Frontend server is ready"
+      - name: Run performance tests
+        working-directory: ./tests
+        env:
+          FRONTEND_URL: http://localhost:3000
+        run: |
+          echo "Running performance budget tests..."
+          npm test -- performance.spec.ts --project=chromium
+          echo "✅ Performance budgets met"
+      - name: Performance budget check
+        if: failure()
+        run: |
+          echo "❌ Performance budget exceeded!"
+          echo "Performance tests failed - budgets not met."
+          echo "See docs/testing/performance-baselines.md for budget details."
+          echo "Budget: Chat start < 500ms (p95), Radar updates < 1000ms (p95)"
+          exit 1
+
   health-mvp:
     runs-on: ubuntu-latest
     strategy:
