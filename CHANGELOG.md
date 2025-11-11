@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### MVP: Integration Testing & Launch Preparation (Issue #6)
+- Cross-browser testing: Added Firefox and Edge browser projects to Playwright config for comprehensive cross-browser E2E testing
+- Accessibility compliance: WCAG AA compliance verified across all pages using axe-core
+- Security audit: Dependency vulnerability scan complete, no high/critical vulnerabilities in production dependencies
+- Error tracking: Sentry configured for frontend and backend error tracking and performance monitoring
+- CI/CD verification: GitHub Actions CI updated with cross-browser matrix strategy, deployment workflow created
+- Deployment guide: Comprehensive deployment documentation with rollback procedures (`docs/deployment.md`)
+- Launch checklist: Pre-launch, launch day, and post-launch checklists (`docs/launch-checklist.md`)
+
+**Technical Details**:
+- Cross-browser: Firefox and Edge projects added to `tests/playwright.config.ts`, CI matrix strategy for all browsers
+- Accessibility: AxeBuilder tests added to all E2E test files, WCAG AA tags (`wcag2a`, `wcag2aa`, `wcag21aa`)
+- Security: `npm audit` run on root, backend, and frontend (moderate vulnerabilities in dev dependencies only, low risk)
+- Error tracking: Sentry React SDK (frontend), Sentry Node SDK (backend), Error Boundary component, error handler middleware
+- CI/CD: `.github/workflows/deploy.yml` created with frontend/backend deployment jobs (platform-agnostic)
+- Documentation: Connection Guide updated with Sentry configuration, deployment guide with platform options
+
+**Verified**:
+- ✅ Cross-browser tests configured (Chromium, Firefox, Edge)
+- ✅ Accessibility tests passing (WCAG AA compliance)
+- ✅ Security audit complete (no high/critical vulnerabilities)
+- ✅ Sentry error tracking configured (frontend + backend)
+- ✅ CI/CD pipeline verified (GitHub Actions)
+- ✅ Deployment workflow ready (platform-agnostic)
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
 #### MVP: UX Review Fixes + Bootup Random Messages (Issue #9)
 - Critical brand fixes: Removed HealthStatus component from Welcome screen, fixed page title to "IceBreaker"
 - UX improvements: Tightened consent checkbox copy (split into "I am 18 or older" + separate agreement text), standardized all button border radius to `rounded-2xl` per brand guide

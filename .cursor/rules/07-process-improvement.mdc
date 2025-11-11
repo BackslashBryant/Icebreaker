@@ -379,8 +379,56 @@ it('tests endpoint', async () => {
 - If checks fail: Navigate to project root and re-verify
 - Document directory/branch verification in commit messages when fixing
 
+---
+
+## 2025-01-27: Smart Process Cleanup - Project-Specific Process Identification
+
+**Trigger**: User requested cleanup of processes, but needed to preserve MCP processes and Cursor IDE processes while killing only project-related dev servers and test processes.
+
+**Lesson**: Process cleanup must intelligently identify project-related processes by command line patterns (project path, dev server commands, test processes) while excluding MCP servers and Cursor IDE processes. Port-based cleanup alone isn't sufficient - need command-line pattern matching.
+
+**Root Cause**:
+1. Port-based cleanup (`kill-ports.ps1`) only kills processes on specific ports, doesn't identify by process type
+2. No distinction between project processes (dev servers, tests) and system processes (MCP, Cursor IDE)
+3. Risk of killing MCP processes or Cursor IDE when cleaning up
+
+**Resolution Steps**:
+1. ✅ Created smart process identification using WMI command line matching
+2. ✅ Identified project processes by patterns: `icebreaker`, `vite`, `playwright.*test-server`, `node.*dev` with project path
+3. ✅ Excluded MCP processes: `mcp`, `@playwright/mcp`, `mcp-server-playwright`
+4. ✅ Excluded Cursor IDE processes: `Cursor\.exe`
+5. ✅ Killed only project-related processes (dev servers, test servers, build tools)
+
+**Rule Update**:
+- **Smart Process Cleanup**: Identify processes by command line patterns, not just ports
+- **Project Process Patterns**: Match `icebreaker`, `vite`, `playwright.*test-server`, `node.*dev` with project path
+- **Exclude Patterns**: Never kill processes matching `mcp`, `@playwright/mcp`, `mcp-server-playwright`, `Cursor\.exe`
+- **Port Cleanup**: Use port-based cleanup for known dev ports (3000, 8000) as fallback
+- **Verification**: After cleanup, verify ports are free and no project processes remain
+
+**Action Required**:
+- When cleaning up processes: Use command-line pattern matching to identify project processes
+- Exclude MCP and Cursor processes explicitly
+- Verify cleanup: Check ports are free, no project processes remain
+- Use `npm run ports:free:win` for port-based cleanup (fallback)
+- Use smart pattern matching for comprehensive cleanup
+
+**Pattern to Follow**:
+```powershell
+# Identify project processes (exclude MCP and Cursor)
+$processes = Get-WmiObject Win32_Process | Where-Object {
+    ($_.CommandLine -match "icebreaker|vite|playwright.*test-server" -or
+     ($_.CommandLine -match "node.*dev" -and $_.CommandLine -match $projectPath)) -and
+    $_.CommandLine -notmatch "mcp|Cursor\.exe|@playwright/mcp|mcp-server-playwright"
+}
+# Kill identified processes
+$processes | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+```
+
 **Rules/Scripts Updated**:
-- ✅ `.cursor/rules/00-core.mdc`: Added MANDATORY GIT SAFETY CHECKS to Safety Rails section
-- ✅ `.cursor/rules/01-workflow.mdc`: Added checks to Branching & MCP Setup and Direct Commits sections
-- ✅ `.cursor/rules/02-quality.mdc`: Added checks to Git Hygiene section
-- ✅ `.cursor/rules/07-process-improvement.mdc`: Documented this lesson
+- ✅ `.cursor/rules/07-process-improvement.mdc`: Added this lesson
+- ✅ `ops/cleanup/kill-processes-smart.ps1`: Created smart cleanup script with pattern matching
+- ✅ `package.json`: Added `ports:free:smart` and `ports:free:smart:dry` scripts
+- ✅ `.cursor/rules/03-roster.mdc`: Updated cleanup guidance to use smart cleanup
+
+---

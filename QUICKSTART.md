@@ -1,109 +1,99 @@
-# Quick Start
+# Quick Start Guide - Get Icebreaker Running
 
-Get started in 3 steps:
+## Prerequisites
+- Node.js 18+ installed
+- Two terminal windows/tabs
 
-## Step 1: Clone the Repository
+## Step 1: Start Backend Server
 
+In Terminal 1:
 ```bash
-git clone <your-repo-url>
-cd cursor-template-project
+cd backend
+npm install  # (if not already done)
+npm run dev
 ```
 
-## Step 2: Install Dependencies (Auto-Setup)
-
-```bash
-npm install
+You should see:
+```
+Backend server running on http://localhost:8000
+WebSocket server available on ws://localhost:8000/ws
 ```
 
-The postinstall hook runs your personal bootstrap (one-time GitHub token cache) and then `npm run setup` automatically. You can re-run the bootstrap at any time with `npm run personal:bootstrap`.
+## Step 2: Start Frontend Dev Server
 
-During this automated setup Cursor will:
-- Check prerequisites (Node.js, npm, Git, Cursor)
-- Detect the project configuration
-- Ensure the GitHub token is staged from personal config
-- Configure MCP servers
-- Run preflight checks
-- Generate the Cursor guides
-- Auto-refresh detection and agent state when dependencies change
-- Install the template pre-commit guard (if one isn’t present)
+In Terminal 2:
+```bash
+cd frontend
+npm install  # (if not already done)
+npm run dev
+```
 
-**Time**: ~5 minutes (hands-off)
+You should see:
+```
+VITE v5.x.x  ready in xxx ms
 
-## Step 3: Start Coding
+➜  Local:   http://localhost:3000/
+```
 
-Once setup is complete:
+## Step 3: Open the App
 
-1. **Configure Cursor IDE** (if not done during setup):
-   ```bash
-   npm run setup:cursor
-   ```
-   Follow: `docs/cursor/SETTINGS_GUIDE.md`
+Open your browser to: **http://localhost:3000**
 
-2. **Install Extensions**:
-   ```bash
-   npm run setup:extensions
-   ```
+You'll start at the Welcome screen. Click "PRESS START" to begin onboarding.
 
-3. **(Optional) Create Agents**:
-   ```bash
-   npm run setup:agents
-   ```
-   Follow: `docs/agents/CREATE_AGENTS.md`
-   The command seeds `.cursor/agents-state.json`; rerun with `npm run setup:agents -- --sync-state` after each session to keep the roster current while you tick off created agents.
+## What You Can Do
 
-   **Note**: Agents are optional! Persona rules in `.cursor/rules/persona-*.mdc` automatically activate when you open matching files (e.g., opening `docs/Plan.md` wakes Vector 🎯, editing `tests/**` wakes Pixel 🖥️). You only need saved agents if you want them pinned in the Cursor sidebar.
+1. **Onboarding Flow**:
+   - Complete the 4 steps (What We Are/Not → 18+ Consent → Location → Vibe & Tags)
+   - Create your session and see your generated handle
 
-4. **Verify Everything**:
-   ```bash
-   npm run status
-   npm run test:personas    # optional: validate persona auto-routing
-   ```
+2. **Radar View**:
+   - See nearby people (if any are online)
+   - Toggle between CRT Sweep and List views
+   - Click on people to see their PersonCard
 
-5. **Kick Off Work**:
-   - Review `docs/Plan.md` (pre-seeded webapp plan)
-   - Create a GitHub issue using the **0 - Spec** template
-   - See `docs/agents/KICKOFF.md` for the kickoff prompt
-   - Generate a PR draft with `npm run github:pr -- --dry-run` (add `-- --push` to publish the branch)
-   - (Optional) Replace the seeded MVP: `npm run feature:new`
+3. **Chat**:
+   - Click "START CHAT" on a PersonCard to request a chat
+   - If someone accepts, you'll enter the terminal-style chat interface
 
----
+4. **Profile/Settings**:
+   - Click the User icon in Radar header to access Profile
+   - Toggle visibility, add emergency contact, adjust accessibility settings
 
-## Auto-Routing (Default Behavior)
+5. **Safety Features**:
+   - Panic Button (FAB) - Always accessible for immediate exit
+   - Block/Report - Right-click or long-press PersonCard for safety options
 
-Persona rules automatically activate when you work with matching files:
+## Testing with Multiple Users
 
-- **Vector 🎯** → Opens when editing `docs/Plan.md` or `.notes/features/**`
-- **Pixel 🖥️** → Opens when editing `tests/**` or test config files
-- **Forge 🔗** → Opens when editing `api/**`, `server/**`, `db/**`, etc.
-- **Link 🌐** → Opens when editing `src/**`, `app/**`, `components/**`, etc.
-- **Glide 📳** → Opens when editing PWA files (`pwa/**`, `sw.js`, etc.)
-- **Apex 🤖** → Opens when editing `android/**`
-- **Cider 🍏** → Opens when editing `ios/**`
-- **Muse 🎨** → Opens when editing `docs/**`, `README.md`, `CHANGELOG.md`
-- **Nexus 🚀** → Opens when editing `.github/**`, CI configs, Dockerfiles
-- **Scout 🔎** → Opens when editing `docs/research.md`
-- **Sentinel 🛡️** → Opens when editing `docs/security/**`
-
-No manual setup required—just open the file and the right teammate joins the conversation!
-
-- **Full Documentation**: See `README.md` for the comprehensive guide
-- **First Run Guide**: See `docs/FIRST_RUN.md` for the detailed walkthrough
-- **Agent Details**: See `docs/agents/README.md`
-
----
+To test chat/radar interactions, open multiple browser windows:
+- Use **Incognito/Private mode** for additional sessions
+- Each session gets a unique handle
+- You'll see each other on Radar if both have visibility ON
 
 ## Troubleshooting
 
-**Setup failed?**
-- Run `npm run status` to see what is missing
-- Confirm prerequisites: Node.js 18+, npm, Git, Cursor IDE
-- Re-run `npm run personal:bootstrap` if the token changed
+**Backend won't start?**
+- Check if port 8000 is already in use: `npm run ports:status`
+- Kill existing processes: `npm run ports:free:win` (Windows) or `npm run ports:free` (Mac/Linux)
 
-**Need help?**
-- Check `docs/FIRST_RUN.md`
-- Re-run `npm run status`
-- Review generated guides in `docs/`
+**Frontend won't connect?**
+- Verify backend is running on port 8000
+- Check browser console for WebSocket connection errors
+- Ensure CORS is enabled (should be automatic)
 
----
+**No people on Radar?**
+- This is normal if you're the only one online
+- Open a second browser window (incognito) to see yourself
+- Make sure visibility is ON in Profile settings
 
-**Ready to code?** Launch Cursor, open `docs/Plan.md`, and follow the flow in `docs/process/MVP_LOOP.md`.
+## Ports Used
+- **Backend**: `http://localhost:8000` (HTTP + WebSocket)
+- **Frontend**: `http://localhost:3000` (Vite dev server)
+
+## Environment Variables (Optional)
+No environment variables required for basic operation. All features work with defaults.
+
+For production, you may want to set:
+- `PORT` (backend port, default: 8000)
+- `VITE_API_URL` (frontend API URL, default: http://localhost:8000)

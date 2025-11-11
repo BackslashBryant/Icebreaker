@@ -44,14 +44,14 @@ export function BlockDialog({ isOpen, onClose, onConfirm, partnerHandle }: Block
     return () => window.removeEventListener("keydown", handleKeyDown, true);
   }, [isOpen, isConfirming, onClose]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     setIsConfirming(true);
-    onConfirm();
-    // Reset after a short delay to allow for async operations
-    setTimeout(() => {
-      setIsConfirming(false);
-      onClose();
-    }, 100);
+    try {
+      await Promise.resolve(onConfirm());
+    } finally {
+      // Keep loading state until dialog closes
+      // The parent component will call onClose when done
+    }
   };
 
   return (

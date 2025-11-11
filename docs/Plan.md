@@ -1,7 +1,8 @@
 # Plan
 
-_Active feature: **UX Review Fixes + Bootup Random Messages** (Issue #9) ✅ **COMPLETE**_  
-_Previous feature: **Chat Request Cooldowns** (Issue #8) ✅ **COMPLETE**_
+_Active feature: **Persona-Based Testing & Polish** (Issue #10) 📋 **PLANNING**  
+_Previous feature: **Integration Testing & Launch Preparation** (Issue #6) 🔄 **IN PROGRESS**  
+_Previous feature: **UX Review Fixes + Bootup Random Messages** (Issue #9) ✅ **COMPLETE**_
 
 **Git Status**: All feature branches pushed to GitHub:
 - ✅ `origin/agent/link/7-profile-settings` (Issue #7)
@@ -12,329 +13,701 @@ _Previous feature: **Chat Request Cooldowns** (Issue #8) ✅ **COMPLETE**_
 - ✅ `origin/agent/forge/3-chat` (Issue #2 duplicate)
 
 ## Goals
-- GitHub Issue: #9 (UX Review Fixes + Bootup Random Messages)
-- Target User: All users (onboarding flow improvements)
-- Problem: UX review identified critical brand breaks, UX improvements, and polish opportunities. Also need to add random on-brand bootup messages to appeal to target demo.
+- GitHub Issue: #6 (Integration Testing & Launch Preparation)
+- Target: Production readiness for MVP launch
+- Problem: MVP features complete but need comprehensive integration testing, cross-browser verification, security audit, error tracking, and CI/CD verification before launch.
 - Desired Outcome: 
-  - Critical brand breaks fixed (HealthStatus removed, page title corrected)
-  - UX improvements implemented (consent copy tightened, button radius standardized)
-  - Bootup sequence enhanced with random on-brand messages pool
+  - Cross-browser compatibility verified (Chrome, Firefox, Edge)
+  - Accessibility compliance verified (WCAG AA)
+  - Security vulnerabilities fixed
+  - Error tracking operational (Sentry)
+  - CI/CD pipeline verified and deployment-ready
 - Success Metrics:
-  - Welcome screen: No HealthStatus visible
-  - Page title: Shows "IceBreaker" not "Icebreaker Health Check"
-  - Consent step: Checkbox label is concise, matches brand voice
-  - All buttons: Use `rounded-2xl` consistently (brand guide compliance)
-  - Bootup messages: Random selection from on-brand pool, appeals to target demo (18+ adults in shared spaces)
-- Research Status: ✅ **COMPLETE** - UX review report: `.notes/ux-review-2025-01-27.md`
+  - E2E tests pass on Chrome, Firefox, Edge
+  - All pages pass axe-core accessibility audit (WCAG AA)
+  - `npm audit` shows no high/critical vulnerabilities
+  - Sentry error tracking configured and tested
+  - GitHub Actions CI passes all checks
+  - Deployment workflow ready
+- Research Status: ✅ **COMPLETE** - Research file: `docs/research/Issue-6-research.md`
 
 ## Out-of-scope
-- Major UI redesigns (only fixes identified in UX review)
-- Additional bootup animations (keep existing animation style)
-- Button component refactoring (only radius standardization)
+- Mobile/PWA testing (deferred to manual QA for MVP)
+- Lighthouse CI (can be added post-launch)
+- Load/stress testing (deferred to post-launch)
+- Safari testing (requires macOS CI runner, deferred)
 
-## Steps (5)
+## Steps (6)
 
-### Step 1: Critical Brand Breaks - Remove HealthStatus & Fix Page Title
-**Owner**: @Link 🌐  
-**Intent**: Remove dev-only HealthStatus component from Welcome screen and fix page title to match brand
-
-**File Targets**:
-- `frontend/src/pages/Welcome.tsx` (update - remove HealthStatus import and component, line 74)
-- `frontend/index.html` (update - change title from "Icebreaker Health Check" to "IceBreaker")
-
-**Required Tools**:
-- React
-- HTML
-
-**Acceptance Tests**:
-- [ ] HealthStatus component removed from Welcome.tsx (import and usage)
-- [ ] Page title shows "IceBreaker" in browser tab
-- [ ] Welcome screen renders without HealthStatus component
-- [ ] No console errors after removal
-- [ ] Unit tests: Welcome page still passes (may need to update mocks)
-
-**Done Criteria**:
-- HealthStatus completely removed from Welcome screen
-- Page title matches brand ("IceBreaker")
-- No visual regressions
-- Tests passing
-
-**Rollback**: If removal breaks tests, gate HealthStatus behind `NODE_ENV !== 'production'` instead
-
----
-
-### Step 2: UX Improvements - Consent Copy & Button Radius Standardization
-**Owner**: @Link 🌐 + @Muse 🎨  
-**Intent**: Tighten consent checkbox copy (split into checkbox label + separate text) and standardize all button border radius to `rounded-2xl` per brand guide
-
-**File Targets**:
-- `frontend/src/components/onboarding/ConsentStep.tsx` (update - split checkbox label, add separate agreement text)
-- `frontend/src/components/ui/button.tsx` (update - change default from `rounded-xl` to `rounded-2xl`)
-- All components using `rounded-xl` on buttons (grep found 36 instances - update systematically):
-  - `frontend/src/pages/Welcome.tsx` (buttons)
-  - `frontend/src/pages/Onboarding.tsx` (buttons)
-  - `frontend/src/components/onboarding/ConsentStep.tsx` (button)
-  - `frontend/src/components/onboarding/LocationStep.tsx` (buttons)
-  - `frontend/src/components/onboarding/VibeStep.tsx` (vibe cards - keep rounded-xl for cards, only buttons need rounded-2xl)
-  - `frontend/src/components/panic/PanicDialog.tsx` (buttons)
-  - Other button instances (verify each is a button, not a card/container)
-
-**Required Tools**:
-- React
-- Tailwind CSS
-- Brand voice guidelines
-
-**Acceptance Tests**:
-- [ ] Consent checkbox label: "I am 18 or older" (concise)
-- [ ] Consent step shows separate text: "By continuing, you agree to use IceBreaker responsibly." (below checkbox)
-- [ ] All primary/secondary buttons use `rounded-2xl` (not `rounded-xl`)
-- [ ] Cards/containers can still use `rounded-xl` (only buttons standardized)
-- [ ] Button component default is `rounded-2xl`
-- [ ] Visual consistency: All buttons match brand guide
-- [ ] Keyboard navigation still works
-- [ ] Screen reader announces checkbox and agreement text correctly
-- [ ] Unit tests: ConsentStep updated, all button tests pass
-
-**Done Criteria**:
-- Consent copy tightened and split correctly
-- All buttons use `rounded-2xl` consistently
-- Brand guide compliance verified
-- Accessibility maintained
-- Tests passing
-
-**Rollback**: If button radius changes break layout, revert button.tsx default and update components individually
-
----
-
-### Step 3: Bootup Random Messages Pool - Create Message Pool & Selection Logic
-**Owner**: @Muse 🎨 + @Link 🌐  
-**Intent**: Create a pool of random on-brand bootup messages that appeal to target demo (18+ adults in shared spaces who value control, subtlety, safety, and a vibe that doesn't try too hard)
-
-**File Targets**:
-- `frontend/src/components/custom/BootSequence.tsx` (update - replace static bootMessages array with random selection from message pool)
-- `frontend/src/data/bootMessages.ts` (new - message pool with on-brand messages)
-
-**Required Tools**:
-- React
-- Brand voice guidelines
-- Target demo understanding (from vision.md)
-
-**Message Pool Criteria** (from brand voice + target demo):
-- Confident, succinct, slightly playful; never clingy or hypey
-- Appeals to adults (18+) in shared spaces (campuses, events, coworking, neighborhoods)
-- Values: control, subtlety, safety, vibe that doesn't try too hard
-- Terminal/retro aesthetic (matches "terminal meets Game Boy")
-- Examples of good tone: "Real world. Real time. Real connections.", "No one here — yet.", "Connection lost. Chat deleted."
-
-**Acceptance Tests**:
-- [ ] Message pool file created with 10-15 on-brand messages
-- [ ] Messages match brand voice (confident, succinct, slightly playful)
-- [ ] Messages appeal to target demo (adults in shared spaces)
-- [ ] BootSequence randomly selects 4-5 messages from pool (one per stage)
-- [ ] Messages rotate on each boot (not same sequence every time)
-- [ ] Last message is always "READY" (consistent)
-- [ ] Messages maintain terminal aesthetic (UPPERCASE, monospace feel)
-- [ ] No messages are hypey, clingy, or off-brand
-- [ ] Unit tests: BootSequence random selection works
-
-**Done Criteria**:
-- Message pool created with on-brand messages
-- Random selection working
-- Messages appeal to target demo
-- Brand voice maintained
-- Tests passing
-
-**Rollback**: If random selection breaks, fall back to static array with original messages
-
----
-
-### Step 4: Testing & Verification
+### Step 1: Cross-Browser Testing Setup
 **Owner**: @Pixel 🖥️  
-**Intent**: Comprehensive testing of all UX fixes and bootup messages feature
+**Intent**: Add Firefox and Edge browser projects to Playwright config for cross-browser E2E testing
 
 **File Targets**:
-- `frontend/tests/Welcome.test.tsx` (update - remove HealthStatus mocks/assertions)
-- `frontend/tests/ConsentStep.test.tsx` (update - test new checkbox label and agreement text)
-- `frontend/tests/BootSequence.test.tsx` (update or create - test random message selection)
-- `tests/e2e/onboarding.spec.ts` (update - verify UX fixes in E2E flow)
-- `tests/e2e/welcome.spec.ts` (new or update - verify Welcome screen fixes)
+- `tests/playwright.config.ts` (update - add Firefox and Edge projects)
+- `.github/workflows/ci.yml` (update - add cross-browser matrix strategy)
 
 **Required Tools**:
-- Vitest (unit tests)
-- Playwright (E2E tests)
-- React Testing Library
-- Axe (accessibility)
+- Playwright
+- GitHub Actions
 
 **Acceptance Tests**:
-- [ ] Unit tests: Welcome page (no HealthStatus)
-- [ ] Unit tests: ConsentStep (new copy structure)
-- [ ] Unit tests: BootSequence (random message selection)
-- [ ] Unit tests: Button component (rounded-2xl default)
-- [ ] E2E test: Welcome screen - No HealthStatus visible
-- [ ] E2E test: Page title shows "IceBreaker"
-- [ ] E2E test: Consent step - Checkbox label concise, agreement text present
-- [ ] E2E test: All buttons use rounded-2xl
-- [ ] E2E test: Bootup messages rotate (different messages on refresh)
-- [ ] Accessibility: WCAG AA compliance maintained
-- [ ] Accessibility: Keyboard navigation works
-- [ ] Accessibility: Screen reader announces consent correctly
-- [ ] Visual regression: No layout breaks from button radius changes
-- [ ] Performance: Bootup sequence still < 3s
+- [ ] Firefox project added to `playwright.config.ts`
+- [ ] Edge project added to `playwright.config.ts`
+- [ ] E2E tests run successfully on Chromium (existing)
+- [ ] E2E tests run successfully on Firefox
+- [ ] E2E tests run successfully on Edge
+- [ ] GitHub Actions CI runs tests on all browsers
+- [ ] No test failures specific to Firefox/Edge (browser compatibility verified)
 
 **Done Criteria**:
-- All tests passing (unit, E2E)
-- Code coverage ≥80%
-- Accessibility verified (WCAG AA)
-- Performance targets met
-- Visual consistency verified
+- Cross-browser testing configured (Chrome, Firefox, Edge)
+- All E2E tests pass on all browsers
+- CI runs cross-browser tests automatically
 
-**Rollback**: If tests fail, revert changes step by step
+**Rollback**: If Firefox/Edge tests fail due to browser-specific issues, focus on Chromium + Firefox initially (covers 90%+ users)
 
 ---
 
-### Step 5: Documentation & Brand Verification
-**Owner**: @Muse 🎨  
-**Intent**: Update documentation and verify brand consistency
+### Step 2: Accessibility Audit & Fixes
+**Owner**: @Pixel 🖥️  
+**Intent**: Run comprehensive accessibility audit on all pages using axe-core, fix WCAG AA violations
 
 **File Targets**:
-- `README.md` (update - note UX improvements)
-- `CHANGELOG.md` (add UX fixes and bootup messages entry)
-- `.notes/ux-review-2025-01-27.md` (update - mark issues as resolved)
+- `tests/e2e/welcome.spec.ts` (update or create - add accessibility test)
+- `tests/e2e/onboarding.spec.ts` (update - add accessibility test)
+- `tests/e2e/radar.spec.ts` (update - verify accessibility test exists)
+- `tests/e2e/block-report.spec.ts` (update - add accessibility test)
+- `tests/e2e/profile.spec.ts` (update - add accessibility test)
+- `tests/e2e/cooldown.spec.ts` (update - add accessibility test)
+- Frontend components (fix violations found)
+
+**Required Tools**:
+- `@axe-core/playwright`
+- Playwright
+- React Testing Library
+
+**Acceptance Tests**:
+- [ ] Accessibility test added to all E2E test files
+- [ ] Welcome page passes axe-core audit (WCAG AA)
+- [ ] Onboarding flow passes axe-core audit (WCAG AA)
+- [ ] Radar page passes axe-core audit (WCAG AA)
+- [ ] All other pages pass axe-core audit (WCAG AA)
+- [ ] Color contrast ratios meet WCAG AA (4.5:1 for normal text)
+- [ ] Keyboard navigation works on all pages
+- [ ] Screen reader labels present and correct
+- [ ] No accessibility violations in test output
+
+**Done Criteria**:
+- All pages pass axe-core accessibility audit (WCAG AA)
+- Zero accessibility violations
+- Keyboard navigation verified
+- Screen reader compatibility verified
+
+**Rollback**: If violations are too complex to fix, document them and prioritize critical ones (keyboard nav, screen reader)
+
+---
+
+### Step 3: Security Audit & Vulnerability Fixes
+**Owner**: @Nexus 🚀  
+**Intent**: Run `npm audit` on frontend and backend, fix high/critical vulnerabilities, verify security best practices
+
+**File Targets**:
+- `frontend/package.json` (update dependencies if needed)
+- `backend/package.json` (update dependencies if needed)
+- `package.json` (root - update dependencies if needed)
+- `.env.example` (verify no secrets)
+- Code review for security issues (secrets, CORS, rate limiting)
+
+**Required Tools**:
+- `npm audit`
+- Security best practices checklist
+
+**Acceptance Tests**:
+- [ ] `npm audit` run on root, frontend, backend
+- [ ] No high/critical vulnerabilities (moderate/low acceptable)
+- [ ] Dependencies updated if vulnerabilities found
+- [ ] No secrets in code (verify `.env` not committed)
+- [ ] CORS configured correctly (verify `docs/ConnectionGuide.md`)
+- [ ] Rate limiting active (verify backend rate limiter)
+- [ ] HTTPS enforced in production config
+- [ ] Security audit report documented
+
+**Done Criteria**:
+- Zero high/critical vulnerabilities
+- Security best practices verified
+- Dependencies updated if needed
+- Security audit documented
+
+**Rollback**: If dependency updates break functionality, document risk and defer non-critical updates
+
+---
+
+### Step 4: Error Tracking Setup (Sentry)
+**Owner**: @Nexus 🚀  
+**Intent**: Set up Sentry error tracking for frontend and backend, configure error boundaries and middleware
+
+**File Targets**:
+- `frontend/src/lib/sentry.ts` (new - Sentry initialization)
+- `frontend/src/components/ErrorBoundary.tsx` (new or update - integrate Sentry)
+- `backend/src/middleware/error-handler.js` (update - add Sentry integration)
+- `.env.example` (add `SENTRY_DSN` variables)
+- `docs/ConnectionGuide.md` (update - document Sentry setup)
+
+**Required Tools**:
+- Sentry (free tier)
+- `@sentry/react` (frontend)
+- `@sentry/node` (backend)
+
+**Acceptance Tests**:
+- [ ] Sentry account created (free tier)
+- [ ] Frontend Sentry DSN configured
+- [ ] Backend Sentry DSN configured
+- [ ] Error boundary catches React errors
+- [ ] Backend error middleware sends errors to Sentry
+- [ ] Test error triggers Sentry notification (verify in Sentry dashboard)
+- [ ] Error tracking tested (intentional error, verify in Sentry)
+- [ ] Environment variables documented in `.env.example`
+- [ ] Connection Guide updated with Sentry details
+
+**Done Criteria**:
+- Sentry configured for frontend and backend
+- Error tracking operational
+- Test errors appear in Sentry dashboard
+- Documentation updated
+
+**Rollback**: If Sentry setup delays launch, use console logging initially, add Sentry post-launch
+
+---
+
+### Step 5: CI/CD Pipeline Verification & Deployment Workflow
+**Owner**: @Nexus 🚀  
+**Intent**: Verify GitHub Actions CI passes all checks, add deployment workflow, document rollback procedure
+
+**File Targets**:
+- `.github/workflows/ci.yml` (verify - ensure all checks pass)
+- `.github/workflows/deploy.yml` (new - deployment workflow)
+- `docs/deployment.md` (new - deployment guide and rollback procedure)
+- `docs/ConnectionGuide.md` (update - production endpoints)
+
+**Required Tools**:
+- GitHub Actions
+- Deployment platform (TBD - Vercel, Netlify, Railway, etc.)
+
+**Acceptance Tests**:
+- [ ] GitHub Actions CI runs successfully
+- [ ] All CI checks pass (lint, typecheck, tests)
+- [ ] Cross-browser tests run in CI
+- [ ] Deployment workflow created (or documented manual process)
+- [ ] Production environment variables configured
+- [ ] Rollback procedure documented
+- [ ] Deployment guide created
+- [ ] Connection Guide updated with production endpoints
+
+**Done Criteria**:
+- CI pipeline verified and passing
+- Deployment workflow ready (or manual process documented)
+- Rollback procedure documented
+- Production configuration documented
+
+**Rollback**: If deployment automation is complex, document manual deployment process for MVP launch
+
+---
+
+### Step 6: Documentation & Launch Readiness
+**Owner**: @Muse 🎨  
+**Intent**: Update documentation with integration testing results, launch checklist, production details
+
+**File Targets**:
+- `README.md` (update - testing, deployment, monitoring sections)
+- `CHANGELOG.md` (add integration testing and launch prep entry)
+- `docs/deployment.md` (update - finalize deployment guide)
+- `docs/ConnectionGuide.md` (verify - production endpoints documented)
+- `.notes/launch-checklist.md` (new - launch readiness checklist)
 
 **Required Tools**:
 - Markdown
-- Brand guidelines
+- Documentation best practices
 
 **Acceptance Tests**:
-- [ ] README updated with UX improvements
-- [ ] CHANGELOG entry added (UX fixes + bootup messages)
-- [ ] UX review report updated with resolution status
-- [ ] Brand voice verified: All copy matches brand examples
-- [ ] Brand consistency: All buttons match brand guide
-- [ ] Bootup messages align with brand voice
+- [ ] README updated with testing approach, deployment steps, monitoring info
+- [ ] CHANGELOG entry added (integration testing + launch prep)
+- [ ] Deployment guide complete and accurate
+- [ ] Connection Guide has production endpoints
+- [ ] Launch checklist created and verified
+- [ ] All documentation reviewed for accuracy
 
 **Done Criteria**:
-- Documentation complete
-- Brand consistency verified
-- UX review issues marked resolved
+- Documentation complete and accurate
+- Launch checklist verified
+- Production details documented
+- Ready for launch
 
 ---
 
 ## File targets
 
-### Frontend (Link)
-- `frontend/src/pages/Welcome.tsx` (remove HealthStatus)
-- `frontend/index.html` (fix title)
-- `frontend/src/components/onboarding/ConsentStep.tsx` (tighten copy)
-- `frontend/src/components/ui/button.tsx` (standardize radius)
-- `frontend/src/pages/Welcome.tsx` (button radius)
-- `frontend/src/pages/Onboarding.tsx` (button radius)
-- `frontend/src/components/onboarding/LocationStep.tsx` (button radius)
-- `frontend/src/components/panic/PanicDialog.tsx` (button radius)
-- Other button components (systematic update)
+### Testing (Pixel)
+- `tests/playwright.config.ts` (cross-browser projects)
+- `.github/workflows/ci.yml` (cross-browser matrix)
+- `tests/e2e/welcome.spec.ts` (accessibility test)
+- `tests/e2e/onboarding.spec.ts` (accessibility test)
+- `tests/e2e/radar.spec.ts` (accessibility test)
+- `tests/e2e/block-report.spec.ts` (accessibility test)
+- `tests/e2e/profile.spec.ts` (accessibility test)
+- `tests/e2e/cooldown.spec.ts` (accessibility test)
+- Frontend components (accessibility fixes)
 
-### Frontend (Muse + Link)
-- `frontend/src/components/custom/BootSequence.tsx` (random messages)
-- `frontend/src/data/bootMessages.ts` (message pool)
-
-### Tests (Pixel)
-- `frontend/tests/Welcome.test.tsx` (update)
-- `frontend/tests/ConsentStep.test.tsx` (update)
-- `frontend/tests/BootSequence.test.tsx` (update or create)
-- `tests/e2e/onboarding.spec.ts` (update)
-- `tests/e2e/welcome.spec.ts` (new or update)
+### Security & DevOps (Nexus)
+- `frontend/package.json` (dependency updates)
+- `backend/package.json` (dependency updates)
+- `package.json` (root dependency updates)
+- `.env.example` (Sentry variables)
+- `frontend/src/lib/sentry.ts` (new - Sentry init)
+- `frontend/src/components/ErrorBoundary.tsx` (Sentry integration)
+- `backend/src/middleware/error-handler.js` (Sentry integration)
+- `.github/workflows/deploy.yml` (new - deployment workflow)
+- `docs/deployment.md` (new - deployment guide)
 
 ### Documentation (Muse)
-- `README.md` (UX improvements)
-- `CHANGELOG.md` (UX fixes + bootup messages)
-- `.notes/ux-review-2025-01-27.md` (resolution status)
+- `README.md` (testing, deployment, monitoring)
+- `CHANGELOG.md` (integration testing entry)
+- `docs/deployment.md` (deployment guide)
+- `docs/ConnectionGuide.md` (production endpoints, Sentry)
+- `.notes/launch-checklist.md` (new - launch checklist)
 
 ## Acceptance tests
 
-### Step 1: Critical Brand Breaks
-- [ ] HealthStatus removed from Welcome screen
-- [ ] Page title shows "IceBreaker"
-- [ ] No visual regressions
-- [ ] Tests passing
+### Step 1: Cross-Browser Testing
+- [ ] Firefox and Edge projects added to Playwright config
+- [ ] E2E tests pass on Chrome, Firefox, Edge
+- [ ] CI runs cross-browser tests automatically
 
-### Step 2: UX Improvements
-- [ ] Consent copy tightened and split correctly
-- [ ] All buttons use `rounded-2xl` consistently
-- [ ] Brand guide compliance verified
-- [ ] Accessibility maintained
-- [ ] Tests passing
+### Step 2: Accessibility Audit
+- [ ] All pages pass axe-core audit (WCAG AA)
+- [ ] Zero accessibility violations
+- [ ] Keyboard navigation verified
+- [ ] Screen reader compatibility verified
 
-### Step 3: Bootup Random Messages
-- [ ] Message pool created with on-brand messages
-- [ ] Random selection working
-- [ ] Messages appeal to target demo
-- [ ] Brand voice maintained
-- [ ] Tests passing
+### Step 3: Security Audit
+- [ ] Zero high/critical vulnerabilities
+- [ ] Security best practices verified
+- [ ] Dependencies updated if needed
 
-### Step 4: Testing & Verification
-- [ ] All tests passing (unit, E2E)
-- [ ] Code coverage ≥80%
-- [ ] Accessibility verified (WCAG AA)
-- [ ] Performance targets met
-- [ ] Visual consistency verified
+### Step 4: Error Tracking
+- [ ] Sentry configured for frontend and backend
+- [ ] Error tracking operational
+- [ ] Test errors appear in Sentry dashboard
 
-### Step 5: Documentation & Brand Verification
-- [ ] Documentation complete
-- [ ] Brand consistency verified
-- [ ] UX review issues marked resolved
+### Step 5: CI/CD Verification
+- [ ] CI pipeline verified and passing
+- [ ] Deployment workflow ready (or documented)
+- [ ] Rollback procedure documented
+
+### Step 6: Documentation
+- [ ] Documentation complete and accurate
+- [ ] Launch checklist verified
+- [ ] Ready for launch
 
 ## Owners
 - Vector 🎯 (planning, coordination)
-- Link 🌐 (frontend fixes, button radius, bootup integration)
-- Muse 🎨 (bootup message pool creation, copy updates, documentation)
-- Pixel 🖥️ (testing, accessibility verification, performance)
-- Scout 🔎 (research complete - UX review report)
+- Pixel 🖥️ (cross-browser testing, accessibility audit)
+- Nexus 🚀 (security audit, error tracking, CI/CD, deployment)
+- Muse 🎨 (documentation, launch checklist)
+- Scout 🔎 (research complete - `docs/research/Issue-6-research.md`)
 
 ## Implementation Notes
 - **Status**: Planning phase - Ready for team review
-- **Approach**: Frontend-only fixes (no backend changes)
-- **Testing**: Comprehensive unit, integration, and E2E tests
-- **Dependencies**: None (standalone UX improvements)
-- **Enables**: Better brand consistency, improved UX, enhanced bootup experience
+- **Approach**: Verification and preparation (no new features)
+- **Testing**: Cross-browser E2E, accessibility audit, security audit
+- **Dependencies**: Sentry (free tier), Playwright browsers
+- **Enables**: Production launch readiness, cross-browser compatibility, error tracking
 
 ## Risks & Open questions
 
 ### Risks
-- **Button Radius Changes**: Changing `rounded-xl` to `rounded-2xl` may affect layout in some components (cards vs buttons distinction needed)
-- **HealthStatus Removal**: May break existing tests that mock HealthStatus component
-- **Random Messages**: Need to ensure messages don't repeat too often or feel stale
+- **Cross-Browser Compatibility**: Firefox/Edge may have browser-specific issues requiring fixes
+- **Security Vulnerabilities**: Dependency updates may break functionality
+- **Sentry Setup**: May require manual account creation and configuration
+- **Deployment Platform**: Need to choose deployment platform (Vercel, Netlify, Railway, etc.)
 
 ### Open Questions
-- **Button vs Card Distinction**: Should cards/containers keep `rounded-xl` while only buttons use `rounded-2xl`? (Recommendation: Yes, per brand guide - buttons are `rounded-2xl`, cards can be `rounded-xl`)
-- **Message Pool Size**: How many messages should be in the pool? (Recommendation: 10-15 messages, select 4-5 per boot)
-- **Message Selection**: Should messages be truly random or weighted to avoid repetition? (Recommendation: Simple random for MVP, can add weighting later if needed)
+- **Deployment Platform**: Which platform for production? (Recommendation: Choose based on cost, ease of setup, Node.js support)
+- **Sentry Account**: Who creates Sentry account? (Recommendation: Nexus creates, shares DSN)
+- **Mobile Testing**: Defer to manual QA or add automated tests? (Recommendation: Manual QA for MVP, automated post-launch)
 
 ## MCP Tools Required
-- **GitHub MCP**: Issue tracking, branch creation
-- **Playwright MCP** (optional): Accessibility checks (axe), screenshots for visual regression
+- **GitHub MCP**: Issue tracking, branch creation, CI verification
+- **Playwright MCP** (optional): Accessibility checks, screenshots
 
 ## Handoffs
-- **After Step 1**: Link hands off brand fixes to Pixel for testing
-- **After Step 2**: Link + Muse hand off UX improvements to Pixel for testing
-- **After Step 3**: Muse + Link hand off bootup messages to Pixel for testing
-- **After Step 4**: Pixel hands off test results to Muse for documentation
-- **After Step 5**: Issue #9 complete - ready for next feature
+- **After Step 1**: Pixel hands off cross-browser setup to Pixel for Step 2 (accessibility)
+- **After Step 2**: Pixel hands off accessibility results to Nexus for Step 3 (security)
+- **After Step 3**: Nexus hands off security audit to Nexus for Step 4 (error tracking)
+- **After Step 4**: Nexus hands off error tracking to Nexus for Step 5 (CI/CD)
+- **After Step 5**: Nexus hands off CI/CD to Muse for Step 6 (documentation)
+- **After Step 6**: Issue #6 complete - ready for launch
 
 ---
 
-**Plan Status**: ⏳ **AWAITING TEAM REVIEW**
+**Plan Status**: ✅ **APPROVED** - Team review complete, ready for implementation
 
 **Summary**:
-- Issue #9: UX Review Fixes + Bootup Random Messages
-- Plan: 5 steps
-- Research: ✅ Complete (UX review report: `.notes/ux-review-2025-01-27.md`)
-- **NEXT**: Team review required before implementation begins
+- Issue #6: Integration Testing & Launch Preparation
+- Plan: 6 steps
+- Research: ✅ Complete (`docs/research/Issue-6-research.md`)
+- Team Review: ✅ Approved (`.notes/features/integration-testing-launch-prep/team-review-approved.md`)
+- Implementation: Ready to begin Step 1
 
 **Team Involvement**:
-- ✅ Scout 🔎: Research complete (UX review report)
+- ✅ Scout 🔎: Research complete
 - ✅ Vector 🎯: Plan created
-- ⏳ **Team Review**: Required before implementation
-- ⏭️ Link 🌐: Steps 1-2 (Frontend fixes, button radius)
-- ⏭️ Muse 🎨: Step 2-3 (Copy updates, bootup messages)
-- ⏭️ Pixel 🖥️: Step 4 (Testing)
-- ⏭️ Muse 🎨: Step 5 (Documentation)
+- ✅ **Team Review**: ✅ Approved
+- ⏸️ Pixel 🖥️: Steps 1-2 (cross-browser, accessibility) - Ready to begin
+- ⏸️ Nexus 🚀: Steps 3-5 (security, error tracking, CI/CD)
+- ⏸️ Muse 🎨: Step 6 (documentation)
+
+---
+
+## Next Logical Steps (Post-MVP)
+
+**MVP Status**: ✅ **ALL 14 FEATURES COMPLETE** (per `.notes/mvp-feature-inventory-review.md`)
+
+### Priority 1: Integration Testing & Verification
+**Owner**: @Pixel 🖥️ + @Nexus 🚀  
+**Intent**: Verify end-to-end flows, cross-browser compatibility, and performance targets
+
+**Scope**:
+- End-to-end flow testing (onboarding → Radar → Chat → Panic)
+- Cross-browser testing (Chrome, Firefox, Safari, Edge)
+- Mobile/PWA testing
+- Performance verification (< 500ms chat start, < 1s Radar updates)
+- Accessibility audit (WCAG AA compliance)
+
+**Acceptance Tests**:
+- [ ] E2E tests cover critical user flows
+- [ ] Performance targets met (chat start < 500ms, Radar < 1s)
+- [ ] WCAG AA compliance verified
+- [ ] Cross-browser compatibility confirmed
+- [ ] Mobile/PWA functionality verified
+
+**Files/Artifacts**:
+- `tests/e2e/` - E2E test suite
+- Performance test results
+- Accessibility audit report
+- Cross-browser test results
+
+---
+
+### Priority 2: Launch Preparation
+**Owner**: @Nexus 🚀 + @Muse 🎨  
+**Intent**: Prepare for production deployment
+
+**Scope**:
+- Production environment setup
+- CI/CD pipeline verification
+- Monitoring/logging setup
+- Error tracking setup
+- Documentation finalization
+- Security audit
+
+**Acceptance Tests**:
+- [ ] Production environment configured
+- [ ] CI/CD pipeline verified
+- [ ] Monitoring/logging operational
+- [ ] Error tracking configured
+- [ ] Documentation complete
+- [ ] Security audit passed
+
+**Files/Artifacts**:
+- Production deployment configs
+- CI/CD workflow files
+- Monitoring setup docs
+- Security audit report
+- Deployment guide
+
+---
+
+### Priority 3: Post-MVP Features (Future)
+**Owner**: TBD  
+**Intent**: Plan future enhancements based on user feedback
+
+**Scope** (from vision.md):
+- OAuth integrations (Spotify/Reddit/X)
+- Personality/archetype mode
+- Appeals flow
+- Optional verification
+- Client-side encryption
+- Silent queue
+
+**Status**: ⏸️ **DEFERRED** - Awaiting user feedback and prioritization
+
+---
+
+## Issue #10: Persona-Based Testing & Polish
+
+**Status**: 📋 **PLANNING**  
+**Research Status**: ⏸️ **NOT STARTED** - Personas created, research needed for testing methodology
+
+### Goals
+- **GitHub Issue**: #10 (to be created)
+- **Target**: Comprehensive persona-based testing and app polish using 10 user personas
+- **Problem**: MVP features are complete but need real-world user scenario testing and refinement based on actual user personas to ensure the app meets target demo needs.
+- **Desired Outcome**: 
+  - All 10 personas tested through complete user journeys
+  - UX refinements identified and prioritized
+  - Edge cases discovered and fixed
+  - User flow optimizations implemented
+  - App polished to match persona expectations
+- **Success Metrics**:
+  - All 10 personas complete onboarding flow successfully
+  - Each persona's primary use case tested and verified
+  - UX improvements documented and prioritized
+  - Edge cases identified and resolved
+  - User flow friction points eliminated
+- **Personas Reference**: `docs/personas/` (10 personas: 5 core test + 5 market research)
+
+### Out-of-scope
+- New feature development (focus on polish and refinement)
+- Performance optimization (separate issue)
+- Security audit (covered in Issue #6)
+- Cross-browser testing (covered in Issue #6)
+
+### Steps (7)
+
+#### Step 1: Persona Journey Mapping
+**Owner**: @Vector 🎯 + @Pixel 🖥️  
+**Intent**: Map complete user journeys for each persona, identifying key touchpoints and expected behaviors
+
+**File Targets**:
+- `docs/personas/journeys.md` (create - persona journey maps)
+- `docs/testing/persona-scenarios.md` (create - test scenarios per persona)
+
+**Required Tools**:
+- Persona files (`docs/personas/*.md`)
+- Vision document (`docs/vision.md`)
+
+**Acceptance Tests**:
+- [ ] Journey map created for all 10 personas
+- [ ] Each journey includes: onboarding → vibe/tags selection → radar discovery → chat interaction → exit
+- [ ] Key touchpoints identified for each persona
+- [ ] Expected behaviors documented per persona
+- [ ] Test scenarios created for each persona's primary use case
+
+**Done Criteria**:
+- Complete journey maps for all personas
+- Test scenarios documented
+- Expected behaviors defined
+
+**Rollback**: N/A (documentation only)
+
+---
+
+#### Step 2: Core Persona Testing (College Students)
+**Owner**: @Pixel 🖥️  
+**Intent**: Test app with core college student personas (Maya, Ethan, Zoe) to verify anxious student use cases
+
+**File Targets**:
+- `tests/e2e/personas/college-students.spec.ts` (create - persona-based E2E tests)
+- Test results documentation
+
+**Required Tools**:
+- Playwright
+- Persona profiles (`docs/personas/maya-patel.md`, `ethan-chen.md`, `zoe-kim.md`)
+
+**Acceptance Tests**:
+- [ ] Maya Patel (19, anxious first-year) completes onboarding with "thinking" vibe + tags
+- [ ] Ethan Chen (20, socially anxious) completes onboarding with "intros" vibe + tech tags
+- [ ] Zoe Kim (21, overthinker) completes onboarding with "surprise" vibe + overthinking tags
+- [ ] All three appear on each other's Radar (proximity matching)
+- [ ] Shared tags boost signal scores (Maya + Zoe share "Overthinking Things")
+- [ ] Visibility toggling works as expected for anxious users
+- [ ] Ephemeral chat endings feel clean and reduce anxiety
+- [ ] Panic button accessible and functional for all personas
+
+**Done Criteria**:
+- All core student personas tested successfully
+- Edge cases documented
+- UX friction points identified
+
+**Rollback**: Document issues and create follow-up tasks
+
+---
+
+#### Step 3: Professional Persona Testing (Remote Workers & Creatives)
+**Owner**: @Pixel 🖥️  
+**Intent**: Test app with professional personas (Marcus, Casey) to verify coworking/event use cases
+
+**File Targets**:
+- `tests/e2e/personas/professionals.spec.ts` (create - professional persona tests)
+- Test results documentation
+
+**Required Tools**:
+- Playwright
+- Persona profiles (`docs/personas/marcus-thompson.md`, `casey-rivera.md`)
+
+**Acceptance Tests**:
+- [ ] Marcus Thompson (29, remote worker) completes onboarding with "intros" vibe + builder tags
+- [ ] Casey Rivera (34, creative) completes onboarding with "banter" vibe + creative tags
+- [ ] Both appear on Radar in coworking/event scenarios
+- [ ] One-chat-at-a-time enforcement works (professional boundaries)
+- [ ] Proximity matching works for different floors/buildings
+- [ ] Signal scoring prioritizes shared tags ("Tech curious" for Marcus + Ethan)
+- [ ] Ephemeral chats feel appropriate for professional contexts
+
+**Done Criteria**:
+- Professional personas tested successfully
+- Professional use cases verified
+- Boundary enforcement confirmed
+
+**Rollback**: Document issues and create follow-up tasks
+
+---
+
+#### Step 4: Market Research Persona Testing (Diverse Use Cases)
+**Owner**: @Pixel 🖥️  
+**Intent**: Test app with market research personas (River, Alex, Jordan, Sam, Morgan) to verify diverse use cases
+
+**File Targets**:
+- `tests/e2e/personas/market-research.spec.ts` (create - market research persona tests)
+- Test results documentation
+
+**Required Tools**:
+- Playwright
+- Persona profiles (`docs/personas/river-martinez.md`, `alex-kim.md`, `jordan-park.md`, `sam-taylor.md`, `morgan-davis.md`)
+
+**Acceptance Tests**:
+- [ ] River Martinez (26, urban resident) tests neighborhood proximity matching
+- [ ] Alex Kim (27, tech conference) tests event/conference networking
+- [ ] Jordan Park (38, privacy-focused) tests privacy features and visibility toggling
+- [ ] Sam Taylor (24, outgoing introvert) tests event socializing without drain
+- [ ] Morgan Davis (28, grad student) tests academic conference connections
+- [ ] Each persona's unique use case verified
+- [ ] Edge cases discovered and documented
+
+**Done Criteria**:
+- All market research personas tested
+- Diverse use cases verified
+- Edge cases documented
+
+**Rollback**: Document issues and create follow-up tasks
+
+---
+
+#### Step 5: UX Refinement & Polish
+**Owner**: @Link 🌐 + @Pixel 🖥️  
+**Intent**: Implement UX improvements identified during persona testing
+
+**File Targets**:
+- Frontend components (refine based on testing feedback)
+- `docs/testing/persona-feedback.md` (create - UX improvements log)
+
+**Required Tools**:
+- Test results from Steps 2-4
+- Vision document for brand alignment
+
+**Acceptance Tests**:
+- [ ] UX friction points from persona testing addressed
+- [ ] Onboarding flow optimized for anxious users
+- [ ] Radar discovery refined for different use cases
+- [ ] Chat interface polished for ephemeral feel
+- [ ] Visibility controls refined for privacy-conscious users
+- [ ] Brand vibe maintained throughout ("terminal meets Game Boy")
+- [ ] Accessibility preserved (WCAG AA)
+
+**Done Criteria**:
+- UX improvements implemented
+- Persona feedback addressed
+- Brand consistency maintained
+
+**Rollback**: Revert changes if brand vibe compromised
+
+---
+
+#### Step 6: Edge Case Resolution
+**Owner**: @Forge 🔗 + @Link 🌐  
+**Intent**: Fix edge cases and bugs discovered during persona testing
+
+**File Targets**:
+- Backend handlers (fix edge cases)
+- Frontend components (fix UI edge cases)
+- `docs/testing/edge-cases.md` (create - edge case log)
+
+**Required Tools**:
+- Test results from Steps 2-4
+- Backend/frontend codebases
+
+**Acceptance Tests**:
+- [ ] Edge cases from persona testing fixed
+- [ ] Signal scoring edge cases resolved
+- [ ] Proximity matching edge cases fixed
+- [ ] Chat ephemerality edge cases resolved
+- [ ] Visibility toggle edge cases fixed
+- [ ] All persona test scenarios pass
+
+**Done Criteria**:
+- Edge cases resolved
+- All persona tests passing
+- Bug fixes verified
+
+**Rollback**: Revert fixes if they introduce regressions
+
+---
+
+#### Step 7: Persona Testing Documentation & Summary
+**Owner**: @Muse 🎨  
+**Intent**: Document persona testing results, insights, and recommendations
+
+**File Targets**:
+- `docs/testing/persona-results.md` (create - comprehensive test results)
+- `docs/personas/insights.md` (create - persona insights and recommendations)
+- Update `docs/testing/README.md` with persona testing section
+
+**Required Tools**:
+- Test results from Steps 2-4
+- UX feedback from Step 5
+- Edge case logs from Step 6
+
+**Acceptance Tests**:
+- [ ] Persona testing results documented
+- [ ] UX insights summarized
+- [ ] Edge cases catalogued
+- [ ] Recommendations for future improvements
+- [ ] Testing documentation updated
+
+**Done Criteria**:
+- Complete documentation of persona testing
+- Insights and recommendations captured
+- Future improvements identified
+
+**Rollback**: N/A (documentation only)
+
+---
+
+## Current Status Summary
+
+**Completed Issues**:
+- ✅ Issue #2: Radar View
+- ✅ Issue #3: Chat Interface
+- ✅ Issue #5: Panic Button
+- ✅ Issue #6: Block/Report
+- ✅ Issue #7: Profile/Settings
+- ✅ Issue #8: Chat Request Cooldowns
+- ✅ Issue #9: UX Review Fixes + Bootup Random Messages
+
+**In Progress**:
+- 🔄 Issue #6: Integration Testing & Launch Preparation
+
+**Planning**:
+- 📋 Issue #10: Persona-Based Testing & Polish
+
+**Test Coverage**:
+- ✅ Frontend: 172/172 tests passing
+- ⚠️ Backend: Status needs verification
+- ⚠️ E2E: Needs comprehensive coverage
+
+**Next Actions**:
+1. Verify backend test coverage
+2. Create integration testing plan
+3. Begin performance verification
+4. Prepare launch checklist

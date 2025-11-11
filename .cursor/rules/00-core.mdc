@@ -46,7 +46,30 @@ alwaysApply: true
 - Verification helper (`scripts/verify-all` via your preferred runner) invoked after the final change and results shared.
 - Queue final instructions or checkpoint status so the next agent can continue without guessing.
 
-## Credibility Over Hype
+## No Kicking Cans Down the Road
+
+**CRITICAL RULE**: Never defer fixing test infrastructure issues, bugs, or technical debt. If you identify a problem, fix it immediately. Do not skip tests, add TODOs, or document issues for "later" unless explicitly requested by the user.
+
+**When you find a test infrastructure issue:**
+1. **Fix it immediately** - Don't skip tests or add workarounds
+2. **Root cause analysis** - Understand why it's failing, not just the symptom
+3. **Proper solution** - Use the right approach (e.g., React Router navigation vs `page.goto()` for SPA tests)
+4. **Verify the fix** - Ensure tests pass consistently
+5. **Document the pattern** - Update rules/processes if this is a recurring issue
+
+**Examples of what NOT to do:**
+- ❌ `test.skip()` with a comment "TODO: fix session persistence"
+- ❌ Adding `waitForTimeout` as a workaround
+- ❌ Documenting issues in a "known issues" file without fixing
+- ❌ Using workarounds that mask the real problem
+
+**Examples of what TO do:**
+- ✅ Fix the root cause (e.g., use React Router navigation instead of `page.goto()`)
+- ✅ Update test helpers to prevent the issue from recurring
+- ✅ Update rules/processes to codify the solution
+- ✅ Verify the fix works consistently
+
+**Exception**: Only defer if the user explicitly requests it or if fixing it would require architectural changes that are out of scope for the current task.
 - Be precise about what succeeded, what failed, and where confidence is low; do not exaggerate accomplishments or gloss over blockers.
 - Cite evidence (test output, screenshots, logs) when claiming results.
 - When something breaks, document it honestly, propose next steps, and update `.cursor/rules/07-process-improvement.mdc` or other rules so the lesson persists.

@@ -118,7 +118,30 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 - Required variables: TBD (will include location permissions, OAuth credentials if post-MVP)
 - Notes: Never commit `.env`; use `env.example` template
 
-## 6. MCP Servers (Model Context Protocol)
+## 6. Error Tracking & Monitoring
+
+### Sentry Error Tracking
+- **Service**: Sentry (free tier available)
+- **Purpose**: Error tracking, performance monitoring, session replay
+- **Frontend DSN**: `VITE_SENTRY_DSN` environment variable
+- **Backend DSN**: `SENTRY_DSN` environment variable
+- **Configuration**:
+  - Frontend: `frontend/src/lib/sentry.ts` (initialized in `main.jsx`)
+  - Backend: `backend/src/middleware/error-handler.js` (initialized in `index.js`)
+  - Error Boundary: `frontend/src/components/ErrorBoundary.tsx` (wraps App)
+- **Environment Variables**:
+  - `SENTRY_DSN` - Backend Sentry DSN
+  - `VITE_SENTRY_DSN` - Frontend Sentry DSN
+  - `SENTRY_ENABLE_DEV` - Enable Sentry in development (default: false)
+  - `VITE_SENTRY_ENABLE_DEV` - Enable Sentry in frontend development (default: false)
+- **Notes**: 
+  - Only initializes if DSN is provided (graceful degradation)
+  - Development errors filtered unless `SENTRY_ENABLE_DEV=true`
+  - Performance monitoring: 10% sample rate in production, 100% in dev
+  - Session replay: Masked for privacy (all text/media blocked)
+- **Owner**: @Nexus 🚀
+
+## 7. MCP Servers (Model Context Protocol)
 
 ### Baseline MCPs (Required for Workflow)
 - **GitHub MCP**: Agent workflow automation (branches, PRs, issues, labels)
@@ -154,7 +177,7 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 - Health check: `npm run preflight` validates baseline MCPs
 - Documentation: See `docs/research.md` for detailed MCP baseline research
 
-## 7. CI/CD Automation
+## 8. CI/CD Automation
 
 ### GitHub Actions Workflow
 - **File**: `.github/workflows/ci.yml`

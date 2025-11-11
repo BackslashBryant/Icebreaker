@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { getBackendURL } from "../utils/test-helpers";
 
 /**
  * Helper function to complete onboarding and return session token
@@ -7,6 +8,8 @@ import AxeBuilder from "@axe-core/playwright";
 async function completeOnboarding(page: any, vibe: string = "banter") {
   // Wait for page to be ready
   await page.goto("/welcome", { waitUntil: "networkidle" });
+  await page.waitForLoadState("networkidle");
+  // Wait for boot sequence
   await expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout: 10000 });
   
   await page.getByRole("link", { name: /PRESS START/i }).click();
@@ -125,8 +128,9 @@ test.describe("Block/Report Safety Controls", () => {
     // Wait for WebSocket connection
     await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
 
-    // Wait a bit for radar to populate
-    await page.waitForTimeout(2000);
+    // Wait for radar content to be available (people list or empty state)
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one here/i))).toBeVisible({ timeout: 5000 });
 
     // Try to open PersonCard by clicking a person (if available)
     // For E2E, we'll check if people are available
@@ -176,8 +180,9 @@ test.describe("Block/Report Safety Controls", () => {
     // Wait for WebSocket connection
     await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
 
-    // Wait a bit for radar to populate
-    await page.waitForTimeout(2000);
+    // Wait for radar content to be available (people list or empty state)
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one here/i))).toBeVisible({ timeout: 5000 });
 
     // Open PersonCard
     const personButtons = page.locator("ul[role='list'] li button");
@@ -225,7 +230,7 @@ test.describe("Block/Report Safety Controls", () => {
     expect(token1).toBeTruthy();
     
     // Make first report via API
-    const response1 = await page.request.post("http://localhost:8000/api/safety/report", {
+    const response1 = await page.request.post(`${getBackendURL()}/api/safety/report`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token1}`,
@@ -246,7 +251,7 @@ test.describe("Block/Report Safety Controls", () => {
     expect(token2).toBeTruthy();
     
     // Make second report
-    const response2 = await page2.request.post("http://localhost:8000/api/safety/report", {
+    const response2 = await page2.request.post(`${getBackendURL()}/api/safety/report`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token2}`,
@@ -267,7 +272,7 @@ test.describe("Block/Report Safety Controls", () => {
     expect(token3).toBeTruthy();
     
     // Make third report (should trigger safety exclusion)
-    const response3 = await page3.request.post("http://localhost:8000/api/safety/report", {
+    const response3 = await page3.request.post(`${getBackendURL()}/api/safety/report`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token3}`,
@@ -330,7 +335,8 @@ test.describe("Block/Report Safety Controls", () => {
 
     // Close Block dialog and open Report dialog
     await page.keyboard.press("Escape");
-    await page.waitForTimeout(500);
+    // Wait for dialog to close
+    await expect(page.getByRole("dialog")).not.toBeVisible({ timeout: 2000 });
     await menuButton.click();
     await expect(page.getByRole("menuitem", { name: /Report/i })).toBeVisible({ timeout: 2000 });
     const reportOption = page.getByRole("menuitem", { name: /Report/i });

@@ -36,6 +36,9 @@ jobs:
 
   health-mvp:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chromium, firefox, msedge]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -54,7 +57,7 @@ jobs:
         run: npm ci || npm install
       - name: Install Playwright browsers
         working-directory: ./tests
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps ${{ matrix.browser }}
       - name: Start backend server
         working-directory: ./backend
         run: npm run dev &
@@ -78,6 +81,6 @@ jobs:
       - name: Run frontend unit tests
         working-directory: ./frontend
         run: npx vitest run tests/HealthStatus.test.tsx
-      - name: Run E2E tests
+      - name: Run E2E tests on ${{ matrix.browser }}
         working-directory: ./tests
-        run: npx playwright test e2e/health.spec.ts
+        run: npx playwright test e2e/health.spec.ts --project=${{ matrix.browser }}

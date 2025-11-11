@@ -7,9 +7,9 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: 1, // Single worker to avoid server conflicts
   timeout: 60000, // 60s timeout per test
-  // Reporters: list for console, json for artifacts, html for review (never auto-open)
+  // Reporters: line for real-time progress (ASCII-friendly, clean, transparent), json for artifacts, html for review (never auto-open)
   reporter: [
-    ['list'], // Console output
+    ['line'], // Real-time single-line updates - shows current test name and progress, ASCII-only with NO_COLOR=1
     ['json', { outputFile: '../artifacts/playwright-report.json' }], // Machine-readable for CI/review
     ['html', { 
       outputFolder: '../artifacts/playwright-report',
@@ -29,6 +29,14 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'msedge',
+      use: { ...devices['Desktop Edge'] },
+    },
   ],
   // Web servers - set SKIP_WEB_SERVER=1 to use manually started servers
   // Otherwise, Playwright will start servers automatically
@@ -37,19 +45,29 @@ export default defineConfig({
       command: 'npm run dev',
       cwd: '../backend',
       url: 'http://localhost:8000/api/health',
-      reuseExistingServer: true,
+      reuseExistingServer: !process.env.CI, // Reuse in local dev, start fresh in CI
       timeout: 90000, // 90s for initial compile
       stdout: 'ignore',
-      stderr: 'pipe',
+      stderr: 'ignore', // Suppress stderr to prevent node process warnings
+      env: {
+        NODE_ENV: 'test',
+        // Suppress Node.js warnings about process termination and deprecations
+        NODE_OPTIONS: '--no-warnings --no-deprecation',
+      },
     },
     {
       command: 'npm run dev',
       cwd: '../frontend',
       url: 'http://localhost:3000',
-      reuseExistingServer: true,
+      reuseExistingServer: !process.env.CI, // Reuse in local dev, start fresh in CI
       timeout: 90000, // 90s for initial compile
       stdout: 'ignore',
-      stderr: 'pipe',
+      stderr: 'ignore', // Suppress stderr to prevent node process warnings
+      env: {
+        NODE_ENV: 'test',
+        // Suppress Node.js warnings about process termination and deprecations
+        NODE_OPTIONS: '--no-warnings --no-deprecation',
+      },
     },
   ],
 });

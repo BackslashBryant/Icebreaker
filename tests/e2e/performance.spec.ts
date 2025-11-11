@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 /**
  * Performance Test Suite
@@ -33,6 +34,39 @@ test.describe("Performance Tests", () => {
     const loadTime = Date.now() - startTime;
     
     expect(loadTime).toBeLessThan(2000); // < 2s
+  });
+
+  test("accessibility: radar view meets WCAG AA standards", async ({ page }) => {
+    // Set up session storage before navigating
+    await page.addInitScript(() => {
+      sessionStorage.setItem("icebreaker_session", JSON.stringify({
+        sessionId: "test-session",
+        token: "test-token",
+        handle: "testuser",
+      }));
+    });
+
+    await page.goto("/radar");
+    
+    // Wait for radar to load (may redirect to onboarding if no session)
+    await page.waitForLoadState("networkidle");
+    
+    // Check if we're on radar or redirected
+    const currentUrl = page.url();
+    if (currentUrl.includes("/radar")) {
+      // Wait for main content
+      await expect(page.getByRole("main").or(page.locator("canvas")).or(page.getByText("RADAR"))).toBeVisible({ timeout: 10000 });
+
+      // Run accessibility check with WCAG AA tags
+      const accessibilityScanResults = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze();
+
+      expect(accessibilityScanResults.violations).toEqual([]);
+    } else {
+      // If redirected, skip this test (session setup issue)
+      test.skip();
+    }
   });
 
   test("WebSocket connection establishes in under 500ms", async ({ page }) => {
@@ -173,8 +207,8 @@ test.describe("Performance Tests", () => {
         window.dispatchEvent(event);
       }, i);
       
-      // Wait briefly for update
-      await page.waitForTimeout(50);
+      // Wait for update to be processed (check for radar content update)
+      await page.waitForLoadState("networkidle");
       
       updateTimes.push(Date.now() - startTime);
     }

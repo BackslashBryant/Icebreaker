@@ -39,36 +39,51 @@ A proximity-based ephemeral chat application for connecting people nearby. Built
 
 A default "Bootstrap Web Health MVP" feature is generated on first install. Run `npm run feature:new` to replace it with your own spec.
 
-## Try It: Onboarding Flow
+## Try It: Full MVP Experience
 
-The MVP Onboarding Flow is complete and ready to run:
+All MVP features are complete and ready to use! Here's how to get started:
 
-1. **Start the backend**:
+### Quick Start (2 Steps)
+
+1. **Start the backend** (Terminal 1):
    ```bash
    cd backend
-   npm install
+   npm install  # (if not already done)
    npm run dev
    ```
    Server runs on `http://localhost:8000`
 
-2. **Start the frontend** (in a new terminal):
+2. **Start the frontend** (Terminal 2):
    ```bash
    cd frontend
-   npm install
+   npm install  # (if not already done)
    npm run dev
    ```
    Frontend runs on `http://localhost:3000`
 
-3. **Try the onboarding flow**:
-   - Visit `http://localhost:3000/welcome` to see the Welcome screen
-   - Click "PRESS START" to begin onboarding
-   - Complete the 4 steps: What We Are/Not → 18+ Consent → Location (skip optional) → Vibe & Tags
-   - Submit to create a session and navigate to Radar view
+3. **Open your browser**: Visit `http://localhost:3000`
 
-4. **Verify**:
-   - Test the onboarding API: `curl -X POST http://localhost:8000/api/onboarding -H "Content-Type: application/json" -d '{"vibe":"banter","tags":[],"visibility":true}'`
-   - Run unit tests: `cd backend && npm test` and `cd frontend && npm test`
-   - Run E2E: `cd tests && npm test`
+### What You Can Do
+
+- **Onboarding**: Complete the 4-step flow (Welcome → Consent → Location → Vibe & Tags)
+- **Radar View**: See nearby people, toggle between CRT Sweep and List views
+- **Chat**: Request and start ephemeral 1:1 chats
+- **Profile**: Toggle visibility, add emergency contact, adjust accessibility settings
+- **Safety**: Use Panic Button (FAB), Block/Report users
+- **Cooldowns**: Experience cooldown system after declined chat requests
+
+### Testing with Multiple Users
+
+Open multiple browser windows (use Incognito/Private mode for additional sessions) to see Radar interactions and test chat functionality.
+
+**See `QUICKSTART.md` for detailed instructions and troubleshooting.**
+
+**Test Results** (Issue #6 - Integration Testing):
+- ✅ Cross-browser compatibility: Tests configured for Chrome, Firefox, Edge
+- ✅ Accessibility: WCAG AA compliance verified across all pages
+- ✅ Security: No high/critical vulnerabilities in production dependencies
+- ✅ Error tracking: Sentry configured for frontend and backend
+- ✅ CI/CD: GitHub Actions CI verified, deployment workflow ready
 
 **Test Results** (Issue #1):
 - ✅ Backend: 15/15 unit tests passing

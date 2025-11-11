@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 test.describe("Onboarding → Radar Integration Flow", () => {
   test("complete flow: Onboarding → Radar navigation (< 30s total)", async ({
@@ -223,6 +224,59 @@ test.describe("Onboarding → Radar Integration Flow", () => {
 
     const connectionTime = Date.now() - connectionStartTime;
     expect(connectionTime).toBeLessThan(500); // < 500ms
+  });
+
+  test("accessibility: onboarding flow meets WCAG AA standards", async ({ page }) => {
+    await page.goto("/welcome");
+    await page.waitForLoadState("networkidle");
+    // Wait for boot sequence to complete
+    await expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout: 10000 });
+
+    // Check welcome page accessibility
+    const welcomeScanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    expect(welcomeScanResults.violations).toEqual([]);
+
+    // Navigate to onboarding
+    await page.getByRole("link", { name: /PRESS START/i }).click();
+    await expect(page).toHaveURL(/.*\/onboarding/);
+
+    // Check onboarding page accessibility
+    const onboardingScanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    expect(onboardingScanResults.violations).toEqual([]);
+  });
+
+  test("accessibility: radar view meets WCAG AA standards after onboarding", async ({ page }) => {
+    // Complete onboarding
+    await page.goto("/welcome");
+    await page.waitForLoadState("networkidle");
+    // Wait for boot sequence to complete
+    await expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout: 10000 });
+    await page.getByRole("link", { name: /PRESS START/i }).click();
+    await page.getByRole("button", { name: /GOT IT/i }).click();
+    await expect(page.getByText("AGE VERIFICATION")).toBeVisible({ timeout: 10000 });
+    // Wait for consent step to fully load before interacting with checkbox
+    await page.waitForLoadState("networkidle");
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
+    await expect(consentCheckbox).toBeVisible({ timeout: 10000 });
+    await consentCheckbox.check();
+    await page.getByRole("button", { name: /CONTINUE/i }).click();
+    await page.getByRole("button", { name: /Skip for now/i }).click();
+    await page.getByRole("button", { name: /banter/i }).click();
+    await page.getByRole("button", { name: /ENTER RADAR/i }).click();
+
+    // Wait for Radar page
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });
+    await expect(page.getByRole("main")).toBeVisible();
+
+    // Check radar page accessibility
+    const radarScanResults = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    expect(radarScanResults.violations).toEqual([]);
   });
 });
 

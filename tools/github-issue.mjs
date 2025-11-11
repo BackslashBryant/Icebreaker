@@ -23,6 +23,46 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 const issueTemplateDir = path.join(repoRoot, '.github', 'ISSUE_TEMPLATE');
 
+// Load .env file if it exists
+function loadEnvFile() {
+  const envPath = path.join(repoRoot, '.env');
+  if (!existsSync(envPath)) {
+    return; // .env file doesn't exist, skip
+  }
+
+  const envContent = readFileSync(envPath, 'utf8');
+  const lines = envContent.split(/\r?\n/);
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    // Skip comments and empty lines
+    if (!trimmed || trimmed.startsWith('#')) {
+      continue;
+    }
+
+    // Parse KEY=VALUE format
+    const match = trimmed.match(/^([^=]+)=(.*)$/);
+    if (match) {
+      const key = match[1].trim();
+      let value = match[2].trim();
+
+      // Remove quotes if present
+      if ((value.startsWith('"') && value.endsWith('"')) ||
+          (value.startsWith("'") && value.endsWith("'"))) {
+        value = value.slice(1, -1);
+      }
+
+      // Only set if not already in process.env (environment takes precedence)
+      if (key && value && !process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  }
+}
+
+// Load .env file before anything else
+loadEnvFile();
+
 const templateMap = {
   kickoff: {
     file: 'kickoff.md',
@@ -54,6 +94,10 @@ function getToken() {
   const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
   if (!token) {
     throw new Error('Set GITHUB_TOKEN (or GH_TOKEN) with repo scope before running this script.');
+  }
+  // Debug: Check if token was loaded (don't log full token for security)
+  if (process.env.DEBUG) {
+    console.log(`[DEBUG] Token loaded: ${token.substring(0, 7)}...${token.substring(token.length - 4)}`);
   }
   return token;
 }

@@ -138,6 +138,11 @@ People want real-world connection without the baggage of social graphs, profiles
 - Location privacy best practices
 - Accessibility compliance verification
 
+### Test Personas (`docs/personas/`)
+- Detailed user personas with social media profiles for testing and user research
+- Includes IceBreaker profile configurations for each persona
+- See `docs/personas/README.md` for overview and usage
+
 ### Connection guide (`docs/ConnectionGuide.md`)
 - TBD — Initialize with ports, endpoints, services as architecture is defined
 

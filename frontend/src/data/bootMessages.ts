@@ -30,7 +30,7 @@ export const BOOT_MESSAGES_POOL = [
   "ESTABLISHING DATA PIPELINE...",
   "CALIBRATING SIGNAL STRENGTH...",
   "SYNCING PRESENCE CACHE...",
-  
+
   // Relatable to shared spaces
   "CHECKING WHO'S AROUND...",
   "SCANNING THE ROOM...",
@@ -52,7 +52,7 @@ export const BOOT_MESSAGES_POOL = [
   "DETECTING NEARBY VIBES...",
   "MAPPING HUMAN SIGNALS...",
   "SCANNING FOR INTEREST...",
-  
+
   // Playful but not trying too hard
   "WARMING UP THE RADAR...",
   "BOOTING UP THE VIBE CHECK...",
@@ -74,7 +74,7 @@ export const BOOT_MESSAGES_POOL = [
   "SPINNING UP THE VIBE...",
   "CHARGING THE INTERFACE...",
   "PREPPING FOR CONTACT...",
-  
+
   // Witty terminal vibes
   "RUNNING PRESENCE.EXE...",
   "EXECUTING SOCIAL PROTOCOL...",
@@ -96,7 +96,7 @@ export const BOOT_MESSAGES_POOL = [
   "LOADING CONNECTION MODE...",
   "RUNNING SAFETY PROTOCOLS...",
   "COMPILING NEARBY MATRIX...",
-  
+
   // Subtle, confident
   "CONNECTING TO REAL WORLD...",
   "PREPARING FOR AUTHENTIC CONTACT...",
@@ -118,7 +118,7 @@ export const BOOT_MESSAGES_POOL = [
   "PREPARING FOR NOW...",
   "LOADING MOMENT OVER PERMANENCE...",
   "READYING THE AUTHENTIC ALTERNATIVE...",
-  
+
   // More personality & variety
   "TURNING ON THE RADAR...",
   "ACTIVATING PRESENCE MODE...",
@@ -140,7 +140,7 @@ export const BOOT_MESSAGES_POOL = [
   "PREPPING THE RADAR...",
   "TURNING ON PRESENCE...",
   "ACTIVATING NEARBY MODE...",
-  
+
   // Terminal charm
   "SYSTEM READY...",
   "ALL SYSTEMS GO...",

@@ -19,6 +19,13 @@ This directory contains testing procedures, data, and results for the project.
 - [Mock Data](test-data.md#mock-data)
 - [Test Fixtures](test-data.md#test-fixtures)
 
+## Test Personas
+- **User Personas**: See `docs/personas/` for detailed user personas with social media profiles
+- **Usage**: Reference personas during manual testing, user research, and feature development
+- **IceBreaker Profiles**: Each persona includes expected IceBreaker profile configuration (vibe, tags, visibility) for testing
+- **Core Personas**: Maya Patel (19, anxious student), Ethan Chen (20, socially anxious), Zoe Kim (21, overthinker), Marcus Thompson (29, remote worker), Casey Rivera (34, creative professional)
+- **Market Research Personas**: River Martinez (26, urban resident), Alex Kim (27, tech conference), Jordan Park (38, privacy-focused), Sam Taylor (24, outgoing introvert), Morgan Davis (28, grad student)
+
 ## Results
 - [Test Results](results.md)
 - [Coverage Reports](results.md#coverage)
