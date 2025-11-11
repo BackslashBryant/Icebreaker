@@ -65,4 +65,4 @@ Goal: Implement JWT-based authentication with login/logout endpoints
 
 - Vector prompt: `docs/agents/prompts/vector.md`
 - Workflow rules: `.cursor/rules/01-workflow.mdc`
-- Plan template: `.cursor/plans/templates/`
+- Plan-status template: `.cursor/templates/Issue-plan-status.md`

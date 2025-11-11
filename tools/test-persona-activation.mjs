@@ -63,7 +63,7 @@ const testCases = [
   ['apps/web/tests/unit/app.test.ts', 'pixel'],
   ['packages/web/__tests__/header.test.tsx', 'pixel'],
 
-  ['docs/Plan.md', 'vector'],
+  ['Docs/plans/Issue-21-plan-status.md', 'vector'],
   ['.notes/features/auth/spec.md', 'vector'],
 
   ['docs/README.md', 'muse'],

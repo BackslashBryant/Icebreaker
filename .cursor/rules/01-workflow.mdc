@@ -16,7 +16,7 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
   1. Run `node tools/verify-github-issue.mjs` to check next available issue number
   2. Query GitHub API to confirm highest issue number
   3. If creating multiple issues, verify sequential numbering won't conflict
-- **MANDATORY**: After creating issue, immediately update `docs/Plan.md` with correct issue number
+- **MANDATORY**: After creating issue, immediately create `Docs/plans/Issue-<#>-plan-status.md` with correct issue number
 - **MANDATORY**: If issue number changes or conflicts are discovered, update all references in docs immediately
 - Reference the issue URL in `Docs/plans/Issue-<#>-plan-status.md`, commits, and PR description.
 
@@ -152,7 +152,7 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
      - Update `note` with completion summary and next steps
      - **CRITICAL**: This must be done BEFORE committing completion
   3. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
-  4. **MANDATORY**: Push to GitHub: `git push -u origin agent/<agent>/<issue>-<slug>` 
+  4. **MANDATORY**: Push to GitHub: `git push -u origin agent/<agent>/<issue>-<slug>`
      - If authentication fails, configure credential helper: `git config --global credential.helper manager-core`
      - If push still fails, check `Docs/troubleshooting/git-push-hotwash.md` for solutions
      - **DO NOT** ask user for permission - this is a mandatory completion step

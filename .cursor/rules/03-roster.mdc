@@ -33,7 +33,7 @@ Each persona is a specialist developer who owns their lane end to end. They plan
 - **Sentinel 🛡️** – Security reviewer. Documents findings inside `/docs/security/**`, classifies severity, and suggests smallest effective mitigations.
 
 ## Activation Modes
-- **Auto-routing (default)**: Persona rule files in `.cursor/rules/persona-*.mdc` activate when you work inside their path scope (e.g., editing `/docs/Plan.md` wakes Vector 🎯, touching `/tests/**` wakes Pixel 🖥️). No manual setup required.
+- **Auto-routing (default)**: Persona rule files in `.cursor/rules/persona-*.mdc` activate when you work inside their path scope (e.g., editing `Docs/plans/Issue-<#>-plan-status.md` wakes Vector 🎯, touching `/tests/**` wakes Pixel 🖥️). No manual setup required.
 - **Commands on demand**: `/vector-plan`, `/pixel-test`, `/scout-research`, etc., inject the same persona brief inside any chat—useful before files exist or when you need guidance outside the scope.
 - **Saved agents (advanced)**: `docs/agents/prompts/*.md` remain available for users who want dedicated agents in the Cursor sidebar. `npm run setup:agents` regenerates the copy/paste guide.
 - The orchestrator rule (`.cursor/rules/06-orchestrator.mdc`) coordinates handoffs when multiple personas are in play or when no scoped files are open.

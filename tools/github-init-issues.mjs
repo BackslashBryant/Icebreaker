@@ -112,7 +112,7 @@ const DEFAULT_ISSUES = [
 - Log acceptance tests for Pixel
 
 ## Checklist
-- [ ] Plan stored in docs/Plan.md
+- [ ] Plan stored in Docs/plans/Issue-<#>-plan-status.md
 - [ ] Checkpoints mapped to owners
 - [ ] Pixel test strategy confirmed
 - [ ] /session-summary appended`
