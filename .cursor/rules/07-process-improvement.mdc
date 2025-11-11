@@ -30,7 +30,7 @@ alwaysApply: false
 
 ## 2025-11-09: Supabase MCP Migration
 
-**Trigger**: Supabase MCP npm package required undocumented `MCP_API_KEY`. **Lesson**: Use official hosted server (`https://mcp.supabase.com/mcp`) - simpler, more secure, browser auth. **Rule**: Updated `.cursor/mcp.json` to use URL-based config, removed env var requirement.
+**Trigger**: Supabase MCP npm package required undocumented `MCP_API_KEY`. **Lesson**: Use official hosted server (`https://mcp.supabase.com/mcp`) - simpler, more secure, browser auth. Access tokens (`sbp_...`) are for Management API, not MCP. MCP requires `SUPABASE_ANON_KEY` (`eyJ...`) from dashboard. **Rule**: Updated `.cursor/mcp.json` to use URL-based config, documented key differences in `.cursor/rules/04-integrations.mdc`.
 
 ## 2025-11-10: Issue Completion Protocol
 
@@ -55,6 +55,10 @@ alwaysApply: false
 ## 2025-11-06: Issue Completion Workflow
 
 **Trigger**: Agent didn't create proper branch or update GitHub issue. **Lesson**: Create branch FIRST (`agent/<agent>/<issue>-<slug>`), then update GitHub issue, commit, push. **Rule**: Enforced in `AGENTS.md` and `.cursor/rules/01-workflow.mdc`.
+
+## 2025-11-11: MCP Environment Variable Management
+
+**Trigger**: MCP servers failing due to environment variables set only in PowerShell session, not User-level. **Lesson**: Windows requires User-level environment variables (not session) for Cursor to access them. Always use `npm run mcp:load-env:win` to load from `.env` file, then restart Cursor completely. **Rule**: Documented in `.cursor/rules/04-integrations.mdc` - env vars must be User-level, always restart Cursor after changes.
 
 ## 2025-11-11: Git Push Troubleshooting Consolidation
 
