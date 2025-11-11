@@ -26,7 +26,7 @@ test.describe("Persona: River Martinez - Urban Neighborhood Resident", () => {
 
     // Step 1: 18+ Consent
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
-    const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await consentCheckbox.check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
 
@@ -122,7 +122,7 @@ test.describe("Persona: Alex Kim - Tech Conference Attendee", () => {
 
     // Step 1: 18+ Consent
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
-    const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await consentCheckbox.check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
 
@@ -235,7 +235,7 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
 
     // Step 1: 18+ Consent
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
-    const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await consentCheckbox.check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
 
@@ -275,11 +275,19 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
     
     // Jordan toggles visibility OFF (privacy-first)
-    const visibilityToggle = page.getByRole("button", { name: /visibility|toggle/i });
-    if (await visibilityToggle.isVisible({ timeout: 5000 }).catch(() => false)) {
+    // Note: Visibility toggle is on Profile page, not Radar page
+    // Navigate to Profile to access visibility toggle
+    await page.getByRole("button", { name: /Go to profile/i }).click();
+    await expect(page).toHaveURL(/.*\/profile/);
+    
+    // Find visibility toggle checkbox on Profile page
+    const visibilityCheckbox = page.getByRole("checkbox", { name: /Show me on Radar|Hide from Radar/i });
+    if (await visibilityCheckbox.isVisible({ timeout: 5000 }).catch(() => false)) {
       // Toggle visibility OFF
-      await visibilityToggle.click();
-      await expect(visibilityToggle).toBeVisible();
+      await visibilityCheckbox.click();
+      // Navigate back to Radar
+      await page.getByRole("button", { name: /DONE/i }).click();
+      await expect(page).toHaveURL(/.*\/radar/);
       
       // Verify Jordan does NOT appear on Radar (visibility off)
       // Note: Full visibility testing requires WebSocket integration
@@ -300,11 +308,19 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
     
     // Jordan may toggle visibility ON selectively
-    const visibilityToggle = page.getByRole("button", { name: /visibility|toggle/i });
-    if (await visibilityToggle.isVisible({ timeout: 5000 }).catch(() => false)) {
+    // Note: Visibility toggle is on Profile page, not Radar page
+    // Navigate to Profile to access visibility toggle
+    await page.getByRole("button", { name: /Go to profile/i }).click();
+    await expect(page).toHaveURL(/.*\/profile/);
+    
+    // Find visibility toggle checkbox on Profile page
+    const visibilityCheckbox = page.getByRole("checkbox", { name: /Show me on Radar|Hide from Radar/i });
+    if (await visibilityCheckbox.isVisible({ timeout: 5000 }).catch(() => false)) {
       // Toggle visibility ON
-      await visibilityToggle.click();
-      await expect(visibilityToggle).toBeVisible();
+      await visibilityCheckbox.click();
+      // Navigate back to Radar
+      await page.getByRole("button", { name: /DONE/i }).click();
+      await expect(page).toHaveURL(/.*\/radar/);
       
       // Verify Jordan appears on Radar (visibility on)
       // Note: Full visibility testing requires WebSocket integration
@@ -381,7 +397,7 @@ test.describe("Persona: Sam Taylor - Outgoing Introvert", () => {
 
     // Step 1: 18+ Consent
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
-    const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await consentCheckbox.check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
 
@@ -494,7 +510,7 @@ test.describe("Persona: Morgan Davis - Graduate Student & Researcher", () => {
 
     // Step 1: 18+ Consent
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
-    const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await consentCheckbox.check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
 

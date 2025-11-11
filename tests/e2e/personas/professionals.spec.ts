@@ -33,7 +33,7 @@ test.describe("Persona: Marcus Thompson - Remote Worker", () => {
 
     // Step 1: 18+ Consent
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
-    const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await consentCheckbox.check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
 
@@ -182,7 +182,7 @@ test.describe("Persona: Casey Rivera - Creative Professional", () => {
 
     // Step 1: 18+ Consent
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
-    const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await consentCheckbox.check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
 

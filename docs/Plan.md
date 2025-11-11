@@ -446,7 +446,9 @@ _Previous feature: **UX Review Fixes + Bootup Random Messages** (Issue #9) ✅ *
 
 ## Issue #10: Persona-Based Testing & Polish
 
-**Status**: ✅ **APPROVED** - Ready for implementation  
+**Status**: ⚠️ **IN PROGRESS** - Tests executed, selector fixes applied, backend server dependency remains  
+**Test Results**: See `docs/testing/persona-test-results.md`  
+**Edge Cases**: See `docs/testing/edge-cases.md`  
 **Research Status**: ✅ **COMPLETE** - Research file: `docs/research/Issue-10-research.md`  
 **Team Review**: ✅ **APPROVED** - Approval file: `.notes/features/persona-testing-polish/team-review-approved.md`
 

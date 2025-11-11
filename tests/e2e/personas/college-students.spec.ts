@@ -37,7 +37,7 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
 
     // Step 1: 18+ Consent - Maya may pause to read terms
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
-    const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await consentCheckbox.check();
     await expect(consentCheckbox).toBeChecked();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
@@ -82,12 +82,19 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
 
     // Maya checks for visibility toggle (anxious user behavior)
-    const visibilityToggle = page.getByRole("button", { name: /visibility|toggle/i });
-    if (await visibilityToggle.isVisible({ timeout: 5000 }).catch(() => false)) {
+    // Note: Visibility toggle is on Profile page, not Radar page
+    // Navigate to Profile to access visibility toggle
+    await page.getByRole("button", { name: /Go to profile/i }).click();
+    await expect(page).toHaveURL(/.*\/profile/);
+    
+    // Find visibility toggle checkbox on Profile page
+    const visibilityCheckbox = page.getByRole("checkbox", { name: /Show me on Radar|Hide from Radar/i });
+    if (await visibilityCheckbox.isVisible({ timeout: 5000 }).catch(() => false)) {
       // Maya may toggle visibility off if overwhelmed
-      await visibilityToggle.click();
-      // Verify visibility state changes
-      await expect(visibilityToggle).toBeVisible();
+      await visibilityCheckbox.click();
+      // Navigate back to Radar
+      await page.getByRole("button", { name: /DONE/i }).click();
+      await expect(page).toHaveURL(/.*\/radar/);
     }
   });
 
@@ -123,7 +130,8 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     await page.waitForLoadState("networkidle");
 
     // Verify panic button is accessible (always-accessible FAB)
-    const panicButton = page.getByRole("button", { name: /panic|emergency|help/i });
+    // Panic button has aria-label="Emergency panic button"
+    const panicButton = page.getByRole("button", { name: /Emergency panic button/i });
     await expect(panicButton).toBeVisible({ timeout: 5000 });
     
     // Verify panic button is keyboard accessible
@@ -166,7 +174,7 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
 
     // Step 1: 18+ Consent
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
-    const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await consentCheckbox.check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
 
@@ -261,7 +269,7 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
 
     // Step 1: 18+ Consent
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
-    const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await consentCheckbox.check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
 
@@ -349,10 +357,18 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
     await page.waitForLoadState("networkidle");
 
     // Zoe may toggle visibility off if overwhelmed
-    const visibilityToggle = page.getByRole("button", { name: /visibility|toggle/i });
-    if (await visibilityToggle.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await visibilityToggle.click();
-      await expect(visibilityToggle).toBeVisible();
+    // Note: Visibility toggle is on Profile page, not Radar page
+    // Navigate to Profile to access visibility toggle
+    await page.getByRole("button", { name: /Go to profile/i }).click();
+    await expect(page).toHaveURL(/.*\/profile/);
+    
+    // Find visibility toggle checkbox on Profile page
+    const visibilityCheckbox = page.getByRole("checkbox", { name: /Show me on Radar|Hide from Radar/i });
+    if (await visibilityCheckbox.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await visibilityCheckbox.click();
+      // Navigate back to Radar
+      await page.getByRole("button", { name: /DONE/i }).click();
+      await expect(page).toHaveURL(/.*\/radar/);
     }
   });
 });
@@ -378,7 +394,7 @@ test.describe("Cross-Persona: College Students", () => {
 
       await page.getByRole("button", { name: /GOT IT/i }).click();
       
-      const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+      const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
       await consentCheckbox.check();
       await page.getByRole("button", { name: /CONTINUE/i }).click();
       
