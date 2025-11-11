@@ -36,6 +36,7 @@ Each persona scenario includes:
 8. Initiate chat with Zoe
 9. Verify ephemeral chat ending feels clean
 10. Verify panic button is accessible
+11. **Complete persona feedback questionnaire** (see `docs/testing/persona-questionnaire.md` - Maya Patel questions)
 
 **Expected Outcomes**:
 - ✅ Onboarding completes successfully
@@ -427,6 +428,23 @@ Each persona scenario includes:
 
 ---
 
+## Feedback Collection
+
+After each persona test scenario, complete the persona-specific questionnaire:
+- **Questionnaire**: `docs/testing/persona-questionnaire.md`
+- **Process**: Answer questions truthfully as the persona would
+- **Timing**: Complete immediately after testing while experience is fresh
+- **Documentation**: Record feedback in `docs/testing/persona-feedback.md`
+
+**Feedback Categories**:
+- **Onboarding Experience**: Clarity, comfort, pressure
+- **Radar Discovery**: Understanding, control, safety
+- **Chat Interaction**: Ease, ephemerality, endings
+- **Overall Experience**: Brand, anxiety reduction, privacy
+- **Persona-Specific**: Tailored to persona's concerns and use case
+
+---
+
 **Last Updated**: 2025-01-27  
-**Next Steps**: Implement E2E tests (`tests/e2e/personas/`)
+**Next Steps**: Implement E2E tests (`tests/e2e/personas/`) and integrate questionnaire completion
 

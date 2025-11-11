@@ -438,6 +438,22 @@ Each persona journey follows this flow:
 
 ---
 
+## Feedback Collection
+
+After completing each persona journey, complete the persona-specific questionnaire:
+- **Questionnaire**: `docs/testing/persona-questionnaire.md`
+- **Feedback Log**: `docs/testing/persona-feedback.md`
+- **Process**: Answer questions truthfully as the persona would, not as yourself
+- **Timing**: Complete immediately after journey while experience is fresh
+
+**Key Principles**:
+- **Be honest**: Answer truthfully based on persona's perspective and concerns
+- **Be specific**: Provide concrete examples and suggestions
+- **Be persona-focused**: Answer as the persona would, not as an ideal user
+- **Capture emotions**: Note when persona feels anxious, frustrated, or relieved
+
+---
+
 **Last Updated**: 2025-01-27  
-**Next Steps**: Create test scenarios document (`docs/testing/persona-scenarios.md`)
+**Next Steps**: Complete persona testing with questionnaire feedback collection
 
