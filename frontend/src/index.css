@@ -1,0 +1,210 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* IceBreaker brand colors in oklch format */
+  --background: oklch(0.12 0.02 250); /* Deep navy #0A0F1F */
+  --foreground: oklch(0.92 0 0); /* Light gray #E5E5E5 */
+  --card: oklch(0.15 0.02 250); /* Slightly lighter navy for cards */
+  --card-foreground: oklch(0.92 0 0);
+  --popover: oklch(0.13 0.02 250);
+  --popover-foreground: oklch(0.92 0 0);
+  --primary: oklch(0.7 0.12 195); /* Neon teal #00B8D9 */
+  --primary-foreground: oklch(0.12 0.02 250); /* Dark navy text on teal */
+  --secondary: oklch(0.18 0.02 250); /* Muted navy */
+  --secondary-foreground: oklch(0.78 0 0); /* Warm gray #C2C2C2 */
+  --muted: oklch(0.18 0.02 250);
+  --muted-foreground: oklch(0.55 0 0); /* Dimmer gray */
+  --accent: oklch(0.7 0.12 195); /* Neon teal */
+  --accent-foreground: oklch(0.12 0.02 250);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.2 0.02 250); /* Subtle navy border */
+  --input: oklch(0.18 0.02 250);
+  --ring: oklch(0.7 0.12 195); /* Teal focus ring */
+  --radius: 1rem;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+    outline-color: color-mix(in oklch, var(--ring) 50%, transparent);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+  }
+}
+
+/* Screen reader only utility class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Toast styling (on-brand: monospace, top-center, teal border) */
+[data-sonner-toaster] {
+  font-family: var(--font-mono, monospace) !important;
+}
+
+[data-sonner-toast] {
+  font-family: var(--font-mono, monospace) !important;
+  border: 2px solid var(--accent) !important;
+  border-radius: 0.75rem !important;
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+/* IceBreaker custom animations for retro terminal aesthetic */
+@keyframes sweep {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes radar-ping {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-sweep {
+  animation: sweep 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+.animate-radar-ping {
+  animation: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-sweep,
+  .animate-pulse-slow,
+  .animate-radar-ping {
+    animation: none;
+  }
+}
+
+/* User-controlled reduced motion (overrides system preference) */
+.reduced-motion .animate-sweep,
+.reduced-motion .animate-pulse-slow,
+.reduced-motion .animate-radar-ping,
+.reduced-motion .animate-blink {
+  animation: none !important;
+}
+
+.reduced-motion * {
+  transition: none !important;
+}
+
+/* ASCII divider */
+.ascii-divider {
+  font-family: monospace;
+  color: oklch(0.9 0.06 195);
+  opacity: 1;
+  user-select: none;
+  letter-spacing: 0.1em;
+}
+
+/* Glow effect for accent elements */
+.glow-accent {
+  text-shadow: 0 0 10px oklch(0.7 0.12 195 / 0.5);
+}
+
+/* Chunky button style */
+.retro-button {
+  position: relative;
+  box-shadow: 4px 4px 0 0 oklch(0.6 0.12 195), 4px 4px 0 2px oklch(0.2 0.02 250);
+  transition: all 0.1s ease;
+}
+
+.retro-button:active {
+  box-shadow: 2px 2px 0 0 oklch(0.6 0.12 195), 2px 2px 0 2px oklch(0.2 0.02 250);
+  transform: translate(2px, 2px);
+}
+
+/* Blinking cursor effect */
+.cursor-blink::after {
+  content: "▊";
+  color: oklch(0.7 0.12 195);
+  animation: blink 1s step-end infinite;
+  margin-left: 2px;
+}
+
+/* Pixel-style borders */
+.pixel-border-bottom {
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    oklch(0.7 0.12 195) 0px,
+    oklch(0.7 0.12 195) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+/* High contrast mode */
+.high-contrast {
+  --background: oklch(0.05 0.02 250); /* Darker navy */
+  --foreground: oklch(0.98 0 0); /* Brighter white */
+  --accent: oklch(0.85 0.15 195); /* Brighter teal */
+  --accent-foreground: oklch(0.05 0.02 250); /* Dark navy on bright teal */
+  --card: oklch(0.08 0.02 250); /* Darker card */
+  --card-foreground: oklch(0.98 0 0); /* Bright white */
+  --border: oklch(0.3 0.02 250); /* Brighter border */
+  --muted-foreground: oklch(0.7 0 0); /* Brighter muted text */
+}
+
+.high-contrast .glow-accent {
+  text-shadow: 0 0 15px oklch(0.85 0.15 195 / 0.8);
+}
+
+.high-contrast .retro-button {
+  box-shadow: 6px 6px 0 0 oklch(0.85 0.15 195), 6px 6px 0 2px oklch(0.3 0.02 250);
+}
+
+.high-contrast .retro-button:active {
+  box-shadow: 3px 3px 0 0 oklch(0.85 0.15 195), 3px 3px 0 2px oklch(0.3 0.02 250);
+}

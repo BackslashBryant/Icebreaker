@@ -1,8 +1,12 @@
 {
-  "slug": "icebreaker-mvp-planning",
-  "featureName": "Icebreaker MVP Planning",
+  "slug": "block-report",
+  "featureName": "Block/Report (Safety Controls)",
   "updatedAt": "2025-01-27T00:00:00.000Z",
-  "status": "planning",
+  "status": "complete",
   "vision": "docs/vision.md",
-  "description": "Planning phase for Icebreaker MVP - proximity-based ephemeral chat app"
+  "description": "MVP Block/Report - safety controls accessible from Chat header and PersonCard, with backend endpoints and Signal Engine integration",
+  "githubIssue": 6,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/6",
+  "branch": "feat/6-block-report",
+  "note": "Implementation complete - pending push (blocked by Windows DNS error, requires PC restart)"
 }

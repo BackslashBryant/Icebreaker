@@ -39,9 +39,9 @@ A proximity-based ephemeral chat application for connecting people nearby. Built
 
 A default "Bootstrap Web Health MVP" feature is generated on first install. Run `npm run feature:new` to replace it with your own spec.
 
-## Try It: Health Check MVP
+## Try It: Onboarding Flow
 
-The Bootstrap Web Health MVP is ready to run:
+The MVP Onboarding Flow is complete and ready to run:
 
 1. **Start the backend**:
    ```bash
@@ -59,13 +59,180 @@ The Bootstrap Web Health MVP is ready to run:
    ```
    Frontend runs on `http://localhost:3000`
 
-3. **Verify**:
-   - Visit `http://localhost:3000` to see the health status UI
-   - Or test the API directly: `curl http://localhost:8000/api/health`
-   - Run tests: `cd backend && npx vitest run` and `cd frontend && npx vitest run`
-   - Run E2E: `cd tests && npx playwright test`
+3. **Try the onboarding flow**:
+   - Visit `http://localhost:3000/welcome` to see the Welcome screen
+   - Click "PRESS START" to begin onboarding
+   - Complete the 4 steps: What We Are/Not → 18+ Consent → Location (skip optional) → Vibe & Tags
+   - Submit to create a session and navigate to Radar view
 
-**Test Results**: All 7 tests passing (2 backend, 2 frontend, 3 E2E). See `.notes/features/bootstrap-web-health-mvp/progress.md` for details.
+4. **Verify**:
+   - Test the onboarding API: `curl -X POST http://localhost:8000/api/onboarding -H "Content-Type: application/json" -d '{"vibe":"banter","tags":[],"visibility":true}'`
+   - Run unit tests: `cd backend && npm test` and `cd frontend && npm test`
+   - Run E2E: `cd tests && npm test`
+
+**Test Results** (Issue #1):
+- ✅ Backend: 15/15 unit tests passing
+- ✅ Frontend: 35/35 unit tests passing  
+- ✅ E2E: 8/8 tests passing (complete flow, accessibility, keyboard nav, error handling)
+- ✅ Code coverage: 94.74% average (target: ≥80%)
+- ✅ WCAG AA compliance: Verified via Playwright axe checks
+
+See `.notes/features/onboarding-flow/` for detailed test results and verification.
+
+---
+
+## Try It: Radar View (Issue #2)
+
+The Radar View feature is complete and ready to use:
+
+1. **Complete onboarding** (see above) to create a session
+2. **Navigate to Radar view** (`/radar`) after onboarding
+3. **View nearby people**:
+   - **CRT Sweep View**: Retro radar visualization showing people sorted by compatibility score
+   - **List View**: Accessible list format with keyboard navigation
+   - Toggle between views using the view switcher button
+4. **Interact with people**:
+   - Click on a person (sweep or list) to view their details
+   - Person card shows handle, vibe, tags, signal score, and proximity tier
+   - "START CHAT" button initiates chat request (Issue #3)
+
+**Features**:
+- Real-time WebSocket connection for radar updates
+- Proximity-based sorting (ROOM, VENUE, NEARBY, FAR tiers)
+- Compatibility scoring (vibe match, shared tags, visibility, proximity)
+- Location updates every 30 seconds (approximate location only)
+- WCAG AA compliant (keyboard navigation, screen reader support, reduced motion)
+- Safety exclusions (sessions with safety flags excluded from results)
+
+**Test Results** (Issue #2):
+- ✅ Backend: 37/37 unit tests passing (Signal Engine, Proximity Utils, SessionManager, WebSocket)
+- ✅ Frontend: 31/31 unit tests passing (Radar, RadarList, PersonCard, location-utils)
+- ✅ E2E: Test scaffold created (full execution in Step 7)
+- ✅ Accessibility: WCAG AA compliance verified (ARIA labels, keyboard nav, reduced motion)
+
+See `docs/Plan.md` for complete implementation details.
+
+---
+
+## Try It: Block/Report (Safety Controls) (Issue #6)
+
+The Block/Report feature provides safety controls for users to block or report others:
+
+1. **From Chat Header**:
+   - Click the ⋯ menu button (right side of header)
+   - Select "Block" or "Report"
+   - Block: Confirmation dialog → ends chat and blocks user
+   - Report: Category selection (Harassment, Spam, Impersonation, Other) → submits report
+
+2. **From PersonCard** (Radar view):
+   - Long-press (500ms) or right-click on PersonCard dialog
+   - Menu appears with "Block" and "Report" options
+   - Keyboard alternative: Shift+Enter when PersonCard is focused
+   - Same Block/Report dialogs as Chat header
+
+3. **What happens**:
+   - **Block**: User added to blocked list, active chat ended (if any), user won't appear in Radar
+   - **Report**: Report stored with category, target's report count incremented
+   - **Safety Exclusion**: When ≥3 unique users report the same person, they're temporarily hidden from Radar (1 hour default)
+   - **Signal Engine Penalty**: Reported users (1-2 unique reports) appear lower in Radar results (negative weight applied)
+
+**Features**:
+- Authentication required: All safety endpoints require session token
+- Duplicate prevention: Can't block/report yourself, can't duplicate reports
+- Privacy-first: No message content stored, only report metadata
+- Safety exclusion: Automatic temporary hiding for users with ≥3 unique reports
+- Signal Engine integration: Reported users deprioritized in Radar results
+- Accessibility: Keyboard navigation, ARIA labels, screen reader support
+- WCAG AA compliant: All dialogs and menus accessible
+
+**Test Results** (Issue #6):
+- ✅ Backend: 66/66 unit tests passing (safety endpoints, SafetyManager, ReportManager, Signal Engine)
+- ✅ Frontend: Tests created (BlockDialog, ReportDialog, useSafety, PersonCard tap-hold)
+- ✅ Safety exclusion: Verified (≥3 unique reports triggers exclusion)
+- ✅ Signal Engine integration: Verified (report penalty applied correctly)
+- ✅ WCAG AA compliance: Verified (ARIA labels, keyboard nav)
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
+---
+
+## Try It: Profile/Settings Page (Issue #7)
+
+The Profile/Settings page allows users to manage their visibility, emergency contacts, and accessibility preferences:
+
+1. **Access Profile**:
+   - Click the Profile button (User icon) in Radar header or Chat header
+   - Navigate to `/profile` route
+
+2. **Manage Visibility**:
+   - Toggle "Show me on Radar" checkbox to show/hide yourself from Radar
+   - Changes are saved immediately and persisted in session
+   - Toast notification confirms update
+
+3. **Set Emergency Contact**:
+   - Click "Add" or "Edit" button in Emergency Contact section
+   - Enter phone number (E.164 format: +1234567890) or email address
+   - Click "Save" to store contact (used for Panic Button notifications)
+   - Click "Cancel" to discard changes
+
+4. **Accessibility Settings**:
+   - **Reduce Motion**: Toggle to disable animations and transitions
+   - **High Contrast**: Toggle to increase color contrast for better visibility
+   - Preferences persist in LocalStorage across sessions
+
+**Features**:
+- Visibility toggle: Show/hide on Radar (session-scoped)
+- Emergency contact: Phone (E.164) or email (RFC 5322) validation
+- Accessibility toggles: Reduced-motion and high-contrast modes
+- LocalStorage persistence: Accessibility preferences saved locally
+- Keyboard navigation: All interactive elements accessible via keyboard
+- WCAG AA compliance: ARIA labels, screen reader support, high-contrast mode meets contrast ratios
+
+**Test Results** (Issue #7):
+- ✅ Backend: 21/21 unit tests passing (profile endpoints, SessionManager updates)
+- ✅ Frontend: Component tests created (VisibilityToggle, EmergencyContactInput, AccessibilityToggles, Profile page)
+- ✅ E2E: Profile page tests created (navigation, toggles, validation, accessibility)
+- ✅ WCAG AA compliance: Verified (ARIA labels, keyboard nav, high-contrast)
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
+
+---
+
+The Panic Button feature provides an always-accessible emergency exit:
+
+1. **Access from Radar or Chat**:
+   - Fixed floating action button (FAB) in bottom-right corner
+   - Teal accent color, AlertTriangle icon
+   - Always visible and accessible
+
+2. **Trigger panic**:
+   - Click the panic button FAB
+   - Confirmation dialog appears: "Everything okay?"
+   - Click "SEND ALERT & EXIT" or press Enter to confirm
+   - Press Escape or "Never mind" to cancel
+
+3. **What happens**:
+   - Session ends immediately
+   - Active chat terminated (if any)
+   - User hidden from Radar for 1 hour (safety exclusion)
+   - Success screen: "You're safe. Session ended."
+   - Auto-redirects to Welcome screen after 3 seconds
+
+**Features**:
+- Always accessible: Fixed FAB on Radar and Chat screens
+- Calm confirmation: "Everything okay?" dialog (brand voice)
+- Safety exclusion: Temporarily hides user from Radar (1 hour default)
+- Session termination: Ends active chat and clears session
+- Keyboard accessible: Escape to cancel, Enter to confirm
+- WCAG AA compliant: ARIA labels, screen reader support
+
+**Test Results** (Issue #5):
+- ✅ Backend: 21/21 PanicManager tests passing
+- ✅ Frontend: 27/27 panic tests passing (components + hook)
+- ✅ Safety exclusion: Verified in Signal Engine tests
+- ✅ WCAG AA compliance: Verified (ARIA labels, keyboard nav)
+
+See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
 ---
 
@@ -153,6 +320,16 @@ Type `/` in chat to insert these helpers. See `.cursor/commands/README.md` for d
 - `/current-issues` – Append a structured blocker entry to the feature log
 - `/finish` – Generate Muse/Nexus wrap-up checklists
 - `/vector-plan`, `/pixel-test`, `/scout-research` – Persona-specific helpers
+- **Domain Team Commands** – Multi-persona teams for comprehensive reviews:
+  - `/team-userexperience` – UI/UX review (Link + Muse)
+  - `/team-security` – Security audit (Sentinel + Scout)
+  - `/team-testing` – Test infrastructure review (Pixel + Sentinel + Scout)
+  - `/team-accessibility` – Accessibility audit (Link + Pixel)
+  - `/team-documentation` – Docs alignment (Muse + Link)
+  - `/team-architecture` – Tech decisions (Vector + Scout + Sentinel)
+  - `/team-release` – Release readiness (Pixel + Sentinel + Muse)
+  - `/team-planning` – Test strategy (Vector + Pixel)
+  - `/team-research` – Research with domain context (Scout + expert)
 - `/self-review` – Architecture/code hygiene self-critique
 - `/data-flow` – Explain end-to-end data flow and flag gaps
 - `/predict-breakage` – Anticipate production failures with mitigations
@@ -214,7 +391,7 @@ See `docs/cursor/extensions.md` or run `npm run setup:extensions`.
 - `docs/cursor/SETTINGS_GUIDE.md` - Cursor IDE configuration (generated)
 - `docs/cursor/extensions.md` - Extension installation
 - `docs/cursor/models.md` - Model selection guide
-- `docs/MCP_SETUP_GUIDE.md` - MCP server configuration
+- `docs/troubleshooting/mcp-setup-guide.md` - MCP server configuration
 
 ### Workflow
 

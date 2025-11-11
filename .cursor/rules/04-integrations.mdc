@@ -11,26 +11,38 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 ## Principles
 - Stay in ticket scope. Propose the exact command/query before running it and wait for approval.
 - Prefer scripted helpers (see `tools/` and `examples/automation/`) so operations are reproducible.
-- Log meaningful results (links, summaries, screenshots) in `/docs/research.md`, `artifacts/`, or the relevant doc.
+- Log meaningful results (links, summaries, screenshots) in issue-specific research files (`docs/research/Issue-<#>-research.md`), `artifacts/`, or the relevant doc.
 - If an MCP fails twice, document it in `.notes/features/<slug>/progress.md` and suggest the fallback.
 
 ## When to Reach for Which Tool
-- **GitHub MCP** – Branch/PR automation, repo search, code examples. First stop for anything "git" or GitHub API shaped.
-- **Ref Tools MCP** – Token-efficient documentation search for APIs, libraries, services. Supports private repos and PDFs. Cite sources in `/docs/research.md`.
-- **Playwright MCP** – UI screenshots, axe/Lighthouse accessibility/perf checks. Attach outputs to the ticket or artifacts.
-- **Supabase MCP Lite** – Database schema diffs, SQL experiments, policy checks (if Supabase is chosen). Update `docs/ConnectionGuide.md` when endpoints change.
-- **Desktop Commander MCP** – Local shell/file automation aligned with the allowlist in `.cursor/tools/policy.md`.
-- **Toolbox MCP** – Search for and discover additional MCP servers in the Smithery registry.
+- **GitHub MCP** (`@modelcontextprotocol/server-github`) – Branch/PR automation, repo search, code examples, issue comments. First stop for anything "git" or GitHub API shaped (except commits - use git CLI for commits).
+  - **Note**: Git commits use CLI (GitHub MCP doesn't have commit tool), but branch creation, PRs, and issue updates should use GitHub MCP.
+  - **Requires**: `GITHUB_TOKEN` environment variable
+- **Ref Tools MCP** (`ref-tools-mcp`) – Token-efficient documentation search for APIs, libraries, services. Supports private repos and PDFs. Cite sources in issue-specific research files (`docs/research/Issue-<#>-research.md`).
+  - **Requires**: No configuration needed (runs on stdio)
+- **Playwright MCP** (`@playwright/mcp`) – UI screenshots, axe/Lighthouse accessibility/perf checks. Attach outputs to the ticket or artifacts.
+  - **Requires**: `GITHUB_TOKEN` environment variable
+- **Supabase MCP** (`supabase-mcp`) – Database schema diffs, SQL experiments, policy checks. Update `docs/ConnectionGuide.md` when endpoints change.
+  - **Requires**: `SUPABASE_URL` and `SUPABASE_ANON_KEY` environment variables
+  - **Note**: Access tokens (`sbp_...`) are different from anon keys (`eyJ...`). MCP needs anon key, not access token.
+- **Desktop Commander MCP** (`@wonderwhy-er/desktop-commander`) – Local shell/file automation aligned with the allowlist in `.cursor/tools/policy.md`.
+  - **Requires**: `GITHUB_TOKEN` environment variable
 
 ## Plan vs Act Expectations
 1. **Plan Mode** – State which MCP you intend to use, the command/query, expected outcome, and rollback. Await approval.
 2. **Act Mode** – Execute exactly what was approved. Share the raw output (trimmed) plus a one-line interpretation.
-3. **Log** – Place citations or artifacts where the next agent will find them (`/docs/research.md`, `artifacts/<issue>/…`, README updates via Muse, etc.).
+3. **Log** – Place citations or artifacts where the next agent will find them (issue-specific research files `docs/research/Issue-<#>-research.md`, `artifacts/<issue>/…`, README updates via Muse, etc.).
 
 ## Health Checks
 - Run `npm run preflight` at the start of a session to confirm baseline MCP servers respond.
+- Run `npm run mcp:heal` to detect and fix common MCP configuration issues (missing env fields, deprecated Smithery CLI usage).
 - `npm run mcp:suggest` highlights additional servers worth enabling; document decisions in `.notes/features/<slug>/progress.md`.
 - Nexus records any credential or config changes in `docs/ConnectionGuide.md` before closing a task.
+
+## Important Notes
+- **Smithery CLI Deprecated**: As of September 2025, Smithery discontinued STDIO support. All MCP servers now use direct npm package installations (`npx -y <package>`), not `@smithery/cli run`.
+- **Environment Variables**: Must be set as User-level variables in Windows (not just session variables) for Cursor to access them. Use `npm run mcp:load-env:win` to load from `.env` file.
+- **Supabase Keys**: Access tokens (`sbp_...`) are for Management API, not MCP. MCP requires `SUPABASE_ANON_KEY` (starts with `eyJ...`) from dashboard Settings → API.
 
 ## Fallback Protocol
 1. Pause and report the outage (include the MCP name and error).

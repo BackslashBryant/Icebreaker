@@ -43,6 +43,7 @@ People want real-world connection without the baggage of social graphs, profiles
 - **Post-MVP**: Appeals flow, contextual prompts, venue partnerships
 - **Post-MVP**: Optional verification (email/phone) for higher trust contexts
 - **Post-MVP**: Client-side encryption (feature flag)
+- **Post-MVP**: Silent queue — one pending chat request shown after current chat ends (no interruption)
 - Dating app features, social graphs, profiles, avatars, follower cues
 - Message history, reactions, stickers, threads
 - Background tracking, precise location history
@@ -148,6 +149,7 @@ People want real-world connection without the baggage of social graphs, profiles
 - `Docs/Vision/IceBreaker — Signal Engine Vision.txt` — Compatibility scoring
 - `Docs/Vision/IceBreaker — Safety & Moderation Vision.txt` — Safety guardrails
 - `Docs/Vision/IceBreaker — Social Enrichment Vision.txt` — Post-MVP OAuth
+- `Docs/Vision/IceBreaker — Silent Queue Vision.txt` — Post-MVP quiet queue for missed connections
 - `Docs/Vision/IceBreaker — Main Screens Emotional Map.txt` — Screen-by-screen feel
 
 ---

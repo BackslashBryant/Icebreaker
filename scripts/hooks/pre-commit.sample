@@ -66,6 +66,16 @@ if ! check_cursor_files; then
   exit 1
 fi
 
+# Check branch naming format (warn but don't block for now)
+branch="$(git rev-parse --abbrev-ref HEAD)"
+if [ "$branch" != "main" ] && [ "$branch" != "master" ]; then
+  if ! [[ "$branch" =~ ^(agent/[^/]+/[0-9]+-[^/]+|feat/[0-9]+-[^/]+)$ ]]; then
+    echo "[pre-commit] WARNING: Branch '$branch' does not match required format: agent/<agent>/<issue>-<slug> or feat/<issue>-<slug>"
+    echo "[pre-commit] Example: agent/vector/1-onboarding-flow"
+    echo "[pre-commit] Continuing anyway, but please use proper branch naming next time."
+  fi
+fi
+
 echo "[pre-commit] Running sanity checks..."
 if ! npm run status -- --ci >/dev/null; then
   echo "[pre-commit] Workspace status failed. Fix issues or run Allow overrides intentionally."

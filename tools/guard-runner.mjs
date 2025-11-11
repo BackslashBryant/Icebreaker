@@ -43,7 +43,10 @@ switch (task) {
     break;
   }
   case 'test': {
-    if (hasBin('jest')) {
+    const runTestsScript = path.join(repoRoot, 'scripts', 'run-tests.mjs');
+    if (existsSync(runTestsScript)) {
+      run('node', [runTestsScript]);
+    } else if (hasBin('jest')) {
       run('npx', ['--no-install', 'jest', '--runInBand']);
     } else if (existsSync(path.join(repoRoot, 'scripts', 'verify-all'))) {
       run('npm', ['run', 'verify']);

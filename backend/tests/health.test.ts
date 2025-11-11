@@ -1,25 +1,37 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { app } from '../src/index.js';
+import { createTestServer, closeTestServer } from './utils/test-server.js';
 
 /**
- * Health API Unit Test
+ * Health API Integration Test
  *
  * MVP DoD: Health API returns JSON { status: "ok" }
  *
- * This test verifies:
- * - GET /api/health returns 200 status code
- * - Response body is JSON with shape { status: "ok" }
+ * Uses test server utilities to start a server for testing.
  */
 describe('Health API Endpoint', () => {
+  let server;
+  let baseUrl;
+
+  beforeAll(async () => {
+    const result = await createTestServer(app);
+    server = result.server;
+    baseUrl = result.url;
+  });
+
+  afterAll(async () => {
+    await closeTestServer(server);
+  });
+
   it('should return 200 OK with { status: "ok" }', async () => {
-    const response = await fetch('http://localhost:8000/api/health');
+    const response = await fetch(`${baseUrl}/api/health`);
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body).toEqual({ status: 'ok' });
   });
 
   it('should return JSON content-type', async () => {
-    const response = await fetch('http://localhost:8000/api/health');
+    const response = await fetch(`${baseUrl}/api/health`);
     const contentType = response.headers.get('content-type');
     expect(contentType).toMatch(/json/);
   });

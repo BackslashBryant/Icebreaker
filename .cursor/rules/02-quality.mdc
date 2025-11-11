@@ -11,12 +11,15 @@ alwaysApply: true
 - Keep validations fast and deterministic so they can run locally and in CI.
 - When adding a new stack, update `scripts/verify-all` or your package scripts to include lint, test, build, type, and audit steps appropriate to that stack.
 - Run the smallest useful test suite immediately after every code change. Post the command and result in chat so reviewers can trace regressions to a single edit.
+- **Testing practices**: See `.cursor/rules/08-testing.mdc` for tool selection, logging requirements, and timeout configuration.
 
 ## Manual Validation
 - Document any manual verification performed (UI walkthroughs, API calls, accessibility checks).
 - Capture screenshots, console output, or logs; attach them to the ticket/PR.
 - Note residual risk or missing coverage so it can be automated later.
 - When a loop occurs (same fix attempted twice without progress), stop, document it in `.notes/features/<slug>/progress.md` under **Current Issues**, and reset the chat before trying again.
+- **For comprehensive reviews**: Use domain team commands (`/team-testing`, `/team-security`, `/team-accessibility`, `/team-userexperience`) when multiple perspectives are needed.
+- **Before release**: Use `/team-release` for final readiness check (tests, security, docs).
 
 ## CI Expectations
 - `Template CI` currently runs the preflight check and best-effort verification helper.
@@ -39,9 +42,25 @@ alwaysApply: true
 
 # Git Hygiene
 
-- One issue/task per branch; name it `{type}/{issue-id}-{slug}` (e.g., `feat/123-add-auth`).
-- Keep commits scoped and reference the issue ID in the message.
-- Use GitHub MCP or your automation scripts to create branches, commits, PRs, and merges.
+- **BEFORE starting work**: 
+  - **MANDATORY PRE-FLIGHT CHECKS** (must pass ALL):
+    1. Research file exists: `docs/research/Issue-<#>-research.md`
+    2. Plan file exists: `docs/Plan.md` with checkpoints
+    3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
+  - **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any files. Report which check failed and coordinate with Vector.
+  - Create branch with format `agent/<agent>/<issue>-<slug>` (e.g., `agent/vector/1-onboarding-flow`) per `.cursor/rules/01-workflow.mdc`. Never work on existing branches unless they match the issue.
+- **BEFORE ANY GIT OPERATION** (add, commit, push):
+  - **MANDATORY GIT SAFETY CHECKS** (must pass ALL):
+    1. Verify current directory is project root: Run `git rev-parse --show-toplevel` and ensure you're in that exact directory
+    2. Verify current branch matches issue: Run `git branch --show-current` and confirm branch name contains the issue number
+    3. Verify no parent directory scanning: `git status` should NOT show files outside the repository (no warnings about AppData, Documents, etc.)
+    4. If directory is wrong: Navigate to project root with `cd "$(git rev-parse --show-toplevel)"` (PowerShell: `cd (git rev-parse --show-toplevel)`)
+    5. If branch is wrong: Create correct branch or switch before committing
+  - **NEVER** run git commands from parent directories or outside the repository
+- One issue/task per branch; name it `agent/<agent>/<issue>-<slug>` (preferred) or `feat/<issue>-<slug>` (fallback).
+- Keep commits scoped and reference the issue ID in the message: `feat: Complete Issue #X - [description]`.
+- **When completing a feature**: Update GitHub issue with completion comment, commit changes, then ask before pushing.
+- Use GitHub MCP (or `gh`) for branch pushes, PR updates, and reviews. Terminal git is a fallback for commits.
 - Ask before committing or pushing; surface the staged diff and test results for approval.
 - Merge cleanly (squash/rebase) after quality gates are green and the ticket is updated.
 - Install the provided git hook (`scripts/git-hooks/install`) so `.cursor/` changes never leave your machine unless you intentionally set `ALLOW_CURSOR_PUSH=1`.
@@ -54,7 +73,7 @@ alwaysApply: true
 - **Data / Storage**: Supabase MCP for schema diffs, advisor checks, and logs.
 - **Research**: DocFork MCP or Context7 for official references; summarize findings in the ticket.
 - **System Ops**: Desktop Commander MCP for local shell automation when allowed.
-- Always log citations in `/docs/research.md` when Docfork, Scout, or Vector pulls references.
+- Always log citations in issue-specific research files (`docs/research/Issue-<#>-research.md`) when Docfork, Scout, or Vector pulls references.
 
 Document the MCP run outputs or link to transcripts so reviewers can see what was validated.
 

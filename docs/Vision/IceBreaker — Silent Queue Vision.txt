@@ -1,0 +1,189 @@
+# IceBreaker — Silent Queue Vision
+
+> Post-MVP feature: Quiet, non-intrusive way to surface missed connections without breaking ephemerality or adding pressure.
+
+---
+
+## 🎯 Concept
+
+When a user is busy (in an active chat), incoming chat requests are silently queued. After the current chat ends, the user sees a simple notification: someone tried to chat, with their handle and compatibility signal. One action: start chat or dismiss.
+
+**Key principle:** No interruption, no pressure, no complexity. Just a quiet "someone tried to reach you" moment.
+
+---
+
+## 🧭 Brand Alignment
+
+- **Quiet relevance** → Notification appears only after chat ends, never during
+- **Simplicity wins** → One pending request max, two actions (start/dismiss)
+- **Ephemeral by default** → Queue expires with session; no persistence
+- **No pressure** → Dismiss is easy, no guilt, no FOMO language
+- **Confident, succinct** → Copy matches brand voice examples
+
+---
+
+## 📋 User Flow
+
+### Scenario: User A is chatting with User B. User C tries to chat with User A.
+
+1. **User C's perspective:**
+   - Sees User A as "BUSY" on Radar
+   - Chat request button disabled
+   - If they try anyway: "They're in a chat — try again later." (toast)
+
+2. **User A's perspective (during chat):**
+   - No notification, no interruption
+   - Chat proceeds normally
+   - Queue silently stores one pending request (User C's sessionId, handle, signal)
+
+3. **User A's perspective (after chat ends):**
+   - Chat ends normally: "Connection lost. Chat deleted."
+   - Brief pause (1-2 seconds)
+   - Queue notification appears:
+
+```
+Chat ended.
+
+Someone tried to chat — {handle}, signal {X.X}
+[START CHAT] [DISMISS]
+```
+
+4. **User A's actions:**
+   - **START CHAT** → Navigate to chat with User C (if still nearby/available)
+   - **DISMISS** → Queue cleared, return to Radar
+   - **Timeout** → Queue expires after 30 seconds if no action
+
+---
+
+## ✍️ Copy Examples
+
+### Queue Notification (after chat ends)
+
+**Title:** `Chat ended.`
+
+**Body:** `Someone tried to chat — {handle}, signal {X.X}`
+
+**Actions:**
+- Primary: `START CHAT` (teal button)
+- Secondary: `DISMISS` (outline button)
+
+**Screen reader:** `"Chat ended. Someone tried to chat — {handle}, signal {X.X}. Start chat or dismiss."`
+
+---
+
+### Error States
+
+**User tries to chat with busy person:**
+- Toast: `"{handle} is busy — try again later."`
+- Duration: 3 seconds
+- No action button
+
+**Queue expires (user took too long):**
+- Silent expiration, no notification
+- User returns to Radar normally
+
+**Queue target no longer available:**
+- Notification: `"{handle} is no longer nearby."`
+- Auto-dismiss after 3 seconds
+- Return to Radar
+
+---
+
+## 🎨 Visual Design
+
+### Queue Notification Component
+
+- **Container:** Dialog/modal overlay (same style as PersonCard)
+- **Background:** Deep navy (#0A0F1F) with subtle border
+- **Typography:** IBM Plex Mono, monospace
+- **Layout:**
+  ```
+  Chat ended.
+
+  Someone tried to chat — {handle}, signal {X.X}
+  
+  [START CHAT] [DISMISS]
+  ```
+
+- **Signal display:** Same format as Radar (e.g., "signal 8.2")
+- **Buttons:** Primary teal, secondary outline (matching brand)
+- **Animation:** Fade in (reduced-motion: instant)
+
+---
+
+## ⚙️ Technical Constraints
+
+### Queue Rules
+
+- **One request max:** If multiple users try to chat, only the highest-signal request is queued
+- **Session-scoped:** Queue cleared when session expires or user logs out
+- **Proximity check:** Before showing notification, verify requester is still nearby (< 100m)
+- **Timeout:** Queue notification expires after 30 seconds if no action
+- **No persistence:** Queue data is ephemeral (in-memory, cleared on server restart)
+
+### Data Structure
+
+```javascript
+{
+  sessionId: string,      // Requester's session ID
+  handle: string,         // Requester's handle
+  signal: number,         // Compatibility signal score
+  timestamp: number,      // When request was made
+  expiresAt: number       // Queue expiration time
+}
+```
+
+---
+
+## 🚫 What We're NOT Doing
+
+- **No interruption:** No notifications during active chat
+- **No "call waiting":** No ability to switch chats mid-conversation
+- **No "hold":** No ability to pause current chat
+- **No multiple queues:** Only one pending request at a time
+- **No history:** Queue doesn't persist across sessions
+- **No pressure language:** No "Don't miss out" or FOMO copy
+- **No compatibility comparison:** Don't show "better match" language
+
+---
+
+## ✅ Success Criteria
+
+### Quantitative
+
+- Queue notification shown within 2 seconds of chat end
+- User action rate (start vs dismiss) tracked (no target, just observe)
+- Queue expiration rate < 5% (most users act within 30s)
+
+### Qualitative
+
+- Notification feels quiet and non-intrusive
+- Copy matches brand voice (confident, succinct, slightly playful)
+- No user confusion about what happened
+- Dismiss feels easy and guilt-free
+
+---
+
+## 🔗 Related Features
+
+- **Busy status indicator** (MVP): Shows "BUSY" on Radar when user is in chat
+- **Signal Engine**: Compatibility scoring used in queue notification
+- **Proximity monitoring**: Used to verify requester still nearby before showing queue
+
+---
+
+## 📝 Implementation Notes
+
+- Backend: Store queue in session data (`pendingChatRequest` field)
+- Frontend: Show queue notification component after chat end handler
+- Accessibility: Full keyboard navigation, screen reader announcements
+- Testing: Verify queue works with proximity loss, session expiry, multiple requests
+
+---
+
+**Status:** Post-MVP feature — implement after busy status indicator (MVP) is complete.
+
+**Owner:** TBD (Link for UI, Forge for backend, Muse for copy)
+
+**Priority:** Low — nice-to-have, not essential for MVP
+

@@ -209,10 +209,33 @@ function checkMcpConfig() {
     return;
   }
 
-  const requiredServers = ['github', 'docfork', 'desktop-commander'];
-  const missing = requiredServers.filter(name => !servers[name]);
-  if (missing.length > 0) {
-    addResult('MCP config', false, `Missing required MCP servers: ${missing.join(', ')}`);
+  // Check for required servers (migrated from Smithery CLI to direct MCP servers)
+  const requiredServers = ['github', 'ref-tools-mcp', 'desktop-commander', 'playwright-mcp'];
+  const serverNames = Object.keys(servers);
+  const hasRequired = requiredServers.some(name => 
+    serverNames.includes(name) || serverNames.includes(`${name}-v2`)
+  );
+  
+  if (!hasRequired) {
+    addResult('MCP config', false, `Missing required MCP servers. Run: npm run mcp:heal`);
+    return;
+  }
+
+  // Check for missing env fields
+  const githubTokenServers = ['github', 'github-v2', 'desktop-commander', 'desktop-commander-v2', 'playwright-mcp', 'playwright-mcp-v2'];
+  let missingEnv = false;
+  for (const serverName of serverNames) {
+    const server = servers[serverName];
+    if (githubTokenServers.some(name => serverName.includes(name.replace('-v2', '')))) {
+      if (!server.env || !server.env.GITHUB_TOKEN) {
+        missingEnv = true;
+        break;
+      }
+    }
+  }
+
+  if (missingEnv) {
+    addResult('MCP config', false, 'Some servers missing env fields. Run: npm run mcp:heal');
     return;
   }
 
@@ -297,6 +320,32 @@ function checkRepoMode() {
   const mode = detectRepoMode();
   const cursorDir = path.join(repoRoot, '.cursor');
   const cursorIgnorePath = path.join(repoRoot, '.cursorignore');
+  const repoModeFile = path.join(repoRoot, '.repo-mode');
+
+  // Check if repo looks like an app but is in template mode
+  if (mode === 'template' && !existsSync(repoModeFile)) {
+    // No explicit .repo-mode file, check package.json
+    const packageJsonPath = path.join(repoRoot, 'package.json');
+    if (existsSync(packageJsonPath)) {
+      try {
+        const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+        const name = (packageJson.name || '').toLowerCase();
+        const description = (packageJson.description || '').toLowerCase();
+        
+        // If package.json doesn't contain "template", this is likely an app repo
+        if (!name.includes('template') && !description.includes('template')) {
+          addResult(
+            'Repo mode',
+            false,
+            'Template mode detected but repo appears to be an app. Run: npm run convert:app'
+          );
+          return;
+        }
+      } catch (error) {
+        // Ignore parse errors
+      }
+    }
+  }
 
   if (mode === 'app') {
     // In app mode, check if .cursor/ is being tracked
@@ -322,6 +371,34 @@ function checkRepoMode() {
   addResult('Repo mode', true, `Template mode: Cursor files tracked`);
 }
 
+function checkBranchNaming() {
+  try {
+    const branch = execSync('git rev-parse --abbrev-ref HEAD', { 
+      cwd: repoRoot, 
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
+    
+    // Skip check for main/master branches (allow direct work on main for template updates)
+    if (branch === 'main' || branch === 'master') {
+      addResult('Branch naming', true, `On ${branch} (main branch - allowed)`);
+      return;
+    }
+    
+    // Check format: agent/<agent>/<issue>-<slug> or feat/<issue>-<slug>
+    const validPattern = /^(agent\/\w+\/\d+-[\w-]+|feat\/\d+-[\w-]+)$/;
+    if (validPattern.test(branch)) {
+      addResult('Branch naming', true, `Branch "${branch}" matches required format`);
+      return;
+    }
+    
+    addResult('Branch naming', false, `Branch "${branch}" does not match required format: agent/<agent>/<issue>-<slug> or feat/<issue>-<slug> (e.g., agent/vector/1-onboarding-flow)`);
+  } catch (error) {
+    // Git not initialized or other error - skip check
+    addResult('Branch naming', true, 'Git branch check skipped (not a git repo or git unavailable)');
+  }
+}
+
 function main() {
   checkPlanScaffold();
   checkResearchLog();
@@ -336,6 +413,7 @@ function main() {
   checkFeatureWorkflow();
   checkMvpGuide();
   checkRepoMode();
+  checkBranchNaming();
 
   const rawArgs = process.argv.slice(2);
   const wantsJson = rawArgs.includes('--json') || rawArgs.includes('--ci');

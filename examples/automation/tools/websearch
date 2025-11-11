@@ -54,7 +54,7 @@ function showHelp() {
   log('  scripts/tools/websearch "nextjs deployment" --verbose', 'green');
   log('\nSetup:', 'blue');
   log('  This tool requires MCP services to be configured in .cursor/mcp.json', 'yellow');
-  log('  See docs/MCP_SETUP_GUIDE.md for setup instructions', 'yellow');
+  log('  See docs/troubleshooting/mcp-setup-guide.md for setup instructions', 'yellow');
 }
 
 function ensureArtifactsDir() {
@@ -130,7 +130,7 @@ async function performWebSearch(query) {
   if (!mcpStatus.available) {
     log(`\n⚠️  ${mcpStatus.reason}`, 'yellow');
     log(`💡 ${mcpStatus.suggestion}`, 'yellow');
-    log('📚 See docs/MCP_SETUP_GUIDE.md for setup instructions', 'blue');
+    log('📚 See docs/troubleshooting/mcp-setup-guide.md for setup instructions', 'blue');
     
     // Generate placeholder results
     const placeholderResults = generatePlaceholderResults(query, mcpStatus);
@@ -180,7 +180,7 @@ function generatePlaceholderResults(query, mcpStatus) {
     {
       title: 'MCP Setup Guide',
       url: 'https://example.com/mcp-setup',
-      snippet: 'See docs/MCP_SETUP_GUIDE.md for detailed setup instructions. Add search MCP servers like duckduckgo-mcp-server or web-research.',
+      snippet: 'See docs/troubleshooting/mcp-setup-guide.md for detailed setup instructions. Add search MCP servers like duckduckgo-mcp-server or web-research.',
       source: 'documentation',
       timestamp: new Date().toISOString(),
     },

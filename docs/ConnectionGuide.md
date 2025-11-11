@@ -11,21 +11,53 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 - Startup command: `cd frontend && npm install && npm run dev`
 - Notes: React + Vite, proxy to backend on /api routes
 
-### Backend API (Bootstrap MVP)
+### Backend API (Bootstrap MVP + Onboarding)
 - Name: Icebreaker API Server
-- Purpose: Health endpoint (Bootstrap MVP)
+- Purpose: Health endpoint + Onboarding API
 - Port: 8000
 - Startup command: `cd backend && npm install && npm run dev`
-- Notes: Express.js server, CORS enabled for frontend
+- Notes: Express.js server, CORS enabled for frontend, JSON body parsing
 - Endpoints:
   - `GET /api/health` - Returns `{ status: "ok" }`
+  - `POST /api/onboarding` - Creates session from onboarding data
+    - Request: `{ vibe: string, tags: string[], visibility: boolean, location?: { lat: number, lng: number } }`
+    - Response: `{ sessionId: string, token: string, handle: string }`
+    - Errors: `400` (validation error), `500` (server error)
+  - `POST /api/safety/block` - Block a user (requires Authorization header with session token)
+    - Request: `{ targetSessionId: string }`
+    - Response: `{ success: boolean }`
+    - Errors: `400` (validation error), `401` (unauthorized), `500` (server error)
+  - `POST /api/safety/report` - Report a user (requires Authorization header with session token)
+    - Request: `{ targetSessionId: string, category: 'harassment' | 'spam' | 'impersonation' | 'other' }`
+    - Response: `{ success: boolean }`
+    - Errors: `400` (validation error), `401` (unauthorized), `500` (server error)
+  - `PUT /api/profile/visibility` - Update session visibility (requires Authorization header with session token)
+    - Request: `{ visibility: boolean }`
+    - Response: `{ success: boolean, visibility: boolean }`
+    - Errors: `400` (validation error), `401` (unauthorized), `500` (server error)
+  - `PUT /api/profile/emergency-contact` - Update session emergency contact (requires Authorization header with session token)
+    - Request: `{ emergencyContact: string | null }` (phone: E.164 format +1234567890, or email: RFC 5322)
+    - Response: `{ success: boolean, emergencyContact: string | null }`
+    - Errors: `400` (validation error), `401` (unauthorized), `500` (server error)
 
-### WebSocket Server (TBD - if needed)
-- Name: Real-time Chat Service
-- Purpose: Ephemeral chat messaging, proximity monitoring
-- Port: TBD (typically 3002 or separate WebSocket port)
-- Startup command: TBD
-- Notes: No message content storage; session-based connections only
+### WebSocket Server (Radar View)
+- Name: Real-time Radar Service
+- Purpose: Radar updates, proximity monitoring, chat requests
+- Port: 8000 (same as HTTP server, WebSocket upgrade on /ws)
+- Startup command: `cd backend && npm run dev` (starts with HTTP server)
+- Endpoint: `ws://localhost:8000/ws?token=<sessionToken>`
+- Message Types:
+  - Client → Server: `radar:subscribe`, `location:update`, `chat:request`, `chat:accept`, `chat:decline`, `chat:message`, `chat:end`, `panic:trigger`
+  - Server → Client: `connected`, `radar:update`, `chat:request`, `chat:request:ack`, `chat:accepted`, `chat:declined`, `chat:message`, `chat:end`, `panic:triggered`, `error`
+- Notes: Session token required for connection; heartbeat ping-pong every 30s
+- Signal Engine Config: `backend/src/config/signal-weights.js` (tunable weights for compatibility scoring)
+- Chat Rate Limiting: `backend/src/lib/rate-limiter.js` (max 10 messages/minute per chat)
+- Chat Proximity Thresholds: Warning at 80m, termination at 100m (configurable in `backend/src/services/ChatManager.js`)
+- Panic Button: `backend/src/services/PanicManager.js` (safety exclusion, session termination)
+- Panic Exclusion Duration: Default 1 hour (configurable in `backend/src/services/PanicManager.js`)
+- Chat Request Cooldowns: `backend/src/services/CooldownManager.js` (session-level cooldowns after 3 declines in 10 minutes)
+- Cooldown Duration: Default 30 minutes (configurable via `COOLDOWN_DURATION_MS` environment variable)
+- Cooldown Config: `backend/src/config/cooldown-config.js` (threshold: 3, window: 10 min, duration: 30 min, weights)
 
 ## 2. Remote APIs & Integrations
 
@@ -47,12 +79,13 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 
 ## 3. Datastores
 
-### Session Store (TBD)
-- Type: Redis / In-memory / Database (TBD)
-- Connection string / host: TBD
+### Session Store (MVP)
+- Type: In-memory Map (MVP), Redis (production scaling)
+- Connection string / host: N/A (in-memory for MVP)
 - Migration owner: @Forge
-- Backup/rollback procedure: TBD
-- Notes: Session-scoped data only; ephemeral by design; minimal metadata
+- Backup/rollback procedure: Data lost on server restart (ephemeral by design)
+- Notes: Session-scoped data only; ephemeral by design; minimal metadata; TTL cleanup every minute (1 hour default expiration)
+- Session data stored: sessionId, token, handle, vibe, tags, visibility, location (optional), createdAt, expiresAt, activeChatPartnerId, blockedSessionIds, reportCount
 
 ### Safety Metadata Store (TBD)
 - Type: Database (Postgres / SQLite / TBD)

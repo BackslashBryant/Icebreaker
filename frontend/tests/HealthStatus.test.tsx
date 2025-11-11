@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { HealthStatus } from '../src/components/HealthStatus.jsx';
+import { HealthStatus } from '../src/components/HealthStatus';
 
 /**
  * Health Status Component Unit Test

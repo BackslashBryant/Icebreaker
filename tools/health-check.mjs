@@ -227,17 +227,35 @@ function checkMcpConfig() {
     const config = JSON.parse(readFileSync(mcpConfigPath, 'utf8'));
     const servers = config?.mcpServers || {};
 
-    const requiredServers = ['github', 'docfork', 'desktop-commander'];
+    const requiredServers = ['github', 'ref-tools-mcp', 'desktop-commander', 'playwright-mcp'];
     const configuredServers = Object.keys(servers);
 
     for (const serverName of requiredServers) {
-      if (servers[serverName]) {
+      // Check for both old and new (-v2) names
+      const hasServer = servers[serverName] || servers[`${serverName}-v2`];
+      const actualName = servers[serverName] ? serverName : `${serverName}-v2`;
+      
+      if (hasServer) {
+        const server = servers[actualName];
+        const needsGithubToken = ['github', 'desktop-commander', 'playwright-mcp'].includes(serverName);
+        const hasEnv = server?.env?.GITHUB_TOKEN;
+        
+        if (needsGithubToken && !hasEnv) {
+          addCheck(
+            'MCP Configuration',
+            `MCP Server: ${actualName}`,
+            STATUS.NEEDS_SETUP,
+            `${actualName} missing env field for GITHUB_TOKEN`,
+            'Run: npm run mcp:heal',
+          );
+        } else {
         addCheck(
           'MCP Configuration',
-          `MCP Server: ${serverName}`,
+            `MCP Server: ${actualName}`,
           STATUS.READY,
-          `${serverName} is configured`,
+            `${actualName} is configured`,
         );
+        }
       } else {
         addCheck(
           'MCP Configuration',
@@ -249,33 +267,50 @@ function checkMcpConfig() {
       }
     }
 
-    // Check for optional servers
+    // Check for optional servers (including hosted Supabase)
     const optionalServers = ['supabase', 'playwright'];
     for (const serverName of optionalServers) {
       if (servers[serverName]) {
-        addCheck(
-          'MCP Configuration',
-          `MCP Server: ${serverName}`,
-          STATUS.READY,
-          `${serverName} is configured (optional)`,
-        );
+        const server = servers[serverName];
+        // Hosted Supabase server (url-based) doesn't need env vars
+        if (serverName === 'supabase' && server.url && server.url.includes('mcp.supabase.com')) {
+          addCheck(
+            'MCP Configuration',
+            `MCP Server: ${serverName}`,
+            STATUS.READY,
+            `${serverName} is configured (hosted server - no env vars needed)`,
+          );
+        } else {
+          addCheck(
+            'MCP Configuration',
+            `MCP Server: ${serverName}`,
+            STATUS.READY,
+            `${serverName} is configured (optional)`,
+          );
+        }
       }
     }
 
     // Check if MCP servers have environment variables set
-    const optionalMcpEnv = new Set(['SUPABASE_URL', 'SUPABASE_ANON_KEY']);
+    // Note: Hosted Supabase server doesn't need env vars
+    const optionalMcpEnv = new Set(['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY']);
     for (const [serverName, serverConfig] of Object.entries(servers)) {
+      // Skip env check for hosted Supabase server
+      if (serverName === 'supabase' && serverConfig.url && serverConfig.url.includes('mcp.supabase.com')) {
+        continue;
+      }
+      
       const envVars = serverConfig?.env || {};
       for (const [envVar, envValue] of Object.entries(envVars)) {
         if (typeof envValue === 'string' && envValue.startsWith('${')) {
-          const varName = envValue.replace(/^\$\{|\}$/g, '');
+          const varName = envValue.replace(/^\$\{env:|env:|^\$\{|\}$/g, '');
           if (!process.env[varName]) {
             if (optionalMcpEnv.has(varName)) {
               addCheck(
                 'MCP Configuration',
                 `${serverName} -> ${envVar}`,
                 STATUS.READY,
-                `${envVar} not set (optional)`,
+                `${envVar} not set (optional - only needed for legacy npm package)`,
               );
             } else {
               addCheck(

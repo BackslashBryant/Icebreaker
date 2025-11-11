@@ -4,7 +4,7 @@
  * verify-all - Comprehensive verification script (Scaffold-Ready)
  * Runs lint, types, tests, and build checks across the project
  * Usage: scripts/verify-all [--fix] [--verbose] [--parallel]
- * 
+ *
  * This script is scaffold-ready and will work with any project type:
  * - Detects project type automatically (Next.js, React, Node.js, etc.)
  * - Adapts verification steps based on available package.json scripts
@@ -47,16 +47,16 @@ function ensureArtifactsDir() {
 
 function detectProjectType() {
   const packageJsonPath = path.join(__dirname, '..', 'package.json');
-  
+
   if (!fs.existsSync(packageJsonPath)) {
     return { type: 'unknown', hasPackageJson: false };
   }
-  
+
   try {
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
     const scripts = packageJson.scripts || {};
     const dependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
-    
+
     // Detect project type based on dependencies and scripts
     if (dependencies.next) {
       return { type: 'nextjs', hasPackageJson: true, scripts, dependencies };
@@ -141,7 +141,7 @@ function getAvailableScripts(projectInfo) {
 function runCommand(command, description, options = {}) {
   const startTime = Date.now();
   log(`\n🔍 ${description}...`, 'cyan');
-  
+
   try {
     const result = execSync(command, {
       stdio: config.verbose ? 'inherit' : 'pipe',
@@ -149,61 +149,62 @@ function runCommand(command, description, options = {}) {
       encoding: 'utf8',
       ...options
     });
-    
+
     const duration = Date.now() - startTime;
     log(`✅ ${description} completed (${duration}ms)`, 'green');
-    
+
     // Save output to artifacts if not verbose
     if (!config.verbose && result) {
       const artifactFile = path.join(config.artifactsDir, `${description.toLowerCase().replace(/\s+/g, '-')}.log`);
       fs.writeFileSync(artifactFile, result);
     }
-    
+
     return { success: true, output: result, duration };
   } catch (error) {
     const duration = Date.now() - startTime;
     log(`❌ ${description} failed (${duration}ms)`, 'red');
-    
+
     // Save error output to artifacts
     const errorFile = path.join(config.artifactsDir, `${description.toLowerCase().replace(/\s+/g, '-')}-error.log`);
-    fs.writeFileSync(errorFile, error.message + '\n' + (error.stdout || '') + '\n' + (error.stderr || ''));
-    
+    const errorOutput = error.message + '\n' + (error.stdout || '') + '\n' + (error.stderr || '');
+    fs.writeFileSync(errorFile, errorOutput);
+
     if (config.verbose) {
       console.error(error.message);
     }
-    
+
     return { success: false, error: error.message, duration };
   }
 }
 
 async function runParallel(tasks) {
   log('\n🚀 Running tasks in parallel...', 'magenta');
-  
-  const promises = tasks.map(({ command, description, options }) => 
+
+  const promises = tasks.map(({ command, description, options }) =>
     new Promise((resolve) => {
       const result = runCommand(command, description, options);
       resolve({ description, ...result });
     })
   );
-  
+
   const results = await Promise.all(promises);
   return results;
 }
 
 function runSequential(tasks) {
   log('\n📋 Running tasks sequentially...', 'magenta');
-  
+
   const results = [];
   for (const { command, description, options } of tasks) {
     const result = runCommand(command, description, options);
     results.push({ description, ...result });
-    
+
     // Stop on first failure unless --continue flag is present
     if (!result.success && !process.argv.includes('--continue')) {
       break;
     }
   }
-  
+
   return results;
 }
 
@@ -233,68 +234,68 @@ function generateSummary(results) {
   const totalDuration = results.reduce((sum, r) => sum + (r.duration || 0), 0);
   const successful = results.filter(r => r.success).length;
   const failed = results.length - successful;
-  
+
   log('\n📊 VERIFICATION SUMMARY', 'magenta');
   log('='.repeat(50), 'magenta');
   log(`Total tasks: ${results.length}`, 'blue');
   log(`Successful: ${successful}`, successful === results.length ? 'green' : 'yellow');
   log(`Failed: ${failed}`, failed > 0 ? 'red' : 'green');
   log(`Total time: ${totalDuration}ms`, 'blue');
-  
+
   if (failed > 0) {
     log('\n❌ Failed tasks:', 'red');
     results.filter(r => !r.success).forEach(r => {
       log(`  - ${r.description}`, 'red');
     });
-    
+
     log(`\n💡 Check artifacts directory for detailed logs: ${config.artifactsDir}`, 'yellow');
   } else {
     log('\n🎉 All verifications passed!', 'green');
   }
-  
+
   return failed === 0;
 }
 
 async function main() {
   log('🔧 Project Verification Suite (Scaffold-Ready)', 'cyan');
   log('==============================================', 'cyan');
-  
+
   ensureArtifactsDir();
-  
+
   // Detect project type and available scripts
   const projectInfo = detectProjectType();
   log(`\n📦 Detected project type: ${projectInfo.type}`, 'blue');
-  
+
   runMcpSuggestionSummary();
-  
+
   if (!projectInfo.hasPackageJson) {
     log('⚠️  No package.json found. This is a scaffold template.', 'yellow');
     log('💡 To use this script, initialize your project with: npm init', 'yellow');
     process.exit(0);
   }
-  
+
   // Get available verification tasks
   const tasks = getAvailableScripts(projectInfo);
-  
+
   if (tasks.length === 0) {
     log('⚠️  No verification scripts found in package.json', 'yellow');
     log('💡 Add scripts like "lint", "test", "build" to your package.json', 'yellow');
     process.exit(0);
   }
-  
+
   log(`\n🔍 Found ${tasks.length} verification tasks:`, 'blue');
   tasks.forEach(task => {
     log(`  - ${task.description}`, 'cyan');
   });
-  
+
   // Run tasks
-  const results = config.parallel 
+  const results = config.parallel
     ? await runParallel(tasks)
     : runSequential(tasks);
-  
+
   // Generate summary
   const allPassed = generateSummary(results);
-  
+
   // Exit with appropriate code
   process.exit(allPassed ? 0 : 1);
 }

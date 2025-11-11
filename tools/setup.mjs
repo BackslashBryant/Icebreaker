@@ -16,6 +16,7 @@ import readline from 'node:readline';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadPersonalConfig } from './lib/personal-config.mjs';
+import { detectRepoMode, setRepoMode } from './lib/repo-mode.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -205,6 +206,67 @@ async function step2_ProjectDetection(rl) {
   }
 
   return null;
+}
+
+async function step2b_RepoModeCheck(rl) {
+  log('\n? Repository Mode Check\n', 'magenta');
+
+  const currentMode = detectRepoMode();
+  const packageJsonPath = path.join(repoRoot, 'package.json');
+  let looksLikeApp = false;
+
+  // Check package.json to see if it looks like an app
+  if (existsSync(packageJsonPath)) {
+    try {
+      const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+      const name = (packageJson.name || '').toLowerCase();
+      const description = (packageJson.description || '').toLowerCase();
+      
+      if (!name.includes('template') && !description.includes('template')) {
+        looksLikeApp = true;
+      }
+    } catch (error) {
+      // Ignore
+    }
+  }
+
+  if (currentMode === 'template' && looksLikeApp) {
+    log('  ??  Repository appears to be an app but is in template mode', 'yellow');
+    log('      Template mode is for developing Cursor workspace templates.', 'yellow');
+    log('      App mode blocks .cursor/ files from being committed.', 'yellow');
+    
+    const convert = await prompt(rl, '\n  Convert to app mode? (Y/n): ', {
+      autoAnswer: 'y',
+    });
+    
+    if (convert.toLowerCase() !== 'n') {
+      try {
+        await setRepoMode('app');
+        log('  ? Converted to app mode', 'green');
+        
+        // Update .gitignore
+        const convertResult = spawnSync('node', ['tools/convert-to-app.mjs'], {
+          cwd: repoRoot,
+          encoding: 'utf8',
+        });
+        
+        if (convertResult.status === 0) {
+          log('  ? Updated .gitignore', 'green');
+        }
+      } catch (error) {
+        log('  ??  Failed to convert to app mode', 'yellow');
+        log(`     Error: ${error instanceof Error ? error.message : error}`, 'yellow');
+      }
+    } else {
+      log('  ??  Skipping conversion. Run `npm run convert:app` later if needed.', 'yellow');
+    }
+  } else if (currentMode === 'app') {
+    log('  ? Repository is in app mode (correct for application repos)', 'green');
+  } else {
+    log('  ? Repository is in template mode (correct for template repos)', 'green');
+  }
+
+  return true;
 }
 
 async function step3_TokenSetup(rl) {
@@ -464,6 +526,8 @@ function main() {
     }
 
     results.detection = await runStep(rl, 'Step 2: Project Detection', step2_ProjectDetection);
+
+    results.repoMode = await runStep(rl, 'Step 2b: Repository Mode', step2b_RepoModeCheck);
 
     results.tokens = await runStep(rl, 'Step 3: Token Setup', step3_TokenSetup);
 

@@ -16,6 +16,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { loadPersonalConfig } from './lib/personal-config.mjs';
+import { detectRepoMode, setRepoMode } from './lib/repo-mode.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -153,7 +154,7 @@ function printReminder() {
   console.log('Set SKIP_SETUP_PROMPT=true to disable this reminder.\n');
 }
 
-function main() {
+async function main() {
   if (process.env.SKIP_SETUP_PROMPT === 'true') {
     return;
   }
@@ -180,6 +181,60 @@ function main() {
 
   refreshBrainsIfNeeded(isCI);
   installPrecommitHook(isCI);
+
+  // Auto-heal MCP config if needed
+  if (!isCI) {
+    try {
+      const healResult = spawnSync('node', ['tools/mcp-self-heal.mjs'], {
+        cwd: repoRoot,
+        encoding: 'utf8',
+        stdio: 'inherit',
+      });
+      if (healResult.status === 0) {
+        console.log('[info] MCP config health check completed.\n');
+      }
+    } catch (error) {
+      console.warn('[warn] MCP self-heal check failed:', error instanceof Error ? error.message : error);
+    }
+  }
+
+  // Auto-detect and fix repo mode if needed
+  if (!isCI) {
+    try {
+      const currentMode = detectRepoMode();
+      const packageJsonPath = path.join(repoRoot, 'package.json');
+      let looksLikeApp = false;
+
+      if (existsSync(packageJsonPath)) {
+        try {
+          const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+          const name = (packageJson.name || '').toLowerCase();
+          const description = (packageJson.description || '').toLowerCase();
+          
+          if (!name.includes('template') && !description.includes('template')) {
+            looksLikeApp = true;
+          }
+        } catch {
+          // Ignore
+        }
+      }
+
+      if (currentMode === 'template' && looksLikeApp) {
+        console.log('\n[info] Detected app repository in template mode. Auto-converting to app mode...\n');
+        await setRepoMode('app');
+        const convertResult = spawnSync('node', ['tools/convert-to-app.mjs'], {
+          cwd: repoRoot,
+          encoding: 'utf8',
+          stdio: 'inherit',
+        });
+        if (convertResult.status === 0) {
+          console.log('[info] Repository converted to app mode.\n');
+        }
+      }
+    } catch (error) {
+      console.warn('[warn] Failed to auto-detect repo mode:', error instanceof Error ? error.message : error);
+    }
+  }
 
   if (existsSync(setupStatePath)) {
     return; // setup already completed previously

@@ -15,10 +15,15 @@ alwaysApply: true
 - Optimise responsive behaviour, offline handling, and performance budgets for mobile/PWA surfaces tied to the current checkpoint.
 
 ## Workflow
-1. **Plan Mode**: reference `docs/vision.md` for context, call out target breakpoints/devices, offline requirements, caching strategy, and performance metrics (LCP/INP goals). Identify tests/telemetry you'll run. Wait for approval.
-2. **Act Mode**: implement focused changes (layout tweaks, service worker updates, caching rules). After each edit, run relevant tests (lighthouse, playwright mobile runs, unit tests) and share metrics/summaries.
-3. Note any instructions for @Pixel (how to reproduce on mobile, offline, throttled network) and docs updates needed for @Muse.
-4. Update `.notes/features/<slug>/progress.md` with **Current Issues** if implementation blocks or loops occur.
+1. **MANDATORY PRE-FLIGHT**: Before starting ANY implementation work, verify:
+   - Research file exists: `docs/research/Issue-<#>-research.md`
+   - Plan file exists: `docs/Plan.md`
+   - **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
+   - If ANY check fails, STOP and report to Vector. Do not create or modify any files.
+2. **Plan Mode**: reference `docs/vision.md` for context, call out target breakpoints/devices, offline requirements, caching strategy, and performance metrics (LCP/INP goals). Identify tests/telemetry you'll run. Wait for approval.
+3. **Act Mode**: implement focused changes (layout tweaks, service worker updates, caching rules). After each edit, run relevant tests (lighthouse, playwright mobile runs, unit tests) and share metrics/summaries.
+4. Note any instructions for @Pixel (how to reproduce on mobile, offline, throttled network) and docs updates needed for @Muse.
+5. Update `.notes/features/<slug>/progress.md` with **Current Issues** if implementation blocks or loops occur.
 
 ## Guardrails
 - Do not alter backend contracts; coordinate with @Forge for API requirements.

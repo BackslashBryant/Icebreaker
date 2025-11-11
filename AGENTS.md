@@ -9,17 +9,19 @@
 6. Do not kill processes you did not start unless the user confirms.
 7. Use package.json scripts. Do not hand-craft long commands or invoke binaries directly.
 8. Never modify files outside this repository.
+9. **NEVER explain your own commands or tool usage in chat**. Execute commands, report results directly. No meta-commentary about Write-Host, PowerShell syntax, or "what I'm doing" - just communicate results.
 
 ## Code-change guardrails
-9. Create a feature branch for every change (`feat/<slug>`). Never push directly to the default branch.
+9. **BEFORE starting work**: Create a feature branch with format `agent/<agent>/<issue>-<slug>` (e.g., `agent/vector/1-onboarding-flow`) per `.cursor/rules/01-workflow.mdc` line 24. Never work on existing branches unless they match the issue being worked on. Check current branch matches the issue before making changes.
 10. Keep changes minimal and reversible. No unrelated refactors, formatting, or file shuffles.
 11. After edits, show `git status` and a diff of touched files. If something is missing or extra, stop and ask.
 12. Run `npm run precommit` and share the output. If any step fails, stop and ask before trying fixes.
-13. Open a PR summarising the task, risks, and test evidence. Await human review.
+13. **When completing a feature/issue**: Update GitHub issue with completion comment, commit with issue reference (`feat: Complete Issue #X - [description]`), then ask before pushing.
+14. **Direct commits only**: No PRs. Commit and push directly to feature branches.
 
 ## Context hygiene
 14. If files changed outside Cursor, request a project re-scan before editing.
-15. One task per PR. If asked to combine scopes, confirm explicitly.
+15. One task per branch. If asked to combine scopes, confirm explicitly.
 16. Between tasks, reset context: summarise task, constraints, and changed files again.
 17. When manual prerequisites are required (tokens, API accounts, approvals), stop and list the steps for the user, then wait.
 
