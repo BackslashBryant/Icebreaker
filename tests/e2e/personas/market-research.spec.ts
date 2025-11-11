@@ -44,12 +44,15 @@ test.describe("Persona: River Martinez - Urban Neighborhood Resident", () => {
     await page.getByText("Quietly Curious").click();
     await page.getByText("Here for the humans").click();
     
-    // Submit form
+    // Submit form - wait for API call and navigation
     await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-
-    // Verify navigation to radar
-    await expect(page).toHaveURL(/.*\/radar/);
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+    
+    // Wait for loading state to disappear (API call complete)
+    await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+    
+    // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
   });
 
   test("dense urban neighborhood proximity matching works", async ({ page }) => {
@@ -140,12 +143,15 @@ test.describe("Persona: Alex Kim - Tech Conference Attendee", () => {
     await page.getByText("Tech curious").click();
     await page.getByText("Builder brain").click();
     
-    // Submit form
+    // Submit form - wait for API call and navigation
     await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-
-    // Verify navigation to radar
-    await expect(page).toHaveURL(/.*\/radar/);
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+    
+    // Wait for loading state to disappear (API call complete)
+    await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+    
+    // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
   });
 
   test("event/conference proximity matching works", async ({ page }) => {
@@ -253,12 +259,15 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
     await page.getByText("Tech curious").click();
     await page.getByText("Quietly Curious").click();
     
-    // Submit form
+    // Submit form - wait for API call and navigation
     await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-
-    // Verify navigation to radar
-    await expect(page).toHaveURL(/.*\/radar/);
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+    
+    // Wait for loading state to disappear (API call complete)
+    await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+    
+    // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
   });
 
   test("visibility toggle OFF works for privacy-first users", async ({ page }) => {
@@ -415,12 +424,15 @@ test.describe("Persona: Sam Taylor - Outgoing Introvert", () => {
     await page.getByText("Creative Energy").click();
     await page.getByText("Here for the humans").click();
     
-    // Submit form
+    // Submit form - wait for API call and navigation
     await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-
-    // Verify navigation to radar
-    await expect(page).toHaveURL(/.*\/radar/);
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+    
+    // Wait for loading state to disappear (API call complete)
+    await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+    
+    // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
   });
 
   test("event/venue proximity matching works for music venues", async ({ page }) => {
@@ -528,12 +540,15 @@ test.describe("Persona: Morgan Davis - Graduate Student & Researcher", () => {
     await page.getByText("Big Sci-Fi Brain").click();
     await page.getByText("Overthinking Things").click();
     
-    // Submit form
+    // Submit form - wait for API call and navigation
     await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-
-    // Verify navigation to radar
-    await expect(page).toHaveURL(/.*\/radar/);
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+    
+    // Wait for loading state to disappear (API call complete)
+    await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+    
+    // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
   });
 
   test("academic conference proximity matching works", async ({ page }) => {
@@ -640,7 +655,12 @@ test.describe("Cross-Persona: Market Research Personas", () => {
       }
       
       await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-      await expect(page).toHaveURL(/.*\/radar/);
+      
+      // Wait for loading state to disappear (API call complete)
+      await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+      
+      // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+      await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
       
       // Clear session for next persona
       await page.evaluate(() => {

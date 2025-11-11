@@ -59,12 +59,15 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     // Maya verifies handle is displayed (anxious user verification)
     await expect(page.getByText(/Your anonymous handle/i)).toBeVisible();
     
-    // Submit form
+    // Submit form - wait for API call and navigation
     await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-
-    // Verify navigation to radar
-    await expect(page).toHaveURL(/.*\/radar/);
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+    
+    // Wait for loading state to disappear (API call complete)
+    await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+    
+    // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
   });
 
   test("appears on Radar and can toggle visibility", async ({ page }) => {
@@ -194,12 +197,15 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
     await page.getByText("Tech curious").click();
     await page.getByText("Quietly Curious").click();
     
-    // Submit form
+    // Submit form - wait for API call and navigation
     await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-
-    // Verify navigation to radar
-    await expect(page).toHaveURL(/.*\/radar/);
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+    
+    // Wait for loading state to disappear (API call complete)
+    await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+    
+    // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
   });
 
   test("appears on Radar and checks for shared tags", async ({ page }) => {
@@ -287,12 +293,15 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
     await page.getByText("Overthinking Things").click();
     await page.getByText("Lo-fi head").click();
     
-    // Submit form
+    // Submit form - wait for API call and navigation
     await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-
-    // Verify navigation to radar
-    await expect(page).toHaveURL(/.*\/radar/);
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+    
+    // Wait for loading state to disappear (API call complete)
+    await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+    
+    // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
   });
 
   test("shared tag compatibility with Maya boosts signal score", async ({ page }) => {
@@ -408,7 +417,12 @@ test.describe("Cross-Persona: College Students", () => {
       }
       
       await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-      await expect(page).toHaveURL(/.*\/radar/);
+      
+      // Wait for loading state to disappear (API call complete)
+      await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+      
+      // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+      await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
       
       // Clear session for next persona
       await page.evaluate(() => {

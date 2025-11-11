@@ -52,12 +52,15 @@ test.describe("Persona: Marcus Thompson - Remote Worker", () => {
     await page.getByText("Builder brain").click();
     await page.getByText("Tech curious").click();
     
-    // Submit form
+    // Submit form - wait for API call and navigation
     await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-
-    // Verify navigation to radar
-    await expect(page).toHaveURL(/.*\/radar/);
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+    
+    // Wait for loading state to disappear (API call complete)
+    await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+    
+    // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
   });
 
   test("appears on Radar and checks for shared tags", async ({ page }) => {
@@ -200,12 +203,15 @@ test.describe("Persona: Casey Rivera - Creative Professional", () => {
     await page.getByText("Creative Energy").click();
     await page.getByText("Here for the humans").click();
     
-    // Submit form
+    // Submit form - wait for API call and navigation
     await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-
-    // Verify navigation to radar
-    await expect(page).toHaveURL(/.*\/radar/);
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+    
+    // Wait for loading state to disappear (API call complete)
+    await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+    
+    // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
   });
 
   test("appears on Radar at event/venue scenarios", async ({ page }) => {
@@ -343,7 +349,12 @@ test.describe("Cross-Persona: Professional Personas", () => {
       }
       
       await page.getByRole("button", { name: /ENTER RADAR/i }).click();
-      await expect(page).toHaveURL(/.*\/radar/);
+      
+      // Wait for loading state to disappear (API call complete)
+      await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+      
+      // Wait for navigation to radar (onboarding has 500ms delay + API call time)
+      await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
       
       // Clear session for next persona
       await page.evaluate(() => {
