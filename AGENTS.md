@@ -21,7 +21,7 @@
     - **MANDATORY**: Push to GitHub automatically (`git push -u origin agent/<agent>/<issue>-<slug>`)
     - **MANDATORY**: Update GitHub issue with completion comment (`gh issue comment <issue#> --body "..."`)
     - **MANDATORY**: Update GitHub issue labels (`gh issue edit <issue#> --add-label "status:done"`)
-    - These completion steps are mandatory and should happen automatically without asking the user. If push fails, configure credential helper (`git config --global credential.helper manager-core`) and reference `Docs/troubleshooting/git-push-hotwash.md`.
+    - These completion steps are mandatory and should happen automatically without asking the user. If push fails, see `.cursor/rules/01-workflow.mdc` Section 6 for troubleshooting steps (DNS errors, 403 errors, branch creation).
 14. **Direct commits only**: No PRs. Commit and push directly to feature branches.
 
 ## Context hygiene

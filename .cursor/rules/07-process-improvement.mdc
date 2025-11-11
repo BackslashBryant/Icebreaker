@@ -14,7 +14,7 @@ alwaysApply: false
 
 ## 2025-11-11: GitHub API Authentication Fallback
 
-**Trigger**: GitHub API 401 errors when creating issues via Node.js scripts or `gh` CLI despite token being set. **Lesson**: PowerShell direct API calls reading token from `.env` file are most reliable on Windows - bypass Node.js env var issues and CLI keyring conflicts. **Rule**: Always try PowerShell `Invoke-RestMethod` with token parsed from `.env` as fallback when GitHub operations fail. See `Docs/troubleshooting/github-api-auth.md`.
+**Trigger**: GitHub API 401 errors when creating issues via Node.js scripts or `gh` CLI despite token being set. **Lesson**: PowerShell direct API calls reading token from `.env` file are most reliable on Windows - bypass Node.js env var issues and CLI keyring conflicts. **Rule**: Always try PowerShell `Invoke-RestMethod` with token parsed from `.env` as fallback when GitHub operations fail. Pattern codified in `.cursor/rules/01-workflow.mdc` and `.cursor/rules/04-integrations.mdc`.
 
 ## 2025-11-10: Missing Dependency Import Crash
 
@@ -56,9 +56,13 @@ alwaysApply: false
 
 **Trigger**: Agent didn't create proper branch or update GitHub issue. **Lesson**: Create branch FIRST (`agent/<agent>/<issue>-<slug>`), then update GitHub issue, commit, push. **Rule**: Enforced in `AGENTS.md` and `.cursor/rules/01-workflow.mdc`.
 
+## 2025-11-11: Git Push Troubleshooting Consolidation
+
+**Trigger**: Multiple troubleshooting files (`git-push-hotwash.md`, `windows-git-push-fix.md`) contained duplicate information that should be in rules. **Lesson**: Troubleshooting knowledge must be codified into workflow rules, not scattered in separate files. **Rule**: Consolidated all git push troubleshooting into `.cursor/rules/01-workflow.mdc` Section 6 with step-by-step solutions for DNS errors, 403 errors, and branch creation. Removed redundant troubleshooting files.
+
 ## 2025-11-06: Windows Git Push Issues
 
-**Trigger**: Git push failed with DNS threading error, then 403 after restart. **Lesson**: Create branch on GitHub FIRST via MCP, use system Git if Cursor's bundled Git fails, check token scopes for 403 errors. **Rule**: Updated troubleshooting docs with PC restart and auth scope solutions.
+**Trigger**: Git push failed with DNS threading error, then 403 after restart. **Lesson**: Create branch on GitHub FIRST via MCP, use system Git if Cursor's bundled Git fails, check token scopes for 403 errors, restart PC for DNS threading bugs. **Rule**: Codified into `.cursor/rules/01-workflow.mdc` Section 6 push troubleshooting steps.
 
 ## 2025-11-06: Direct Commits Only
 

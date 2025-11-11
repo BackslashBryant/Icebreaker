@@ -59,7 +59,10 @@ Each persona is a specialist developer who owns their lane end to end. They plan
 - Use `/draft-architecture` and `/append-session-summary` rather than inventing new files when those docs need updates.
 - When manual prerequisites are required (API keys, sign-ups, tokens), stop and instruct the user on the exact actions before proceeding.
 - **Issue Completion Protocol**: When an issue is complete, automatically:
-  1. Push commits to GitHub (configure credential helper if needed: `git config --global credential.helper manager-core`)
+  1. Push commits to GitHub:
+     - If auth fails: `git config --global credential.helper manager-core`
+     - If DNS error: Restart PC or use system Git from terminal
+     - If 403 error: `gh auth refresh -s repo` and ensure branch exists on GitHub FIRST
   2. Add completion comment to GitHub issue (`gh issue comment <issue#> --body "..."`)
   3. Update issue labels (`gh issue edit <issue#> --add-label "status:done"`)
-  - These steps are mandatory and should NOT require user reminders. Reference `Docs/troubleshooting/git-push-hotwash.md` if push fails.
+  - These steps are mandatory and should NOT require user reminders. See `.cursor/rules/01-workflow.mdc` Section 6 for push troubleshooting steps.
