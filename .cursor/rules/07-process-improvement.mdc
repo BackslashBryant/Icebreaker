@@ -56,6 +56,10 @@ alwaysApply: false
 
 **Trigger**: Agent didn't create proper branch or update GitHub issue. **Lesson**: Create branch FIRST (`agent/<agent>/<issue>-<slug>`), then update GitHub issue, commit, push. **Rule**: Enforced in `AGENTS.md` and `.cursor/rules/01-workflow.mdc`.
 
+## 2025-11-11: GitHub Authentication Token Sync
+
+**Trigger**: User repeatedly needed to refresh GitHub CLI authentication (`gh auth refresh`) for git push operations. **Lesson**: Git uses GitHub CLI's credential helper, but `GITHUB_TOKEN` env var (used by MCP/scripts) can become out of sync. When GitHub CLI refreshes, sync the token: `npm run github:sync-token`. This ensures git operations and MCP servers use the same token. **Rule**: Created `tools/sync-github-token.ps1` script, added `npm run github:sync-token` command, updated `.cursor/rules/01-workflow.mdc` to run sync token first when authentication fails.
+
 ## 2025-11-11: MCP Environment Variable Management
 
 **Trigger**: MCP servers failing due to environment variables set only in PowerShell session, not User-level. **Lesson**: Windows requires User-level environment variables (not session) for Cursor to access them. Always use `npm run mcp:load-env:win` to load from `.env` file, then restart Cursor completely. **Rule**: Documented in `.cursor/rules/04-integrations.mdc` - env vars must be User-level, always restart Cursor after changes.

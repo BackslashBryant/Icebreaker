@@ -92,16 +92,22 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - **NEVER** run git commands from parent directories or outside the repository
 - Branch name format: `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`).
 - Install/refresh GitHub MCP in Cursor; authenticate using a PAT with `repo`, `workflow`, `issues`.
+- **GitHub Authentication Setup**: 
+  1. **Git operations**: Git is configured to use GitHub CLI's credential helper (`gh auth git-credential`). This handles authentication automatically.
+  2. **MCP/scripts**: Use `GITHUB_TOKEN` environment variable (set as User-level in Windows).
+  3. **Token sync**: When GitHub CLI refreshes authentication, sync the token: `npm run github:sync-token`. This ensures `GITHUB_TOKEN` env var matches GitHub CLI's keyring token.
+  4. **If git push fails**: Run `npm run github:sync-token` first, then retry. This prevents authentication mismatches.
 - **GitHub API Fallback**: If GitHub operations (create issue, comment, labels) fail with 401 errors:
   1. **First attempt**: Use GitHub MCP or `gh` CLI
-  2. **If 401 error**: Immediately switch to PowerShell direct API calls:
+  2. **Sync token**: Run `npm run github:sync-token` to ensure token is current
+  3. **If still 401 error**: Immediately switch to PowerShell direct API calls:
      ```powershell
      # Load token from .env file
      $token = (Get-Content .env | Select-String "^GITHUB_TOKEN=" | ForEach-Object { $_.Line.Split('=', 2)[1].Trim('"''') })
      $headers = @{Authorization = "Bearer $token"}
      Invoke-RestMethod -Uri "https://api.github.com/repos/BackslashBryant/Icebreaker/issues" -Method Post -Headers $headers -Body (@{title="..."; body="..."} | ConvertTo-Json)
      ```
-  3. **PowerShell pattern**: Load token from `.env` file directly, use `Invoke-RestMethod` with `Bearer` auth
+  4. **PowerShell pattern**: Load token from `.env` file directly, use `Invoke-RestMethod` with `Bearer` auth
   5. **Never give up**: Always try PowerShell fallback before reporting failure
 - Nexus or the acting human runs `npm run agents:install-hook` to copy the path-scope pre-commit hook locally.
 - Run `npm run preflight` before pushing to ensure scaffolding is intact (includes branch name validation).
@@ -158,14 +164,18 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
      - **CRITICAL**: This must be done BEFORE committing completion
   3. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
   4. **MANDATORY**: Push to GitHub: `git push -u origin agent/<agent>/<issue>-<slug>`
-     - **If authentication fails**: Configure credential helper: `git config --global credential.helper manager-core`
+     - **If authentication fails**: 
+       - **First**: Run `npm run github:sync-token` to sync `GITHUB_TOKEN` with GitHub CLI's token
+       - **Then retry**: Git uses GitHub CLI's credential helper, so syncing ensures consistency
+       - **If still fails**: Configure credential helper: `git config --global credential.helper manager-core`
      - **If push fails with DNS error** (`getaddrinfo() thread failed`):
        - First: Restart PC (Windows DNS threading bug)
        - If persists: Use system Git from terminal instead of Cursor's bundled Git
        - Check for third-party firewalls blocking Git
      - **If push fails with 403 error**:
+       - Run `npm run github:sync-token` to sync token
        - Verify token has `repo` scope: `gh auth status`
-       - Refresh token: `gh auth refresh -s repo`
+       - Refresh token: `gh auth refresh -s repo` (then run `npm run github:sync-token` again)
        - Ensure branch exists on GitHub FIRST (create via GitHub MCP)
      - **If push fails with "branch not found"**: Create branch on GitHub FIRST via GitHub MCP before pushing
      - **DO NOT** ask user for permission - this is a mandatory completion step

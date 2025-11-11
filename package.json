@@ -21,6 +21,7 @@
     "setup:tokens": "node ./tools/token-wizard.mjs",
     "mcp:load-env": "node ./tools/load-env-to-system.mjs",
     "mcp:load-env:win": "powershell -ExecutionPolicy Bypass -File ./tools/load-env-to-system.ps1",
+    "github:sync-token": "powershell -ExecutionPolicy Bypass -File ./tools/sync-github-token.ps1",
     "setup:agents": "node ./tools/agent-helper.mjs",
     "setup:extensions": "node ./tools/cursor-extensions.mjs",
     "setup:cursor": "node ./tools/cursor-settings-gen.mjs",
