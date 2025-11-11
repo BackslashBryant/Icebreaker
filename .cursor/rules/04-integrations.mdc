@@ -18,6 +18,7 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 - **GitHub MCP** (`@modelcontextprotocol/server-github`) – Branch/PR automation, repo search, code examples, issue comments. First stop for anything "git" or GitHub API shaped (except commits - use git CLI for commits).
   - **Note**: Git commits use CLI (GitHub MCP doesn't have commit tool), but branch creation, PRs, and issue updates should use GitHub MCP.
   - **Requires**: `GITHUB_TOKEN` environment variable
+  - **Fallback**: If GitHub MCP or `gh` CLI fails with 401 errors, use PowerShell direct API calls (see `Docs/troubleshooting/github-api-auth.md`). Load token from `.env` file directly and use `Invoke-RestMethod`.
 - **Ref Tools MCP** (`ref-tools-mcp`) – Token-efficient documentation search for APIs, libraries, services. Supports private repos and PDFs. Cite sources in issue-specific research files (`docs/research/Issue-<#>-research.md`).
   - **Requires**: No configuration needed (runs on stdio)
 - **Playwright MCP** (`@playwright/mcp`) – UI screenshots, axe/Lighthouse accessibility/perf checks. Attach outputs to the ticket or artifacts.
@@ -46,7 +47,13 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 
 ## Fallback Protocol
 1. Pause and report the outage (include the MCP name and error).
-2. Suggest an approved fallback (CLI, SDK, manual step) if it stays within scope.
-3. Capture the variance in the plan or Current Issues log so future runs know why the MCP was skipped.
+2. **For GitHub operations**: If 401 authentication error occurs:
+   - **Immediately try PowerShell direct API call** (don't ask user first)
+   - Load token from `.env` file: `$token = (Get-Content .env | Select-String "^GITHUB_TOKEN=" | ForEach-Object { $_.Line.Split('=', 2)[1].Trim('"''') })`
+   - Use `Invoke-RestMethod` with `Bearer` auth header
+   - See `Docs/troubleshooting/github-api-auth.md` for complete pattern
+   - Example script: `tools/create-persona-issues.ps1`
+3. Suggest an approved fallback (CLI, SDK, manual step) if it stays within scope.
+4. Capture the variance in the plan or Current Issues log so future runs know why the MCP was skipped.
 
 Treat MCP usage with the same care as code changes—propose, approve, execute, and document.

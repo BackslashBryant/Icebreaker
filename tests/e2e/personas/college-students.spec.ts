@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { waitForBootSequence, completeOnboarding, setupSession } from "../../utils/test-helpers";
+import { setPersonaGeo, denyGeolocation } from "../../utils/geolocation";
+import locations from "../../fixtures/locations.json";
+import { SEL } from "../../utils/selectors";
+import { TelemetryCollector, checkPanicButtonVisible, checkVisibilityToggleVisible, checkFocusOrder, countErrorBanners } from "../../utils/telemetry";
 
 /**
  * Persona-Based E2E Tests: College Students
@@ -17,7 +21,7 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     // Visibility: true (wants to be found, but cautiously)
   });
 
-  test("completes onboarding with anxious user pattern", async ({ page }) => {
+  test("@smoke completes onboarding with anxious user pattern", async ({ page }) => {
     // Navigate to welcome screen
     await page.goto("/welcome");
     await page.waitForLoadState("networkidle");
@@ -28,33 +32,33 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     await expect(page.getByText("Real world.")).toBeVisible();
     
     // Click PRESS START (Maya may hesitate, but proceeds)
-    await page.getByRole("link", { name: /PRESS START/i }).click();
+    await page.locator(SEL.ctaPressStart).click();
     await expect(page).toHaveURL(/.*\/onboarding/);
 
     // Step 0: What We Are/Not - Maya reads carefully
-    await expect(page.getByText("WHAT IS ICEBREAKER?")).toBeVisible();
-    await page.getByRole("button", { name: /GOT IT/i }).click();
+    await expect(page.locator(SEL.onboardingStep0)).toBeVisible();
+    await page.locator(SEL.onboardingGotIt).click();
 
     // Step 1: 18+ Consent - Maya may pause to read terms
-    await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
+    await expect(page.locator(SEL.onboardingStep1)).toBeVisible();
     const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await consentCheckbox.check();
     await expect(consentCheckbox).toBeChecked();
-    await page.getByRole("button", { name: /CONTINUE/i }).click();
+    await page.locator(SEL.onboardingContinue).click();
 
     // Step 2: Location - Maya likely skips initially (privacy-conscious)
-    await expect(page.getByText("LOCATION ACCESS")).toBeVisible();
-    await page.getByRole("button", { name: /Skip for now/i }).click();
+    await expect(page.locator(SEL.onboardingStep2)).toBeVisible();
+    await page.locator(SEL.onboardingSkipLocation).click();
 
     // Step 3: Vibe & Tags - Maya selects "thinking" vibe + 2-3 tags
-    await expect(page.getByText("YOUR VIBE")).toBeVisible();
+    await expect(page.locator(SEL.onboardingStep3)).toBeVisible();
     
     // Select "thinking" vibe (matches anxious state)
-    await page.getByText(/Thinking out loud/i).click();
+    await page.locator(SEL.vibeThinking).click();
     
     // Select 2-3 tags (not too many, not none)
-    await page.getByText("Quietly Curious").click();
-    await page.getByText("Overthinking Things").click();
+    await page.locator(SEL.tagQuietlyCurious).click();
+    await page.locator(SEL.tagOverthinkingThings).click();
     
     // Maya verifies handle is displayed (anxious user verification)
     await expect(page.getByText(/Your anonymous handle/i)).toBeVisible();
@@ -134,7 +138,10 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
   });
 
-  test("appears on Radar and can toggle visibility", async ({ page }) => {
+  test("appears on Radar and can toggle visibility", async ({ page, context }) => {
+    // Set up telemetry collector
+    const telemetry = new TelemetryCollector('maya', 'maya-session');
+
     // Set up Maya's session
     await setupSession(page, {
       sessionId: "maya-session",
@@ -142,9 +149,41 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
       handle: "QuietThinker42",
     });
 
+    // Set Maya's geolocation to campus library (floor 2)
+    const campusLibrary = locations.venues.find((v) => v.name === "campus-library");
+    if (campusLibrary) {
+      await setPersonaGeo(context, campusLibrary.coordinates);
+    }
+
     await page.goto("/radar");
     // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+
+    // Capture telemetry: check affordances
+    const panicVisible = await checkPanicButtonVisible(page);
+    telemetry.recordAffordance('panicButton', panicVisible);
+
+    // Navigate to Profile to check visibility toggle
+    await page.getByRole("button", { name: /Go to profile/i }).click();
+    await expect(page).toHaveURL(/.*\/profile/);
+    
+    const visibilityVisible = await checkVisibilityToggleVisible(page);
+    telemetry.recordAffordance('visibilityToggle', visibilityVisible);
+
+    // Check focus order
+    const focusOrderCorrect = await checkFocusOrder(page);
+    telemetry.recordFocusOrder(focusOrderCorrect);
+
+    // Check for error banners
+    const errorCount = await countErrorBanners(page);
+    if (errorCount > 0) {
+      for (let i = 0; i < errorCount; i++) {
+        telemetry.recordErrorBanner();
+      }
+    }
+
+    // Write telemetry to file
+    await telemetry.writeToFile();
 
     // Verify Maya appears on Radar
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
@@ -274,14 +313,14 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
     await page.getByRole("button", { name: /Skip for now/i }).click();
 
     // Step 3: Vibe & Tags - Ethan selects "intros" vibe + tech tags
-    await expect(page.getByText("YOUR VIBE")).toBeVisible();
+    await expect(page.locator(SEL.onboardingStep3)).toBeVisible();
     
     // Select "intros" vibe (low-pressure)
-    await page.getByText(/Open to intros/i).click();
+    await page.locator(SEL.vibeIntros).click();
     
     // Select tech-related tags
-    await page.getByText("Tech curious").click();
-    await page.getByText("Quietly Curious").click();
+    await page.locator(SEL.tagTechCurious).click();
+    await page.locator(SEL.tagQuietlyCurious).click();
     
     // Submit form - wait for API call and navigation
     const enterRadarButton = page.getByRole("button", { name: /ENTER RADAR/i });
@@ -295,12 +334,18 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
     await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
   });
 
-  test("appears on Radar and checks for shared tags", async ({ page }) => {
+  test("appears on Radar and checks for shared tags", async ({ page, context }) => {
     await setupSession(page, {
       sessionId: "ethan-session",
       token: "ethan-token",
       handle: "ChillFriend28",
     });
+
+    // Set Ethan's geolocation to campus coffee shop
+    const coffeeShop = locations.venues.find((v) => v.name === "campus-coffee-shop");
+    if (coffeeShop) {
+      await setPersonaGeo(context, coffeeShop.coordinates);
+    }
 
     await page.goto("/radar");
     // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)

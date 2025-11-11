@@ -1,0 +1,30 @@
+{
+  "venue": "coworking-downtown",
+  "personas": [
+    {
+      "sessionId": "marcus-session",
+      "handle": "BuilderBrain99",
+      "vibe": "intros",
+      "tags": ["Builder brain", "Tech curious"],
+      "visible": true,
+      "geo": {
+        "lat": 37.7749,
+        "lon": -122.4194,
+        "floor": 3
+      }
+    },
+    {
+      "sessionId": "ethan-session",
+      "handle": "ChillFriend28",
+      "vibe": "intros",
+      "tags": ["Tech curious", "Quietly Curious"],
+      "visible": true,
+      "geo": {
+        "lat": 37.7749,
+        "lon": -122.4194,
+        "floor": 2
+      }
+    }
+  ]
+}
+

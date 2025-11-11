@@ -8,6 +8,14 @@ alwaysApply: false
 
 **Format**: Keep entries to 2-3 sentences max. Include: trigger, lesson, rule update. No verbose sections. **Date format**: Always use the current system date in YYYY-MM-DD format when creating new entries. Never use placeholder dates like "2025-01-XX" or future dates. Check system date before adding entries.
 
+## 2025-11-11: GitHub Issue Number Sync
+
+**Trigger**: Issue #11 conflict - main planning issue existed in docs but was never created on GitHub, causing Phase 2 backlog items to get wrong numbers. **Lesson**: Always verify GitHub issue numbers before creating, sync docs immediately after creation, check for conflicts when creating multiple issues. **Rule**: Added mandatory pre-creation verification step in `.cursor/rules/01-workflow.mdc`, created `tools/verify-github-issue.mjs` safeguard script, updated `tools/github-issue.mjs` with pre-check.
+
+## 2025-11-11: GitHub API Authentication Fallback
+
+**Trigger**: GitHub API 401 errors when creating issues via Node.js scripts or `gh` CLI despite token being set. **Lesson**: PowerShell direct API calls reading token from `.env` file are most reliable on Windows - bypass Node.js env var issues and CLI keyring conflicts. **Rule**: Always try PowerShell `Invoke-RestMethod` with token parsed from `.env` as fallback when GitHub operations fail. See `Docs/troubleshooting/github-api-auth.md`.
+
 ## 2025-11-10: Missing Dependency Import Crash
 
 **Trigger**: Backend crashed on startup because `@sentry/node` was imported but not installed. **Lesson**: Never use static imports for optional dependencies - use dynamic `import()` with try-catch. **Rule**: Added dependency check to preflight, use dynamic imports for optional packages.

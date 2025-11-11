@@ -1,0 +1,30 @@
+{
+  "venue": "chat-performance-test",
+  "personas": [
+    {
+      "sessionId": "requester-session",
+      "handle": "RequesterUser",
+      "vibe": "banter",
+      "tags": ["Tech curious"],
+      "visible": true,
+      "geo": {
+        "lat": 37.7749,
+        "lon": -122.4194,
+        "floor": 1
+      }
+    },
+    {
+      "sessionId": "accepter-session",
+      "handle": "AccepterUser",
+      "vibe": "intros",
+      "tags": ["Builder brain"],
+      "visible": true,
+      "geo": {
+        "lat": 37.7750,
+        "lon": -122.4195,
+        "floor": 1
+      }
+    }
+  ]
+}
+

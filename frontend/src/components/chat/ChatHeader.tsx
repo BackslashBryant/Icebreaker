@@ -120,6 +120,7 @@ export function ChatHeader({
             size="icon"
             className="shrink-0"
             aria-label="End chat"
+            data-testid="chat-end"
           >
             <X className="h-4 w-4" />
           </Button>

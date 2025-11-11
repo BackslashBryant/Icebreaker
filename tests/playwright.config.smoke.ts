@@ -1,0 +1,89 @@
+import { defineConfig, devices } from '@playwright/test';
+
+/**
+ * Smoke Test Configuration
+ * 
+ * Fast subset of tests for quick feedback on every push.
+ * Includes:
+ * - 1 test per persona group (college-students, professionals, etc.)
+ * - Visual tests for Welcome + Radar (mobile viewport only)
+ * - Basic WebSocket mock smoke test
+ * 
+ * Runs in ~2-3 minutes vs. full suite which takes 10+ minutes.
+ */
+
+export default defineConfig({
+  testDir: './e2e',
+  // Smoke tests run faster - can use parallel execution
+  fullyParallel: true,
+  workers: 2, // Allow 2 workers for smoke tests
+  timeout: 30000, // 30s timeout (shorter for smoke tests)
+  maxFailures: 3, // Allow a few failures before stopping
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 1 : 0, // Single retry in CI
+  
+  // Only run tests tagged with @smoke
+  grep: /@smoke/,
+  
+  // Same reporters as full config
+  reporter: [
+    ['line'],
+    ['json', { outputFile: '../artifacts/playwright-report-smoke.json' }],
+    ['html', { 
+      outputFolder: '../artifacts/playwright-report-smoke',
+      open: 'never'
+    }],
+  ],
+  
+  // Same output directory
+  outputDir: '../artifacts/test-results-smoke',
+  
+  use: {
+    baseURL: process.env.FRONTEND_URL || 'http://localhost:3000',
+    trace: 'on-first-retry',
+    actionTimeout: 10000,
+    navigationTimeout: 30000,
+  },
+  
+  // Web servers - same as full config
+  webServer: process.env.SKIP_WEB_SERVER ? undefined : [
+    {
+      command: 'npm run dev:e2e',
+      cwd: '../backend',
+      url: 'http://localhost:8000/api/health',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120000,
+      stdout: process.env.DEBUG ? 'pipe' : 'ignore',
+      stderr: process.env.DEBUG ? 'pipe' : 'ignore',
+      env: {
+        NODE_ENV: 'test',
+        PORT: '8000',
+        ALLOW_SERVER_START: 'true',
+        NODE_OPTIONS: '--no-warnings --no-deprecation',
+      },
+    },
+    {
+      command: 'npm run dev',
+      cwd: '../frontend',
+      url: 'http://localhost:3000',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120000,
+      stdout: process.env.DEBUG ? 'pipe' : 'ignore',
+      stderr: process.env.DEBUG ? 'pipe' : 'ignore',
+      env: {
+        NODE_ENV: 'test',
+        VITE_API_URL: 'http://localhost:8000',
+        NODE_OPTIONS: '--no-warnings --no-deprecation',
+      },
+    },
+  ],
+  
+  // Only Chromium for smoke tests (fastest)
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
+});
+

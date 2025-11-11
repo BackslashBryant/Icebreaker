@@ -3,6 +3,18 @@ name: Guardrails CI
 on:
   pull_request:
     branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+  schedule:
+    # Run full test suite nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      run_full_suite:
+        description: 'Run full test suite (not just smoke)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   checks:
@@ -19,8 +31,6 @@ jobs:
         run: npm run guard:type
       - name: Guard Tests
         run: npm test
-      - name: Persona smoke test
-        run: npm run test:personas
       - name: Connection Guide check
         run: |
           git fetch --no-tags --depth=1 origin ${{ github.base_ref }}
@@ -33,6 +43,102 @@ jobs:
           else
             echo "No CI/env changes detected; skipping ConnectionGuide check."
           fi
+
+  persona-smoke:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_full_suite == 'false')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install root dependencies
+        run: npm ci || npm install
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci || npm install
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci || npm install
+      - name: Install E2E test dependencies
+        working-directory: ./tests
+        run: npm ci || npm install
+      - name: Install Playwright browsers
+        working-directory: ./tests
+        run: npx playwright install --with-deps chromium
+      - name: Run smoke tests
+        working-directory: ./tests
+        run: npm run test:smoke
+      - name: Publish smoke test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-report
+          path: |
+            artifacts/playwright-report-smoke/
+            artifacts/test-results-smoke/
+          retention-days: 7
+      - name: Generate telemetry summary
+        if: always()
+        working-directory: .
+        run: node tools/summarize-persona-runs.mjs
+      - name: Publish telemetry summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: telemetry-summary
+          path: |
+            docs/testing/persona-feedback.md
+            artifacts/persona-runs/
+          retention-days: 30
+
+  persona-full:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_full_suite == 'true')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install root dependencies
+        run: npm ci || npm install
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci || npm install
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci || npm install
+      - name: Install E2E test dependencies
+        working-directory: ./tests
+        run: npm ci || npm install
+      - name: Install Playwright browsers
+        working-directory: ./tests
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Run full persona test suite
+        working-directory: ./tests
+        run: npm test
+      - name: Publish full test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-test-report
+          path: |
+            artifacts/playwright-report/
+            artifacts/test-results/
+          retention-days: 30
+      - name: Generate telemetry summary
+        if: always()
+        working-directory: .
+        run: node tools/summarize-persona-runs.mjs
+      - name: Publish telemetry summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: telemetry-summary-full
+          path: |
+            docs/testing/persona-feedback.md
+            artifacts/persona-runs/
+          retention-days: 30
 
   health-mvp:
     runs-on: ubuntu-latest

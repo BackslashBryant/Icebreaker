@@ -28,6 +28,7 @@ export function VibeStep({ selectedVibe, onVibeSelect }: VibeStepProps) {
             onClick={() => onVibeSelect(vibe.id)}
             aria-pressed={selectedVibe === vibe.id}
             aria-label={`${vibe.label}${selectedVibe === vibe.id ? " (selected)" : ""}`}
+            data-testid={`vibe-${vibe.id}`}
             className={`w-full p-3 sm:p-4 rounded-xl border-2 transition-all text-left font-mono text-sm sm:text-base ${
               selectedVibe === vibe.id
                 ? "border-accent bg-accent/10 text-accent"

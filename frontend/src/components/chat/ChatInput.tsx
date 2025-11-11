@@ -60,6 +60,7 @@ export function ChatInput({
         className="flex-1 font-mono text-sm bg-background text-foreground border border-accent rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Message input"
         aria-describedby="input-help"
+        data-testid="chat-input"
       />
       <Button
         onClick={handleSend}
@@ -67,6 +68,7 @@ export function ChatInput({
         size="icon"
         className="shrink-0"
         aria-label="Send message"
+        data-testid="chat-send"
       >
         <Send className="h-4 w-4" />
       </Button>

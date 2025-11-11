@@ -62,6 +62,7 @@ export function LocationStep({ onEnable, onSkip }: LocationStepProps) {
           onClick={onSkip}
           variant="ghost"
           className="w-full rounded-2xl text-muted-foreground hover:text-foreground font-mono border-2 border-transparent hover:border-muted text-sm"
+          data-testid="onboarding-skip-location"
         >
           Skip for now
         </Button>

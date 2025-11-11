@@ -101,7 +101,7 @@ export default function Onboarding() {
         </div>
 
         {step === 0 && (
-          <div className="space-y-6 sm:space-y-8">
+          <div className="space-y-6 sm:space-y-8" data-testid="onboarding-step-0">
             <div className="space-y-4">
               <div className="ascii-divider text-center mb-4">▼ ▼ ▼</div>
               <h2 className="text-xl sm:text-2xl font-bold text-accent font-mono glow-accent">WHAT IS ICEBREAKER?</h2>
@@ -143,6 +143,7 @@ export default function Onboarding() {
             <Button
               onClick={() => setStep(1)}
               className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-background font-mono h-11 sm:h-12 text-sm retro-button border-2 border-accent"
+              data-testid="onboarding-got-it"
             >
               GOT IT →
             </Button>
@@ -150,22 +151,26 @@ export default function Onboarding() {
         )}
 
         {step === 1 && (
-          <ConsentStep
-            consent={consent}
-            onConsentChange={setConsent}
-            onContinue={() => setStep(2)}
-          />
+          <div data-testid="onboarding-step-1">
+            <ConsentStep
+              consent={consent}
+              onConsentChange={setConsent}
+              onContinue={() => setStep(2)}
+            />
+          </div>
         )}
 
         {step === 2 && (
-          <LocationStep
-            onEnable={handleLocationEnable}
-            onSkip={handleLocationSkip}
-          />
+          <div data-testid="onboarding-step-2">
+            <LocationStep
+              onEnable={handleLocationEnable}
+              onSkip={handleLocationSkip}
+            />
+          </div>
         )}
 
         {step === 3 && (
-          <div className="space-y-6 sm:space-y-8">
+          <div className="space-y-6 sm:space-y-8" data-testid="onboarding-step-3">
             <VibeStep
               selectedVibe={selectedVibe}
               onVibeSelect={setSelectedVibe}
@@ -186,6 +191,7 @@ export default function Onboarding() {
               onClick={handleSubmit}
               disabled={!selectedVibe || loading}
               className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-background font-mono h-11 sm:h-12 text-sm retro-button border-2 border-accent disabled:opacity-50"
+              data-testid="onboarding-enter-radar"
             >
               {loading ? "CREATING SESSION..." : "ENTER RADAR →"}
             </Button>
@@ -198,6 +204,7 @@ export default function Onboarding() {
             onClick={() => setStep(step - 1)}
             variant="ghost"
             className="w-full text-muted-foreground hover:text-foreground font-mono border-2 border-transparent hover:border-muted rounded-2xl text-sm"
+            data-testid="onboarding-back"
           >
             ← BACK
           </Button>

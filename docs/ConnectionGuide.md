@@ -134,11 +134,27 @@ Track every port, endpoint, credential reference, and integration touchpoint her
   - `VITE_SENTRY_DSN` - Frontend Sentry DSN
   - `SENTRY_ENABLE_DEV` - Enable Sentry in development (default: false)
   - `VITE_SENTRY_ENABLE_DEV` - Enable Sentry in frontend development (default: false)
+- **Dashboard Access**:
+  - **Sentry Dashboard**: https://sentry.io/ (login required)
+  - **Projects**: Create separate projects for frontend and backend (free tier allows multiple projects)
+  - **Issues Dashboard**: View errors, stack traces, and error trends
+  - **Performance Dashboard**: View performance metrics, latency, throughput
+  - **Releases Dashboard**: Track deployments and release health
+- **Setup Steps** (Manual - Issue #22 Step 1):
+  1. Create Sentry account at https://sentry.io/signup/ (free tier)
+  2. Create project for "Icebreaker Frontend" (React)
+  3. Create project for "Icebreaker Backend" (Node.js)
+  4. Copy DSNs from project settings
+  5. Add DSNs to `.env` file (not committed):
+     - `SENTRY_DSN=<backend-dsn>`
+     - `VITE_SENTRY_DSN=<frontend-dsn>`
+  6. Test error capture by triggering intentional errors
 - **Notes**: 
   - Only initializes if DSN is provided (graceful degradation)
   - Development errors filtered unless `SENTRY_ENABLE_DEV=true`
   - Performance monitoring: 10% sample rate in production, 100% in dev
   - Session replay: Masked for privacy (all text/media blocked)
+  - Package: `@sentry/node` installed in backend (Issue #22 Step 1)
 - **Owner**: @Nexus 🚀
 
 ## 7. MCP Servers (Model Context Protocol)

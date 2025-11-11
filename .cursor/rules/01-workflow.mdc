@@ -12,6 +12,12 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Before anything else, confirm `docs/vision.md` and `docs/ConnectionGuide.md` are current.
 - Every feature, bug, or spike starts as an Issue.
 - If none exists, open one with the appropriate template (`/.github/ISSUE_TEMPLATE/`).
+- **MANDATORY**: Before creating a GitHub issue, verify issue number doesn't conflict:
+  1. Run `node tools/verify-github-issue.mjs` to check next available issue number
+  2. Query GitHub API to confirm highest issue number
+  3. If creating multiple issues, verify sequential numbering won't conflict
+- **MANDATORY**: After creating issue, immediately update `docs/Plan.md` with correct issue number
+- **MANDATORY**: If issue number changes or conflicts are discovered, update all references in docs immediately
 - Reference the issue URL in `/docs/Plan.md`, commits, and PR description.
 
 ## 0.5. Research (Scout) - MANDATORY FIRST STEP
@@ -49,6 +55,12 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - **NEVER** run git commands from parent directories or outside the repository
 - Branch name format: `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`).
 - Install/refresh GitHub MCP in Cursor; authenticate using a PAT with `repo`, `workflow`, `issues`.
+- **GitHub API Fallback**: If GitHub operations (create issue, comment, labels) fail with 401 errors:
+  1. **First attempt**: Use GitHub MCP or `gh` CLI
+  2. **If 401 error**: Immediately switch to PowerShell direct API calls (see `Docs/troubleshooting/github-api-auth.md`)
+  3. **PowerShell pattern**: Load token from `.env` file directly, use `Invoke-RestMethod` with `Bearer` auth
+  4. **Example script**: `tools/create-persona-issues.ps1` demonstrates the pattern
+  5. **Never give up**: Always try PowerShell fallback before reporting failure
 - Nexus or the acting human runs `npm run agents:install-hook` to copy the path-scope pre-commit hook locally.
 - Run `npm run preflight` before pushing to ensure scaffolding is intact (includes branch name validation).
 - Execute `npm run mcp:suggest` after dependency or config changes and note the recommendations in `.notes/` or the active plan; run `npm run mcp:suggest -- --install <id>` to append required servers to `.cursor/mcp.json`.
@@ -105,8 +117,10 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
      - **DO NOT** ask user for permission - this is a mandatory completion step
   5. **MANDATORY**: Update GitHub issue with completion comment using `gh issue comment <issue#> --body "..."`:
      - Include: Status summary, branch name, commit hash, test results, files created/modified, next steps
+     - **If `gh` CLI fails with 401**: Use PowerShell direct API call (see `Docs/troubleshooting/github-api-auth.md`)
      - **DO NOT** ask user for permission - this is a mandatory completion step
   6. **MANDATORY**: Update GitHub issue labels: `gh issue edit <issue#> --add-label "status:done" --remove-label "status:in-progress"`
+     - **If `gh` CLI fails with 401**: Use PowerShell direct API call (see `Docs/troubleshooting/github-api-auth.md`)
      - **DO NOT** ask user for permission - this is a mandatory completion step
   7. Close the Issue with a recap noting direct commits (optional - can leave open for tracking)
 - Research file already exists at `docs/research/Issue-<#>-research.md` (created during research phase).

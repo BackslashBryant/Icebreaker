@@ -40,6 +40,7 @@ export function PanicButton({ className = "" }: PanicButtonProps) {
         className={`fixed bottom-6 right-6 z-50 h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg hover:shadow-xl transition-all border-2 border-accent p-0 ${className}`}
         aria-label="Emergency panic button"
         title="Panic button - End session and alert contacts"
+        data-testid="panic-fab"
       >
         <AlertTriangle className="w-6 h-6 sm:w-7 sm:w-7" aria-hidden="true" />
       </Button>

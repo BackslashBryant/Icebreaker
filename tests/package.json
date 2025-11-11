@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env FORCE_COLOR=0 playwright test"
+    "test": "cross-env FORCE_COLOR=0 playwright test",
+    "test:smoke": "cross-env FORCE_COLOR=0 playwright test --config=playwright.config.smoke.ts"
   },
   "keywords": [],
   "author": "",

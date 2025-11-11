@@ -46,7 +46,7 @@ export function VisibilityToggle() {
   };
 
   return (
-    <div className="p-3 sm:p-4 border-2 border-accent/30 rounded-xl bg-card">
+    <div className="p-3 sm:p-4 border-2 border-accent/30 rounded-xl bg-card" data-testid="visibility-toggle">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           {visibility ? (
@@ -67,6 +67,7 @@ export function VisibilityToggle() {
           disabled={isUpdating || loading}
           className="shrink-0"
           aria-label={visibility ? "Hide from Radar" : "Show on Radar"}
+          data-testid="visibility-toggle-checkbox"
         />
       </div>
     </div>

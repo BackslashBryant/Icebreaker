@@ -5,7 +5,7 @@ _Previous feature: **Integration Testing & Launch Preparation** (Issue #6) ✅ *
 _Previous feature: **UX Review Fixes + Bootup Random Messages** (Issue #9) ✅ **COMPLETE**_
 
 **Git Status**: All feature branches pushed to GitHub:
-- ✅ `origin/agent/link/7-profile-settings` (Issue #7)
+- ✅ `origin/agent/link/7-profile-settings` (Issue #19 - Profile/Settings, retroactively created)
 - ✅ `origin/feat/3-chat` (Issue #3)
 - ✅ `origin/feat/5-panic-button` (Issue #5)
 - ✅ `origin/feat/6-block-report` (Issue #6)
@@ -709,22 +709,1390 @@ _Previous feature: **UX Review Fixes + Bootup Random Messages** (Issue #9) ✅ *
 
 ---
 
+## Issue #18: Persona-Simulated User Testing with Look-and-Feel Validation
+
+**Status**: 📋 **PLANNING** - Awaiting team review  
+**Research Status**: ✅ **COMPLETE** - Research file: `docs/research/Issue-11-research.md`  
+**Team Review**: ✅ **APPROVED** - Approval file: `.notes/features/persona-sim-testing/team-review-approved.md`
+
+**Team review complete - approved for implementation.**
+
+### Goals
+- **GitHub Issue**: #18
+- **Target**: Transform existing E2E persona tests into realistic, simulated multi-user testing with look-and-feel validation
+- **Problem**: Current tests require real backend, can't simulate multi-user scenarios, lack visual regression, and don't capture UX telemetry
+- **Desired Outcome**: 
+  - Deterministic multi-user simulation without live backend
+  - Visual regression testing for key screens across viewports
+  - UX telemetry capture and automatic feedback summaries
+  - Stable selectors via data-testid to reduce flakiness
+  - Geolocation realism per persona and scenario
+- **Success Metrics**:
+  - WebSocket mock enables multi-user tests without backend
+  - Visual snapshots captured for all key screens (Welcome, Onboarding, Radar, Chat, Panic)
+  - Telemetry captured per persona run and aggregated
+  - All critical UI elements have data-testid attributes
+  - Multi-user scenarios test mutual visibility, signal scoring, chat blocking
+  - Tests run faster and more reliably
+
+### Out-of-scope
+- Real backend integration (mocked for deterministic testing)
+- Mobile device testing (emulation only)
+- Performance profiling (basic telemetry only)
+- Cross-browser visual regression (Chromium first, expand later)
+
+### Steps (7)
+
+#### Step 1: WebSocket Mock Infrastructure
+**Owner**: @Forge 🔗 + @Pixel 🖥️  
+**Intent**: Create WebSocket mock and runtime shim to enable multi-user simulation without real backend
+
+**File Targets**:
+- `tests/mocks/websocket-mock.ts` (create - WebSocket mock class)
+- `frontend/src/lib/websocket-client.ts` (update - add mock shim)
+- `tests/e2e/fixtures/ws-mock.setup.ts` (create - Playwright fixture)
+- `tests/fixtures/persona-presence/campus-library.json` (create - example presence script)
+- `tests/fixtures/persona-presence/schema.d.ts` (create - TypeScript types)
+
+**Required Tools**:
+- Playwright
+- TypeScript
+- Existing WebSocket message types
+
+**Acceptance Tests**:
+- [ ] `WsMock` class implements WebSocket-like interface
+- [ ] Mock handles `connect`, `disconnect`, `setVisibility`, `updateGeo` methods
+- [ ] Mock broadcasts presence updates to all connected sessions
+- [ ] Runtime shim checks `PLAYWRIGHT_WS_MOCK=1` environment variable
+- [ ] When mock enabled, app uses mock instead of real WebSocket
+- [ ] Presence script JSON validates against schema
+- [ ] Playwright fixture injects mock before app loads
+
+**Done Criteria**:
+- WebSocket mock class created and tested
+- Runtime shim integrated into frontend
+- Playwright fixture sets up mock correctly
+- At least one presence script created (campus-library scenario)
+- Mock can simulate multiple personas simultaneously
+
+**Rollback**: Remove shim code, fall back to real backend (tests will be slower but functional)
+
+---
+
+#### Step 2: Geolocation Helpers & Location Fixtures
+**Owner**: @Pixel 🖥️  
+**Intent**: Create geolocation helpers and location fixtures for realistic proximity testing
+
+**File Targets**:
+- `tests/utils/geolocation.ts` (create - geolocation helper functions)
+- `tests/fixtures/locations.json` (create - venue coordinates)
+- `tests/e2e/personas/college-students.spec.ts` (update - use geolocation helpers)
+
+**Required Tools**:
+- Playwright geolocation API
+- Existing persona scenarios
+
+**Acceptance Tests**:
+- [ ] `setPersonaGeo(context, geo)` helper grants permission and sets coordinates
+- [ ] `locations.json` contains coordinates for all venues (campus-library, coworking-downtown, gallery-opening)
+- [ ] Helper supports floor numbers for multi-floor buildings
+- [ ] Permission denial flow tested
+- [ ] Boundary testing helpers work (just inside/outside radius)
+
+**Done Criteria**:
+- Geolocation helper functions created
+- Location fixtures include all persona venues
+- At least one persona test uses geolocation helpers
+- Permission flows tested
+
+**Rollback**: Use fixed coordinates per test if fixtures prove complex
+
+---
+
+#### Step 3: Multi-User Test Scenarios
+**Owner**: @Pixel 🖥️  
+**Intent**: Create multi-user test scenarios that validate mutual visibility, signal scoring, and chat blocking
+
+**File Targets**:
+- `tests/utils/multi-persona.ts` (create - multi-user test helpers)
+- `tests/e2e/personas/multi-user.spec.ts` (create - multi-user scenarios)
+- `tests/fixtures/persona-presence/coworking-downtown.json` (create - Marcus + Ethan scenario)
+- `tests/fixtures/persona-presence/gallery-opening.json` (create - Casey + Alex scenario)
+
+**Required Tools**:
+- WebSocket mock (Step 1)
+- Geolocation helpers (Step 2)
+- Playwright multi-context API
+
+**Acceptance Tests**:
+- [ ] Maya + Zoe appear on each other's Radar (shared tag compatibility)
+- [ ] Shared tags boost signal scores (Maya + Zoe both have "Overthinking Things")
+- [ ] Visibility toggle hides one persona from the other in real time
+- [ ] One-chat-at-a-time enforcement blocks second chat start
+- [ ] Reconnect/disconnect scenarios work (transient WS drop and recovery)
+- [ ] Stale presence cleanup works correctly
+
+**Done Criteria**:
+- Multi-user test helpers created
+- At least 3 multi-user scenarios tested (Maya+Zoe, Ethan+Marcus, Casey+Alex)
+- Mutual visibility verified
+- Signal scoring verified
+- Chat blocking verified
+
+**Rollback**: Test personas individually if multi-user setup proves complex
+
+---
+
+#### Step 4: data-testid Attributes & Selector Centralization
+**Owner**: @Link 🌐 + @Pixel 🖥️  
+**Intent**: Add data-testid attributes to critical UI elements and centralize selectors
+
+**File Targets**:
+- `frontend/src/pages/Welcome.tsx` (update - add data-testid)
+- `frontend/src/pages/Onboarding.tsx` (update - add data-testid)
+- `frontend/src/pages/Radar.tsx` (update - add data-testid)
+- `frontend/src/pages/Chat.tsx` (update - add data-testid)
+- `frontend/src/components/PanicButton.tsx` (update - add data-testid)
+- `tests/utils/selectors.ts` (create - centralized selector map)
+- `tests/e2e/personas/college-students.spec.ts` (update - use centralized selectors)
+
+**Required Tools**:
+- React components
+- Playwright selectors
+
+**Acceptance Tests**:
+- [ ] Welcome CTA has `data-testid="cta-press-start"`
+- [ ] All onboarding steps have `data-testid="onboarding-step-{n}"`
+- [ ] All vibe options have `data-testid="vibe-{name}"`
+- [ ] All tag chips have `data-testid="tag-{name}"`
+- [ ] Panic button has `data-testid="panic-fab"`
+- [ ] Visibility toggle has `data-testid="visibility-toggle"`
+- [ ] Chat controls have `data-testid="chat-{action}"`
+- [ ] Centralized selector map exports `SEL` object
+- [ ] At least one test file uses centralized selectors
+
+**Done Criteria**:
+- All critical UI elements have data-testid attributes
+- Centralized selector map created
+- At least one test file updated to use centralized selectors
+- Selector naming convention documented
+
+**Rollback**: Keep text-based selectors if adding data-testid proves disruptive
+
+---
+
+#### Step 5: Visual Regression Testing
+**Owner**: @Pixel 🖥️  
+**Intent**: Add Playwright screenshot tests for key screens across viewports
+
+**File Targets**:
+- `tests/e2e/visual/welcome.spec.ts` (create - Welcome screen visual tests)
+- `tests/e2e/visual/onboarding.spec.ts` (create - Onboarding steps visual tests)
+- `tests/e2e/visual/radar.spec.ts` (create - Radar visual tests)
+- `tests/e2e/visual/chat.spec.ts` (create - Chat visual tests)
+- `tests/utils/viewports.ts` (create - viewport matrix helper)
+
+**Required Tools**:
+- Playwright screenshot API
+- Existing persona test setup
+
+**Acceptance Tests**:
+- [ ] Welcome screen captured for mobile (375x812), tablet (768x1024), desktop (1440x900)
+- [ ] Each onboarding step captured across viewports
+- [ ] Radar empty state captured
+- [ ] Radar with users captured (multiple personas visible)
+- [ ] Chat active state captured
+- [ ] Chat ending state captured
+- [ ] Panic prompt captured
+- [ ] Screenshots stored in `artifacts/visual/<persona>/<screen>-<viewport>.png`
+- [ ] Dynamic content masked (handles, timestamps)
+
+**Done Criteria**:
+- Visual tests created for Welcome, Onboarding, Radar, Chat, Panic
+- Viewport matrix helper created
+- Screenshots captured for all key screens
+- Dynamic content masked appropriately
+- Baseline screenshots stored
+
+**Rollback**: Skip visual regression if flaky, focus on functional tests
+
+---
+
+#### Step 6: UX Telemetry Capture & Aggregation
+**Owner**: @Pixel 🖥️  
+**Intent**: Instrument tests to capture UX metrics and create aggregation script
+
+**File Targets**:
+- `tests/utils/telemetry.ts` (create - telemetry capture functions)
+- `tests/utils/test-helpers.ts` (update - instrument with telemetry)
+- `tools/summarize-persona-runs.mjs` (create - aggregation script)
+- `docs/testing/persona-feedback.md` (create - auto-generated feedback)
+
+**Required Tools**:
+- Playwright performance API
+- Node.js file system APIs
+
+**Acceptance Tests**:
+- [ ] Time-to-boot captured (Welcome screen load)
+- [ ] Time-to-complete-onboarding captured (all steps)
+- [ ] Steps retried captured (back button usage)
+- [ ] Error banners encountered captured
+- [ ] UI focus order correctness captured
+- [ ] Visible affordances captured (panic button, visibility toggle)
+- [ ] Per-run JSON written to `artifacts/persona-runs/<persona>-<timestamp>.json`
+- [ ] Aggregation script summarizes trends
+- [ ] Top 5 friction patterns identified
+
+**Done Criteria**:
+- Telemetry capture functions created
+- Test helpers instrumented with telemetry
+- Aggregation script created
+- At least one persona run captures telemetry
+- Feedback summary generated
+
+**Rollback**: Skip telemetry initially, add incrementally
+
+---
+
+#### Step 7: CI Integration & Test Splitting
+**Owner**: @Nexus 🚀 + @Pixel 🖥️  
+**Intent**: Split smoke vs. full test suites and integrate into CI
+
+**File Targets**:
+- `tests/playwright.config.smoke.ts` (create - smoke test config)
+- `.github/workflows/ci.yml` (update - add smoke/full split)
+- `tests/e2e/personas/college-students.spec.ts` (update - tag smoke tests)
+
+**Required Tools**:
+- Playwright config
+- GitHub Actions
+
+**Acceptance Tests**:
+- [ ] Smoke suite runs 1 test per persona group
+- [ ] Smoke suite includes visual tests for Welcome + Radar
+- [ ] Full suite runs all personas + WS-mock + visual matrix + a11y
+- [ ] Smoke runs on every push (fast feedback)
+- [ ] Full runs nightly or on demand
+- [ ] HTML report published
+- [ ] Screenshots/videos published
+- [ ] Telemetry summary published
+
+**Done Criteria**:
+- Smoke test config created
+- CI workflow updated with smoke/full split
+- Smoke tests tagged appropriately
+- Reports published correctly
+
+**Rollback**: Run all tests together if splitting proves complex
+
+---
+
+### Team Review Required
+
+**CRITICAL CHECKPOINT**: This plan must be reviewed by all agents before implementation begins.
+
+**Review Checklist**:
+- [ ] @Forge 🔗: Review WebSocket mock approach and runtime shim
+- [ ] @Link 🌐: Review data-testid placement and selector strategy
+- [ ] @Pixel 🖥️: Review test structure and visual regression approach
+- [ ] @Nexus 🚀: Review CI integration and test splitting
+- [ ] @Scout 🔎: Verify research findings align with plan
+- [ ] @Vector 🎯: Confirm plan completeness and checkpoint structure
+
+**After Team Review**:
+- Create `.notes/features/persona-sim-testing/team-review-approved.md`
+- Update `docs/Plan.md` to include "Team review complete - approved for implementation"
+- Proceed to implementation phase
+
+**Do not continue past Step 1 without team review approval.**
+
+**✅ Team review complete - approved for implementation. Proceed to Step 1.**
+
+---
+
+## Issue #20: Performance Verification & Benchmarking
+
+**Status**: ✅ **APPROVED** - Team review complete, ready for implementation  
+**Research Status**: ✅ **COMPLETE** - Research file: `docs/research/Issue-20-research.md`  
+**Team Review**: ✅ **APPROVED** - Approval file: `.notes/features/performance-verification/team-review-approved.md`
+
+**Team review complete - approved for implementation.**
+
+### Goals
+- **GitHub Issue**: #20
+- **Target**: Comprehensive performance verification and benchmarking for production readiness
+- **Problem**: Chat start performance (< 500ms) is not tested. Existing Radar performance tests exist but need regression verification. Performance targets from vision.md must be verified before launch.
+- **Desired Outcome**: 
+  - Chat start latency < 500ms verified (button click → chat active)
+  - All existing performance targets re-verified (regression check)
+  - Performance results documented and compared to vision.md targets
+  - Performance budget enforced in CI (optional)
+- **Success Metrics**:
+  - Chat start performance test passes (< 500ms)
+  - Radar performance tests still pass (regression check)
+  - WebSocket connection tests still pass (regression check)
+  - Performance results documented
+  - CI fails if performance targets not met (optional)
+- **Research Status**: ✅ **COMPLETE** - Research file: `docs/research/Issue-20-research.md`
+
+### Out-of-scope
+- Performance optimization (verification only, optimization is separate work)
+- Network throttling comprehensive tests (deferred to post-MVP)
+- Mobile device performance testing (deferred to manual QA for MVP)
+- Core Web Vitals measurement (LCP, INP, CLS) - not needed for chat latency
+- Load/stress testing (deferred to post-launch)
+
+### Steps (4)
+
+#### Step 1: Chat Start Performance Test Implementation
+**Owner**: @Pixel 🖥️  
+**Intent**: Create chat start performance test measuring button click → chat active state (< 500ms)
+
+**File Targets**:
+- `tests/e2e/performance.spec.ts` (update - add chat start performance test)
+- `tests/fixtures/persona-presence/chat-performance.json` (create - 2-persona presence script for chat testing)
+
+**Required Tools**:
+- Playwright
+- WebSocket mock infrastructure (`tests/mocks/websocket-mock.ts`)
+- Multi-persona test helpers (`tests/utils/multi-persona.ts`)
+
+**Acceptance Tests**:
+- [ ] Chat start performance test added to `performance.spec.ts`
+- [ ] Test uses WebSocket mock with 2 personas (requester + accepter)
+- [ ] Test measures: Button click → `chatState === "active"` visible in UI
+- [ ] Test asserts: Total latency < 500ms
+- [ ] Test uses existing performance test pattern (`Date.now()` timing)
+- [ ] Test passes consistently (no flakiness)
+- [ ] Presence script created for chat performance testing (2 personas)
+
+**Done Criteria**:
+- Chat start performance test implemented and passing
+- Test measures end-to-end latency accurately
+- Test uses WebSocket mock for deterministic results
+- Performance target (< 500ms) verified
+
+**Rollback**: If WebSocket mock doesn't support chat flow accurately, use real backend with controlled test data. If test proves flaky, document manual performance testing approach.
+
+---
+
+#### Step 2: Performance Regression Verification
+**Owner**: @Pixel 🖥️  
+**Intent**: Re-run existing performance tests to verify no regressions, document results
+
+**File Targets**:
+- `tests/e2e/performance.spec.ts` (verify - all existing tests still pass)
+- `.notes/features/performance-verification/performance.md` (create - performance results documentation)
+
+**Required Tools**:
+- Playwright
+- Existing performance test suite
+
+**Acceptance Tests**:
+- [ ] Radar view load test still passes (< 2s)
+- [ ] WebSocket connection test still passes (< 500ms)
+- [ ] Radar updates test still passes (< 1s)
+- [ ] Signal Engine calculation test still passes (< 100ms for 100 sessions)
+- [ ] All performance tests run successfully
+- [ ] Performance results documented in `.notes/features/performance-verification/performance.md`
+- [ ] Results compared to vision.md targets
+
+**Done Criteria**:
+- All existing performance tests pass (no regressions)
+- Performance results documented
+- Results match or exceed vision.md targets
+
+**Rollback**: If performance regressions found, document bottlenecks and create follow-up optimization tasks. Do not block launch for minor regressions (< 10% degradation).
+
+---
+
+#### Step 3: Performance Documentation & Summary
+**Owner**: @Muse 🎨  
+**Intent**: Document performance verification results, create performance summary, update CHANGELOG
+
+**File Targets**:
+- `.notes/features/performance-verification/performance.md` (update - finalize documentation)
+- `CHANGELOG.md` (update - add performance verification entry)
+- `docs/vision.md` (verify - performance targets still accurate)
+
+**Required Tools**:
+- Markdown
+- Performance test results from Steps 1-2
+
+**Acceptance Tests**:
+- [ ] Performance results documented with all metrics
+- [ ] Results compared to vision.md targets (pass/fail status)
+- [ ] Performance summary created (all targets met/not met)
+- [ ] CHANGELOG entry added (performance verification)
+- [ ] Vision document verified (targets still accurate)
+- [ ] Documentation clear and actionable
+
+**Done Criteria**:
+- Performance documentation complete
+- CHANGELOG updated
+- Vision document verified
+- Performance summary available for launch readiness
+
+**Rollback**: N/A (documentation only)
+
+---
+
+#### Step 4: CI Performance Budget Integration (Optional)
+**Owner**: @Nexus 🚀  
+**Intent**: Add performance budget checks to CI pipeline (fail if targets not met)
+
+**File Targets**:
+- `.github/workflows/ci.yml` (update - add performance budget check)
+- `tests/e2e/performance.spec.ts` (verify - tests suitable for CI)
+
+**Required Tools**:
+- GitHub Actions
+- Playwright CI configuration
+
+**Acceptance Tests**:
+- [ ] Performance tests run in CI
+- [ ] CI fails if performance targets not met
+- [ ] Performance test results visible in CI output
+- [ ] CI performance checks don't slow down pipeline significantly
+- [ ] Performance budget documented in CI workflow
+
+**Done Criteria**:
+- Performance budget enforced in CI
+- CI fails appropriately if targets not met
+- Performance results visible in CI
+
+**Rollback**: Skip CI integration for MVP if it proves complex. Manual performance verification is acceptable for launch. Add CI integration post-launch.
+
+---
+
+### File targets
+
+### Testing (Pixel)
+- `tests/e2e/performance.spec.ts` (chat start performance test)
+- `tests/fixtures/persona-presence/chat-performance.json` (2-persona presence script)
+- `.notes/features/performance-verification/performance.md` (performance results)
+
+### Documentation (Muse)
+- `.notes/features/performance-verification/performance.md` (performance documentation)
+- `CHANGELOG.md` (performance verification entry)
+- `docs/vision.md` (verify performance targets)
+
+### CI/DevOps (Nexus - Optional)
+- `.github/workflows/ci.yml` (performance budget check)
+
+### Acceptance tests
+
+### Step 1: Chat Start Performance Test
+- [ ] Chat start performance test implemented
+- [ ] Test measures button click → chat active (< 500ms)
+- [ ] Test uses WebSocket mock with 2 personas
+- [ ] Test passes consistently
+
+### Step 2: Performance Regression Verification
+- [ ] All existing performance tests pass
+- [ ] Performance results documented
+- [ ] Results match vision.md targets
+
+### Step 3: Performance Documentation
+- [ ] Performance results documented
+- [ ] CHANGELOG updated
+- [ ] Vision document verified
+
+### Step 4: CI Performance Budget (Optional)
+- [ ] Performance budget enforced in CI
+- [ ] CI fails if targets not met
+
+### Owners
+- Vector 🎯 (planning, coordination)
+- Pixel 🖥️ (chat start performance test, regression verification)
+- Muse 🎨 (performance documentation)
+- Nexus 🚀 (CI integration - optional)
+- Scout 🔎 (research complete - `docs/research/Issue-20-research.md`)
+
+### Implementation Notes
+- **Status**: ✅ **APPROVED** - Team review complete, ready for implementation
+- **Approach**: Performance verification only (no optimization)
+- **Testing**: Chat start latency, Radar regression check
+- **Dependencies**: WebSocket mock infrastructure, multi-persona test helpers
+- **Enables**: Production launch readiness, performance confidence
+
+### Risks & Open questions
+
+### Risks
+- **WebSocket Mock Accuracy**: Mock may not accurately simulate real backend chat flow
+- **Test Flakiness**: Performance tests may be flaky due to timing variability
+- **Performance Regressions**: Existing performance may have degraded since last verification
+
+### Open Questions
+- **CI Integration**: Should performance budget be enforced in CI for MVP? (Recommendation: Optional for MVP, add post-launch)
+- **Network Throttling**: Should we test chat start on throttled networks? (Recommendation: Skip for MVP, add post-launch)
+
+## Team Review Required
+
+**CRITICAL CHECKPOINT**: This plan must be reviewed by all agents before implementation begins.
+
+**Review Checklist**:
+- [ ] @Pixel 🖥️: Review chat start performance test approach and measurement points
+- [ ] @Forge 🔗: Review WebSocket mock usage for chat performance testing
+- [ ] @Nexus 🚀: Review CI integration approach (optional step)
+- [ ] @Muse 🎨: Review documentation requirements
+- [ ] @Scout 🔎: Verify research findings align with plan
+- [ ] @Vector 🎯: Confirm plan completeness and checkpoint structure
+
+**After Team Review**:
+- ✅ Create `.notes/features/performance-verification/team-review-approved.md`
+- ✅ Update `docs/Plan.md` to include "Team review complete - approved for implementation"
+- ✅ Proceed to implementation phase
+
+**✅ Team review complete - approved for implementation. Proceed to Step 1.**
+
+---
+
+**Status**: ✅ **APPROVED** - Team review complete, ready for implementation  
+**Research Status**: ✅ **COMPLETE** - Research file: `docs/research/Issue-21-research.md`  
+**Team Review**: ✅ **APPROVED** - Approval file: `.notes/features/production-deployment-infrastructure/team-review-approved.md`
+
+**Team review complete - approved for implementation.**
+
+### Goals
+- **GitHub Issue**: #21
+- **Target**: Production-ready deployment infrastructure for MVP launch
+- **Problem**: No production environment, deployment workflow, or rollback plan exists. Cannot launch MVP without production infrastructure.
+- **Desired Outcome**: 
+  - Production environment ready and accessible
+  - Deployment workflow tested (deploy, verify, rollback)
+  - Rollback plan documented and tested
+  - SSL/domain configured
+  - Environment variables secured
+  - Deployment runbook complete
+  - Team can deploy with confidence
+- **Success Metrics**:
+  - Successful production deployment
+  - Rollback tested and working
+  - Production environment stable
+  - Deployment time < 5 minutes
+  - Zero-downtime deployments (if possible)
+- **Research Status**: ✅ **COMPLETE** - Research file: `docs/research/Issue-21-research.md`
+
+### Out-of-scope
+- Multi-region deployment (post-MVP)
+- Blue-green deployments (post-MVP)
+- Auto-scaling configuration (post-MVP)
+- Custom domains (can be added post-MVP, platform domains sufficient for launch)
+- GitHub Actions deployment workflow (platform-native auto-deploy for MVP, can enhance later)
+
+### Steps (7)
+
+#### Step 1: Platform Account Setup & GitHub Connection
+**Owner**: @Nexus 🚀  
+**Intent**: Create Vercel and Railway accounts, connect GitHub repositories, verify access
+
+**File Targets**:
+- Platform dashboards (Vercel, Railway)
+- GitHub repository settings
+
+**Required Tools**:
+- Vercel account (free tier)
+- Railway account (free tier)
+- GitHub repository access
+
+**Acceptance Tests**:
+- [ ] Vercel account created and verified
+- [ ] Railway account created and verified
+- [ ] GitHub repository connected to Vercel
+- [ ] GitHub repository connected to Railway
+- [ ] Vercel can access repository
+- [ ] Railway can access repository
+- [ ] Platform dashboards accessible
+
+**Done Criteria**:
+- Both platforms connected to GitHub repository
+- Accounts verified and accessible
+- Ready for environment variable configuration
+
+**Rollback**: If platform connection fails, use manual deployment via CLI as fallback
+
+---
+
+#### Step 2: Environment Variables Configuration
+**Owner**: @Nexus 🚀  
+**Intent**: Configure all required environment variables in Vercel and Railway dashboards
+
+**File Targets**:
+- Vercel dashboard → Project Settings → Environment Variables
+- Railway dashboard → Service → Variables
+- `env.example` (verify all variables documented)
+
+**Required Tools**:
+- Platform dashboards
+- Sentry DSNs (if available)
+- Production API URLs (TBD after backend deployment)
+
+**Acceptance Tests**:
+- [ ] Frontend env vars configured in Vercel:
+  - [ ] `VITE_API_URL` (set after backend deployment)
+  - [ ] `VITE_SENTRY_DSN` (if available)
+  - [ ] `VITE_SENTRY_ENABLE_DEV=false`
+  - [ ] `VITE_APP_VERSION=0.1.0`
+- [ ] Backend env vars configured in Railway:
+  - [ ] `NODE_ENV=production`
+  - [ ] `PORT=8000` (or Railway-assigned port)
+  - [ ] `SENTRY_DSN` (if available)
+  - [ ] `SENTRY_ENABLE_DEV=false`
+  - [ ] `APP_VERSION=0.1.0`
+  - [ ] `CORS_ORIGIN` (set after frontend deployment)
+- [ ] `env.example` updated with all production variables
+- [ ] All variables encrypted/secured in platform dashboards
+
+**Done Criteria**:
+- All required environment variables configured
+- Variables documented in `env.example`
+- Ready for deployment
+
+**Rollback**: Remove incorrect variables, reconfigure correctly
+
+---
+
+#### Step 3: Backend Deployment (Railway)
+**Owner**: @Nexus 🚀  
+**Intent**: Deploy backend to Railway, verify WebSocket support, test health endpoints
+
+**File Targets**:
+- Railway dashboard → Service configuration
+- `backend/package.json` (verify start script)
+- `backend/src/index.js` (verify health endpoint)
+
+**Required Tools**:
+- Railway dashboard
+- Backend codebase
+- Health check endpoint (`/api/health`)
+
+**Acceptance Tests**:
+- [ ] Railway service created with root directory `backend`
+- [ ] Start command set to `npm start`
+- [ ] Backend deploys successfully
+- [ ] Health endpoint accessible: `https://<railway-url>/api/health`
+- [ ] Health endpoint returns `{ status: "ok" }`
+- [ ] WebSocket endpoint accessible: `wss://<railway-url>/ws`
+- [ ] WebSocket connection successful (test with token)
+- [ ] Logs visible in Railway dashboard
+- [ ] Railway URL documented (for frontend `VITE_API_URL`)
+
+**Done Criteria**:
+- Backend deployed and accessible
+- Health endpoint working
+- WebSocket connection successful
+- Backend URL available for frontend configuration
+
+**Rollback**: Use Railway dashboard → Deployments → Redeploy previous commit
+
+---
+
+#### Step 4: Frontend Deployment (Vercel)
+**Owner**: @Nexus 🚀  
+**Intent**: Deploy frontend to Vercel, configure API URL, verify production build
+
+**File Targets**:
+- Vercel dashboard → Project configuration
+- `frontend/package.json` (verify build script)
+- `frontend/vite.config.js` (verify build config)
+
+**Required Tools**:
+- Vercel dashboard
+- Frontend codebase
+- Backend URL (from Step 3)
+
+**Acceptance Tests**:
+- [ ] Vercel project created and connected to GitHub repo
+- [ ] Root directory set to `frontend` (or build command configured)
+- [ ] Build command: `npm run build` (auto-detected by Vercel)
+- [ ] Output directory: `dist` (auto-detected by Vercel)
+- [ ] `VITE_API_URL` set to Railway backend URL
+- [ ] Frontend deploys successfully
+- [ ] Frontend accessible: `https://<vercel-url>`
+- [ ] Frontend loads without errors
+- [ ] Vercel URL documented (for backend `CORS_ORIGIN`)
+
+**Done Criteria**:
+- Frontend deployed and accessible
+- API URL configured correctly
+- Frontend loads successfully
+- Frontend URL available for backend CORS configuration
+
+**Rollback**: Use Vercel dashboard → Deployments → Promote previous deployment
+
+---
+
+#### Step 5: Deployment Verification & Testing
+**Owner**: @Pixel 🖥️ + @Nexus 🚀  
+**Intent**: Verify end-to-end deployment, test critical flows, verify HTTPS/SSL
+
+**File Targets**:
+- `scripts/verify-deployment.mjs` (create - deployment verification script)
+- Production URLs (Vercel frontend, Railway backend)
+
+**Required Tools**:
+- Production deployments
+- Playwright (for E2E testing)
+- curl or HTTP client (for health checks)
+
+**Acceptance Tests**:
+- [ ] Health check script created (`scripts/verify-deployment.mjs`)
+- [ ] Backend health endpoint: `GET /api/health` returns `{ status: "ok" }`
+- [ ] WebSocket connection: `wss://<backend-url>/ws` connects successfully
+- [ ] Frontend loads: `https://<frontend-url>` loads without errors
+- [ ] HTTPS enforced: All requests use HTTPS (no mixed content)
+- [ ] CORS configured: Frontend can connect to backend
+- [ ] Onboarding flow: Complete onboarding → Radar view loads
+- [ ] Sentry errors: Errors appear in Sentry dashboard (if configured)
+- [ ] Cross-browser test: Chrome, Firefox, Edge (basic smoke test)
+- [ ] Performance: Frontend load time < 2s, backend health < 500ms
+
+**Done Criteria**:
+- All verification checks pass
+- Critical flows working in production
+- HTTPS/SSL verified
+- Ready for rollback testing
+
+**Rollback**: If verification fails, use Step 6 rollback procedures
+
+---
+
+#### Step 6: Rollback Procedure Testing
+**Owner**: @Nexus 🚀  
+**Intent**: Test rollback procedures (quick rollback and emergency rollback) to ensure team can recover from deployment issues
+
+**File Targets**:
+- Platform dashboards (Vercel, Railway)
+- `docs/deployment/RUNBOOK.md` (create - rollback procedures)
+
+**Required Tools**:
+- Platform dashboards
+- Git (for emergency rollback)
+- Production deployments
+
+**Acceptance Tests**:
+- [ ] Quick rollback tested (Vercel):
+  - [ ] Deploy new version
+  - [ ] Rollback to previous deployment via dashboard
+  - [ ] Verify previous version is live
+  - [ ] Rollback time < 2 minutes
+- [ ] Quick rollback tested (Railway):
+  - [ ] Deploy new version
+  - [ ] Rollback to previous deployment via dashboard
+  - [ ] Verify previous version is live
+  - [ ] Rollback time < 2 minutes
+- [ ] Emergency rollback tested (Git revert):
+  - [ ] Make test commit
+  - [ ] Deploy to production
+  - [ ] Revert commit: `git revert <commit-hash>`
+  - [ ] Push to main: `git push origin main`
+  - [ ] Verify reverted version deploys
+  - [ ] Total rollback time < 5 minutes
+- [ ] Rollback procedures documented in `docs/deployment/RUNBOOK.md`
+
+**Done Criteria**:
+- Quick rollback tested and working (< 2 minutes)
+- Emergency rollback tested and working (< 5 minutes)
+- Rollback procedures documented
+- Team confident in rollback process
+
+**Rollback**: N/A (testing rollback procedures)
+
+---
+
+#### Step 7: Deployment Runbook Documentation
+**Owner**: @Muse 🎨 + @Nexus 🚀  
+**Intent**: Create comprehensive deployment runbook with step-by-step procedures, troubleshooting, and best practices
+
+**File Targets**:
+- `docs/deployment/RUNBOOK.md` (create - comprehensive deployment guide)
+- `docs/deployment.md` (update - add production deployment section)
+- `docs/ConnectionGuide.md` (update - add production endpoints)
+- `README.md` (update - add deployment section)
+
+**Required Tools**:
+- Markdown
+- Production deployment experience (from Steps 1-6)
+
+**Acceptance Tests**:
+- [ ] `docs/deployment/RUNBOOK.md` created with:
+  - [ ] Initial deployment steps
+  - [ ] Continuous deployment process
+  - [ ] Rollback procedures (quick + emergency)
+  - [ ] Troubleshooting guide
+  - [ ] Environment variable reference
+  - [ ] Platform-specific notes (Vercel, Railway)
+- [ ] `docs/deployment.md` updated with production deployment section
+- [ ] `docs/ConnectionGuide.md` updated with:
+  - [ ] Production frontend URL
+  - [ ] Production backend URL
+  - [ ] Production WebSocket URL
+  - [ ] Production environment variables
+- [ ] `README.md` updated with deployment section
+- [ ] All documentation reviewed for accuracy
+
+**Done Criteria**:
+- Deployment runbook complete and accurate
+- All documentation updated
+- Team can deploy independently using runbook
+- Production endpoints documented
+
+**Rollback**: Update documentation if procedures change
+
+---
+
+### File Targets
+
+### Platform Setup (Nexus)
+- Vercel dashboard (account, project, GitHub connection)
+- Railway dashboard (account, service, GitHub connection)
+- Platform environment variables (Vercel, Railway)
+
+### Deployment (Nexus)
+- Railway service configuration (root directory, start command)
+- Vercel project configuration (root directory, build settings)
+- Production deployments (backend, frontend)
+
+### Verification (Pixel + Nexus)
+- `scripts/verify-deployment.mjs` (new - deployment verification script)
+- Production URLs (health checks, WebSocket, frontend)
+
+### Documentation (Muse + Nexus)
+- `docs/deployment/RUNBOOK.md` (new - comprehensive deployment guide)
+- `docs/deployment.md` (update - production deployment section)
+- `docs/ConnectionGuide.md` (update - production endpoints)
+- `README.md` (update - deployment section)
+- `env.example` (update - production variables)
+
+### Acceptance Tests
+
+### Step 1: Platform Setup
+- [ ] Vercel and Railway accounts created
+- [ ] GitHub repositories connected
+- [ ] Platform dashboards accessible
+
+### Step 2: Environment Variables
+- [ ] All frontend variables configured in Vercel
+- [ ] All backend variables configured in Railway
+- [ ] Variables documented in `env.example`
+
+### Step 3: Backend Deployment
+- [ ] Backend deployed to Railway
+- [ ] Health endpoint accessible
+- [ ] WebSocket connection successful
+- [ ] Backend URL documented
+
+### Step 4: Frontend Deployment
+- [ ] Frontend deployed to Vercel
+- [ ] API URL configured correctly
+- [ ] Frontend loads successfully
+- [ ] Frontend URL documented
+
+### Step 5: Deployment Verification
+- [ ] All verification checks pass
+- [ ] Critical flows working in production
+- [ ] HTTPS/SSL verified
+
+### Step 6: Rollback Testing
+- [ ] Quick rollback tested (< 2 minutes)
+- [ ] Emergency rollback tested (< 5 minutes)
+- [ ] Rollback procedures documented
+
+### Step 7: Documentation
+- [ ] Deployment runbook complete
+- [ ] All documentation updated
+- [ ] Production endpoints documented
+
+### Owners
+- Vector 🎯 (planning, coordination)
+- Nexus 🚀 (platform setup, deployment, rollback testing)
+- Pixel 🖥️ (deployment verification, testing)
+- Muse 🎨 (documentation, runbook)
+- Scout 🔎 (research complete - `docs/research/Issue-21-research.md`)
+
+### Implementation Notes
+- **Status**: Planning phase - Ready for team review
+- **Approach**: Platform-native auto-deploy (simplest for MVP)
+- **Platforms**: Vercel (frontend), Railway (backend)
+- **Deployment**: Automatic on push to `main` branch
+- **Rollback**: Dashboard rollback + git revert
+- **Enables**: Production launch readiness, zero-downtime deployments
+
+### Risks & Open Questions
+
+### Risks
+- **Platform Limits**: Railway free tier ($5 credit) may be insufficient for production traffic
+- **WebSocket Stability**: Need to verify WebSocket connections remain stable on Railway
+- **Environment Variables**: Sensitive variables must be secured in platform dashboards
+- **Deployment Failures**: Need tested rollback procedures before production launch
+- **CORS Configuration**: Frontend and backend URLs must be configured correctly
+
+### Open Questions
+- **Sentry DSNs**: Are Sentry accounts created? (If not, can deploy without Sentry initially)
+- **Custom Domains**: Use platform domains for MVP or configure custom domains? (Recommendation: Platform domains for MVP)
+- **Monitoring**: Basic monitoring via platform dashboards sufficient? (Recommendation: Yes for MVP, enhance with Issue #22)
+
+### MCP Tools Required
+- **GitHub MCP**: Issue tracking, branch creation (if needed)
+- **Desktop Commander MCP**: Local script execution (verify-deployment.mjs)
+
+### Handoffs
+- **After Step 1**: Nexus hands off platform setup to Nexus for Step 2 (environment variables)
+- **After Step 2**: Nexus hands off env vars to Nexus for Step 3 (backend deployment)
+- **After Step 3**: Nexus hands off backend URL to Nexus for Step 4 (frontend deployment)
+- **After Step 4**: Nexus hands off deployments to Pixel for Step 5 (verification)
+- **After Step 5**: Pixel hands off verification to Nexus for Step 6 (rollback testing)
+- **After Step 6**: Nexus hands off rollback testing to Muse for Step 7 (documentation)
+- **After Step 7**: Issue #21 complete - production deployment ready
+
+---
+
+**Plan Status**: ✅ **APPROVED** - Team review complete, ready for implementation
+
+**Summary**:
+- Issue #21: Production Deployment Infrastructure
+- Plan: 7 steps
+- Research: ✅ Complete (`docs/research/Issue-21-research.md`)
+- Team Review: ✅ Approved (`.notes/features/production-deployment-infrastructure/team-review-approved.md`)
+- Implementation: Ready to begin Step 1
+
+**Team Involvement**:
+- ✅ Scout 🔎: Research complete
+- ✅ Vector 🎯: Plan created
+- ✅ **Team Review**: ✅ Approved
+- ⏸️ Nexus 🚀: Steps 1-4, 6 (platform setup, deployment, rollback) - Ready to begin
+- ⏸️ Pixel 🖥️: Step 5 (verification)
+- ⏸️ Muse 🎨: Step 7 (documentation)
+
+**✅ Team review complete - approved for implementation. Proceed to Step 1.**
+
+---
+
+## Issue #22: Monitoring, Observability & Error Tracking
+
+**Status**: ✅ **APPROVED** - Team review complete, ready for implementation  
+**Research Status**: ✅ **COMPLETE** - Research file: `docs/research/Issue-22-research.md`  
+**Team Review**: ✅ **APPROVED** - Approval file: `.notes/features/monitoring-observability-error-tracking/team-review-approved.md`
+
+**Team review complete - approved for implementation.**
+
+### Goals
+- **GitHub Issue**: #22
+- **Target**: Complete monitoring, observability, and error tracking setup for production readiness
+- **Problem**: Sentry partially implemented but setup unclear. No performance monitoring verification, uptime monitoring, alerting rules, dashboards, or runbooks configured.
+- **Desired Outcome**: 
+  - Sentry error tracking operational (frontend + backend)
+  - Performance monitoring verified and enhanced (WebSocket, Signal Engine spans)
+  - Uptime monitoring active (UptimeRobot free tier)
+  - Alerting rules configured (error rate, performance degradation)
+  - Monitoring dashboards accessible and documented
+  - Monitoring runbook created for incident response
+- **Success Metrics**:
+  - Sentry captures errors from frontend and backend
+  - Performance metrics visible in Sentry dashboard
+  - Uptime monitoring alerts on downtime
+  - Alert response time < 5 minutes
+  - Zero false-positive alerts
+  - Team can respond to incidents using runbook
+- **Research Status**: ✅ **COMPLETE** - Research file: `docs/research/Issue-22-research.md`
+
+### Out-of-scope
+- Prometheus + Grafana setup (post-MVP enhancement)
+- Advanced business metrics (chat starts, radar updates) - basic metrics only
+- Slack/PagerDuty alerting (email alerts only for MVP)
+- Custom Grafana dashboards (use Sentry dashboards)
+- Load/stress testing monitoring (deferred to post-launch)
+
+### Steps (6)
+
+#### Step 1: Complete Sentry Setup & Verification
+**Owner**: @Nexus 🚀 + @Forge 🔗  
+**Intent**: Install missing Sentry package, create Sentry project, configure DSNs, and verify error capture
+
+**File Targets**:
+- `backend/package.json` (update - add `@sentry/node` dependency)
+- `.env.example` (verify - Sentry DSN variables documented)
+- `backend/src/middleware/error-handler.js` (verify - Sentry initialization correct)
+- `frontend/src/lib/sentry.ts` (verify - Sentry initialization correct)
+- `docs/ConnectionGuide.md` (update - document Sentry dashboard access)
+
+**Required Tools**:
+- Sentry account (free tier)
+- npm (package installation)
+- Environment variable configuration
+
+**Acceptance Tests**:
+- [ ] `@sentry/node` installed in backend (`npm install @sentry/node`)
+- [ ] Sentry project created (free tier) for frontend
+- [ ] Sentry project created (free tier) for backend
+- [ ] Frontend DSN configured in `.env` (`VITE_SENTRY_DSN`)
+- [ ] Backend DSN configured in `.env` (`SENTRY_DSN`)
+- [ ] Intentional error test: Frontend error appears in Sentry dashboard
+- [ ] Intentional error test: Backend error appears in Sentry dashboard
+- [ ] Sentry dashboard access documented in `docs/ConnectionGuide.md`
+- [ ] Error capture verified (test errors visible in Sentry)
+
+**Done Criteria**:
+- Sentry packages installed (frontend + backend)
+- Sentry projects created and DSNs configured
+- Error capture verified (test errors appear in Sentry)
+- Dashboard access documented
+
+**Rollback**: If Sentry setup fails, fall back to console logging + structured logs. Can add Sentry post-launch.
+
+---
+
+#### Step 2: WebSocket Error Tracking & Performance Spans
+**Owner**: @Forge 🔗  
+**Intent**: Add Sentry error tracking to WebSocket error handler and create performance spans for WebSocket operations
+
+**File Targets**:
+- `backend/src/websocket/server.js` (update - add Sentry error tracking)
+- `backend/src/websocket/handlers.js` (update - add Sentry spans for message handling)
+- `backend/src/services/SignalEngine.js` (update - add Sentry spans for calculations)
+
+**Required Tools**:
+- Sentry SDK (`@sentry/node`)
+- WebSocket server code
+
+**Acceptance Tests**:
+- [ ] WebSocket errors captured in Sentry (`ws.on("error")` handler)
+- [ ] Custom tags added: `sessionId`, `connectionCount`
+- [ ] Performance span created for WebSocket message handling
+- [ ] Performance span created for Signal Engine calculations
+- [ ] WebSocket error test: Error appears in Sentry with correct tags
+- [ ] Performance spans visible in Sentry Performance dashboard
+
+**Done Criteria**:
+- WebSocket errors tracked in Sentry
+- Performance spans created for WebSocket and Signal Engine operations
+- Custom tags added for context
+- Performance data visible in Sentry dashboard
+
+**Rollback**: If Sentry integration proves complex, start with basic error logging. Add spans incrementally.
+
+---
+
+#### Step 3: Enhanced Health Endpoint & Uptime Monitoring
+**Owner**: @Forge 🔗 + @Nexus 🚀  
+**Intent**: Enhance health endpoint to check WebSocket status, add readiness endpoint, and set up UptimeRobot monitoring
+
+**File Targets**:
+- `backend/src/routes/health.js` (update - enhance health endpoint)
+- `backend/src/websocket/server.js` (update - expose WebSocket status)
+- `.env.example` (verify - no new variables needed)
+- `docs/ConnectionGuide.md` (update - document health endpoints)
+
+**Required Tools**:
+- UptimeRobot account (free tier)
+- Express route handlers
+
+**Acceptance Tests**:
+- [ ] Health endpoint returns: `{ status: "ok", websocket: "connected", sessions: <count> }`
+- [ ] Health endpoint checks WebSocket server status (`wss.clients.size`)
+- [ ] Readiness endpoint created: `GET /api/health/ready`
+- [ ] Readiness endpoint returns: `{ status: "ready", websocket: "connected" }`
+- [ ] UptimeRobot account created (free tier)
+- [ ] UptimeRobot monitor configured: `GET /api/health` (5-minute intervals)
+- [ ] UptimeRobot alert configured: 3+ consecutive failures = downtime alert
+- [ ] Health endpoints documented in `docs/ConnectionGuide.md`
+- [ ] UptimeRobot status page URL documented
+
+**Done Criteria**:
+- Health endpoint enhanced with WebSocket status
+- Readiness endpoint created for deployment checks
+- UptimeRobot monitoring active (health checks every 5 minutes)
+- Uptime alerts configured (3+ consecutive failures)
+- Documentation updated
+
+**Rollback**: If UptimeRobot fails, use GitHub Actions scheduled workflow to ping health endpoint. Manual monitoring as last resort.
+
+---
+
+#### Step 4: Alerting Rules Configuration
+**Owner**: @Nexus 🚀  
+**Intent**: Configure alerting rules in Sentry and UptimeRobot for error rate, performance degradation, and uptime
+
+**File Targets**:
+- Sentry dashboard (configure alert rules)
+- UptimeRobot dashboard (configure alert settings)
+- `docs/monitoring/ALERTS.md` (create - alert rules documentation)
+
+**Required Tools**:
+- Sentry dashboard access
+- UptimeRobot dashboard access
+
+**Acceptance Tests**:
+- [ ] Sentry alert rule: Error rate > 10 errors/minute (critical)
+- [ ] Sentry alert rule: Error rate > 5 errors/minute (warning)
+- [ ] Sentry alert rule: Performance degradation P95 > 1s (warning)
+- [ ] Sentry alert rule: Performance degradation P95 > 2s (critical)
+- [ ] Sentry alert rule: New error type detected (alert on new issues)
+- [ ] UptimeRobot alert: Health check fails 3+ times consecutively (downtime)
+- [ ] UptimeRobot alert: Response time > 1s (performance alert)
+- [ ] Alert channels configured: Email (default)
+- [ ] Alert rules documented in `docs/monitoring/ALERTS.md`
+- [ ] Test alert sent (verify email delivery)
+
+**Done Criteria**:
+- Sentry alert rules configured (error rate, performance degradation)
+- UptimeRobot alerts configured (downtime, performance)
+- Email alerts working (test alert received)
+- Alert rules documented
+
+**Rollback**: If alerting fails, fall back to email-only. Manual dashboard checks as interim solution.
+
+---
+
+#### Step 5: Performance Monitoring Verification & Dashboard Setup
+**Owner**: @Nexus 🚀 + @Pixel 🖥️  
+**Intent**: Verify Sentry Performance Monitoring is working, create performance dashboard, and document access
+
+**File Targets**:
+- Sentry dashboard (create performance dashboard)
+- `docs/ConnectionGuide.md` (update - document Sentry Performance dashboard)
+- `docs/monitoring/DASHBOARDS.md` (create - dashboard access guide)
+
+**Required Tools**:
+- Sentry dashboard access
+- Performance test suite (existing)
+
+**Acceptance Tests**:
+- [ ] Sentry Performance Monitoring verified (traces visible in dashboard)
+- [ ] Performance dashboard created in Sentry (latency, throughput)
+- [ ] WebSocket performance spans visible in dashboard
+- [ ] Signal Engine performance spans visible in dashboard
+- [ ] P50, P95, P99 latencies tracked for critical paths
+- [ ] Performance dashboard access documented
+- [ ] UptimeRobot status page URL documented
+- [ ] Dashboard access guide created (`docs/monitoring/DASHBOARDS.md`)
+
+**Done Criteria**:
+- Sentry Performance Monitoring verified and working
+- Performance dashboard created and accessible
+- Dashboard access documented
+- Team can access monitoring dashboards
+
+**Rollback**: If dashboards unavailable, use Sentry Issues page + manual log analysis. Add Grafana post-MVP if needed.
+
+---
+
+#### Step 6: Monitoring Runbook Creation
+**Owner**: @Muse 🎨 + @Nexus 🚀  
+**Intent**: Create comprehensive monitoring runbook for incident response
+
+**File Targets**:
+- `docs/monitoring/RUNBOOK.md` (create - incident response runbook)
+- `docs/ConnectionGuide.md` (verify - monitoring details complete)
+
+**Required Tools**:
+- Documentation best practices
+- Incident response procedures
+
+**Acceptance Tests**:
+- [ ] Runbook created: `docs/monitoring/RUNBOOK.md`
+- [ ] Error investigation procedure documented:
+  - Access Sentry dashboard
+  - Check error grouping and trends
+  - Review stack traces and context
+  - Check related performance metrics
+- [ ] Performance degradation procedure documented:
+  - Check Sentry Performance dashboard
+  - Identify slow endpoints/operations
+  - Check WebSocket connection metrics
+  - Review recent deployments
+- [ ] Service downtime procedure documented:
+  - Check UptimeRobot status
+  - Verify health endpoint (`/api/health`)
+  - Check server logs
+  - Verify WebSocket server status
+  - Check deployment status
+- [ ] WebSocket connection issues procedure documented:
+  - Check WebSocket server logs
+  - Verify connection count (`wss.clients.size`)
+  - Check for connection errors in Sentry
+  - Verify session store health
+- [ ] Incident response process documented (Detect → Acknowledge → Investigate → Resolve → Document)
+- [ ] Connection Guide updated with all monitoring details
+
+**Done Criteria**:
+- Monitoring runbook complete with all procedures
+- Incident response process documented
+- Team can follow runbook to respond to incidents
+- Documentation complete and accurate
+
+**Rollback**: If runbooks prove insufficient, document common issues in GitHub issues. Build runbook incrementally based on real incidents.
+
+---
+
+### File Targets
+
+### Sentry Setup (Nexus + Forge)
+- `backend/package.json` (add `@sentry/node`)
+- `backend/src/middleware/error-handler.js` (verify Sentry init)
+- `frontend/src/lib/sentry.ts` (verify Sentry init)
+- `.env.example` (verify Sentry variables)
+
+### WebSocket Monitoring (Forge)
+- `backend/src/websocket/server.js` (add Sentry error tracking)
+- `backend/src/websocket/handlers.js` (add performance spans)
+- `backend/src/services/SignalEngine.js` (add performance spans)
+
+### Health & Uptime (Forge + Nexus)
+- `backend/src/routes/health.js` (enhance health endpoint)
+- `backend/src/websocket/server.js` (expose WebSocket status)
+- UptimeRobot dashboard (configure monitoring)
+
+### Alerting (Nexus)
+- Sentry dashboard (configure alert rules)
+- UptimeRobot dashboard (configure alerts)
+- `docs/monitoring/ALERTS.md` (document alert rules)
+
+### Dashboards (Nexus + Pixel)
+- Sentry dashboard (create performance dashboard)
+- `docs/monitoring/DASHBOARDS.md` (dashboard access guide)
+
+### Documentation (Muse + Nexus)
+- `docs/monitoring/RUNBOOK.md` (incident response runbook)
+- `docs/ConnectionGuide.md` (monitoring details)
+- `docs/monitoring/ALERTS.md` (alert rules)
+
+## Acceptance Tests
+
+### Step 1: Sentry Setup
+- [ ] `@sentry/node` installed in backend
+- [ ] Sentry projects created (frontend + backend)
+- [ ] DSNs configured in environment variables
+- [ ] Error capture verified (test errors appear in Sentry)
+- [ ] Dashboard access documented
+
+### Step 2: WebSocket Monitoring
+- [ ] WebSocket errors tracked in Sentry
+- [ ] Performance spans created for WebSocket operations
+- [ ] Performance spans created for Signal Engine calculations
+- [ ] Custom tags added for context
+
+### Step 3: Health & Uptime
+- [ ] Health endpoint enhanced (WebSocket status check)
+- [ ] Readiness endpoint created
+- [ ] UptimeRobot monitoring active
+- [ ] Uptime alerts configured
+
+### Step 4: Alerting
+- [ ] Sentry alert rules configured (error rate, performance)
+- [ ] UptimeRobot alerts configured (downtime, performance)
+- [ ] Email alerts working
+- [ ] Alert rules documented
+
+### Step 5: Dashboards
+- [ ] Sentry Performance Monitoring verified
+- [ ] Performance dashboard created
+- [ ] Dashboard access documented
+- [ ] Team can access dashboards
+
+### Step 6: Runbook
+- [ ] Monitoring runbook created
+- [ ] Incident response procedures documented
+- [ ] Team can follow runbook
+- [ ] Documentation complete
+
+## Owners
+- Vector 🎯 (planning, coordination)
+- Nexus 🚀 (Sentry setup, UptimeRobot, alerting, dashboards)
+- Forge 🔗 (WebSocket monitoring, health endpoint, performance spans)
+- Pixel 🖥️ (performance verification)
+- Muse 🎨 (runbook, documentation)
+- Scout 🔎 (research complete - `docs/research/Issue-22-research.md`)
+
+## Implementation Notes
+- **Status**: Planning phase - Ready for team review
+- **Approach**: Complete existing Sentry setup, add monitoring infrastructure
+- **Dependencies**: Sentry account (free tier), UptimeRobot account (free tier)
+- **Enables**: Production monitoring, error tracking, incident response
+
+## Risks & Open Questions
+
+### Risks
+- **Sentry Setup**: May require manual account creation and DSN configuration
+- **UptimeRobot**: Free tier limitations (50 monitors, 5-minute intervals)
+- **Alert Fatigue**: Too many alerts may cause team to ignore them
+- **Performance Impact**: Sentry spans may add overhead (mitigated by sampling rates)
+
+### Open Questions
+- **Sentry Account**: Who creates Sentry account? (Recommendation: Nexus creates, shares DSNs)
+- **UptimeRobot Account**: Who creates UptimeRobot account? (Recommendation: Nexus creates, shares access)
+- **Alert Channels**: Email only or add Slack? (Recommendation: Email for MVP, Slack post-launch)
+- **Performance Sampling**: Current 10% sample rate sufficient? (Recommendation: Start with 10%, adjust based on volume)
+
+## MCP Tools Required
+- **GitHub MCP**: Issue tracking, branch creation
+- **Ref Tools MCP** (optional): Sentry documentation search
+
+## Handoffs
+- **After Step 1**: Nexus hands off Sentry setup to Forge for Step 2 (WebSocket monitoring)
+- **After Step 2**: Forge hands off WebSocket monitoring to Forge + Nexus for Step 3 (health endpoint)
+- **After Step 3**: Forge + Nexus hand off health monitoring to Nexus for Step 4 (alerting)
+- **After Step 4**: Nexus hands off alerting to Nexus + Pixel for Step 5 (dashboards)
+- **After Step 5**: Nexus + Pixel hand off dashboards to Muse + Nexus for Step 6 (runbook)
+- **After Step 6**: Issue #22 complete - monitoring operational
+
+---
+
+**Plan Status**: ✅ **APPROVED** - Team review complete, ready for implementation
+
+**Summary**:
+- Issue #22: Monitoring, Observability & Error Tracking
+- Plan: 6 steps
+- Research: ✅ Complete (`docs/research/Issue-22-research.md`)
+- Team Review: ✅ Approved (`.notes/features/monitoring-observability-error-tracking/team-review-approved.md`)
+- Implementation: Ready to begin Step 1
+
+**Team Involvement**:
+- ✅ Scout 🔎: Research complete
+- ✅ Vector 🎯: Plan created
+- ✅ **Team Review**: ✅ Approved
+- ⏸️ Nexus 🚀: Steps 1, 3, 4, 5 (Sentry, UptimeRobot, alerting, dashboards) - Ready to begin
+- ⏸️ Forge 🔗: Steps 1, 2, 3 (Sentry setup, WebSocket monitoring, health endpoint)
+- ⏸️ Pixel 🖥️: Step 5 (performance verification)
+- ⏸️ Muse 🎨: Step 6 (runbook, documentation)
+
+**✅ Team review complete - approved for implementation. Proceed to Step 1.**
+
+---
+
 ## Current Status Summary
 
 **Completed Issues**:
 - ✅ Issue #2: Radar View
 - ✅ Issue #3: Chat Interface
 - ✅ Issue #5: Panic Button
-- ✅ Issue #6: Block/Report
-- ✅ Issue #7: Profile/Settings
-- ✅ Issue #8: Chat Request Cooldowns
+- ✅ Issue #6: Integration Testing & Launch Preparation
 - ✅ Issue #9: UX Review Fixes + Bootup Random Messages
 
-**In Progress**:
-- 🔄 Issue #6: Integration Testing & Launch Preparation
+**Note**: Issue #7 was completed but created retroactively as Issue #19. Current active issues are listed below.
 
 **Planning**:
-- 📋 Issue #10: Persona-Based Testing & Polish
+- 📋 Issue #18: Persona-Simulated User Testing with Look-and-Feel Validation (Main planning issue - see steps above)
+- 📋 Issue #21: Production Deployment Infrastructure (Launch blocker - see plan above)
+
+**Production Readiness (Critical for Launch)**:
+- 📋 Issue #20: Performance Verification & Benchmarking (Vision requirement: < 500ms chat, < 1s radar)
+- 📋 Issue #22: Monitoring, Observability & Error Tracking (Operational requirement)
+
+**Persona Sim Testing Phase 2 Backlog** (Issues #8-#10, #11-#17):
+- 📋 Issue #8: Feature-Flagged WebSocket Mock & Shim
+- 📋 Issue #9: Persona Presence Fixture Library  
+- 📋 Issue #10: Geolocation & Permission Helpers
+- 📋 Issue #11: Multi-Context Persona Specs (Phase 2)
+- 📋 Issue #12: Device & Theme Matrix Coverage
+- 📋 Issue #13: Stable Selector Map via `data-testid`
+- 📋 Issue #14: Persona Telemetry Writer & Aggregator
+- 📋 Issue #15: CI Smoke vs Full Split + Multi-Browser Matrix
+- 📋 Issue #16: Accessibility & Failure-State Hardening
+- 📋 Issue #17: Visual Regression Baselines
+
+See `.notes/features/persona-sim-testing/next-issues.md` for detailed scope and acceptance criteria.
 
 **Test Coverage**:
 - ✅ Frontend: 172/172 tests passing

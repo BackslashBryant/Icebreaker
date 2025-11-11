@@ -10,7 +10,7 @@ import { waitForBootSequence, completeOnboarding, setupSession } from "../../uti
  */
 
 test.describe("Persona: River Martinez - Urban Neighborhood Resident", () => {
-  test("completes onboarding with urban neighborhood pattern", async ({ page }) => {
+  test("@smoke completes onboarding with urban neighborhood pattern", async ({ page }) => {
     await page.goto("/welcome", { waitUntil: "domcontentloaded", timeout: 30000 });
     await waitForBootSequence(page);
 

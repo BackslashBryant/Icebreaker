@@ -1,0 +1,82 @@
+{
+  "venues": [
+    {
+      "name": "campus-library",
+      "description": "University campus library - multi-floor building",
+      "coordinates": {
+        "lat": 37.8716,
+        "lon": -122.2727,
+        "floor": 2
+      },
+      "personas": ["maya-session", "zoe-session"]
+    },
+    {
+      "name": "coworking-downtown",
+      "description": "Downtown coworking space - multi-floor building",
+      "coordinates": {
+        "lat": 37.7749,
+        "lon": -122.4194,
+        "floor": 3
+      },
+      "personas": ["marcus-session", "ethan-session"]
+    },
+    {
+      "name": "gallery-opening",
+      "description": "Art gallery opening event",
+      "coordinates": {
+        "lat": 37.7849,
+        "lon": -122.4094,
+        "floor": 1
+      },
+      "personas": ["casey-session", "alex-session"]
+    },
+    {
+      "name": "campus-coffee-shop",
+      "description": "Campus coffee shop",
+      "coordinates": {
+        "lat": 37.8716,
+        "lon": -122.2727,
+        "floor": 1
+      },
+      "personas": ["ethan-session"]
+    },
+    {
+      "name": "tech-conference",
+      "description": "Tech conference venue",
+      "coordinates": {
+        "lat": 37.7849,
+        "lon": -122.4094,
+        "floor": 1
+      },
+      "personas": ["alex-session"]
+    },
+    {
+      "name": "urban-neighborhood",
+      "description": "Dense urban neighborhood (apartment building/café)",
+      "coordinates": {
+        "lat": 37.7849,
+        "lon": -122.4094,
+        "floor": 1
+      },
+      "personas": ["river-session"]
+    },
+    {
+      "name": "student-union",
+      "description": "Student union / campus event space",
+      "coordinates": {
+        "lat": 37.8716,
+        "lon": -122.2727,
+        "floor": 1
+      },
+      "personas": ["zoe-session", "maya-session"]
+    }
+  ],
+  "proximityRadiusMeters": 50,
+  "notes": {
+    "campus-library": "Maya on floor 2, Zoe on floor 3 - same building, different floors",
+    "coworking-downtown": "Marcus and Ethan on different floors - same building",
+    "gallery-opening": "Casey and Alex at same event - same coordinates",
+    "boundary-testing": "Use getJustInsideRadius() and getJustOutsideRadius() helpers for proximity boundary tests"
+  }
+}
+

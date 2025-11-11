@@ -37,6 +37,7 @@ export function ConsentStep({ consent, onConsentChange, onContinue }: ConsentSte
         onClick={onContinue}
         disabled={!consent}
         className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-background font-mono h-11 sm:h-12 text-sm retro-button border-2 border-accent disabled:opacity-50"
+        data-testid="onboarding-continue"
       >
         CONTINUE →
       </Button>
