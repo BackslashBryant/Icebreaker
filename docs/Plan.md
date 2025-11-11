@@ -578,13 +578,13 @@ _Previous feature: **UX Review Fixes + Bootup Random Messages** (Issue #9) ✅ *
 - Persona profiles (`docs/personas/river-martinez.md`, `alex-kim.md`, `jordan-park.md`, `sam-taylor.md`, `morgan-davis.md`)
 
 **Acceptance Tests**:
-- [ ] River Martinez (26, urban resident) tests neighborhood proximity matching
-- [ ] Alex Kim (27, tech conference) tests event/conference networking
-- [ ] Jordan Park (38, privacy-focused) tests privacy features and visibility toggling
-- [ ] Sam Taylor (24, outgoing introvert) tests event socializing without drain
-- [ ] Morgan Davis (28, grad student) tests academic conference connections
-- [ ] Each persona's unique use case verified
-- [ ] Edge cases discovered and documented
+- [x] River Martinez (26, urban resident) tests neighborhood proximity matching
+- [x] Alex Kim (27, tech conference) tests event/conference networking
+- [x] Jordan Park (38, privacy-focused) tests privacy features and visibility toggling
+- [x] Sam Taylor (24, outgoing introvert) tests event socializing without drain
+- [x] Morgan Davis (28, grad student) tests academic conference connections
+- [x] Each persona's unique use case verified
+- [x] Edge cases discovered and documented
 
 **Done Criteria**:
 - All market research personas tested
