@@ -53,10 +53,11 @@ test.describe("Persona: Marcus Thompson - Remote Worker", () => {
     await page.getByText("Tech curious").click();
     
     // Submit form - wait for API call and navigation
-    await page.getByRole("button", { name: /ENTER RADAR/i }).click();
+    const enterRadarButton = page.getByRole("button", { name: /ENTER RADAR/i });
+    await enterRadarButton.click();
     
-    // Wait for loading state to disappear (API call complete)
-    await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+    // Wait for button to not be disabled (API call started)
+    await expect(enterRadarButton).toBeDisabled({ timeout: 2000 }).catch(() => {});
     
     // Wait for navigation to radar (onboarding has 500ms delay + API call time)
     await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
@@ -204,10 +205,11 @@ test.describe("Persona: Casey Rivera - Creative Professional", () => {
     await page.getByText("Here for the humans").click();
     
     // Submit form - wait for API call and navigation
-    await page.getByRole("button", { name: /ENTER RADAR/i }).click();
+    const enterRadarButton = page.getByRole("button", { name: /ENTER RADAR/i });
+    await enterRadarButton.click();
     
-    // Wait for loading state to disappear (API call complete)
-    await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+    // Wait for button to not be disabled (API call started)
+    await expect(enterRadarButton).toBeDisabled({ timeout: 2000 }).catch(() => {});
     
     // Wait for navigation to radar (onboarding has 500ms delay + API call time)
     await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
@@ -348,10 +350,11 @@ test.describe("Cross-Persona: Professional Personas", () => {
         await page.getByText(tag).click();
       }
       
-      await page.getByRole("button", { name: /ENTER RADAR/i }).click();
+      const enterRadarButton = page.getByRole("button", { name: /ENTER RADAR/i });
+      await enterRadarButton.click();
       
-      // Wait for loading state to disappear (API call complete)
-      await page.waitForSelector('button:has-text("CREATING SESSION...")', { state: 'hidden', timeout: 10000 }).catch(() => {});
+      // Wait for button to not be disabled (API call started)
+      await expect(enterRadarButton).toBeDisabled({ timeout: 2000 }).catch(() => {});
       
       // Wait for navigation to radar (onboarding has 500ms delay + API call time)
       await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
