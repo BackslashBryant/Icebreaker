@@ -1,8 +1,12 @@
 {
-  "slug": "icebreaker-mvp-planning",
-  "featureName": "Icebreaker MVP Planning",
-  "updatedAt": "2025-01-27T00:00:00.000Z",
-  "status": "planning",
+  "slug": "production-deployment-infrastructure",
+  "featureName": "Production Deployment Infrastructure",
+  "updatedAt": "2025-11-11T00:00:00.000Z",
+  "status": "ready",
   "vision": "docs/vision.md",
-  "description": "Planning phase for Icebreaker MVP - proximity-based ephemeral chat app"
+  "description": "Launch blocker. Production deployment infrastructure and workflows. Production environment, deployment process, rollback plan, SSL/domain configuration, environment variables, deployment runbook.",
+  "githubIssue": 21,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/21",
+  "branch": "agent/nexus/21-production-deployment",
+  "note": "Issue #21 ready. Research complete, plan approved. Launch blocker - production deployment infrastructure needed before MVP launch."
 }
