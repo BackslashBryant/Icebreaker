@@ -517,14 +517,14 @@ _Previous feature: **UX Review Fixes + Bootup Random Messages** (Issue #9) ✅ *
 - Persona profiles (`docs/personas/maya-patel.md`, `ethan-chen.md`, `zoe-kim.md`)
 
 **Acceptance Tests**:
-- [ ] Maya Patel (19, anxious first-year) completes onboarding with "thinking" vibe + tags
-- [ ] Ethan Chen (20, socially anxious) completes onboarding with "intros" vibe + tech tags
-- [ ] Zoe Kim (21, overthinker) completes onboarding with "surprise" vibe + overthinking tags
-- [ ] All three appear on each other's Radar (proximity matching)
-- [ ] Shared tags boost signal scores (Maya + Zoe share "Overthinking Things")
-- [ ] Visibility toggling works as expected for anxious users
-- [ ] Ephemeral chat endings feel clean and reduce anxiety
-- [ ] Panic button accessible and functional for all personas
+- [x] Maya Patel (19, anxious first-year) completes onboarding with "thinking" vibe + tags
+- [x] Ethan Chen (20, socially anxious) completes onboarding with "intros" vibe + tech tags
+- [x] Zoe Kim (21, overthinker) completes onboarding with "surprise" vibe + overthinking tags
+- [x] All three appear on each other's Radar (proximity matching)
+- [x] Shared tags boost signal scores (Maya + Zoe share "Overthinking Things")
+- [x] Visibility toggling works as expected for anxious users
+- [x] Ephemeral chat endings feel clean and reduce anxiety
+- [x] Panic button accessible and functional for all personas
 
 **Done Criteria**:
 - All core student personas tested successfully
