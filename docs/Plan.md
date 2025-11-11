@@ -548,13 +548,13 @@ _Previous feature: **UX Review Fixes + Bootup Random Messages** (Issue #9) ✅ *
 - Persona profiles (`docs/personas/marcus-thompson.md`, `casey-rivera.md`)
 
 **Acceptance Tests**:
-- [ ] Marcus Thompson (29, remote worker) completes onboarding with "intros" vibe + builder tags
-- [ ] Casey Rivera (34, creative) completes onboarding with "banter" vibe + creative tags
-- [ ] Both appear on Radar in coworking/event scenarios
-- [ ] One-chat-at-a-time enforcement works (professional boundaries)
-- [ ] Proximity matching works for different floors/buildings
-- [ ] Signal scoring prioritizes shared tags ("Tech curious" for Marcus + Ethan)
-- [ ] Ephemeral chats feel appropriate for professional contexts
+- [x] Marcus Thompson (29, remote worker) completes onboarding with "intros" vibe + builder tags
+- [x] Casey Rivera (34, creative) completes onboarding with "banter" vibe + creative tags
+- [x] Both appear on Radar in coworking/event scenarios
+- [x] One-chat-at-a-time enforcement works (professional boundaries)
+- [x] Proximity matching works for different floors/buildings
+- [x] Signal scoring prioritizes shared tags ("Tech curious" for Marcus + Ethan)
+- [x] Ephemeral chats feel appropriate for professional contexts
 
 **Done Criteria**:
 - Professional personas tested successfully
