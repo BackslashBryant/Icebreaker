@@ -2,7 +2,7 @@
 
 **Research Date**: 2025-01-27  
 **Researcher**: Scout 🔎  
-**Issue**: #7 - Profile/Settings Page  
+**Issue**: #5 - Profile/Settings Page (originally #7)  
 **Status**: ✅ Complete
 
 ## Research Question

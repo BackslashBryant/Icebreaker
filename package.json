@@ -16,6 +16,7 @@
     "github:labels": "node ./tools/github-labels.mjs",
     "cursor:extensions": "node ./tools/cursor-extensions.mjs",
     "status": "node ./tools/health-check.mjs",
+    "whats-next": "node ./tools/whats-next.mjs",
     "setup": "node ./tools/setup.mjs",
     "setup:tokens": "node ./tools/token-wizard.mjs",
     "mcp:load-env": "node ./tools/load-env-to-system.mjs",

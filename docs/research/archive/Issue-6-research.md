@@ -2,7 +2,7 @@
 
 **Research Date**: 2025-01-27  
 **Researcher**: Scout 🔎  
-**Issue**: #8 - Chat Request Cooldowns  
+**Issue**: #6 - Chat Request Cooldowns (originally #8)  
 **Status**: ✅ Complete
 
 ## Research Question

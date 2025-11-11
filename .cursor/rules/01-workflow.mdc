@@ -12,60 +12,67 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Before anything else, confirm `docs/vision.md` and `docs/ConnectionGuide.md` are current.
 - Every feature, bug, or spike starts as an Issue.
 - If none exists, open one with the appropriate template (`/.github/ISSUE_TEMPLATE/`).
-- Reference the issue URL in `/docs/Plan.md`, commits, and PR description.
+- Reference the issue URL in `docs/plans/Issue-<#>.md`, commits, and PR description.
 
 ## 0.5. Research (Scout) - MANDATORY FIRST STEP
 - **MANDATORY**: Scout must research the feature/issue BEFORE planning begins.
-- Create issue-specific research file: `docs/research/Issue-<#>-research.md`
+- **CRITICAL**: All research MUST be documented directly in the issue-specific plan file: `docs/plans/Issue-<#>.md`
 - Research question, sources, findings, recommendations, rollback options
-- **PAUSE**: Research must be complete and documented before Vector creates plan.
-- **NO EXCEPTIONS**: Do not proceed to planning without completed research.
+- **DO NOT** create separate research files - all research goes in the plan file under a "Research" section
+- **PAUSE**: Research must be complete and documented in the plan file before Vector creates plan.
+- **NO EXCEPTIONS**: Do not proceed to planning without completed research in the plan file.
 
 ## 1. Plan (Vector) - MANDATORY AFTER RESEARCH
-- **MANDATORY**: Vector must wait for Scout's research to be complete.
-- Reference Scout's research file: `docs/research/Issue-<#>-research.md`
+- **MANDATORY**: Vector must wait for Scout's research to be complete in the plan file.
+- **CRITICAL**: All planning, team notes, decisions, and progress MUST be documented in the issue-specific plan file: `docs/plans/Issue-<#>.md`
 - Use Cursor Plan Mode with the issue context plus `docs/vision.md` and research findings.
-- Save the plan to `/docs/Plan.md` (3-7 numbered checkpoints, acceptance tests, owners). Include "Do not continue past step _n_ without approval."
+- Save the plan to `docs/plans/Issue-<#>.md` (NOT `docs/Plan.md` - that's the index only)
+- Plan file must include: Goals, Research section, Steps, Team Review section, Decisions section, Progress section
 - Add labels: `agent:vector`, relevant implementer labels, and `status:plan`.
 - **PAUSE**: Plan must be reviewed by team before implementation begins.
 - **NO EXCEPTIONS**: Do not proceed to implementation without team review of plan.
 
 ## 1.5. Team Review - MANDATORY BEFORE EXECUTION
 - **MANDATORY**: All agents review the plan and provide notes/feedback.
+- **CRITICAL**: All team review notes, approvals, and decisions MUST be documented in the issue-specific plan file: `docs/plans/Issue-<#>.md` under a "Team Review" section
 - Vector coordinates team review session.
 - Address any concerns or gaps before proceeding.
-- **CRITICAL CHECKPOINT**: Create `.notes/features/<slug>/team-review-approved.md` file ONLY after all agents have reviewed and approved the plan.
-- **PAUSE**: Implementation cannot begin until plan is approved by team AND approval file exists.
-- **NO EXCEPTIONS**: Do not proceed to implementation without team approval AND approval file.
-- **VERIFICATION**: Before starting any implementation work, check that `.notes/features/<slug>/team-review-approved.md` exists. If missing, STOP and coordinate team review.
+- **CRITICAL CHECKPOINT**: Update the plan file with team review approval status. The plan file IS the approval record.
+- **DO NOT** create separate team review files - all review notes go in the plan file
+- **PAUSE**: Implementation cannot begin until plan is approved by team AND approval is documented in the plan file.
+- **NO EXCEPTIONS**: Do not proceed to implementation without team approval documented in the plan file.
+- **VERIFICATION**: Before starting any implementation work, check that the plan file contains "Team Review: ✅ APPROVED" section. If missing, STOP and coordinate team review.
 
 ## 2. Branching & MCP Setup
 - **MANDATORY**: Create branch with format `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`) **BEFORE starting any work**. Check current branch matches the issue being worked on. If on wrong branch, create correct branch and move commits.
 - **CRITICAL**: Before ANY git operation (add, commit, push), verify:
   1. Current directory is the project root (contains `.git` folder)
   2. Current branch matches the issue being worked on (check with `git branch --show-current`)
-  3. If directory is wrong, navigate to project root: `cd "$(git rev-parse --show-toplevel)"`
-  4. If branch is wrong, create correct branch or switch: `git checkout -b agent/<agent>/<issue>-<slug>`
+  3. **Branch-feature alignment**: Run `node tools/verify-branch-feature.mjs` to verify branch matches `.notes/features/current.json`. If mismatch detected, run `node tools/verify-branch-feature.mjs --fix` to auto-fix or manually switch branches.
+  4. If directory is wrong, navigate to project root: `cd "$(git rev-parse --show-toplevel)"`
+  5. If branch is wrong, create correct branch or switch: `git checkout -b agent/<agent>/<issue>-<slug>`
 - **NEVER** run git commands from parent directories or outside the repository
+- **BRANCH VERIFICATION**: The pre-commit hook and `tools/verify-branch-feature.mjs` enforce branch-feature alignment. Always verify before starting work on a new issue.
 - Branch name format: `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`).
 - Install/refresh GitHub MCP in Cursor; authenticate using a PAT with `repo`, `workflow`, `issues`.
 - Nexus or the acting human runs `npm run agents:install-hook` to copy the path-scope pre-commit hook locally.
 - Run `npm run preflight` before pushing to ensure scaffolding is intact (includes branch name validation).
-- Execute `npm run mcp:suggest` after dependency or config changes and note the recommendations in `.notes/` or the active plan; run `npm run mcp:suggest -- --install <id>` to append required servers to `.cursor/mcp.json`.
+- Execute `npm run mcp:suggest` after dependency or config changes and note the recommendations in the active plan file (`docs/plans/Issue-<#>.md`); run `npm run mcp:suggest -- --install <id>` to append required servers to `.cursor/mcp.json`.
 - Record any new ports, endpoints, or services in `docs/ConnectionGuide.md` immediately.
 
 ## 2. Implement (Forge/Link/Glide/Apex/Cider) - MANDATORY AFTER PLAN APPROVAL
 - **MANDATORY PRE-FLIGHT CHECKS** (must pass ALL before starting):
-  1. Research file exists: `docs/research/Issue-<#>-research.md`
-  2. Plan file exists: `docs/Plan.md` with checkpoints
-  3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
-  4. Plan explicitly states "Team review complete - approved for implementation"
+  1. Plan file exists: `docs/plans/Issue-<#>.md` with Research section complete
+  2. Plan file contains Team Review section with approval status
+  3. Plan file explicitly states "Team Review: ✅ APPROVED"
+- **CRITICAL**: All progress, decisions, test results, edge cases, and notes MUST be documented in the issue-specific plan file: `docs/plans/Issue-<#>.md`
+- **DO NOT** create separate progress files, test result files, or edge case files - all content goes in the plan file
 - **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any implementation files. Report which check failed and coordinate with Vector.
 - Stay in Plan Mode until the caller says "Proceed." Once approved, execute one checkpoint at a time.
 - Work within your agent branch and path scope.
 - Commit early/often; reference the issue (`#1234`) in commit messages.
 - Run targeted tests right after each change; paste the command/output in chat.
-- Update `.notes/features/<slug>/progress.md` with **Current Issues** if something fails or loops.
+- Update the plan file's "Progress" section with **Current Issues** if something fails or loops.
 - Push directly to GitHub branch (no PR needed). Commit and push when ready.
 - Use GitHub MCP (or `gh`) for branch creation. Terminal git is used for commits and pushes.
 
@@ -99,7 +106,7 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
   4. **MANDATORY**: Update GitHub issue labels: `gh issue edit <issue#> --add-label "status:done" --remove-label "status:in-progress"`
      - **DO NOT** ask user for permission - this is a mandatory completion step
   5. Close the Issue with a recap noting direct commits (optional - can leave open for tracking)
-- Research file already exists at `docs/research/Issue-<#>-research.md` (created during research phase).
+- **CRITICAL**: Ensure the plan file (`docs/plans/Issue-<#>.md`) contains complete research, team review, decisions, progress, test results, and edge cases. The plan file IS the complete record of the issue.
 - Archive security notes (if any) in `/docs/security/`.
 - Update `/docs/agents/KICKOFF.md` sanity checklist if the flow uncovered gaps.
 - **CRITICAL**: Never complete an issue without pushing commits and updating the GitHub issue. This is mandatory, not optional. These steps should happen automatically without user reminders.
@@ -113,6 +120,11 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 ## Guardrails
 - Never merge directly to `main`. Enforce branch protections: require PR, passing checks, linear history.
 - Keep secrets in GitHub Actions secrets or environment variables; never commit `.env` files.
+- If MCP access changes (new services, revoked tokens), open an issue for Nexus to update `.cursor/config.json` and automation.
+- **Repository Mode**: Template repos track Cursor files (`.cursor/`). App repos block them. The pre-commit hook enforces this separation. See `docs/development/SEPARATION.md` for mode conversion and override procedures.
+
+Follow this loop for every change to keep GitHub the source of truth and Cursor Agents accountable.***
+
 - If MCP access changes (new services, revoked tokens), open an issue for Nexus to update `.cursor/config.json` and automation.
 - **Repository Mode**: Template repos track Cursor files (`.cursor/`). App repos block them. The pre-commit hook enforces this separation. See `docs/development/SEPARATION.md` for mode conversion and override procedures.
 

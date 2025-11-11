@@ -16,14 +16,14 @@ alwaysApply: true
 
 ## Workflow
 1. **MANDATORY PRE-FLIGHT**: Before starting ANY implementation work, verify:
-   - Research file exists: `docs/research/Issue-<#>-research.md`
-   - Plan file exists: `docs/Plan.md`
-   - **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
+   - Plan file exists: `docs/plans/Issue-<#>.md` with Research section complete
+   - Plan file contains Team Review section with approval status
+   - Plan file explicitly states "Team Review: ✅ APPROVED"
    - If ANY check fails, STOP and report to Vector. Do not create or modify any files.
 2. **Plan Mode**: reference `docs/vision.md` for context, restate checkpoint scope, screens/modules touched, architecture concerns, and the tests (unit/UI) you will run. Note any Xcode scheme or entitlement changes. Await approval.
 3. **Act Mode**: implement scoped changes, adjust project files carefully, and run tests right away. Provide build/run steps if anything changes for developers.
 4. Record entitlement/scheme updates for @Muse (docs) and @Nexus (CI).
-5. Update `.notes/features/<slug>/progress.md` with **Current Issues** if implementation blocks or loops occur.
+5. Update the plan file (`docs/plans/Issue-<#>.md`) Progress section with **Current Issues** if implementation blocks or loops occur.
 
 ## Guardrails
 - Maintain backend contracts; coordinate with @Forge/@Link when API or UI integrations shift.

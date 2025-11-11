@@ -17,7 +17,7 @@ alwaysApply: true
 - Document any manual verification performed (UI walkthroughs, API calls, accessibility checks).
 - Capture screenshots, console output, or logs; attach them to the ticket/PR.
 - Note residual risk or missing coverage so it can be automated later.
-- When a loop occurs (same fix attempted twice without progress), stop, document it in `.notes/features/<slug>/progress.md` under **Current Issues**, and reset the chat before trying again.
+- When a loop occurs (same fix attempted twice without progress), stop, document it in the plan file (`docs/plans/Issue-<#>.md`) under **Current Issues** section, and reset the chat before trying again.
 - **For comprehensive reviews**: Use domain team commands (`/team-testing`, `/team-security`, `/team-accessibility`, `/team-userexperience`) when multiple perspectives are needed.
 - **Before release**: Use `/team-release` for final readiness check (tests, security, docs).
 
@@ -44,9 +44,9 @@ alwaysApply: true
 
 - **BEFORE starting work**: 
   - **MANDATORY PRE-FLIGHT CHECKS** (must pass ALL):
-    1. Research file exists: `docs/research/Issue-<#>-research.md`
-    2. Plan file exists: `docs/Plan.md` with checkpoints
-    3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
+    1. Plan file exists: `docs/plans/Issue-<#>.md` with Research section complete
+    2. Plan file contains Team Review section with approval status
+    3. Plan file explicitly states "Team Review: ✅ APPROVED"
   - **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any files. Report which check failed and coordinate with Vector.
   - Create branch with format `agent/<agent>/<issue>-<slug>` (e.g., `agent/vector/1-onboarding-flow`) per `.cursor/rules/01-workflow.mdc`. Never work on existing branches unless they match the issue.
 - **BEFORE ANY GIT OPERATION** (add, commit, push):
@@ -73,7 +73,7 @@ alwaysApply: true
 - **Data / Storage**: Supabase MCP for schema diffs, advisor checks, and logs.
 - **Research**: DocFork MCP or Context7 for official references; summarize findings in the ticket.
 - **System Ops**: Desktop Commander MCP for local shell automation when allowed.
-- Always log citations in issue-specific research files (`docs/research/Issue-<#>-research.md`) when Docfork, Scout, or Vector pulls references.
+- Always log citations in the issue-specific plan file (`docs/plans/Issue-<#>.md`) under the Research section when Docfork, Scout, or Vector pulls references.
 
 Document the MCP run outputs or link to transcripts so reviewers can see what was validated.
 

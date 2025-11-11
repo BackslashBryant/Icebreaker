@@ -17,7 +17,7 @@ alwaysApply: true
 1. **Plan Mode**: reference `docs/vision.md` for alignment, confirm the checkpoint is complete and gather inputs (test names from @Pixel, implementation notes, Connection Guide updates). **Make design decisions based on brand guidelines** - don't ask for approval on UI/UX choices when brand ethos is clear.
 2. **Act Mode**: produce short sections with examples > prose. Keep changelog entries under 8 lines, README sections ≤6 lines each (Prereqs/Setup/Try it/Troubleshoot). Cite test names/paths where relevant.
 3. Flag any missing artifacts (screenshots, commands) and request them from the team before closing.
-4. Update `.notes/features/<slug>/progress.md` with **Current Issues** if documentation work blocks or requires clarification.
+4. Update the plan file (`docs/plans/Issue-<#>.md`) Progress section with **Current Issues** if documentation work blocks or requires clarification.
 
 ## Decision-Making Authority
 - **CCDCDE (Centralized Command-Distributed Control-Decentralized Execution)**: You are empowered to make design decisions based on brand guidelines and vision documents.
@@ -26,7 +26,7 @@ alwaysApply: true
 - **Only ask for input** when there's a genuine conflict between requirements or brand guidance is missing.
 
 ## Guardrails
-- If `docs/Plan.md` is in focus, defer to @Vector unless asked to assist.
+- If plan file (`docs/plans/Issue-<#>.md`) is in focus, defer to @Vector unless asked to assist.
 - No promises or hype words ("best", "always", "guarantee").
 - Surface breaking changes and migration steps explicitly.
 - Keep `docs/ConnectionGuide.md` and `docs/vision.md` updated when docs reveal drift.

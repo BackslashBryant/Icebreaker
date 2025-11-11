@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-#### MVP: Integration Testing & Launch Preparation (Issue #6)
+#### MVP: Integration Testing & Launch Preparation (Issue #4)
 - Cross-browser testing: Added Firefox and Edge browser projects to Playwright config for comprehensive cross-browser E2E testing
 - Accessibility compliance: WCAG AA compliance verified across all pages using axe-core
 - Security audit: Dependency vulnerability scan complete, no high/critical vulnerabilities in production dependencies
@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
-#### MVP: UX Review Fixes + Bootup Random Messages (Issue #9)
+#### MVP: UX Review Fixes + Bootup Random Messages (Issue #7)
 - Critical brand fixes: Removed HealthStatus component from Welcome screen, fixed page title to "IceBreaker"
 - UX improvements: Tightened consent checkbox copy (split into "I am 18 or older" + separate agreement text), standardized all button border radius to `rounded-2xl` per brand guide
 - Bootup random messages: Expanded message pool to 106 on-brand messages with random selection (4 messages + "READY" per boot sequence)
@@ -61,7 +61,7 @@ See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
 See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
-#### MVP: Chat Request Cooldowns (Issue #8)
+#### MVP: Chat Request Cooldowns (Issue #6)
 - Cooldown system: Session-level cooldowns after 3 declined chat invites within 10 minutes
 - Cooldown duration: 30 minutes default (configurable 15-60 min via environment variables)
 - Cooldown enforcement: Users cannot send chat requests during active cooldown
@@ -90,7 +90,7 @@ See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
 See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
-#### MVP: Profile/Settings Page (Issue #7)
+#### MVP: Profile/Settings Page (Issue #5)
 - Profile page: Accessible from Radar and Chat headers, displays handle, visibility toggle, emergency contact, and accessibility settings
 - Visibility toggle: Users can show/hide themselves on Radar (persisted in session)
 - Emergency contact: Users can add phone (E.164) or email (RFC 5322) for Panic Button notifications
@@ -121,7 +121,7 @@ See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
 See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
-#### MVP: Block/Report (Safety Controls) (Issue #6)
+#### MVP: Block/Report (Safety Controls) (Issue #4)
 - Block functionality: Users can block others from Chat header (⋯ menu) or PersonCard (tap-hold/right-click)
 - Report functionality: Users can report others with categories (Harassment, Spam, Impersonation, Other)
 - Safety exclusion: Users with ≥3 unique reports temporarily hidden from Radar (1 hour default)
@@ -157,7 +157,7 @@ See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
 See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
-#### MVP: Panic Button (Emergency Exit & Safety) (Issue #5)
+#### MVP: Panic Button (Emergency Exit & Safety) (Issue #3)
 - Fixed floating action button (FAB): Always accessible from Radar and Chat screens
 - Panic confirmation flow: "Everything okay?" dialog with calm, reassuring copy
 - Safety exclusion: Temporarily hides user from Radar for 1 hour (configurable)
@@ -188,7 +188,7 @@ See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
 See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
-#### MVP: Chat (Ephemeral 1:1 Messaging) (Issue #3)
+#### MVP: Chat (Ephemeral 1:1 Messaging) (Issue #2)
 - Terminal-style chat interface: black background, teal monospace text, `[HH:MM]` timestamps
 - Ephemeral messaging: no storage, no history, messages relayed via WebSocket only
 - Chat request flow: one-tap initiation from Radar, accept/decline handling
@@ -223,7 +223,7 @@ See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
 See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
-#### MVP: Radar View (Proximity-Based Presence Visualization) (Issue #2)
+#### MVP: Radar View (Proximity-Based Presence Visualization) (Issue #1)
 - CRT-style radar sweep visualization with retro aesthetic
 - Accessible list view for keyboard navigation and screen readers
 - Real-time WebSocket connection for radar updates (`ws://localhost:8000/ws?token=<sessionToken>`)
@@ -304,7 +304,7 @@ See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
 See `.notes/features/onboarding-flow/gap-analysis.md` for complete DoD verification.
 
-## [0.1.0] - 2025-01-27
+## [0.1.0] - 2025-11-11
 
 ### Added
 

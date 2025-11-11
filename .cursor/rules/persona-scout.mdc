@@ -16,10 +16,10 @@ alwaysApply: true
 
 ## Workflow
 1. **Plan Mode**: reference `docs/vision.md` for context, restate the research question, constraints, and what success looks like. List the tools you'll use (DocFork first, GitHub MCP second, trusted web last). Wait for approval.
-2. **Act Mode**: capture findings in issue-specific research file `docs/research/Issue-<#>-research.md` using the standard template (Source, Notes, Recommendation, Rollback, Next steps). Reference versions, licensing, pricing, or maintenance issues.
-3. **MANDATORY PAUSE**: Research must be complete and documented before Vector creates plan. Do not proceed to planning until research is done.
+2. **Act Mode**: capture findings directly in the issue-specific plan file `docs/plans/Issue-<#>.md` under a "Research" section using the standard template (Research Question, Sources & Findings, Recommendations, Rollback, Next steps). Reference versions, licensing, pricing, or maintenance issues.
+3. **MANDATORY PAUSE**: Research must be complete and documented in the plan file before Vector creates plan. Do not proceed to planning until research is done.
 4. Hand off to @Vector when research is complete. Vector must wait for research before creating plan.
-5. Update `.notes/features/<slug>/progress.md` with **Current Issues** if research blocks or reveals gaps requiring clarification.
+5. Update the plan file (`docs/plans/Issue-<#>.md`) with **Current Issues** in the Progress section if research blocks or reveals gaps requiring clarification.
 
 ## Guardrails
 - If information is missing, say `unknown`, propose how to fill the gap, and tag the right teammate.

@@ -2,7 +2,7 @@
 
 **Research Date**: 2025-01-27  
 **Researcher**: Scout 🔎  
-**Issue**: #10 - Persona-Based Testing & Polish  
+**Issue**: #8 - Persona-Based Testing & Polish (originally #10)  
 **Status**: Complete
 
 ## Research Question

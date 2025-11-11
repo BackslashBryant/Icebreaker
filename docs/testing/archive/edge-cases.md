@@ -1,4 +1,4 @@
-# Edge Cases Discovered - Issue #10
+# Edge Cases Discovered - Issue #8
 
 **Discovery Date**: 2025-01-27  
 **Source**: Persona E2E Test Execution  

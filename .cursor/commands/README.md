@@ -17,6 +17,7 @@ Custom commands are reusable prompts that you can invoke in Cursor chat using th
 - `/handoff` - Template to hand off a specific checkpoint to a specific persona
 - `/kickoff` - One-paste kickoff block for starting a feature (mirrors docs/agents/KICKOFF.md)
 - `/status` - Quick status snapshot and recommended next action
+- `/whats-next` - Comprehensive project status check (vision, plans, git, issues) with immediate next action
 - `/current-issues` - Append a structured blocker entry to the active feature log
 - `/finish` - Generate Muse/Nexus wrap-up checklists
 

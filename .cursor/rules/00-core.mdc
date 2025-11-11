@@ -14,9 +14,9 @@ alwaysApply: true
 
 ## Safety Rails We Keep Even When Vibing
 - **MANDATORY WORKFLOW CHECKPOINTS**: Before starting ANY implementation work, verify:
-  1. Research file exists: `docs/research/Issue-<#>-research.md`
-  2. Plan file exists: `docs/Plan.md` with checkpoints
-  3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
+  1. Plan file exists: `docs/plans/Issue-<#>.md` with Research section complete
+  2. Plan file contains Team Review section with approval status
+  3. Plan file explicitly states "Team Review: ✅ APPROVED"
 - **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any implementation files. Coordinate with Vector for team review.
 - **MANDATORY GIT SAFETY CHECKS**: Before ANY git operation (add, commit, push), verify:
   1. Current directory is project root: Run `git rev-parse --show-toplevel` and ensure you're in that exact directory
@@ -27,12 +27,12 @@ alwaysApply: true
 - **NEVER** run git commands from parent directories or outside the repository
 - Never ship code you have not read; sanity-check diffs and run the quickest meaningful verification.
 - Flag real secrets, prod data, or compliance-sensitive areas before asking the agent to touch them.
-- Document gotchas in `.notes/` or the active plan so the next session inherits your context.
+- Document gotchas in the active plan file (`docs/plans/Issue-<#>.md`) so the next session inherits your context.
 - Be stupidly specific: name files, selectors, colors, padding, payload keys. Vague in -> vague out.
 - Ask before committing, pushing, installing new tech, or touching new services. Present the proposed command first.
 - No mock data in production paths. If placeholders are required, confirm with the caller or Pixel.
 - Maintain `docs/ConnectionGuide.md` anytime a port, endpoint, or credential changes.
-- When loops happen, stop, capture them in the **Current Issues** section of `.notes/features/<slug>/progress.md`, and restart the chat with that context.
+- When loops happen, stop, capture them in the **Current Issues** section of the plan file (`docs/plans/Issue-<#>.md`), and restart the chat with that context.
 
 ## Collaboration Rituals
 - Reference `docs/agents/PLAYBOOK.md` for handoffs, tone, and checkpoints.

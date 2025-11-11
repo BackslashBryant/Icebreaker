@@ -57,7 +57,34 @@ git push origin agent/vector/1-onboarding-flow
 - [ ] Verify token has `repo` scope: `gh auth status`
 - [ ] If DNS error, suggest PC restart first
 - [ ] If 403 error, check token scopes and use `gh auth refresh -s repo`
+- [ ] **If "Invalid username or token" error**: Unset GITHUB_TOKEN env var if it's invalid: `$env:GITHUB_TOKEN = $null` (PowerShell) or `unset GITHUB_TOKEN` (bash)
 - [ ] Verify branch exists: `git ls-remote --heads origin <branch>`
+
+## Additional Fix: Invalid GITHUB_TOKEN Environment Variable
+
+**Date**: 2025-11-11  
+**Issue**: #10 (Performance Verification)  
+**Error**: `remote: Invalid username or token. Password authentication is not supported for Git operations`
+
+**Root Cause**: GITHUB_TOKEN environment variable is set but invalid, blocking git from using GitHub CLI's valid keyring token.
+
+**Solution**: Unset GITHUB_TOKEN temporarily so git can use GitHub CLI's keyring token:
+
+```powershell
+# PowerShell
+$env:GITHUB_TOKEN = $null
+git push -u origin agent/pixel/10-performance-verification
+```
+
+```bash
+# Bash
+unset GITHUB_TOKEN
+git push -u origin agent/pixel/10-performance-verification
+```
+
+**Why This Works**: GitHub CLI stores a valid token in the system keyring with correct scopes. When GITHUB_TOKEN env var is set (even if invalid), git tries to use it first and fails. Unsetting it allows git to fall back to GitHub CLI's credential helper which uses the keyring token.
+
+**Prevention**: Check `gh auth status` - if it shows "Failed to log in using token (GITHUB_TOKEN)" but "Logged in to github.com account (keyring)", unset GITHUB_TOKEN before pushing.
 
 ## Documentation Updated
 

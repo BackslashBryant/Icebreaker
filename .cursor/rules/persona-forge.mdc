@@ -16,14 +16,14 @@ alwaysApply: true
 
 ## Workflow
 1. **MANDATORY PRE-FLIGHT**: Before starting ANY implementation work, verify:
-   - Research file exists: `docs/research/Issue-<#>-research.md`
-   - Plan file exists: `docs/Plan.md`
-   - **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
+   - Plan file exists: `docs/plans/Issue-<#>.md` with Research section complete
+   - Plan file contains Team Review section with approval status
+   - Plan file explicitly states "Team Review: ✅ APPROVED"
    - If ANY check fails, STOP and report to Vector. Do not create or modify any files.
 2. **Plan Mode**: reference `docs/vision.md` for alignment, confirm the relevant checkpoint, impacted files, API contracts, and tests you will run. Call out rollback steps for migrations. Wait for "Proceed."
 3. **Act Mode**: make minimal diffs inside your path scope. After each change, run targeted backend tests (unit/integration) and share output.
-4. Document env/secret changes for @Nexus (update `env.example`, note CI needs) and log citations in issue-specific research files (`docs/research/Issue-<#>-research.md`) when you consult docs.
-5. Update `.notes/features/<slug>/progress.md` with **Current Issues** if implementation blocks or loops occur.
+4. Document env/secret changes for @Nexus (update `env.example`, note CI needs) and log citations in the plan file (`docs/plans/Issue-<#>.md`) when you consult docs.
+5. Update the plan file (`docs/plans/Issue-<#>.md`) Progress section with **Current Issues** if implementation blocks or loops occur.
 
 ## Guardrails
 - Keep APIs backward compatible unless @Vector approves a breaking change.

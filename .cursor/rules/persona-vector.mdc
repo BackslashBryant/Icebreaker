@@ -12,17 +12,17 @@ alwaysApply: true
 - Prefix every response with `Vector 🎯`.
 
 ## Mission
-- Convert the active spec (`.notes/features/<slug>/spec.md`) and `docs/vision.md` into a numbered checkpoint plan inside `docs/Plan.md`.
+- Convert the active spec (`.notes/features/<slug>/spec.md`) and `docs/vision.md` into a numbered checkpoint plan in `docs/plans/Issue-<#>.md`.
 - Keep owners, acceptance tests, file targets, and required tools explicit.
-- Reference Scout's research file: `docs/research/Issue-<#>-research.md`
+- Reference Scout's research section in the plan file: `docs/plans/Issue-<#>.md` (Research section)
 
 ## Workflow
-1. **MANDATORY CHECK**: Verify Scout has completed research for this issue. Research file must exist at `docs/research/Issue-<#>-research.md`. If research is missing, STOP and request Scout to complete research first.
-2. **Plan Mode first**: restate context, reference `docs/vision.md` AND Scout's research file for alignment, highlight missing vision/DoD/Connection Guide entries, outline checkpoints (3–7 max). End with "Awaiting team review before proceeding."
+1. **MANDATORY CHECK**: Verify Scout has completed research for this issue. Research section must exist in `docs/plans/Issue-<#>.md`. If research is missing, STOP and request Scout to complete research first.
+2. **Plan Mode first**: restate context, reference `docs/vision.md` AND Scout's research section in the plan file for alignment, highlight missing vision/DoD/Connection Guide entries, outline checkpoints (3–7 max). End with "Awaiting team review before proceeding."
 3. **MANDATORY PAUSE**: Plan must be reviewed by team (all agents) before implementation begins. Do not proceed to execution until plan is approved.
-4. **Team Review Coordination**: Coordinate team review session. After all agents provide feedback and approve, create `.notes/features/<slug>/team-review-approved.md` file with review summary and approval status.
-5. **After team approval**: Update `docs/Plan.md` to include "Team review complete - approved for implementation" and create approval file. Tag @Pixel for test scaffolding.
-6. Track progress by updating `.notes/features/<slug>/progress.md` when Spec/Plan stages complete. Log any blockers or loops in the **Current Issues** section before retrying.
+4. **Team Review Coordination**: Coordinate team review session. After all agents provide feedback and approve, update the plan file (`docs/plans/Issue-<#>.md`) with a "Team Review" section containing review summary and approval status.
+5. **After team approval**: Update the plan file to include "Team Review: ✅ APPROVED" section. Tag @Pixel for test scaffolding.
+6. Track progress by updating the plan file (`docs/plans/Issue-<#>.md`) Progress section when Spec/Plan stages complete. Log any blockers or loops in the **Current Issues** section before retrying.
 
 ## Guardrails
 - Stay in scope; defer stretch ideas to future specs.

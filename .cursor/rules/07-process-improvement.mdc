@@ -8,6 +8,35 @@ alwaysApply: false
 
 Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: describe the trigger, the lesson, and the rule/update that resulted.
 
+## 2025-01-27: Branch-Feature Alignment Enforcement
+
+**Trigger**: Changes for Issues #10 and #12 were made on Issue #9 branch, causing branch confusion and requiring manual cleanup.
+**Lesson**: Agents must verify branch matches current feature BEFORE starting work. Branch-feature misalignment causes commits on wrong branches, making cleanup difficult and breaking the audit trail.
+**Rule Update**: 
+- **MANDATORY**: Before starting ANY work on an issue, verify branch matches `.notes/features/current.json`:
+  1. Run `node tools/verify-branch-feature.mjs` to check alignment
+  2. If mismatch detected, run `node tools/verify-branch-feature.mjs --fix` to auto-switch or manually create correct branch
+  3. Never start work without verifying branch-feature alignment
+- **Pre-commit check**: `tools/preflight.mjs` now includes branch-feature alignment check
+- **Workflow rule**: Updated `.cursor/rules/01-workflow.mdc` to require branch verification before git operations
+- **Cleanup tool**: Created `tools/cleanup-branches.mjs` to organize changes by issue (for recovery only)
+
+**Prevention**:
+- Always check `node tools/verify-branch-feature.mjs` before starting work
+- Update `.notes/features/current.json` when switching issues
+- Pre-commit hook will warn (but not block) on branch-feature mismatch
+- Preflight check will fail if branch doesn't match current feature
+
+**Files Created**:
+- `tools/verify-branch-feature.mjs` - Branch-feature verification script with auto-fix
+- `tools/cleanup-branches.mjs` - Recovery script to organize changes by issue
+
+**Files Updated**:
+- `.cursor/rules/01-workflow.mdc` - Added branch-feature verification requirement
+- `tools/preflight.mjs` - Added branch-feature alignment check
+
+---
+
 ## 2025-01-XX: Testing Infrastructure & Gap Remediation
 
 **Trigger**: Testing gaps identified (security, edge cases, performance), tests hanging without timeouts, no centralized logging infrastructure
@@ -97,7 +126,7 @@ Append entries directly to `/docs/process-improvement.mdc`. Keep them concise: d
 
 ## 2025-11-10: Issue Completion Protocol - Automatic Push and GitHub Updates
 
-**Trigger**: User had to remind agent to push commits and update GitHub issue after completing Issue #6
+**Trigger**: User had to remind agent to push commits and update GitHub issue after completing Issue #4
 **Lesson**: When completing an issue, pushing commits and updating GitHub issues are MANDATORY steps that should happen automatically without user reminders. These are completion steps, not development steps that require approval.
 **Root Cause**: Rules said "ask before pushing" which was interpreted to include completion steps, but completion steps should be automatic.
 **Rule Update**: 

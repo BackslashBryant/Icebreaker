@@ -91,7 +91,7 @@ case "$branch" in
   agent/glide/*)    allowed='^(app/|pwa/|public/|service-worker)' ;;
   agent/apex/*)     allowed='^android/' ;;
   agent/cider/*)    allowed='^ios/' ;;
-  agent/pixel/*)    allowed='^tests/|^jest|^vitest' ;;
+  agent/pixel/*)    allowed='^(tests/|backend/tests/|frontend/tests/|jest|vitest|docs/testing/|Docs/testing/|Docs/plans/Issue-|docs/plans/Issue-|Docs/troubleshooting/|docs/troubleshooting/)' ;;
   agent/muse/*)     allowed='^(docs/|README\.md|CHANGELOG\.md)' ;;
   agent/nexus/*)    allowed='^(\.github/|\.ci/|Dockerfile|vercel|deploy)' ;;
   agent/sentinel/*) allowed='^docs/security/' ;;

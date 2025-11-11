@@ -78,7 +78,7 @@ Open multiple browser windows (use Incognito/Private mode for additional session
 
 **See `QUICKSTART.md` for detailed instructions and troubleshooting.**
 
-**Test Results** (Issue #6 - Integration Testing):
+**Test Results** (Issue #4 - Integration Testing):
 - ✅ Cross-browser compatibility: Tests configured for Chrome, Firefox, Edge
 - ✅ Accessibility: WCAG AA compliance verified across all pages
 - ✅ Security: No high/critical vulnerabilities in production dependencies
@@ -96,7 +96,7 @@ See `.notes/features/onboarding-flow/` for detailed test results and verificatio
 
 ---
 
-## Try It: Radar View (Issue #2)
+## Try It: Radar View (Issue #1)
 
 The Radar View feature is complete and ready to use:
 
@@ -109,7 +109,7 @@ The Radar View feature is complete and ready to use:
 4. **Interact with people**:
    - Click on a person (sweep or list) to view their details
    - Person card shows handle, vibe, tags, signal score, and proximity tier
-   - "START CHAT" button initiates chat request (Issue #3)
+   - "START CHAT" button initiates chat request (Issue #2)
 
 **Features**:
 - Real-time WebSocket connection for radar updates
@@ -119,7 +119,7 @@ The Radar View feature is complete and ready to use:
 - WCAG AA compliant (keyboard navigation, screen reader support, reduced motion)
 - Safety exclusions (sessions with safety flags excluded from results)
 
-**Test Results** (Issue #2):
+**Test Results** (Issue #1):
 - ✅ Backend: 37/37 unit tests passing (Signal Engine, Proximity Utils, SessionManager, WebSocket)
 - ✅ Frontend: 31/31 unit tests passing (Radar, RadarList, PersonCard, location-utils)
 - ✅ E2E: Test scaffold created (full execution in Step 7)
@@ -129,7 +129,7 @@ See `docs/Plan.md` for complete implementation details.
 
 ---
 
-## Try It: Block/Report (Safety Controls) (Issue #6)
+## Try It: Block/Report (Safety Controls) (Issue #4)
 
 The Block/Report feature provides safety controls for users to block or report others:
 
@@ -160,7 +160,7 @@ The Block/Report feature provides safety controls for users to block or report o
 - Accessibility: Keyboard navigation, ARIA labels, screen reader support
 - WCAG AA compliant: All dialogs and menus accessible
 
-**Test Results** (Issue #6):
+**Test Results** (Issue #4):
 - ✅ Backend: 66/66 unit tests passing (safety endpoints, SafetyManager, ReportManager, Signal Engine)
 - ✅ Frontend: Tests created (BlockDialog, ReportDialog, useSafety, PersonCard tap-hold)
 - ✅ Safety exclusion: Verified (≥3 unique reports triggers exclusion)
@@ -171,7 +171,7 @@ See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
 ---
 
-## Try It: Profile/Settings Page (Issue #7)
+## Try It: Profile/Settings Page (Issue #5)
 
 The Profile/Settings page allows users to manage their visibility, emergency contacts, and accessibility preferences:
 
@@ -203,7 +203,7 @@ The Profile/Settings page allows users to manage their visibility, emergency con
 - Keyboard navigation: All interactive elements accessible via keyboard
 - WCAG AA compliance: ARIA labels, screen reader support, high-contrast mode meets contrast ratios
 
-**Test Results** (Issue #7):
+**Test Results** (Issue #3 - Panic Button):
 - ✅ Backend: 21/21 unit tests passing (profile endpoints, SessionManager updates)
 - ✅ Frontend: Component tests created (VisibilityToggle, EmergencyContactInput, AccessibilityToggles, Profile page)
 - ✅ E2E: Profile page tests created (navigation, toggles, validation, accessibility)
@@ -241,7 +241,7 @@ The Panic Button feature provides an always-accessible emergency exit:
 - Keyboard accessible: Escape to cancel, Enter to confirm
 - WCAG AA compliant: ARIA labels, screen reader support
 
-**Test Results** (Issue #5):
+**Test Results** (Issue #3 - Panic Button):
 - ✅ Backend: 21/21 PanicManager tests passing
 - ✅ Frontend: 27/27 panic tests passing (components + hook)
 - ✅ Safety exclusion: Verified in Signal Engine tests

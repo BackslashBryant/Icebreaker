@@ -31,12 +31,12 @@ GitHub CLI (`gh`) cannot create issues or add comments because the token lacks t
 - ✅ Code complete and committed (`feat/3-chat` branch)
 - ✅ Tests passing (117 backend, 14 frontend)
 - ✅ Documentation updated
-- ❌ Issue #3 needs to be created (token lacks `issues` scope)
+- ❌ Issue #2 needs to be created (token lacks `issues` scope)
 - ❌ Completion comment needs to be added (token lacks `issues` scope)
 
 ## Next Steps
 1. Update GitHub token to include `issues` scope, OR
-2. Create Issue #3 manually via web UI
+2. Create Issue #2 manually via web UI
 3. Add completion comment manually
 
 **Files Ready**:

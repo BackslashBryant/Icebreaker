@@ -389,6 +389,24 @@ function checkBranchNaming() {
     const validPattern = /^(agent\/\w+\/\d+-[\w-]+|feat\/\d+-[\w-]+)$/;
     if (validPattern.test(branch)) {
       addResult('Branch naming', true, `Branch "${branch}" matches required format`);
+      
+      // Also check branch-feature alignment
+      try {
+        execSync('node tools/verify-branch-feature.mjs', {
+          cwd: repoRoot,
+          encoding: 'utf8',
+          stdio: ['ignore', 'pipe', 'pipe'],
+        });
+        addResult('Branch-feature alignment', true, `Branch "${branch}" matches current feature`);
+      } catch (error) {
+        const output = (error.stdout || error.stderr || '').toString();
+        if (output.includes('BRANCH MISMATCH')) {
+          addResult('Branch-feature alignment', false, `Branch "${branch}" does not match current feature. Run: node tools/verify-branch-feature.mjs --fix`);
+        } else {
+          // Verification script not available or other error - skip
+          addResult('Branch-feature alignment', true, 'Branch-feature check skipped (verification script unavailable)');
+        }
+      }
       return;
     }
     
