@@ -1,7 +1,8 @@
 # MCP Troubleshooting Guide
 
-> **Last Updated**: 2025-11-10  
-> **Key Changes**: Migrated from Smithery CLI to direct MCP server installations after STDIO support was discontinued.
+> **Last Updated**: 2025-11-11  
+> **Purpose**: Detailed troubleshooting guide for MCP server issues  
+> **Related**: See `docs/guides/setup/mcp-setup.md` for initial setup
 
 ## Quick Checks
 
@@ -27,31 +28,23 @@ Cursor supports two locations:
 
 If project-level isn't working, try copying to global:
 ```powershell
-# Copy project config to global location
 Copy-Item ".cursor\mcp.json" "$env:USERPROFILE\.cursor\mcp.json"
 ```
 
 ### 3. Clear npx Cache
 
 Sometimes npx cache causes issues:
-
 ```powershell
-# Windows
 Remove-Item -Recurse -Force "$env:LOCALAPPDATA\npm-cache\_npx"
 ```
-
 Then restart Cursor.
 
 ### 4. Test MCP Command Manually
 
 Test if the MCP server command works:
-
 ```powershell
-# Set env var in current session
 $env:GITHUB_TOKEN = "your_token_here"
-
-# Test GitHub MCP
-npx -y @smithery/cli@latest run github
+npx -y @modelcontextprotocol/server-github
 ```
 
 If this works but Cursor shows errors, it's a Cursor configuration issue.
@@ -85,6 +78,66 @@ NOT:
 1. Run `npm run mcp:load-env:win`
 2. Verify variable is set: `[System.Environment]::GetEnvironmentVariable('GITHUB_TOKEN', 'User')`
 3. **Restart Cursor completely** (close all windows)
+
+### Error: "Requires authentication" (GitHub MCP)
+
+**Root Cause**: Cursor IDE may not be reading environment variables correctly, or the MCP server process isn't inheriting them.
+
+**Solutions:**
+
+1. **Restart Cursor** (Most Common Fix)
+   - Close Cursor completely (all windows)
+   - Reopen Cursor
+   - MCP servers should now read the environment variables
+
+2. **Verify Environment Variable Format**
+   - Must use `${env:GITHUB_TOKEN}` (not `${GITHUB_TOKEN}` or hardcoded)
+
+3. **Test Token Manually**
+   ```powershell
+   [System.Environment]::GetEnvironmentVariable('GITHUB_TOKEN', 'User')
+   $token = [System.Environment]::GetEnvironmentVariable('GITHUB_TOKEN', 'User')
+   $headers = @{Authorization = "Bearer $token"}
+   Invoke-RestMethod -Uri "https://api.github.com/user" -Headers $headers
+   ```
+
+4. **Reload Environment Variables**
+   ```powershell
+   npm run mcp:load-env:win
+   ```
+   Then restart Cursor.
+
+5. **Check Cursor MCP Logs**
+   - View → Output
+   - Select "MCP Logs" from dropdown
+   - Look for specific error messages about authentication
+
+6. **Try Global Config Location**
+   ```powershell
+   Copy-Item ".cursor\mcp.json" "$env:USERPROFILE\.cursor\mcp.json"
+   ```
+   Then restart Cursor.
+
+7. **Clear npx Cache**
+   ```powershell
+   Remove-Item -Recurse -Force "$env:LOCALAPPDATA\npm-cache\_npx"
+   ```
+   Then restart Cursor.
+
+8. **Verify Token Permissions**
+   Your GitHub PAT needs these scopes:
+   - `repo` - Full control of private repositories
+   - `workflow` - Update GitHub Action workflows
+   - `read:org` (optional) - Read org membership
+   
+   Check at: https://github.com/settings/tokens
+
+9. **Test MCP Server Directly**
+   ```powershell
+   $env:GITHUB_TOKEN = [System.Environment]::GetEnvironmentVariable('GITHUB_TOKEN', 'User')
+   npx -y @modelcontextprotocol/server-github
+   ```
+   If this works but Cursor doesn't, it's a Cursor configuration issue.
 
 ### Error: "Command not found" or "npx failed"
 
@@ -137,45 +190,21 @@ NOT:
 - **STDIO Support Discontinued**: The `@smithery/cli run` command uses STDIO, which Smithery no longer supports
 - Smithery now requires **Streamable HTTP** protocols only
 - CLI commands are obsolete for production connections
-- Source: [Apify Blog - Smithery Alternative](https://blog.apify.com/smithery-alternative/)
 
 **Solutions:**
-1. **Test network connectivity:**
-   ```powershell
-   # Test if Smithery is reachable
-   curl https://smithery.ai
-   # Or
-   Test-NetConnection smithery.ai -Port 443
-   ```
-
-2. **Test Smithery CLI manually:**
-   ```powershell
-   $env:GITHUB_TOKEN = "your_token"
-   npx -y @smithery/cli@latest run @smithery-ai/github --key <your-key> --profile <your-profile>
-   ```
-   If this times out, the issue is network/Smithery, not Cursor.
-
-3. **Check firewall/proxy settings:**
-   - Windows Firewall may be blocking Node.js/npx
-   - Corporate proxy may require configuration
-   - Antivirus may be blocking network requests
-
-4. **Verify Smithery key/profile:**
-   - Check if key is still valid (may have expired)
-   - Verify profile name matches Smithery dashboard
-   - Try regenerating key in Smithery
-
-5. **MIGRATE TO DIRECT MCP SERVERS** (Required - Smithery CLI no longer works):
+1. **MIGRATE TO DIRECT MCP SERVERS** (Required):
    - **Remove**: `@smithery/cli@latest run @smithery-ai/github` (STDIO - deprecated)
    - **Use**: `npx -y @modelcontextprotocol/server-github` (direct installation)
    - This bypasses Smithery entirely and uses STDIO locally
-   - More reliable and doesn't depend on Smithery service availability
    - See migration guide below
 
-6. **Alternative: Use HTTP/Streamable HTTP endpoints** (if staying with Smithery):
-   - Update config to use HTTP URLs: `https://server.smithery.ai/@org/server/mcp?api_key=KEY&profile=PROFILE`
-   - Requires finding correct server paths for each MCP
-   - More complex but keeps Smithery integration
+2. **Run self-healing tool**: `npm run mcp:heal` - Detects deprecated Smithery CLI usage
+
+3. **Test network connectivity** (if staying with Smithery HTTP):
+   ```powershell
+   curl https://smithery.ai
+   Test-NetConnection smithery.ai -Port 443
+   ```
 
 ## Step-by-Step Fix
 
@@ -264,34 +293,13 @@ NOT:
    - **Playwright**: `@playwright/mcp` (direct package)
    - **Ref Tools**: `ref-tools-mcp` (direct package)
    - **Supabase**: Official hosted server at `https://mcp.supabase.com/mcp` (recommended - no npm package needed)
-   - **Filesystem**: `@modelcontextprotocol/server-filesystem`
-   - Search for more: `npm search @modelcontextprotocol/server` or `npm search mcp`
 
-**Supabase MCP Configuration** (Hosted Server):
-```json
-{
-  "mcpServers": {
-    "supabase": {
-      "url": "https://mcp.supabase.com/mcp?project_ref=YOUR_PROJECT_REF&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cstorage"
-    }
-  }
-}
-```
-No environment variables needed - authentication handled via browser on first use.
+3. **Run self-healing tool**: `npm run mcp:heal` - Detects deprecated Smithery CLI usage and suggests fixes
 
-3. **Servers Without Direct Equivalents**:
-   - **Toolbox** - Smithery-specific, no direct equivalent (use manual search in Smithery registry)
+4. **Restart Cursor completely** after migration
 
-4. **Run self-healing tool**: `npm run mcp:heal` - Detects deprecated Smithery CLI usage and suggests fixes
+## Related Documentation
 
-5. **Restart Cursor completely** after migration
-
-## Getting Help
-
-If still not working, gather:
-- Exact error messages from Cursor
-- Output of `npm run mcp:load-env:win`
-- Cursor version
-- Node.js version
-- Contents of `.cursor/mcp.json` (redact tokens!)
-- Confirmation that you've migrated from STDIO-based CLI commands
+- `docs/guides/setup/mcp-setup.md` - Initial setup guide
+- `docs/guides/reference/supabase-keys.md` - Supabase key reference
+- `.cursor/rules/04-integrations.mdc` - MCP usage rules for agents
