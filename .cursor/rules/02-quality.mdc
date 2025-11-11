@@ -81,7 +81,7 @@ async function loadSentry() {
 - Document any manual verification performed (UI walkthroughs, API calls, accessibility checks).
 - Capture screenshots, console output, or logs; attach them to the ticket/PR.
 - Note residual risk or missing coverage so it can be automated later.
-- When a loop occurs (same fix attempted twice without progress), stop, document it in `.notes/features/<slug>/progress.md` under **Current Issues**, and reset the chat before trying again.
+- When a loop occurs (same fix attempted twice without progress), stop, document it in `Docs/plans/Issue-<#>-plan-status.md` under **Current Issues**, and reset the chat before trying again.
 - **For comprehensive reviews**: Use domain team commands (`/team-testing`, `/team-security`, `/team-accessibility`, `/team-userexperience`) when multiple perspectives are needed.
 - **Before release**: Use `/team-release` for final readiness check (tests, security, docs).
 
@@ -109,7 +109,7 @@ async function loadSentry() {
 - **BEFORE starting work**: 
   - **MANDATORY PRE-FLIGHT CHECKS** (must pass ALL):
     1. Research file exists: `docs/research/Issue-<#>-research.md`
-    2. Plan file exists: `docs/Plan.md` with checkpoints
+    2. Plan-status file exists: `Docs/plans/Issue-<#>-plan-status.md` with checkpoints
     3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
   - **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any files. Report which check failed and coordinate with Vector.
   - Create branch with format `agent/<agent>/<issue>-<slug>` (e.g., `agent/vector/1-onboarding-flow`) per `.cursor/rules/01-workflow.mdc`. Never work on existing branches unless they match the issue.

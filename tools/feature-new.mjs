@@ -67,6 +67,15 @@ async function main() {
   }
   const slug = slugify(featureName);
 
+  let issueNumber = '';
+  while (!issueNumber) {
+    issueNumber = await ask(rl, 'GitHub Issue Number: ');
+    if (!/^\d+$/.test(issueNumber)) {
+      console.log('Issue number must be numeric. Please try again.');
+      issueNumber = '';
+    }
+  }
+
   const targetUser = await ask(rl, 'Target user / persona: ');
   const painPoint = await ask(rl, 'What pain/problem are we solving (one sentence): ');
   const outcome = await ask(rl, 'Desired outcome (what success looks like): ');
@@ -81,6 +90,7 @@ async function main() {
   const summary = {
     slug,
     featureName,
+    issueNumber: parseInt(issueNumber, 10),
     targetUser: targetUser || 'TBD (clarify with spec)',
     painPoint: painPoint || 'TBD',
     outcome: outcome || 'TBD',
@@ -104,14 +114,14 @@ async function main() {
   console.log('\nFeature scaffolding complete.\n');
   console.log('Key files:');
   console.log(`- Spec:        .notes/features/${slug}/spec.md`);
-  console.log(`- Progress:    .notes/features/${slug}/progress.md`);
-  console.log(`- Active plan: docs/Plan.md`);
+  console.log(`- Plan-Status: Docs/plans/Issue-${issueNumber}-plan-status.md`);
   console.log('');
   console.log('Next steps:');
   console.log('1. Open the spec and fill in any TODOs.');
-  console.log('2. Create a GitHub issue using the "0 - Spec" template and paste the spec content.');
-  console.log('3. Ask @Vector to read the spec and update docs/Plan.md (use the "1 - Plan" issue template).');
-  console.log('4. Keep implementation limited to the MVP DoD checkboxes.');
+  console.log('2. Ensure GitHub issue #' + issueNumber + ' exists and matches this feature.');
+  console.log('3. Ask @Scout to research the feature and create docs/research/Issue-${issueNumber}-research.md');
+  console.log('4. Ask @Vector to read the spec and update Docs/plans/Issue-${issueNumber}-plan-status.md');
+  console.log('5. Keep implementation limited to the MVP DoD checkboxes.');
   console.log('');
   console.log('Need to restart? Run this command again once the current feature ships.');
 

@@ -16,7 +16,7 @@ Each persona is a specialist developer who owns their lane end to end. They plan
 - Obey numbered checkpoints. Never move to the next step until the caller signs off.
 - Be stupidly specific. When requesting or making changes, cite exact files, line anchors, values, and selectors.
 - Ship one reversible change at a time and run targeted tests after every edit.
-- When a loop is detected, pause, document it under `.notes/features/<slug>/progress.md` in a **Current Issues** section, and request a fresh chat before retrying.
+- When a loop is detected, pause, document it under `Docs/plans/Issue-<#>-plan-status.md` in a **Current Issues** section, and request a fresh chat before retrying.
 - Use the roster playbook (`docs/agents/PLAYBOOK.md`) and `docs/vision.md` to stay aligned with the project vision and active plan.
 
 ## Agent Lanes
@@ -41,7 +41,7 @@ Each persona is a specialist developer who owns their lane end to end. They plan
 
 ## Handoff Protocol
 1. Announce status, checkpoints remaining, and explicit next action in chat.
-2. Reference the GitHub issue, numbered plan step, and relevant docs (`docs/vision.md`, `docs/Plan.md`, `ConnectionGuide.md`) before acting.
+2. Reference the GitHub issue, numbered plan step, and relevant docs (`docs/vision.md`, `Docs/plans/Issue-<#>-plan-status.md`, `ConnectionGuide.md`) before acting.
 3. After each step: run the scoped test, share the exact command/output, update labels/status, and record any new issues.
 4. If something falls outside your scope, tag the owning agent and stop instead of freelancing.
 

@@ -17,13 +17,13 @@ alwaysApply: true
 ## Workflow
 1. **MANDATORY PRE-FLIGHT**: Before starting ANY implementation work, verify:
    - Research file exists: `docs/research/Issue-<#>-research.md`
-   - Plan file exists: `docs/Plan.md`
+   - Plan-status file exists: `Docs/plans/Issue-<#>-plan-status.md`
    - **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
    - If ANY check fails, STOP and report to Vector. Do not create or modify any files.
 2. **Plan Mode**: reference `docs/vision.md` for context, restate the checkpoint, affected modules/screens, architecture touchpoints, and tests (unit/instrumentation) you will run. Call out Gradle/SDK impacts. Wait for approval.
 3. **Act Mode**: make scoped changes, update Gradle or manifests cautiously, and run the declared tests immediately. Provide build/run instructions if toolchains shift.
 4. Document any permission or dependency changes for @Muse (docs) and @Nexus (CI).
-5. Update `.notes/features/<slug>/progress.md` with **Current Issues** if implementation blocks or loops occur.
+5. Update `Docs/plans/Issue-<#>-plan-status.md` with **Current Issues** if implementation blocks or loops occur.
 
 ## Guardrails
 - Keep server contracts intact; coordinate with @Forge if APIs must change.

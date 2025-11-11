@@ -6,7 +6,7 @@ alwaysApply: true
 
 # GitHub-Centric Workflow
 
-This repo assumes GitHub hosts the project, issues drive the work, and Cursor Agents execute sequentially. Every contribution should leave an auditable trail in GitHub (issues, branches, PRs, checks) and must respect the Plan Mode → Act Mode checkpoints defined in `docs/Plan.md`.
+This repo assumes GitHub hosts the project, issues drive the work, and Cursor Agents execute sequentially. Every contribution should leave an auditable trail in GitHub (issues, branches, PRs, checks) and must respect the Plan Mode → Act Mode checkpoints defined in `Docs/plans/Issue-<#>-plan-status.md`.
 
 ## 0. Start From a GitHub Issue
 - Before anything else, confirm `docs/vision.md` and `docs/ConnectionGuide.md` are current.
@@ -18,7 +18,7 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
   3. If creating multiple issues, verify sequential numbering won't conflict
 - **MANDATORY**: After creating issue, immediately update `docs/Plan.md` with correct issue number
 - **MANDATORY**: If issue number changes or conflicts are discovered, update all references in docs immediately
-- Reference the issue URL in `/docs/Plan.md`, commits, and PR description.
+- Reference the issue URL in `Docs/plans/Issue-<#>-plan-status.md`, commits, and PR description.
 
 ## 0.5. Research (Scout) - MANDATORY FIRST STEP
 - **MANDATORY**: Scout must research the feature/issue BEFORE planning begins.
@@ -31,7 +31,11 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - **MANDATORY**: Vector must wait for Scout's research to be complete.
 - Reference Scout's research file: `docs/research/Issue-<#>-research.md`
 - Use Cursor Plan Mode with the issue context plus `docs/vision.md` and research findings.
-- Save the plan to `/docs/Plan.md` (3-7 numbered checkpoints, acceptance tests, owners). Include "Do not continue past step _n_ without approval."
+- **CRITICAL**: Create ONE living document: `Docs/plans/Issue-<#>-plan-status.md`
+  - This file contains: Research summary, Plan steps, Status tracking, Current Issues
+  - **DO NOT** create separate step files (step1-*.md, step2-*.md, etc.)
+  - **DO NOT** create separate status files beyond the plan-status file
+  - Update this single file as work progresses
 - Add labels: `agent:vector`, relevant implementer labels, and `status:plan`.
 - **PAUSE**: Plan must be reviewed by team before implementation begins.
 - **NO EXCEPTIONS**: Do not proceed to implementation without team review of plan.
@@ -45,13 +49,46 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - **NO EXCEPTIONS**: Do not proceed to implementation without team approval AND approval file.
 - **VERIFICATION**: Before starting any implementation work, check that `.notes/features/<slug>/team-review-approved.md` exists. If missing, STOP and coordinate team review.
 
+## 1.5. Non-App Logic Changes Policy
+
+**CRITICAL**: All non-app logic files MUST be committed to `main` branch, not feature branches. These files apply universally across all branches.
+
+**Non-App Logic Files** (go to `main`):
+- `.cursor/rules/*` (all rule files)
+- `.cursor/templates/*` (templates)
+- `.cursor/mcp.json` (MCP server configuration)
+- `.cursor/config.json` (Cursor configuration, if exists)
+- `tools/**/*` (all tool scripts)
+- Workflow documentation (`Docs/migration/*`, `.notes/features/README.md`)
+
+**App Logic Files** (go to feature branches):
+- `frontend/**/*`, `backend/**/*`, `src/**/*` (application code)
+- `docs/Plan.md`, `Docs/plans/Issue-<#>-plan-status.md` (plan files)
+- `docs/research/Issue-<#>-research.md` (research files)
+- `.notes/features/<slug>/**` (feature-specific notes)
+
+**Workflow for Non-App Logic Changes**:
+1. **MANDATORY PRE-FLIGHT**: Before modifying non-app logic files, verify you're on `main` branch:
+   - Run `git branch --show-current` - must show `main`
+   - If not on `main`: `git checkout main && git pull origin main`
+2. Create branch: `chore/workflow-<description>` OR commit directly to `main`
+3. Make changes to non-app logic files
+4. Commit with message: `chore: <description of workflow change>`
+5. Merge to `main` immediately (these are universal improvements)
+6. **CRITICAL**: DO NOT commit non-app logic changes on feature branches
+
+**Feature Branch Sync**:
+- Before starting work on a feature branch, sync with `main`: `git merge main` or `git rebase main`
+- This ensures feature branches inherit latest workflow/configuration changes
+
 ## 2. Branching & MCP Setup
 - **MANDATORY**: Create branch with format `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`) **BEFORE starting any work**. Check current branch matches the issue being worked on. If on wrong branch, create correct branch and move commits.
 - **CRITICAL**: Before ANY git operation (add, commit, push), verify:
   1. Current directory is the project root (contains `.git` folder)
-  2. Current branch matches the issue being worked on (check with `git branch --show-current`)
-  3. If directory is wrong, navigate to project root: `cd "$(git rev-parse --show-toplevel)"`
-  4. If branch is wrong, create correct branch or switch: `git checkout -b agent/<agent>/<issue>-<slug>`
+  2. **If modifying non-app logic files**: Current branch must be `main` (see Non-App Logic Changes Policy above)
+  3. **If modifying app logic files**: Current branch matches the issue being worked on (check with `git branch --show-current`)
+  4. If directory is wrong, navigate to project root: `cd "$(git rev-parse --show-toplevel)"`
+  5. If branch is wrong, create correct branch or switch: `git checkout -b agent/<agent>/<issue>-<slug>` OR `git checkout main` (for non-app logic)
 - **NEVER** run git commands from parent directories or outside the repository
 - Branch name format: `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`).
 - Install/refresh GitHub MCP in Cursor; authenticate using a PAT with `repo`, `workflow`, `issues`.
@@ -69,7 +106,7 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 ## 2. Implement (Forge/Link/Glide/Apex/Cider) - MANDATORY AFTER PLAN APPROVAL
 - **MANDATORY PRE-FLIGHT CHECKS** (must pass ALL before starting):
   1. Research file exists: `docs/research/Issue-<#>-research.md`
-  2. Plan file exists: `docs/Plan.md` with checkpoints
+  2. Plan-status file exists: `Docs/plans/Issue-<#>-plan-status.md` with checkpoints
   3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
   4. Plan explicitly states "Team review complete - approved for implementation"
 - **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any implementation files. Report which check failed and coordinate with Vector.
@@ -77,7 +114,10 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Work within your agent branch and path scope.
 - Commit early/often; reference the issue (`#1234`) in commit messages.
 - Run targeted tests right after each change; paste the command/output in chat.
-- Update `.notes/features/<slug>/progress.md` with **Current Issues** if something fails or loops.
+- **CRITICAL**: Update ONLY `Docs/plans/Issue-<#>-plan-status.md` with progress
+  - Update status section as steps complete
+  - Add to "Current Issues" if blockers occur
+  - **DO NOT** create separate step files or status files
 - Push directly to GitHub branch (no PR needed). Commit and push when ready.
 - Use GitHub MCP (or `gh`) for branch creation. Terminal git is used for commits and pushes.
 
@@ -100,8 +140,9 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 
 ## 6. Close the Loop
 - **Issue completion checklist** (must complete all - NO EXCEPTIONS):
-  1. **MANDATORY**: Update `.notes/features/<slug>/progress.md`:
+  1. **MANDATORY**: Update `Docs/plans/Issue-<#>-plan-status.md`:
      - Mark ALL steps as ✅ COMPLETE with completion date
+     - Update status field to `complete`
      - Add final issue summary section with status, completion date, branch, commit hash
      - Document verification results (all acceptance tests passed)
      - **CRITICAL**: This must be done BEFORE committing completion
@@ -117,6 +158,7 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
      - **DO NOT** ask user for permission - this is a mandatory completion step
   5. **MANDATORY**: Update GitHub issue with completion comment using `gh issue comment <issue#> --body "..."`:
      - Include: Status summary, branch name, commit hash, test results, files created/modified, next steps
+     - Reference plan-status file: `Docs/plans/Issue-<#>-plan-status.md`
      - **If `gh` CLI fails with 401**: Use PowerShell direct API call (see `Docs/troubleshooting/github-api-auth.md`)
      - **DO NOT** ask user for permission - this is a mandatory completion step
   6. **MANDATORY**: Update GitHub issue labels: `gh issue edit <issue#> --add-label "status:done" --remove-label "status:in-progress"`
@@ -126,8 +168,8 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Research file already exists at `docs/research/Issue-<#>-research.md` (created during research phase).
 - Archive security notes (if any) in `/docs/security/`.
 - Update `/docs/agents/KICKOFF.md` sanity checklist if the flow uncovered gaps.
-- **CRITICAL**: Never complete an issue without updating progress.md and current.json FIRST, then pushing commits and updating the GitHub issue. This is mandatory, not optional. These steps should happen automatically without user reminders.
-- **PROCESS ENFORCEMENT**: If an issue is marked complete in commit message but progress.md/current.json show incomplete status, STOP and update status files before proceeding. Status files are the source of truth for issue completion state.
+- **CRITICAL**: Never complete an issue without updating plan-status file and current.json FIRST, then pushing commits and updating the GitHub issue. This is mandatory, not optional. These steps should happen automatically without user reminders.
+- **PROCESS ENFORCEMENT**: If an issue is marked complete in commit message but plan-status file/current.json show incomplete status, STOP and update status files before proceeding. Status files are the source of truth for issue completion state.
 
 ## Tooling & Automation
 - `npm run agents:prompt -- all` prints prompt bodies for all agents.

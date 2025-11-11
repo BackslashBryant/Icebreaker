@@ -273,7 +273,7 @@ async function main() {
 
   if (templateKey === 'from-spec') {
     console.log(`\nNext steps:`);
-    console.log(`1. Update docs/Plan.md with issue #${result.number}`);
+    console.log(`1. Update Docs/plans/Issue-${result.number}-plan-status.md with issue #${result.number}`);
     console.log(`2. Ask @Vector to refine the plan`);
   }
 }

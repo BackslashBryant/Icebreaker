@@ -448,16 +448,31 @@ function checkFeatureWorkflow() {
     }
 
     const specPath = path.join(featuresDir, slug, 'spec.md');
-    const progressPath = path.join(featuresDir, slug, 'progress.md');
-    if (!existsSync(specPath) || !existsSync(progressPath)) {
+    if (!existsSync(specPath)) {
       addCheck(
         'Feature Workflow',
         'Active Feature',
         STATUS.NEEDS_SETUP,
-        'Spec or progress files missing for ' + slug,
+        'Spec file missing for ' + slug,
         'Run: npm run feature:new',
       );
       return;
+    }
+
+    // Check for plan-status file if issue number is available
+    const issueNumber = state?.githubIssue;
+    if (issueNumber) {
+      const plansDir = path.join(repoRoot, 'Docs', 'plans');
+      const planStatusPath = path.join(plansDir, `Issue-${issueNumber}-plan-status.md`);
+      if (!existsSync(planStatusPath)) {
+        addCheck(
+          'Feature Workflow',
+          'Plan-Status File',
+          STATUS.NEEDS_SETUP,
+          `Plan-status file missing: Docs/plans/Issue-${issueNumber}-plan-status.md`,
+          'Create plan-status file or run npm run feature:new',
+        );
+      }
     }
 
     const specText = readFileSync(specPath, 'utf8');
@@ -667,7 +682,7 @@ function getContextualNextSteps() {
   if (hasTokens && hasAgents && !hasFeature) {
     nextSteps.push('Run: npm run feature:new (to start your first feature)');
   } else if (hasTokens && hasAgents && hasFeature) {
-    nextSteps.push('Continue with your active feature in docs/Plan.md');
+    nextSteps.push('Continue with your active feature in Docs/plans/Issue-<#>-plan-status.md');
   }
 
   // If all setup is done, suggest workflow next steps

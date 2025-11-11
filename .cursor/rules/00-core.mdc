@@ -15,24 +15,25 @@ alwaysApply: true
 ## Safety Rails We Keep Even When Vibing
 - **MANDATORY WORKFLOW CHECKPOINTS**: Before starting ANY implementation work, verify:
   1. Research file exists: `docs/research/Issue-<#>-research.md`
-  2. Plan file exists: `docs/Plan.md` with checkpoints
+  2. Plan-status file exists: `Docs/plans/Issue-<#>-plan-status.md` with checkpoints
   3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
 - **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any implementation files. Coordinate with Vector for team review.
 - **MANDATORY GIT SAFETY CHECKS**: Before ANY git operation (add, commit, push), verify:
   1. Current directory is project root: Run `git rev-parse --show-toplevel` and ensure you're in that exact directory
-  2. Current branch matches issue: Run `git branch --show-current` and confirm branch name contains the issue number being worked on
-  3. No parent directory scanning: `git status` should NOT show files outside the repository (no warnings about AppData, Documents, etc.)
-  4. If directory is wrong: Navigate to project root with `cd "$(git rev-parse --show-toplevel)"` (PowerShell: `cd (git rev-parse --show-toplevel)`)
-  5. If branch is wrong: Create correct branch or switch before committing
+  2. **If modifying non-app logic files**: Current branch must be `main` (see `.cursor/rules/01-workflow.mdc` Non-App Logic Changes Policy)
+  3. **If modifying app logic files**: Current branch matches issue: Run `git branch --show-current` and confirm branch name contains the issue number being worked on
+  4. No parent directory scanning: `git status` should NOT show files outside the repository (no warnings about AppData, Documents, etc.)
+  5. If directory is wrong: Navigate to project root with `cd "$(git rev-parse --show-toplevel)"` (PowerShell: `cd (git rev-parse --show-toplevel)`)
+  6. If branch is wrong: Create correct branch or switch before committing
 - **NEVER** run git commands from parent directories or outside the repository
 - Never ship code you have not read; sanity-check diffs and run the quickest meaningful verification.
 - Flag real secrets, prod data, or compliance-sensitive areas before asking the agent to touch them.
-- Document gotchas in `.notes/` or the active plan so the next session inherits your context.
+- Document gotchas in `.notes/` or the active plan-status file so the next session inherits your context.
 - Be stupidly specific: name files, selectors, colors, padding, payload keys. Vague in -> vague out.
 - Ask before committing, pushing, installing new tech, or touching new services. Present the proposed command first.
 - No mock data in production paths. If placeholders are required, confirm with the caller or Pixel.
 - Maintain `docs/ConnectionGuide.md` anytime a port, endpoint, or credential changes.
-- When loops happen, stop, capture them in the **Current Issues** section of `.notes/features/<slug>/progress.md`, and restart the chat with that context.
+- When loops happen, stop, capture them in the **Current Issues** section of `Docs/plans/Issue-<#>-plan-status.md`, and restart the chat with that context.
 
 ## Collaboration Rituals
 - Reference `docs/agents/PLAYBOOK.md` for handoffs, tone, and checkpoints.

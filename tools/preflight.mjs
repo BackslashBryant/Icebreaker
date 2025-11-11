@@ -15,6 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 
 const planPath = path.join(repoRoot, 'docs', 'Plan.md');
+const plansDir = path.join(repoRoot, 'Docs', 'plans');
 const researchPath = path.join(repoRoot, 'docs', 'research.md');
 const kickoffPath = path.join(repoRoot, 'docs', 'agents', 'KICKOFF.md');
 const hookSamplePath = path.join(repoRoot, 'scripts', 'hooks', 'pre-commit.sample');
@@ -51,40 +52,75 @@ function readLines(filePath) {
 }
 
 function checkPlanScaffold() {
-  if (!existsSync(planPath)) {
-    addResult('Plan.md', false, 'docs/Plan.md is missing');
-    return;
+  // Check for plan-status file if current feature exists
+  const featureStatePath = path.join(featuresDir, 'current.json');
+  if (existsSync(featureStatePath)) {
+    try {
+      const state = JSON.parse(readFileSync(featureStatePath, 'utf8'));
+      const issueNumber = state?.githubIssue;
+      if (issueNumber) {
+        const planStatusPath = path.join(plansDir, `Issue-${issueNumber}-plan-status.md`);
+        if (!existsSync(planStatusPath)) {
+          addResult('Plan-status file', false, `Docs/plans/Issue-${issueNumber}-plan-status.md is missing`);
+          return;
+        }
+        const lines = readLines(planStatusPath);
+        const requiredHeadings = [
+          '# Issue #',
+          '## Research Summary',
+          '## Goals & Success Metrics',
+          '## Plan Steps',
+          '## Current Status',
+          '## Current Issues',
+          '## Acceptance Tests',
+        ];
+        const missing = requiredHeadings.filter(heading => !lines.some(line => line.trim().startsWith(heading)));
+        if (missing.length > 0) {
+          addResult('Plan-status file', false, `Missing headings: ${missing.join(', ')}`);
+          return;
+        }
+        addResult('Plan-status file', true, `Issue-${issueNumber}-plan-status.md structure valid`);
+        return;
+      }
+    } catch (error) {
+      // Fall through to legacy check
+    }
   }
+  
+  // Legacy check for docs/Plan.md (for backwards compatibility)
+  if (existsSync(planPath)) {
+    const lines = readLines(planPath);
+    const requiredHeadings = [
+      '# Plan',
+      '## Goals',
+      '## Out-of-scope',
+      '## Steps (3-7)',
+      '## File targets',
+      '## Acceptance tests',
+      '## Owners',
+      '## Risks & Open questions',
+    ];
 
-  const lines = readLines(planPath);
-  const requiredHeadings = [
-    '# Plan',
-    '## Goals',
-    '## Out-of-scope',
-    '## Steps (3-7)',
-    '## File targets',
-    '## Acceptance tests',
-    '## Owners',
-    '## Risks & Open questions',
-  ];
+    const missing = requiredHeadings.filter(heading => !lines.some(line => line.trim() === heading));
+    if (missing.length > 0) {
+      addResult('Plan.md', false, `Missing headings: ${missing.join(', ')}`);
+      return;
+    }
 
-  const missing = requiredHeadings.filter(heading => !lines.some(line => line.trim() === heading));
-  if (missing.length > 0) {
-    addResult('Plan.md', false, `Missing headings: ${missing.join(', ')}`);
-    return;
+    if (!lines.some(line => line.includes('_Active feature'))) {
+      addResult('Plan.md', false, 'Plan header must include `_Active feature` block (run npm run feature:new).');
+      return;
+    }
+
+    if (!lines.some(line => line.includes('Source spec'))) {
+      addResult('Plan.md', false, 'Plan must reference the generated spec path.');
+      return;
+    }
+
+    addResult('Plan.md', true, 'All required headings present (legacy format)');
+  } else {
+    addResult('Plan.md', false, 'docs/Plan.md is missing (or use plan-status file)');
   }
-
-  if (!lines.some(line => line.includes('_Active feature'))) {
-    addResult('Plan.md', false, 'Plan header must include `_Active feature` block (run npm run feature:new).');
-    return;
-  }
-
-  if (!lines.some(line => line.includes('Source spec'))) {
-    addResult('Plan.md', false, 'Plan must reference the generated spec path.');
-    return;
-  }
-
-  addResult('Plan.md', true, 'All required headings present');
 }
 
 function checkResearchLog() {
@@ -288,10 +324,19 @@ function checkFeatureWorkflow() {
   }
 
   const specPath = path.join(featuresDir, slug, 'spec.md');
-  const progressPath = path.join(featuresDir, slug, 'progress.md');
-  if (!existsSync(specPath) || !existsSync(progressPath)) {
-    addResult('Feature workflow', false, `Spec/progress files missing for slug ${slug} (run npm run feature:new)`);
+  if (!existsSync(specPath)) {
+    addResult('Feature workflow', false, `Spec file missing for slug ${slug} (run npm run feature:new)`);
     return;
+  }
+
+  // Check for plan-status file if issue number is available
+  const issueNumber = state?.githubIssue;
+  if (issueNumber) {
+    const planStatusPath = path.join(plansDir, `Issue-${issueNumber}-plan-status.md`);
+    if (!existsSync(planStatusPath)) {
+      addResult('Feature workflow', false, `Plan-status file missing: Docs/plans/Issue-${issueNumber}-plan-status.md`);
+      return;
+    }
   }
 
   const specText = readFileSync(specPath, 'utf8');

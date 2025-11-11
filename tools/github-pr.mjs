@@ -133,12 +133,19 @@ function checkDoDComplete(specPath) {
 
 function generatePRBody(currentFeature) {
   const specPath = path.join(repoRoot, '.notes', 'features', currentFeature.slug, 'spec.md');
-  const progressPath = path.join(repoRoot, '.notes', 'features', currentFeature.slug, 'progress.md');
+  const issueNumber = currentFeature.githubIssue;
+  const planStatusPath = issueNumber 
+    ? path.join(repoRoot, 'Docs', 'plans', `Issue-${issueNumber}-plan-status.md`)
+    : null;
 
   let body = `## Summary\n\n`;
   body += `Implements feature: **${currentFeature.featureName}**\n\n`;
   body += `- Feature slug: \`${currentFeature.slug}\`\n`;
-  body += `- Spec: \`.notes/features/${currentFeature.slug}/spec.md\`\n\n`;
+  body += `- Spec: \`.notes/features/${currentFeature.slug}/spec.md\`\n`;
+  if (planStatusPath && existsSync(planStatusPath)) {
+    body += `- Plan-Status: \`Docs/plans/Issue-${issueNumber}-plan-status.md\`\n`;
+  }
+  body += `\n`;
 
   if (existsSync(specPath)) {
     const specContent = readFileSync(specPath, 'utf8');
@@ -166,9 +173,9 @@ function generatePRBody(currentFeature) {
 `;
   }
 
-  if (existsSync(progressPath)) {
+  if (planStatusPath && existsSync(planStatusPath)) {
     body += `### Progress\n\n`;
-    body += `See \`.notes/features/${currentFeature.slug}/progress.md\` for detailed status.\n\n`;
+    body += `See \`Docs/plans/Issue-${issueNumber}-plan-status.md\` for detailed status.\n\n`;
   }
 
   body += `## Checklist\n\n`;
@@ -180,7 +187,11 @@ function generatePRBody(currentFeature) {
 
   body += `## Related\n\n`;
   body += `- Spec: \`.notes/features/${currentFeature.slug}/spec.md\`\n`;
-  body += `- Plan: \`docs/Plan.md\`\n`;
+  if (planStatusPath && existsSync(planStatusPath)) {
+    body += `- Plan: \`Docs/plans/Issue-${issueNumber}-plan-status.md\`\n`;
+  } else {
+    body += `- Plan: \`docs/Plan.md\` (legacy)\n`;
+  }
 
   return body;
 }

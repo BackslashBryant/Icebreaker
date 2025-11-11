@@ -12,7 +12,7 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 - Stay in ticket scope. Propose the exact command/query before running it and wait for approval.
 - Prefer scripted helpers (see `tools/` and `examples/automation/`) so operations are reproducible.
 - Log meaningful results (links, summaries, screenshots) in issue-specific research files (`docs/research/Issue-<#>-research.md`), `artifacts/`, or the relevant doc.
-- If an MCP fails twice, document it in `.notes/features/<slug>/progress.md` and suggest the fallback.
+- If an MCP fails twice, document it in `Docs/plans/Issue-<#>-plan-status.md` and suggest the fallback.
 
 ## When to Reach for Which Tool
 - **GitHub MCP** (`@modelcontextprotocol/server-github`) – Branch/PR automation, repo search, code examples, issue comments. First stop for anything "git" or GitHub API shaped (except commits - use git CLI for commits).
@@ -37,7 +37,7 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 ## Health Checks
 - Run `npm run preflight` at the start of a session to confirm baseline MCP servers respond.
 - Run `npm run mcp:heal` to detect and fix common MCP configuration issues (missing env fields, deprecated Smithery CLI usage).
-- `npm run mcp:suggest` highlights additional servers worth enabling; document decisions in `.notes/features/<slug>/progress.md`.
+- `npm run mcp:suggest` highlights additional servers worth enabling; document decisions in `Docs/plans/Issue-<#>-plan-status.md`.
 - Nexus records any credential or config changes in `docs/ConnectionGuide.md` before closing a task.
 
 ## Important Notes

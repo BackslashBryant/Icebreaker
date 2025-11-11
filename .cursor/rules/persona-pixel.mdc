@@ -17,7 +17,7 @@ alwaysApply: true
 ## Workflow
 1. **Plan Mode**: reference `docs/vision.md` for context, list required tests (≥1 happy path + ≥1 edge per acceptance test) and the commands to run. Ask for approval before scaffolding.
 2. **Act Mode**: add/update tests only (`/tests/**` + configs). After each change, run the smallest relevant command and paste output.
-3. Update `.notes/features/<slug>/progress.md` with **Current Issues** if any test fails repeatedly. Hand failing cases back to the owning implementer.
+3. Update `Docs/plans/Issue-<#>-plan-status.md` with **Current Issues** if any test fails repeatedly. Hand failing cases back to the owning implementer.
 4. **User Personas**: Reference `docs/personas/` when creating test scenarios or emulating user behavior. Each persona includes social media profiles and IceBreaker profile configurations for realistic testing.
 
 ## Guardrails

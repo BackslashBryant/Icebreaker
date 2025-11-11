@@ -14,7 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..', '..');
 const notesDir = path.join(repoRoot, '.notes');
 const featuresDir = path.join(notesDir, 'features');
-const planPath = path.join(repoRoot, 'docs', 'Plan.md');
+const plansDir = path.join(repoRoot, 'Docs', 'plans');
 const currentPath = path.join(featuresDir, 'current.json');
 
 function ensureDir(dirPath) {
@@ -136,25 +136,11 @@ ${normalizedScope.map(item => `- ${item}`).join('\n')}
   return specPath;
 }
 
-export function writeProgress({ slug, featureName }) {
-  const progressPath = path.join(featuresDir, slug, 'progress.md');
-  const content = `# Feature Progress - ${featureName}
-
-| Stage | Owner | Status | Notes |
-| --- | --- | --- | --- |
-| Spec | Vector | TODO | Reference .notes/features/${slug}/spec.md |
-| Plan | Vector / Pixel | TODO | Keep steps to 3-5 aligned with MVP DoD |
-| Build | Implementers | TODO | Stop after MVP DoD is GREEN |
-| Verify | Pixel | TODO | Record GREEN/RED with logs |
-| Ship | Nexus | TODO | Release MVP, archive spec |
-`;
-  writeFile(progressPath, content);
-  return progressPath;
-}
 
 export function writePlan({
   slug,
   featureName,
+  issueNumber,
   targetUser,
   painPoint,
   outcome,
@@ -162,41 +148,68 @@ export function writePlan({
   niceToHaves,
   metrics,
 }) {
-  const planBody = `# Plan
+  if (!issueNumber) {
+    throw new Error('Issue number is required to create plan-status file');
+  }
+  
+  const planStatusPath = path.join(plansDir, `Issue-${issueNumber}-plan-status.md`);
+  const planBody = `# Issue #${issueNumber} - ${featureName}
 
-_Active feature: **${featureName}** (\`${slug}\`)_
-_Source spec: \`.notes/features/${slug}/spec.md\`_
+**Status**: draft  
+**Branch**: TBD  
+**GitHub Issue**: https://github.com/BackslashBryant/Icebreaker/issues/${issueNumber}
 
-## Goals
-- GitHub Issue: #TBD
-- Target User: ${targetUser}
-- Problem: ${painPoint}
-- Desired Outcome: ${outcome}
-- Success Metrics:
+## Research Summary
+
+_Research file: \`docs/research/Issue-${issueNumber}-research.md\`_
+
+_Research summary will be added here after Scout completes research._
+
+## Goals & Success Metrics
+
+- **Target User**: ${targetUser}
+- **Problem**: ${painPoint}
+- **Desired Outcome**: ${outcome}
+- **Success Metrics**:
 ${metrics.length > 0 ? metrics.map(item => `  - ${item}`).join('\n') : '  - Confirm MVP is usable end-to-end'}
-- MVP Guardrail: Ship only the checklist in \`MVP DoD\` and defer everything else.
+- **MVP Guardrail**: Ship only the checklist in \`MVP DoD\` and defer everything else.
 
 ## Out-of-scope
+
 ${(niceToHaves.length > 0 ? niceToHaves : ['Create a new spec for additional scope']).map(item => `- ${item}`).join('\n')}
 
-## Steps (3-7)
-1. Vector - Finalize plan & cite research for the DoD.
-2. Pixel - Scaffold tests for each MVP DoD item.
-3. Implementers - Deliver the smallest slice to satisfy the DoD.
-4. Pixel - Verify tests / report GREEN.
-5. Muse - Update docs & release notes for the shipped MVP.
-6. Nexus - Ensure CI/preview or release automation is GREEN.
+## Plan Steps
 
-## File targets
-- \`.notes/features/${slug}/spec.md\`
-- \`.notes/features/${slug}/progress.md\`
-- \`docs/Plan.md\`
-- Implementation directories referenced in the plan (add specifics as Vector refines).
+1. **Vector** - Finalize plan & cite research for the DoD.
+2. **Pixel** - Scaffold tests for each MVP DoD item.
+3. **Implementers** - Deliver the smallest slice to satisfy the DoD.
+4. **Pixel** - Verify tests / report GREEN.
+5. **Muse** - Update docs & release notes for the shipped MVP.
+6. **Nexus** - Ensure CI/preview or release automation is GREEN.
 
-## Acceptance tests
+## Current Status
+
+**Overall Status**: draft
+
+### Step Completion
+
+- [ ] Step 1: Vector - Finalize plan & cite research
+- [ ] Step 2: Pixel - Scaffold tests
+- [ ] Step 3: Implementers - Deliver MVP slice
+- [ ] Step 4: Pixel - Verify tests
+- [ ] Step 5: Muse - Update docs
+- [ ] Step 6: Nexus - Ensure CI/preview automation
+
+## Current Issues
+
+_No blockers at this time._
+
+## Acceptance Tests
+
 ${mustHaves.length > 0 ? mustHaves.map(item => `- [ ] ${item}`).join('\n') : '- [ ] Define acceptance test with Pixel'}
 
 ## Owners
+
 - Vector (planning, research citations)
 - Pixel (tests & verification)
 - Implementers (Forge/Link/Glide/Apex/Cider) as assigned
@@ -204,13 +217,19 @@ ${mustHaves.length > 0 ? mustHaves.map(item => `- [ ] ${item}`).join('\n') : '- 
 - Nexus (CI/preview)
 - Sentinel (only if plan calls for security review)
 
-## Risks & Open questions
+## Risks & Open Questions
+
 - Does anything block the MVP DoD? Capture blockers here.
-- Record research links in \`docs/research.md\`.
+- Record research links in \`docs/research/Issue-${issueNumber}-research.md\`.
+
+## Completion Summary
+
+_Will be filled in when issue is complete._
 `;
 
-  writeFile(planPath, planBody);
-  return planPath;
+  ensureDir(plansDir);
+  writeFile(planStatusPath, planBody);
+  return planStatusPath;
 }
 
 export function scaffoldFeature(options) {
@@ -218,13 +237,11 @@ export function scaffoldFeature(options) {
   ensureDir(featuresDir);
 
   const specPath = writeSpec(options);
-  const progressPath = writeProgress(options);
   const plan = writePlan(options);
   writeCurrent({ slug: options.slug, featureName: options.featureName });
 
   return {
     specPath,
-    progressPath,
     planPath: plan,
     currentPath,
   };

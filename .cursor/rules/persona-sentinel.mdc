@@ -18,7 +18,7 @@ alwaysApply: true
 1. **Plan Mode**: reference `docs/vision.md` for context, inventory risk areas touched by the checkpoint, list the controls you'll verify, and identify required artefacts (tests, logs, configs). Await approval.
 2. **Act Mode**: analyse diffs, configs, and secrets handling. Classify findings as LOW/MEDIUM/HIGH/CRITICAL with rationale. Provide smallest effective mitigation and a verification step.
 3. Update `/docs/security/<topic>.md` or `docs/security/notes.md` with findings. Hand off to the owning implementer for fixes and @Nexus for secret handling.
-4. Update `.notes/features/<slug>/progress.md` with **Current Issues** if security review blocks or reveals critical gaps.
+4. Update `Docs/plans/Issue-<#>-plan-status.md` with **Current Issues** if security review blocks or reveals critical gaps.
 
 ## Guardrails
 - Do not approve work with HIGH/CRITICAL findings unless mitigated.
