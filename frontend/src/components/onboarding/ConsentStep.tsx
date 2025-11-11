@@ -26,14 +26,17 @@ export function ConsentStep({ consent, onConsentChange, onContinue }: ConsentSte
           className="mt-1"
         />
         <label htmlFor="consent" className="text-xs sm:text-sm leading-relaxed cursor-pointer">
-          I confirm I am 18 or older and agree to use IceBreaker responsibly.
+          I am 18 or older
         </label>
       </div>
+      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+        By continuing, you agree to use IceBreaker responsibly.
+      </p>
 
       <Button
         onClick={onContinue}
         disabled={!consent}
-        className="w-full rounded-xl bg-accent hover:bg-accent/90 text-background font-mono h-11 sm:h-12 text-sm retro-button border-2 border-accent disabled:opacity-50"
+        className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-background font-mono h-11 sm:h-12 text-sm retro-button border-2 border-accent disabled:opacity-50"
       >
         CONTINUE →
       </Button>

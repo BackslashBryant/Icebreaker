@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { HealthStatus } from "@/components/HealthStatus";
 import { Button } from "@/components/ui/button";
 import { BootSequence } from "@/components/custom/BootSequence";
 
@@ -56,7 +55,7 @@ export default function Welcome() {
           <Button
             asChild
             size="lg"
-            className="w-full rounded-xl bg-accent hover:bg-accent/90 text-background font-mono text-base sm:text-lg h-12 sm:h-14 retro-button border-2 border-accent"
+            className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-background font-mono text-base sm:text-lg h-12 sm:h-14 retro-button border-2 border-accent"
           >
             <Link to="/onboarding">PRESS START</Link>
           </Button>
@@ -65,13 +64,11 @@ export default function Welcome() {
             asChild
             variant="ghost"
             size="lg"
-            className="w-full rounded-xl text-muted-foreground hover:text-foreground font-mono border-2 border-transparent hover:border-muted text-sm sm:text-base"
+            className="w-full rounded-2xl text-muted-foreground hover:text-foreground font-mono border-2 border-transparent hover:border-muted text-sm sm:text-base"
           >
             <Link to="/">Not for me</Link>
           </Button>
         </div>
-
-        <HealthStatus />
 
         {/* Footer hint */}
         <p className="text-[10px] sm:text-xs text-muted-foreground/60 font-mono">18+ · Ephemeral · Privacy-first</p>
