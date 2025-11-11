@@ -19,7 +19,8 @@ Context:
 - Connection Guide: docs/ConnectionGuide.md (note any missing ports/services)
 
 Requirements:
-1. Create or update `/docs/Plan.md` with:
+1. Create or update `Docs/plans/Issue-<#>-plan-status.md` with:
+   - Research Summary (link to `docs/research/Issue-<#>-research.md`)
    - Goals section referencing the GitHub Issue
    - Out-of-scope items
    - 3-7 sequential steps with:
@@ -28,6 +29,8 @@ Requirements:
      * Required tools/MCP
      * Acceptance tests
      * Done criteria
+   - Current Status section (overall + step completion)
+   - Current Issues section (for blockers/loops)
 
 2. Ensure steps are:
    - Sequential and reversible
@@ -35,14 +38,14 @@ Requirements:
    - Clear about implementation delegation
    - Include "Do not proceed past step <n> without approval"
 
-3. Document any needed research citations in `/docs/research.md`
+3. Document any needed research citations in `docs/research/Issue-<#>-research.md`
 
 4. Create a checklist mapping steps to owners and path scopes
 5. Note any updates required in `docs/ConnectionGuide.md`
 
 Deliverables:
-- Updated `/docs/Plan.md`
-- Research citations if needed
+- Updated `Docs/plans/Issue-<#>-plan-status.md`
+- Research citations if needed (`docs/research/Issue-<#>-research.md`)
 - Handoff plan for Pixel (test scaffolding) and implementers with explicit checkpoints
 
 Please structure this as a proper Vector plan following the format in `.cursor/rules/01-workflow.mdc`.
