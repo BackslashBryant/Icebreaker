@@ -12,7 +12,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execSync } from 'node:child_process';
+import { getRepo, githubApiRequest } from './lib/github-api.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -22,65 +22,12 @@ function readLabels() {
   return JSON.parse(readFileSync(labelsPath, 'utf8'));
 }
 
-function getToken() {
-  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
-  if (!token) {
-    throw new Error('Set GITHUB_TOKEN (or GH_TOKEN) with repo scope before running this script.');
-  }
-  return token;
-}
 
-function parseRepoFromRemote(remote) {
-  if (!remote) {
-    throw new Error('Unable to determine GitHub repository. Set GITHUB_REPO=owner/name.');
-  }
-
-  // git@github.com:owner/repo.git
-  const sshMatch = remote.match(/^git@github\.com:(.+?)\/(.+?)(\.git)?$/);
-  if (sshMatch) {
-    return `${sshMatch[1]}/${sshMatch[2]}`;
-  }
-
-  // https://github.com/owner/repo.git
-  const httpsMatch = remote.match(/^https:\/\/github\.com\/(.+?)\/(.+?)(\.git)?$/);
-  if (httpsMatch) {
-    return `${httpsMatch[1]}/${httpsMatch[2]}`;
-  }
-
-  throw new Error(`Unrecognised GitHub remote format: ${remote}`);
-}
-
-function getRepo() {
-  if (process.env.GITHUB_REPO) {
-    return process.env.GITHUB_REPO;
-  }
-  try {
-    const remote = execSync('git config --get remote.origin.url', {
-      cwd: repoRoot,
-      stdio: ['ignore', 'pipe', 'ignore'],
-      encoding: 'utf8',
-    }).trim();
-    return parseRepoFromRemote(remote);
-  } catch (error) {
-    throw new Error('Failed to read remote.origin.url. Set GITHUB_REPO=owner/name and retry.');
-  }
-}
-
-async function fetchAllLabels(baseUrl, token) {
+async function fetchAllLabels(repo) {
   const all = [];
   let page = 1;
   while (true) {
-    const response = await fetch(`${baseUrl}?per_page=100&page=${page}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github+json',
-        'User-Agent': 'cursor-agent-template',
-      },
-    });
-    if (!response.ok) {
-      throw new Error(`GitHub API error (${response.status}): ${await response.text()}`);
-    }
-    const data = await response.json();
+    const data = await githubApiRequest(`/repos/${repo}/labels?per_page=100&page=${page}`);
     if (!Array.isArray(data) || data.length === 0) {
       break;
     }
@@ -94,7 +41,6 @@ async function fetchAllLabels(baseUrl, token) {
 }
 
 async function main() {
-  const token = getToken();
   const repo = getRepo();
   const [owner, name] = repo.split('/');
   if (!owner || !name) {
@@ -102,10 +48,7 @@ async function main() {
   }
 
   const desiredLabels = readLabels();
-  const apiBase = process.env.GITHUB_API_URL || 'https://api.github.com';
-  const labelsEndpoint = `${apiBase}/repos/${owner}/${name}/labels`;
-
-  const existing = await fetchAllLabels(labelsEndpoint, token);
+  const existing = await fetchAllLabels(repo);
   const existingMap = new Map(existing.map(label => [label.name.toLowerCase(), label]));
 
   for (const label of desiredLabels) {
@@ -115,35 +58,19 @@ async function main() {
       description: label.description ?? '',
     };
     const key = label.name.toLowerCase();
-    const url = `${labelsEndpoint}/${encodeURIComponent(label.name)}`;
+    const endpoint = `/repos/${repo}/labels/${encodeURIComponent(label.name)}`;
 
     if (existingMap.has(key)) {
-      const response = await fetch(url, {
+      await githubApiRequest(endpoint, {
         method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/vnd.github+json',
-          'User-Agent': 'cursor-agent-template',
-        },
-        body: JSON.stringify(payload),
+        body: payload,
       });
-      if (!response.ok) {
-        throw new Error(`Failed to update label "${label.name}": ${response.status} ${await response.text()}`);
-      }
       console.log(`Updated label ${label.name}`);
     } else {
-      const response = await fetch(labelsEndpoint, {
+      await githubApiRequest(`/repos/${repo}/labels`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/vnd.github+json',
-          'User-Agent': 'cursor-agent-template',
-        },
-        body: JSON.stringify(payload),
+        body: payload,
       });
-      if (!response.ok) {
-        throw new Error(`Failed to create label "${label.name}": ${response.status} ${await response.text()}`);
-      }
       console.log(`Created label ${label.name}`);
     }
   }

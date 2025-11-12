@@ -14,6 +14,10 @@ alwaysApply: false
 5. **Never**: Assume or guess the current date
 Format dates as YYYY-MM-DD. Always verify date accuracy before adding entries.
 
+## 2025-11-11: GitHub API REST Primary & Keyring Authentication
+
+**Trigger**: GitHub CLI GraphQL API failing with 401 errors despite authentication. Tools needed reliable GitHub API access. **Lesson**: REST API is more reliable than GraphQL. Token retrieval should prioritize GitHub CLI keyring (`gh auth token`) over environment variables to avoid expired token issues. Setting `GITHUB_TOKEN` in `.env` file interferes with GitHub CLI authentication. **Rule**: Created `tools/lib/github-api.mjs` with REST API utilities and automatic keyring-first token retrieval. Updated all GitHub tools (`verify-github-issue.mjs`, `github-issue.mjs`, `github-pr.mjs`, `github-init-issues.mjs`, `github-labels.mjs`) to use REST API as primary. Deprecated `tools/sync-github-token.ps1` (causes auth issues). Created `tools/fix-github-auth.ps1` for auth troubleshooting. Updated `.cursor/rules/01-workflow.mdc` and `.cursor/rules/04-integrations.mdc` to document REST API primary pattern and keyring-first token retrieval. **CRITICAL**: Do NOT set `GITHUB_TOKEN` in `.env` file - tools get token from keyring automatically.
+
 ## 2025-11-11: Date Verification Guardrails
 
 **Trigger**: Agent used incorrect placeholder dates (2025-01-27) instead of verifying actual current date (2025-11-11). **Lesson**: **NEVER guess dates or use placeholder dates**. Always verify current date first: try Time MCP, if unavailable use system date command (`powershell -Command "Get-Date -Format 'yyyy-MM-dd'"` on Windows), verify date is correct before using. **Rule**: Added mandatory date verification process to `.cursor/rules/04-integrations.mdc`, `.cursor/rules/00-core.mdc`, `.cursor/rules/02-quality.mdc`, `.cursor/rules/07-process-improvement.mdc`, and `.cursor/rules/persona-muse.mdc` - 5-step verification process: try Time MCP → use system date if unavailable → verify → never use placeholders → never guess.

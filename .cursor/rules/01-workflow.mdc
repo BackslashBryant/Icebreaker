@@ -95,13 +95,17 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
   5. If branch is wrong, create correct branch or switch: `git checkout -b agent/<agent>/<issue>-<slug>` OR `git checkout main` (for non-app logic)
 - **NEVER** run git commands from parent directories or outside the repository
 - Branch name format: `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`).
-- **GitHub Authentication**: Use GitHub CLI (`gh`) directly for all GitHub operations. It handles authentication automatically via keyring.
-  - **Setup**: Run `gh auth login` once to authenticate. Git operations use GitHub CLI's credential helper automatically.
+- **GitHub Authentication & API Usage**: 
+  - **PRIMARY METHOD**: Use REST API via `tools/lib/github-api.mjs` utilities. All GitHub tools (`verify-github-issue.mjs`, `github-issue.mjs`, `github-pr.mjs`, etc.) use REST API as primary method.
+  - **Token Retrieval**: Tools automatically get token from GitHub CLI keyring first (`gh auth token`), then fall back to `GITHUB_TOKEN` env var if needed. This prevents issues with expired/invalid env vars.
+  - **Setup**: Run `gh auth login` once to authenticate. GitHub CLI stores token in keyring securely.
   - **For MCP servers**: Other MCP servers (Desktop Commander, Playwright) may need `GITHUB_TOKEN` environment variable. Get token from GitHub CLI: `gh auth token` and set it as `GITHUB_TOKEN` environment variable (User-level on Windows). This is a one-time setup.
-  - **If authentication fails**: Clear any `GITHUB_TOKEN` env var and use `gh` CLI directly: `$env:GITHUB_TOKEN = $null; gh <command>`
-- **GitHub Operations**: Always use `gh` CLI for GitHub operations. It's simpler and handles auth automatically.
-  - **Examples**: `gh issue comment 10 --body "..."`, `gh issue edit 10 --add-label "status:done"`, `gh pr create`, `gh repo create-branch BackslashBryant/Icebreaker <branch-name>`
-  - **Fallback**: If `gh` CLI fails, use direct API with token from `gh auth token`: `$token = gh auth token; $headers = @{Authorization = "Bearer $token"}; Invoke-RestMethod ...`
+  - **If authentication fails**: Run `tools/fix-github-auth.ps1` to clear conflicting env vars and re-authenticate.
+- **GitHub Operations**: 
+  - **For Node.js scripts**: Use `tools/lib/github-api.mjs` utilities (REST API, automatic token from keyring).
+  - **For CLI operations**: Use `gh` CLI directly for simple operations (`gh issue comment`, `gh issue edit`, etc.).
+  - **Examples**: `node tools/verify-github-issue.mjs`, `node tools/github-issue.mjs kickoff "Title"`, `gh issue comment 10 --body "..."`, `gh issue edit 10 --add-label "status:done"`
+  - **CRITICAL**: Do NOT set `GITHUB_TOKEN` in `.env` file - it interferes with GitHub CLI authentication. Tools get token from keyring automatically.
 - Nexus or the acting human runs `npm run agents:install-hook` to copy the path-scope pre-commit hook locally.
 - Run `npm run preflight` before pushing to ensure scaffolding is intact (includes branch name validation).
 - Execute `npm run mcp:suggest` after dependency or config changes and note the recommendations in `.notes/` or the active plan; run `npm run mcp:suggest -- --install <id>` to append required servers to `.cursor/mcp.json`.
