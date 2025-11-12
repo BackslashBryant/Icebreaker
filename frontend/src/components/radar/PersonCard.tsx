@@ -14,12 +14,15 @@ import { useSafety } from "@/hooks/useSafety";
 import { useCooldown } from "@/hooks/useCooldown";
 import { toast } from "sonner";
 import { Clock } from "lucide-react";
+import { Tooltip } from "@/components/ui/tooltip";
+import { getProximityContextLabel, getProximityBadgeVariant } from "@/lib/proximity-context";
 
 interface PersonCardProps {
   person: Person | null;
   open: boolean;
   onClose: () => void;
   onChatRequest: (sessionId: string) => void;
+  userTags?: string[]; // Current user's tags for shared tag highlighting
 }
 
 /**
@@ -29,7 +32,7 @@ interface PersonCardProps {
  * Shows handle, vibe, tags, signal score, and one-tap chat button.
  * Supports tap-hold/long-press (500ms) to open Block/Report menu.
  */
-export function PersonCard({ person, open, onClose, onChatRequest }: PersonCardProps) {
+export function PersonCard({ person, open, onClose, onChatRequest, userTags = [] }: PersonCardProps) {
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -141,8 +144,17 @@ export function PersonCard({ person, open, onClose, onChatRequest }: PersonCardP
           <DialogHeader>
             <DialogTitle className="text-accent font-mono">{person.handle}</DialogTitle>
             <DialogDescription className="font-mono">
-              Signal: {person.signal.toFixed(1)}
-              {person.proximity && ` • ${person.proximity}`}
+              <div className="flex items-center gap-2">
+                <span>Signal: {person.signal.toFixed(1)}</span>
+                <Tooltip content="Signal score combines: • Vibe compatibility • Shared tags • Proximity distance • Visibility status. Higher = better match" />
+                {getProximityContextLabel(person.proximity) && (
+                  <span
+                    className={`text-xs px-1.5 py-0.5 border rounded font-mono ${getProximityBadgeVariant(person.proximity)}`}
+                  >
+                    {getProximityContextLabel(person.proximity)}
+                  </span>
+                )}
+              </div>
             </DialogDescription>
           </DialogHeader>
 
@@ -156,14 +168,21 @@ export function PersonCard({ person, open, onClose, onChatRequest }: PersonCardP
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Tags</p>
                 <div className="flex flex-wrap gap-2">
-                  {person.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 text-xs border border-border rounded-md bg-secondary/50"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                  {person.tags.map((tag, index) => {
+                    const isShared = userTags.includes(tag);
+                    return (
+                      <span
+                        key={index}
+                        className={`px-2 py-1 text-xs border rounded-md ${
+                          isShared
+                            ? "border-accent bg-accent/10 text-accent"
+                            : "border-border bg-secondary/50 text-muted-foreground"
+                        }`}
+                      >
+                        {tag}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             )}

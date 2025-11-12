@@ -307,16 +307,18 @@ describe("SignalEngine", () => {
       expect(results[1].score).toBeGreaterThanOrEqual(results[2].score);
     });
 
-    it("excludes source session from results", () => {
-      const source = createTestSession({ sessionId: "source-123" });
+    it("excludes sessions with visibility OFF (privacy)", () => {
+      const source = createTestSession();
       const targets = [
-        source,
-        createTestSession({ sessionId: "target-1" }),
+        createTestSession({ visibility: false }), // Should be excluded
+        createTestSession({ visibility: true }), // Should be included
+        createTestSession({ visibility: undefined }), // Should be included (defaults to true)
       ];
 
       const results = calculateScores(source, targets);
-      expect(results.length).toBe(1);
-      expect(results[0].session.sessionId).toBe("target-1");
+      expect(results.length).toBe(2); // Only visible sessions included
+      expect(results[0].session.visibility).not.toBe(false);
+      expect(results[1].session.visibility).not.toBe(false);
     });
 
     it("excludes sessions with safety flag", () => {

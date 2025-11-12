@@ -4,6 +4,7 @@ interface SessionData {
   sessionId: string;
   token: string;
   handle: string;
+  tags?: string[]; // User's tags from onboarding
   visibility?: boolean;
   emergencyContact?: string | null;
 }

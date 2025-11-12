@@ -166,6 +166,7 @@ export default function Radar() {
               people={people}
               onSelectPerson={selectPerson}
               emptyMessage="No one here — yet."
+              userTags={session?.tags || []}
             />
           )}
 
@@ -186,6 +187,7 @@ export default function Radar() {
         open={!!selectedPerson}
         onClose={clearSelection}
         onChatRequest={requestChat}
+        userTags={session?.tags || []}
       />
 
       {/* Panic Button FAB */}

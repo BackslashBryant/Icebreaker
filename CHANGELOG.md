@@ -9,6 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### MVP: Persona-Based Testing & Polish (Issue #10)
+- Persona-based testing: Comprehensive E2E testing across 10 user personas (college students, professionals, market research)
+- Test coverage: 64 persona tests covering onboarding, Radar view, chat, safety features, and accessibility
+- Edge case resolution: Fixed critical privacy violation (EC-003) where users with visibility OFF could still appear in Radar results
+- UX improvements: Implemented high-priority improvements based on persona feedback:
+  - Proximity context indicators: Added badges showing "Same room", "Same venue", "Nearby neighborhood" in RadarList and PersonCard
+  - Signal score tooltip: Added accessible tooltip explaining signal calculation factors (keyboard-accessible, screen reader friendly)
+  - Shared tag highlighting: Visual highlighting of shared tags (accent color) vs non-shared tags (muted styling)
+  - Location privacy copy: Enhanced to "approximate location only, never exact coordinates" (addresses privacy concerns)
+  - Tag selection language: Softened from "No tags = reduced discoverability" to "Tags help others find you, but they're optional"
+  - Welcome screen reassurance: Added "No pressure. No permanent connections. Just brief moments." for anxious users
+- Documentation: Comprehensive persona journey maps, test scenarios, feedback analysis, edge case tracking, and UX review
+
+**Technical Details**:
+- Testing: Persona-specific test files (`tests/e2e/personas/college-students.spec.ts`, `professionals.spec.ts`, `market-research.spec.ts`)
+- Backend: Fixed visibility filtering in SignalEngine (`backend/src/services/SignalEngine.js`) to exclude sessions with `visibility === false`
+- Frontend: New proximity context utility (`frontend/src/lib/proximity-context.ts`), accessible tooltip component (`frontend/src/components/ui/tooltip.tsx`)
+- Session management: Extended session data to include tags for shared tag comparison (`frontend/src/hooks/useSession.ts`)
+- Components: Enhanced RadarList and PersonCard with proximity context, signal tooltips, and shared tag highlighting
+- Copy improvements: Updated LocationStep, TagsStep, and Welcome page with persona-informed copy changes
+
+**Verified**:
+- ✅ All 64 persona tests passing (Chromium)
+- ✅ All 21 backend unit tests passing (including new visibility filtering test)
+- ✅ WCAG AA compliance verified across all personas
+- ✅ Brand consistency maintained ("terminal meets Game Boy" aesthetic)
+- ✅ Edge cases documented and resolved (17 edge cases tracked, critical ones fixed)
+- ✅ UX improvements address feedback from 6+ personas
+
+See `Docs/plans/Issue-10-plan-status-IN-PROGRESS.md` for complete implementation plan and acceptance criteria.
+
 #### MVP: Integration Testing & Launch Preparation (Issue #6)
 - Cross-browser testing: Added Firefox and Edge browser projects to Playwright config for comprehensive cross-browser E2E testing
 - Accessibility compliance: WCAG AA compliance verified across all pages using axe-core

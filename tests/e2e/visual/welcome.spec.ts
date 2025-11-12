@@ -13,7 +13,7 @@ test.describe('Visual Regression: Welcome Screen', () => {
   for (const viewportName of getViewportNames()) {
     const viewport = VIEWPORTS[viewportName as keyof typeof VIEWPORTS];
 
-    test(`@smoke Welcome screen - ${viewport.name === 'mobile' ? viewport.name : 'skip'}`, async ({ page }) => {
+    test(`@smoke Welcome screen - ${viewport.name}`, async ({ page }) => {
       // Only run mobile viewport for smoke tests
       if (viewport.name !== 'mobile') {
         test.skip();

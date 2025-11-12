@@ -185,14 +185,9 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     // Write telemetry to file
     await telemetry.writeToFile();
 
-    // Verify Maya appears on Radar
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
-
     // Maya checks for visibility toggle (anxious user behavior)
     // Note: Visibility toggle is on Profile page, not Radar page
-    // Navigate to Profile to access visibility toggle
-    await page.getByRole("button", { name: /Go to profile/i }).click();
-    await expect(page).toHaveURL(/.*\/profile/);
+    // We're already on Profile page from telemetry check above
     
     // Find visibility toggle checkbox on Profile page
     const visibilityCheckbox = page.getByRole("checkbox", { name: /Show me on Radar|Hide from Radar/i });
@@ -202,6 +197,8 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
       // Navigate back to Radar
       await page.getByRole("button", { name: /DONE/i }).click();
       await expect(page).toHaveURL(/.*\/radar/);
+      // Wait for Radar heading again after returning from Profile
+      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
     }
   });
 

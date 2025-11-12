@@ -66,8 +66,11 @@ export default function Onboarding() {
         location: location || undefined,
       });
 
-      // Store session in memory
-      setSession(sessionData);
+      // Store session in memory (include tags for shared tag highlighting)
+      setSession({
+        ...sessionData,
+        tags: selectedTags, // Include tags for shared tag comparison
+      });
 
       // Show success toast (on-brand: short, monospace, no noise)
       toast.success("You're live", {
