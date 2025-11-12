@@ -20,15 +20,25 @@
         "GITHUB_TOKEN": "${env:GITHUB_TOKEN}"
       }
     },
-    "ref-tools-mcp": {
+    "supabase": {
+      "url": "https://mcp.supabase.com/mcp?project_ref=awqcctsqyrlgaygpmgrq&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cstorage"
+    },
+    "vercel": {
+      "url": "https://mcp.vercel.com"
+    },
+    "filesystem": {
       "command": "npx",
       "args": [
         "-y",
-        "ref-tools-mcp"
+        "@modelcontextprotocol/server-filesystem",
+        "C:\\Users\\OrEo2\\Desktop\\DevOps\\1. Projects\\Icebreaker"
       ]
     },
-    "supabase": {
-      "url": "https://mcp.supabase.com/mcp?project_ref=awqcctsqyrlgaygpmgrq&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cstorage"
+    "time": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-time"
+      ]
     }
   }
 }

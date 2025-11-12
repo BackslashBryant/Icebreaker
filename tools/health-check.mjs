@@ -227,7 +227,7 @@ function checkMcpConfig() {
     const config = JSON.parse(readFileSync(mcpConfigPath, 'utf8'));
     const servers = config?.mcpServers || {};
 
-    const requiredServers = ['github', 'ref-tools-mcp', 'desktop-commander', 'playwright-mcp'];
+    const requiredServers = ['github', 'desktop-commander', 'playwright-mcp'];
     const configuredServers = Object.keys(servers);
 
     for (const serverName of requiredServers) {

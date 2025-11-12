@@ -6,7 +6,21 @@ alwaysApply: false
 
 # Lessons Learned
 
-**Format**: Keep entries to 2-3 sentences max. Include: trigger, lesson, rule update. No verbose sections. **Date format**: Always use the current system date in YYYY-MM-DD format when creating new entries. Never use placeholder dates like "2025-01-XX" or future dates. Check system date before adding entries.
+**Format**: Keep entries to 2-3 sentences max. Include: trigger, lesson, rule update. No verbose sections. **Date format**: **MANDATORY** - **NEVER guess dates or use placeholder dates**. Before adding ANY date to ANY file:
+1. **First**: Try Time MCP to get current date/time
+2. **If Time MCP unavailable**: Use system date command (`powershell -Command "Get-Date -Format 'yyyy-MM-dd'"` on Windows, `date +%Y-%m-%d` on Unix)
+3. **Verify**: Confirm the date is correct before using it
+4. **Never**: Use placeholder dates like "2025-01-27", "2025-01-XX", or future dates
+5. **Never**: Assume or guess the current date
+Format dates as YYYY-MM-DD. Always verify date accuracy before adding entries.
+
+## 2025-11-11: Date Verification Guardrails
+
+**Trigger**: Agent used incorrect placeholder dates (2025-01-27) instead of verifying actual current date (2025-11-11). **Lesson**: **NEVER guess dates or use placeholder dates**. Always verify current date first: try Time MCP, if unavailable use system date command (`powershell -Command "Get-Date -Format 'yyyy-MM-dd'"` on Windows), verify date is correct before using. **Rule**: Added mandatory date verification process to `.cursor/rules/04-integrations.mdc`, `.cursor/rules/00-core.mdc`, `.cursor/rules/02-quality.mdc`, `.cursor/rules/07-process-improvement.mdc`, and `.cursor/rules/persona-muse.mdc` - 5-step verification process: try Time MCP → use system date if unavailable → verify → never use placeholders → never guess.
+
+## 2025-11-11: Playwright Test Output Cleanup & Dynamic Workers
+
+**Trigger**: Test output showed Unicode artifacts (Γ£ô, ΓÇ║) and session IDs in PowerShell, making output unreadable. Also using only 1 worker unnecessarily slowed tests. **Lesson**: Use `list` reporter instead of `line` reporter, remove `FORCE_COLOR` env vars (let Playwright handle encoding), use Playwright MCP as primary tool for cleaner output, use dynamic workers (`50%` of CPU cores) instead of hardcoded `workers: 1`. **Rule**: Updated `.cursor/rules/08-testing.mdc` to prioritize Playwright MCP, use `list` reporter, document clean output approach, use `workers: '50%'` for dynamic resource adaptation.
 
 ## 2025-11-11: GitHub Issue Number Sync
 
@@ -56,9 +70,9 @@ alwaysApply: false
 
 **Trigger**: Agent didn't create proper branch or update GitHub issue. **Lesson**: Create branch FIRST (`agent/<agent>/<issue>-<slug>`), then update GitHub issue, commit, push. **Rule**: Enforced in `AGENTS.md` and `.cursor/rules/01-workflow.mdc`.
 
-## 2025-11-11: GitHub Authentication Token Sync
+## 2025-11-11: GitHub MCP Removal
 
-**Trigger**: User repeatedly needed to refresh GitHub CLI authentication (`gh auth refresh`) for git push operations. **Lesson**: Git uses GitHub CLI's credential helper, but `GITHUB_TOKEN` env var (used by MCP/scripts) can become out of sync. When GitHub CLI refreshes, sync the token: `npm run github:sync-token`. This ensures git operations and MCP servers use the same token. **Rule**: Created `tools/sync-github-token.ps1` script, added `npm run github:sync-token` command, updated `.cursor/rules/01-workflow.mdc` to run sync token first when authentication fails.
+**Trigger**: GitHub MCP caused recurring authentication issues and added complexity. **Lesson**: GitHub CLI (`gh`) handles all GitHub operations reliably without MCP overhead. **Rule**: Removed GitHub MCP from `.cursor/mcp.json`. Updated all rules to use `gh` CLI directly for GitHub operations. Removed GitHub MCP references from documentation.
 
 ## 2025-11-11: MCP Environment Variable Management
 

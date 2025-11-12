@@ -1,5 +1,5 @@
 ---
-description: "MCP Integrations – GitHub, Supabase, Playwright, Desktop Commander, Ref Tools, Toolbox"
+description: "MCP Integrations – Supabase, Playwright, Desktop Commander, Vercel, Filesystem, Time"
 globs: ["**/*"]
 alwaysApply: true
 ---
@@ -12,22 +12,32 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 - Stay in ticket scope. Propose the exact command/query before running it and wait for approval.
 - Prefer scripted helpers (see `tools/` and `examples/automation/`) so operations are reproducible.
 - Log meaningful results (links, summaries, screenshots) in issue-specific research files (`docs/research/Issue-<#>-research.md`), `artifacts/`, or the relevant doc.
-- If an MCP fails twice, document it in `Docs/plans/Issue-<#>-plan-status.md` and suggest the fallback.
+- If an MCP fails twice, document it in `Docs/plans/Issue-<#>-plan-status-<STATUS>.md` and suggest the fallback.
 
 ## When to Reach for Which Tool
-- **GitHub MCP** (`@modelcontextprotocol/server-github`) – Branch/PR automation, repo search, code examples, issue comments. First stop for anything "git" or GitHub API shaped (except commits - use git CLI for commits).
-  - **Note**: Git commits use CLI (GitHub MCP doesn't have commit tool), but branch creation, PRs, and issue updates should use GitHub MCP.
-  - **Requires**: `GITHUB_TOKEN` environment variable
-  - **Fallback**: If GitHub MCP or `gh` CLI fails with 401 errors, use PowerShell direct API calls. Load token from `.env` file: `$token = (Get-Content .env | Select-String "^GITHUB_TOKEN=" | ForEach-Object { $_.Line.Split('=', 2)[1].Trim('"''') })`. Use `Invoke-RestMethod` with `Bearer` auth header.
-- **Ref Tools MCP** (`ref-tools-mcp`) – Token-efficient documentation search for APIs, libraries, services. Supports private repos and PDFs. Cite sources in issue-specific research files (`docs/research/Issue-<#>-research.md`).
-  - **Requires**: No configuration needed (runs on stdio)
+- **Web Search** (built-in tool) – Documentation search for APIs, libraries, services. Use for finding official docs, Stack Overflow, etc. Cite sources in issue-specific research files (`docs/research/Issue-<#>-research.md`).
+  - **Use Case**: Documentation search, finding official docs, Stack Overflow, etc.
+  - **Requires**: No configuration needed
 - **Playwright MCP** (`@playwright/mcp`) – UI screenshots, axe/Lighthouse accessibility/perf checks. Attach outputs to the ticket or artifacts.
   - **Requires**: `GITHUB_TOKEN` environment variable
 - **Supabase MCP** (`supabase-mcp`) – Database schema diffs, SQL experiments, policy checks. Update `docs/ConnectionGuide.md` when endpoints change.
   - **Requires**: `SUPABASE_URL` and `SUPABASE_ANON_KEY` environment variables
   - **Note**: Access tokens (`sbp_...`) are different from anon keys (`eyJ...`). MCP needs anon key, not access token.
-- **Desktop Commander MCP** (`@wonderwhy-er/desktop-commander`) – Local shell/file automation aligned with the allowlist in `.cursor/tools/policy.md`.
+- **Desktop Commander MCP** (`@wonderwhy-er/desktop-commander`) – Local shell/file automation aligned with the allowlist in `.cursor/tools/policy.md`. Provides filesystem operations, process management, and search capabilities.
   - **Requires**: `GITHUB_TOKEN` environment variable
+  - **Use Case**: File operations, directory listings, process management, code search
+  - **Note**: Can be used instead of Filesystem MCP for file operations
+  - **Fallback**: Manual terminal operations
+- **Time MCP** (`mcp-server-time`) – Get current time, convert timezones, format dates. **MANDATORY for date/timestamp operations** - use Time MCP to get accurate current dates/times instead of guessing or using system date.
+  - **Requires**: `uvx` (uv package manager) or Python 3.10+ with pip
+  - **Use Case**: When recording dates in CHANGELOG entries, process improvement entries, completion dates, or any timestamped documentation
+  - **CRITICAL DATE RULE**: **NEVER guess dates or use placeholder dates**. Before adding ANY date to ANY file:
+    1. **First**: Try Time MCP to get current date/time
+    2. **If Time MCP unavailable**: Use system date command (`powershell -Command "Get-Date -Format 'yyyy-MM-dd'"` on Windows, `date +%Y-%m-%d` on Unix)
+    3. **Verify**: Confirm the date is correct before using it
+    4. **Never**: Use placeholder dates like "2025-01-27", "2025-01-XX", or future dates
+    5. **Never**: Assume or guess the current date
+  - **Fallback**: If Time MCP unavailable, use system date/time (but prefer Time MCP for accuracy)
 
 ## Plan vs Act Expectations
 1. **Plan Mode** – State which MCP you intend to use, the command/query, expected outcome, and rollback. Await approval.
@@ -37,7 +47,7 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 ## Health Checks
 - Run `npm run preflight` at the start of a session to confirm baseline MCP servers respond.
 - Run `npm run mcp:heal` to detect and fix common MCP configuration issues (missing env fields, deprecated Smithery CLI usage).
-- `npm run mcp:suggest` highlights additional servers worth enabling; document decisions in `Docs/plans/Issue-<#>-plan-status.md`.
+- `npm run mcp:suggest` highlights additional servers worth enabling; document decisions in `Docs/plans/Issue-<#>-plan-status-<STATUS>.md`.
 - Nexus records any credential or config changes in `docs/ConnectionGuide.md` before closing a task.
 
 ## Important Notes
@@ -47,12 +57,10 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 
 ## Fallback Protocol
 1. Pause and report the outage (include the MCP name and error).
-2. **For GitHub operations**: If 401 authentication error occurs:
-   - **Immediately try PowerShell direct API call** (don't ask user first)
-   - Load token from `.env` file: `$token = (Get-Content .env | Select-String "^GITHUB_TOKEN=" | ForEach-Object { $_.Line.Split('=', 2)[1].Trim('"''') })`
-   - Use `Invoke-RestMethod` with `Bearer` auth header: `$headers = @{Authorization = "Bearer $token"}`
-   - Example: `Invoke-RestMethod -Uri "https://api.github.com/repos/BackslashBryant/Icebreaker/issues" -Method Post -Headers $headers -Body (@{title="..."; body="..."} | ConvertTo-Json)`
-   - Example script: `tools/create-persona-issues.ps1`
+2. **For GitHub operations**: Always use `gh` CLI directly. If it fails with 401:
+   - Clear any invalid env var: `$env:GITHUB_TOKEN = $null`
+   - Use `gh` CLI directly: `gh issue comment 10 --body "..."` (it uses keyring token automatically)
+   - If `gh` CLI still fails, get token and use direct API: `$token = gh auth token; $headers = @{Authorization = "Bearer $token"}; Invoke-RestMethod ...`
 3. Suggest an approved fallback (CLI, SDK, manual step) if it stays within scope.
 4. Capture the variance in the plan or Current Issues log so future runs know why the MCP was skipped.
 

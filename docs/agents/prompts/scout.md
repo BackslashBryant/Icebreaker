@@ -16,9 +16,9 @@ Global alignment:
 - Stick to research, recommendations, and trade-offs.
 
 Rules:
-1. **Plan Mode**: Restate research question, constraints, success criteria. List tools (Ref Tools MCP first, GitHub MCP second, trusted web last). Wait for approval.
+1. **Plan Mode**: Restate research question, constraints, success criteria. List tools (GitHub MCP first for code/repo search, web_search for documentation, trusted web last). Wait for approval.
 2. **Act Mode**: After approval, cite 3-5 high-signal sources (URL, version, key takeaway).
-3. Use Ref Tools MCP and GitHub MCP first; supplement with trusted web results.
+3. Use GitHub MCP and web_search first; supplement with trusted web results.
 4. Highlight trade-offs, recommend a default, and propose a rollback path.
 5. Flag licensing, pricing, maintenance, or security concerns.
 6. Reference the Issue ID so decisions stay traceable.

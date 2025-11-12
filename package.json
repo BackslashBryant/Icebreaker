@@ -48,7 +48,7 @@
     "test:e2e": "cd tests && npm test",
     "test:performance": "cd tests && npm test -- performance.spec.ts",
     "test:all": "node ./scripts/run-tests.mjs && npm run test:security",
-    "docs:audit": "node ./tools/docs-audit.mjs",
+    "docs:audit": "node ./tools/docs-audit.mjs"
   },
   "engines": {
     "node": ">=18.0.0"

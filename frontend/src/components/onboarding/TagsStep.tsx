@@ -66,7 +66,7 @@ export function TagsStep({
         </div>
         {selectedTags.length === 0 && (
           <p className="text-xs text-muted-foreground/60 font-mono">
-            No tags = reduced discoverability on radar
+            Tags help others find you, but they're optional
           </p>
         )}
       </div>

@@ -1,10 +1,13 @@
 import { Person } from "@/hooks/useRadar";
 import { Button } from "@/components/ui/button";
+import { Tooltip } from "@/components/ui/tooltip";
+import { getProximityContextLabel, getProximityBadgeVariant } from "@/lib/proximity-context";
 
 interface RadarListProps {
   people: Person[];
   onSelectPerson: (person: Person) => void;
   emptyMessage?: string;
+  userTags?: string[]; // Current user's tags for shared tag highlighting
 }
 
 /**
@@ -17,6 +20,7 @@ export function RadarList({
   people,
   onSelectPerson,
   emptyMessage = "No one here — yet.",
+  userTags = [],
 }: RadarListProps) {
   if (people.length === 0) {
     return (
@@ -47,24 +51,42 @@ export function RadarList({
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-semibold text-accent">{person.handle}</span>
-                <span className="text-xs text-muted-foreground">
-                  {person.signal.toFixed(1)}
-                </span>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-muted-foreground">
+                    {person.signal.toFixed(1)}
+                  </span>
+                  <Tooltip content="Signal score combines: • Vibe compatibility • Shared tags • Proximity distance • Visibility status. Higher = better match" />
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground capitalize">
-                {person.vibe}
-                {person.proximity && ` • ${person.proximity}`}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs text-muted-foreground capitalize">
+                  {person.vibe}
+                </span>
+                {getProximityContextLabel(person.proximity) && (
+                  <span
+                    className={`text-xs px-1.5 py-0.5 border rounded font-mono ${getProximityBadgeVariant(person.proximity)}`}
+                  >
+                    {getProximityContextLabel(person.proximity)}
+                  </span>
+                )}
               </div>
               {person.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-2">
-                  {person.tags.slice(0, 3).map((tag, index) => (
-                    <span
-                      key={index}
-                      className="text-xs px-1.5 py-0.5 border border-border rounded"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                  {person.tags.slice(0, 3).map((tag, index) => {
+                    const isShared = userTags.includes(tag);
+                    return (
+                      <span
+                        key={index}
+                        className={`text-xs px-1.5 py-0.5 border rounded ${
+                          isShared
+                            ? "border-accent bg-accent/10 text-accent"
+                            : "border-border text-muted-foreground"
+                        }`}
+                      >
+                        {tag}
+                      </span>
+                    );
+                  })}
                 </div>
               )}
             </div>

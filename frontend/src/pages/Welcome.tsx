@@ -48,6 +48,9 @@ export default function Welcome() {
             Real connections.
           </p>
           <p className="text-xs sm:text-sm text-muted-foreground">Brief moments with nearby people</p>
+          <p className="text-xs text-muted-foreground/70 font-mono italic">
+            No pressure. No permanent connections. Just brief moments.
+          </p>
         </div>
 
         {/* CTAs */}

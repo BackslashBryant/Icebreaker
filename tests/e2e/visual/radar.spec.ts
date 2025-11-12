@@ -14,7 +14,7 @@ test.describe('Visual Regression: Radar Screen', () => {
   for (const viewportName of getViewportNames()) {
     const viewport = VIEWPORTS[viewportName as keyof typeof VIEWPORTS];
 
-    test(`@smoke Radar empty state - ${viewport.name === 'mobile' ? viewport.name : 'skip'}`, async ({ page }) => {
+    test(`@smoke Radar empty state - ${viewport.name}`, async ({ page }) => {
       // Only run mobile viewport for smoke tests
       if (viewport.name !== 'mobile') {
         test.skip();

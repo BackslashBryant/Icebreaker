@@ -1,12 +1,14 @@
 #!/usr/bin/env pwsh
-# Sync GITHUB_TOKEN environment variable with GitHub CLI's keyring token
-# This ensures git operations and MCP servers use the same token
+# Simple GitHub token sync - get token from GitHub CLI and set as User-level env var
+# This is a one-time setup for MCP servers that need GITHUB_TOKEN env var
 
 $ErrorActionPreference = "Stop"
 
-Write-Host "Syncing GITHUB_TOKEN with GitHub CLI token..." -ForegroundColor Cyan
+Write-Host "Getting GitHub token from GitHub CLI..." -ForegroundColor Cyan
 
-# Get token from GitHub CLI
+# Clear process-level env var first (GitHub CLI prioritizes it)
+$env:GITHUB_TOKEN = $null
+
 try {
     $ghToken = gh auth token 2>&1
     if ($LASTEXITCODE -ne 0) {
@@ -28,7 +30,7 @@ try {
     Write-Host ""
     Write-Host "[NOTE] Restart Cursor for MCP servers to pick up the new token." -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "Git operations will use GitHub CLI's credential helper." -ForegroundColor Cyan
+    Write-Host "Git operations use GitHub CLI's credential helper automatically." -ForegroundColor Cyan
     Write-Host "MCP servers will use the GITHUB_TOKEN environment variable." -ForegroundColor Cyan
     
 } catch {

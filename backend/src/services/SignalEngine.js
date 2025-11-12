@@ -15,6 +15,7 @@ import { getCooldownConfig } from "../config/cooldown-config.js";
  *              w_report * REPORT_COUNT + w_decline * DECLINE_PENALTY
  *
  * Safety exclusion: Sessions with safety_flag == true are excluded from results.
+ * Visibility exclusion: Sessions with visibility == false are excluded from results (privacy).
  * Report penalty: Reported users (1-2 unique reporters) appear lower in results.
  * Decline penalty: Users in cooldown appear lower in results (soft sort-down).
  * Tie-breakers: Stable random seed per session + alphabetical handle.
@@ -122,9 +123,9 @@ export function calculateScore(sourceSession, targetSession) {
  * @returns {Array<Object>} Array of { session, score } objects, sorted by score (descending)
  */
 export function calculateScores(sourceSession, targetSessions) {
-  // Filter out source session itself
+  // Filter out source session itself and sessions with visibility OFF
   const otherSessions = targetSessions.filter(
-    (session) => session.sessionId !== sourceSession.sessionId
+    (session) => session.sessionId !== sourceSession.sessionId && session.visibility !== false
   );
 
   // Calculate scores
