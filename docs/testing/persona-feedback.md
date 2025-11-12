@@ -456,3 +456,840 @@ This document collects feedback from persona testing sessions. Each persona's fe
 - ✅ Manual persona feedback collection complete (all 10 personas)
 - ⏸️ UX improvements prioritized - Ready for implementation
 
+
+
+---
+
+# Persona Test Feedback Summary
+
+**Generated**: 2025-11-12T02:49:58.499Z
+
+## Overall Statistics
+
+- **Total Runs**: 93
+- **Personas Tested**: 13
+
+## Per-Persona Statistics
+
+### alex
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 12
+
+### casey
+- **Runs**: 8
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 16
+
+### cross-persona
+- **Runs**: 3
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 5
+
+### cross-persona-market-research
+- **Runs**: 3
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 6
+
+### cross-persona-professional
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### ethan
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 11
+
+### jordan
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### marcus
+- **Runs**: 9
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 18
+
+### maya
+- **Runs**: 23
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 16
+
+### morgan
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### river
+- **Runs**: 4
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 8
+
+### sam
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### zoe
+- **Runs**: 10
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 19
+
+## Top 5 Friction Patterns
+
+- 🔴 **missing-panic-button**: 76 occurrences
+- 🔴 **missing-visibility-toggle**: 75 occurrences
+- 🔴 **error-banners**: 67 occurrences
+
+## Recommendations
+
+- **missing-panic-button**: High priority - investigate and fix
+- **missing-visibility-toggle**: High priority - investigate and fix
+- **error-banners**: High priority - investigate and fix
+
+
+---
+
+# Persona Test Feedback Summary
+
+**Generated**: 2025-11-12T02:51:23.839Z
+
+## Overall Statistics
+
+- **Total Runs**: 93
+- **Personas Tested**: 13
+
+## Per-Persona Statistics
+
+### alex
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 12
+
+### casey
+- **Runs**: 8
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 16
+
+### cross-persona
+- **Runs**: 3
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 5
+
+### cross-persona-market-research
+- **Runs**: 3
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 6
+
+### cross-persona-professional
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### ethan
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 11
+
+### jordan
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### marcus
+- **Runs**: 9
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 18
+
+### maya
+- **Runs**: 23
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 16
+
+### morgan
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### river
+- **Runs**: 4
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 8
+
+### sam
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### zoe
+- **Runs**: 10
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 19
+
+## Top 5 Friction Patterns
+
+- 🔴 **missing-panic-button**: 76 occurrences
+- 🔴 **missing-visibility-toggle**: 75 occurrences
+- 🔴 **error-banners**: 67 occurrences
+
+## Executive Summary
+
+⚠️ **3 critical issue(s)** requiring immediate attention
+
+## Actionable Insights
+
+### 🔴 Panic Button Not Visible During Tests (Impact: 89/100)
+
+**Priority**: CRITICAL | **Category**: accessibility | **Affected Users**: 76
+
+**Description**: Panic button affordance not detected in majority of test runs, potentially impacting anxious users who need quick exit option.
+
+**Affected Personas**: alex, casey, cross-persona, cross-persona-market-research, cross-persona-professional
+
+**Recommendations**:
+- Verify panic button is rendered on Radar page with correct data-testid="panic-fab"
+- Ensure panic button is visible after onboarding completes
+- Check CSS visibility/display properties - may be hidden by default
+- Add telemetry check to verify panic button visibility in test helpers
+- Consider adding panic button to Profile page as well for consistency
+
+**Code References**:
+- `tests/utils/telemetry.ts:checkPanicButtonVisible()`
+- `frontend/src/components/Radar.tsx (verify panic button rendering)`
+- `tests/e2e/personas/*.spec.ts (verify panic button checks)`
+
+### 🔴 Visibility Toggle Not Detected (Impact: 88/100)
+
+**Priority**: CRITICAL | **Category**: privacy | **Affected Users**: 75
+
+**Description**: Visibility toggle affordance not found in most test runs, affecting privacy-conscious users who need control over their visibility.
+
+**Affected Personas**: alex, casey, cross-persona, cross-persona-market-research, cross-persona-professional
+
+**Recommendations**:
+- Verify visibility toggle is rendered on Profile page with correct selector
+- Check if toggle is conditionally rendered (may only show when user is visible)
+- Ensure data-testid="visibility-toggle" is present on toggle element
+- Update test helpers to check Profile page, not Radar page
+- Consider adding visibility toggle to Radar page for easier access
+
+**Code References**:
+- `tests/utils/telemetry.ts:checkVisibilityToggleVisible()`
+- `frontend/src/components/Profile.tsx (verify toggle rendering)`
+- `tests/e2e/personas/*.spec.ts (verify toggle checks navigate to Profile)`
+
+### 🔴 Error Banners Appearing Frequently (Impact: 83/100)
+
+**Priority**: CRITICAL | **Category**: reliability | **Affected Users**: 67
+
+**Description**: Error banners detected in majority of test runs, indicating potential API errors, validation issues, or network problems.
+
+**Affected Personas**: alex, casey, cross-persona, cross-persona-market-research, cross-persona-professional
+
+**Recommendations**:
+- Review error banner triggers - identify most common error types
+- Check API error handling and user-facing error messages
+- Verify network error handling (timeouts, connection failures)
+- Review form validation error display logic
+- Consider improving error messages to be more user-friendly
+- Add error telemetry to identify specific error patterns
+
+**Code References**:
+- `tests/utils/telemetry.ts:countErrorBanners()`
+- `frontend/src/components/ErrorBanner.tsx`
+- `backend/src/routes/*.ts (API error handling)`
+
+
+## Recommendations (Legacy Format)
+
+- **missing-panic-button**: High priority - investigate and fix
+- **missing-visibility-toggle**: High priority - investigate and fix
+- **error-banners**: High priority - investigate and fix
+
+
+---
+
+# Persona Test Feedback Summary
+
+**Generated**: 2025-11-12T02:58:12.496Z
+
+## Overall Statistics
+
+- **Total Runs**: 17
+- **Personas Tested**: 4
+
+## Per-Persona Statistics
+
+### cross-persona
+- **Runs**: 3
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 5
+
+### ethan
+- **Runs**: 4
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 7
+
+### maya
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 7
+
+### zoe
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 9
+
+## Top 5 Friction Patterns
+
+- 🔴 **missing-visibility-toggle**: 15 occurrences
+- 🔴 **missing-panic-button**: 13 occurrences
+
+## Executive Summary
+
+⚠️ **2 critical issue(s)** requiring immediate attention
+
+## Actionable Insights
+
+### 🔴 Visibility Toggle Not Detected (Impact: 93/100)
+
+**Priority**: CRITICAL | **Category**: privacy | **Affected Users**: 15
+
+**Description**: Visibility toggle affordance not found in most test runs, affecting privacy-conscious users who need control over their visibility.
+
+**Affected Personas**: cross-persona, ethan, maya, zoe
+
+**Recommendations**:
+- Verify visibility toggle is rendered on Profile page with correct selector
+- Check if toggle is conditionally rendered (may only show when user is visible)
+- Ensure data-testid="visibility-toggle" is present on toggle element
+- Update test helpers to check Profile page, not Radar page
+- Consider adding visibility toggle to Radar page for easier access
+
+**Code References**:
+- `tests/utils/telemetry.ts:checkVisibilityToggleVisible()`
+- `frontend/src/components/Profile.tsx (verify toggle rendering)`
+- `tests/e2e/personas/*.spec.ts (verify toggle checks navigate to Profile)`
+
+### 🔴 Panic Button Not Visible During Tests (Impact: 86/100)
+
+**Priority**: CRITICAL | **Category**: accessibility | **Affected Users**: 13
+
+**Description**: Panic button affordance not detected in majority of test runs, potentially impacting anxious users who need quick exit option.
+
+**Affected Personas**: cross-persona, ethan, maya, zoe
+
+**Recommendations**:
+- Verify panic button is rendered on Radar page with correct data-testid="panic-fab"
+- Ensure panic button is visible after onboarding completes
+- Check CSS visibility/display properties - may be hidden by default
+- Add telemetry check to verify panic button visibility in test helpers
+- Consider adding panic button to Profile page as well for consistency
+
+**Code References**:
+- `tests/utils/telemetry.ts:checkPanicButtonVisible()`
+- `frontend/src/components/Radar.tsx (verify panic button rendering)`
+- `tests/e2e/personas/*.spec.ts (verify panic button checks)`
+
+
+## Recommendations (Legacy Format)
+
+- **missing-visibility-toggle**: High priority - investigate and fix
+- **missing-panic-button**: High priority - investigate and fix
+
+
+---
+
+# Persona Test Feedback Summary
+
+**Generated**: 2025-11-12T03:02:02.972Z
+
+## Overall Statistics
+
+- **Total Runs**: 80
+- **Personas Tested**: 13
+
+## Per-Persona Statistics
+
+### alex
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 12
+
+### casey
+- **Runs**: 8
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 16
+
+### cross-persona
+- **Runs**: 3
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 5
+
+### cross-persona-market-research
+- **Runs**: 3
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 6
+
+### cross-persona-professional
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### ethan
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 11
+
+### jordan
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### marcus
+- **Runs**: 9
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 18
+
+### maya
+- **Runs**: 10
+- **Avg Boot Time**: 1ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 16
+
+### morgan
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### river
+- **Runs**: 4
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 8
+
+### sam
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### zoe
+- **Runs**: 10
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 19
+
+## Top 5 Friction Patterns
+
+- 🔴 **missing-panic-button**: 76 occurrences
+- 🔴 **missing-visibility-toggle**: 75 occurrences
+
+## Executive Summary
+
+⚠️ **2 critical issue(s)** requiring immediate attention
+
+## Actionable Insights
+
+### 🔴 Panic Button Not Visible During Tests (Impact: 97/100)
+
+**Priority**: CRITICAL | **Category**: accessibility | **Affected Users**: 76
+
+**Description**: Panic button affordance not detected in majority of test runs, potentially impacting anxious users who need quick exit option.
+
+**Affected Personas**: alex, casey, cross-persona, cross-persona-market-research, cross-persona-professional
+
+**Recommendations**:
+- Verify panic button is rendered on Radar page with correct data-testid="panic-fab"
+- Ensure panic button is visible after onboarding completes
+- Check CSS visibility/display properties - may be hidden by default
+- Add telemetry check to verify panic button visibility in test helpers
+- Consider adding panic button to Profile page as well for consistency
+
+**Code References**:
+- `tests/utils/telemetry.ts:checkPanicButtonVisible()`
+- `frontend/src/components/Radar.tsx (verify panic button rendering)`
+- `tests/e2e/personas/*.spec.ts (verify panic button checks)`
+
+### 🔴 Visibility Toggle Not Detected (Impact: 96/100)
+
+**Priority**: CRITICAL | **Category**: privacy | **Affected Users**: 75
+
+**Description**: Visibility toggle affordance not found in most test runs, affecting privacy-conscious users who need control over their visibility.
+
+**Affected Personas**: alex, casey, cross-persona, cross-persona-market-research, cross-persona-professional
+
+**Recommendations**:
+- Verify visibility toggle is rendered on Profile page with correct selector
+- Check if toggle is conditionally rendered (may only show when user is visible)
+- Ensure data-testid="visibility-toggle" is present on toggle element
+- Update test helpers to check Profile page, not Radar page
+- Consider adding visibility toggle to Radar page for easier access
+
+**Code References**:
+- `tests/utils/telemetry.ts:checkVisibilityToggleVisible()`
+- `frontend/src/components/Profile.tsx (verify toggle rendering)`
+- `tests/e2e/personas/*.spec.ts (verify toggle checks navigate to Profile)`
+
+
+## Recommendations (Legacy Format)
+
+- **missing-panic-button**: High priority - investigate and fix
+- **missing-visibility-toggle**: High priority - investigate and fix
+
+
+---
+
+# Persona Test Feedback Summary
+
+**Generated**: 2025-11-12T03:06:46.768Z
+
+## Overall Statistics
+
+- **Total Runs**: 80
+- **Personas Tested**: 13
+
+## Per-Persona Statistics
+
+### alex
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 12
+
+### casey
+- **Runs**: 8
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 16
+
+### cross-persona
+- **Runs**: 3
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 5
+
+### cross-persona-market-research
+- **Runs**: 3
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 6
+
+### cross-persona-professional
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### ethan
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 11
+
+### jordan
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### marcus
+- **Runs**: 9
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 18
+
+### maya
+- **Runs**: 10
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 16
+
+### morgan
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### river
+- **Runs**: 4
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 8
+
+### sam
+- **Runs**: 5
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 10
+
+### zoe
+- **Runs**: 10
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 19
+
+## Top 5 Friction Patterns
+
+- 🔴 **missing-panic-button**: 76 occurrences
+- 🔴 **missing-visibility-toggle**: 75 occurrences
+
+## Executive Summary
+
+⚠️ **2 critical issue(s)** requiring immediate attention
+
+## Actionable Insights
+
+### 🔴 Panic Button Not Visible During Tests (Impact: 97/100)
+
+**Priority**: CRITICAL | **Category**: accessibility | **Affected Users**: 76
+
+**Description**: Panic button affordance not detected in majority of test runs, potentially impacting anxious users who need quick exit option.
+
+**Affected Personas**: alex, casey, cross-persona, cross-persona-market-research, cross-persona-professional
+
+**Recommendations**:
+- Verify panic button is rendered on Radar page with correct data-testid="panic-fab"
+- Ensure panic button is visible after onboarding completes
+- Check CSS visibility/display properties - may be hidden by default
+- Add telemetry check to verify panic button visibility in test helpers
+- Consider adding panic button to Profile page as well for consistency
+
+**Code References**:
+- `tests/utils/telemetry.ts:checkPanicButtonVisible()`
+- `frontend/src/components/Radar.tsx (verify panic button rendering)`
+- `tests/e2e/personas/*.spec.ts (verify panic button checks)`
+
+### 🔴 Visibility Toggle Not Detected (Impact: 96/100)
+
+**Priority**: CRITICAL | **Category**: privacy | **Affected Users**: 75
+
+**Description**: Visibility toggle affordance not found in most test runs, affecting privacy-conscious users who need control over their visibility.
+
+**Affected Personas**: alex, casey, cross-persona, cross-persona-market-research, cross-persona-professional
+
+**Recommendations**:
+- Verify visibility toggle is rendered on Profile page with correct selector
+- Check if toggle is conditionally rendered (may only show when user is visible)
+- Ensure data-testid="visibility-toggle" is present on toggle element
+- Update test helpers to check Profile page, not Radar page
+- Consider adding visibility toggle to Radar page for easier access
+
+**Code References**:
+- `tests/utils/telemetry.ts:checkVisibilityToggleVisible()`
+- `frontend/src/components/Profile.tsx (verify toggle rendering)`
+- `tests/e2e/personas/*.spec.ts (verify toggle checks navigate to Profile)`
+
+
+## Recommendations (Legacy Format)
+
+- **missing-panic-button**: High priority - investigate and fix
+- **missing-visibility-toggle**: High priority - investigate and fix

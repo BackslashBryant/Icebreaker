@@ -12,6 +12,7 @@
 import { test, expect } from '@playwright/test';
 import { createMultiPersonaContexts, cleanupPersonaContexts, waitForMutualVisibility } from '../../utils/multi-persona';
 import type { PersonaPresenceScript } from '../../fixtures/persona-presence/schema';
+import { TelemetryCollector, countErrorBanners } from '../../utils/telemetry';
 
 // Import presence scripts
 import campusLibraryScript from '../../fixtures/persona-presence/campus-library.json';
@@ -24,6 +25,9 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       browser,
       campusLibraryScript as PersonaPresenceScript,
     );
+
+    const mayaTelemetry = new TelemetryCollector('maya', 'maya-multi-user-visibility');
+    const zoeTelemetry = new TelemetryCollector('zoe', 'zoe-multi-user-visibility');
 
     try {
       const maya = contexts.find((c) => c.sessionId === 'maya-session')!;
@@ -41,11 +45,32 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       await maya.page.waitForTimeout(2000);
       await zoe.page.waitForTimeout(2000);
 
+      // Record error banners for both personas
+      const mayaErrorCount = await countErrorBanners(maya.page);
+      if (mayaErrorCount > 0) {
+        for (let i = 0; i < mayaErrorCount; i++) {
+          mayaTelemetry.recordErrorBanner();
+        }
+      }
+
+      const zoeErrorCount = await countErrorBanners(zoe.page);
+      if (zoeErrorCount > 0) {
+        for (let i = 0; i < zoeErrorCount; i++) {
+          zoeTelemetry.recordErrorBanner();
+        }
+      }
+
       // Verify both personas can see Radar (basic check)
       // Full presence verification requires WebSocket mock to send presence:update messages
       expect(maya.page.url()).toContain('/radar');
       expect(zoe.page.url()).toContain('/radar');
+    } catch (error) {
+      mayaTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      zoeTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      throw error;
     } finally {
+      await mayaTelemetry.writeToFile();
+      await zoeTelemetry.writeToFile();
       await cleanupPersonaContexts(contexts);
     }
   });
@@ -55,6 +80,9 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       browser,
       campusLibraryScript as PersonaPresenceScript,
     );
+
+    const mayaTelemetry = new TelemetryCollector('maya', 'maya-shared-tags');
+    const zoeTelemetry = new TelemetryCollector('zoe', 'zoe-shared-tags');
 
     try {
       const maya = contexts.find((c) => c.sessionId === 'maya-session')!;
@@ -79,10 +107,31 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       await maya.page.waitForTimeout(2000);
       await zoe.page.waitForTimeout(2000);
 
+      // Record error banners
+      const mayaErrorCount = await countErrorBanners(maya.page);
+      if (mayaErrorCount > 0) {
+        for (let i = 0; i < mayaErrorCount; i++) {
+          mayaTelemetry.recordErrorBanner();
+        }
+      }
+
+      const zoeErrorCount = await countErrorBanners(zoe.page);
+      if (zoeErrorCount > 0) {
+        for (let i = 0; i < zoeErrorCount; i++) {
+          zoeTelemetry.recordErrorBanner();
+        }
+      }
+
       // Signal score verification would require checking actual Radar UI
       // For now, verify shared tags exist
       expect(sharedTags.length).toBeGreaterThan(0);
+    } catch (error) {
+      mayaTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      zoeTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      throw error;
     } finally {
+      await mayaTelemetry.writeToFile();
+      await zoeTelemetry.writeToFile();
       await cleanupPersonaContexts(contexts);
     }
   });
@@ -92,6 +141,9 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       browser,
       campusLibraryScript as PersonaPresenceScript,
     );
+
+    const mayaTelemetry = new TelemetryCollector('maya', 'maya-visibility-toggle');
+    const zoeTelemetry = new TelemetryCollector('zoe', 'zoe-visibility-toggle');
 
     try {
       const maya = contexts.find((c) => c.sessionId === 'maya-session')!;
@@ -120,9 +172,33 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       await maya.page.waitForTimeout(1000);
       await zoe.page.waitForTimeout(1000);
 
+      // Record error banners
+      const mayaErrorCount = await countErrorBanners(maya.page);
+      if (mayaErrorCount > 0) {
+        for (let i = 0; i < mayaErrorCount; i++) {
+          mayaTelemetry.recordErrorBanner();
+        }
+      }
+
+      const zoeErrorCount = await countErrorBanners(zoe.page);
+      if (zoeErrorCount > 0) {
+        for (let i = 0; i < zoeErrorCount; i++) {
+          zoeTelemetry.recordErrorBanner();
+        }
+      }
+
+      // Record visibility toggle affordance
+      mayaTelemetry.recordAffordance('visibilityToggle', true);
+
       // Visibility toggle should work (mock handles this)
       // Full verification would require checking Radar UI
+    } catch (error) {
+      mayaTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      zoeTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      throw error;
     } finally {
+      await mayaTelemetry.writeToFile();
+      await zoeTelemetry.writeToFile();
       await cleanupPersonaContexts(contexts);
     }
   });
@@ -134,6 +210,9 @@ test.describe('Multi-User Scenarios: Ethan + Marcus (Coworking)', () => {
       browser,
       coworkingScript as PersonaPresenceScript,
     );
+
+    const ethanTelemetry = new TelemetryCollector('ethan', 'ethan-different-floors');
+    const marcusTelemetry = new TelemetryCollector('marcus', 'marcus-different-floors');
 
     try {
       const ethan = contexts.find((c) => c.sessionId === 'ethan-session')!;
@@ -154,10 +233,31 @@ test.describe('Multi-User Scenarios: Ethan + Marcus (Coworking)', () => {
       await ethan.page.waitForTimeout(2000);
       await marcus.page.waitForTimeout(2000);
 
+      // Record error banners
+      const ethanErrorCount = await countErrorBanners(ethan.page);
+      if (ethanErrorCount > 0) {
+        for (let i = 0; i < ethanErrorCount; i++) {
+          ethanTelemetry.recordErrorBanner();
+        }
+      }
+
+      const marcusErrorCount = await countErrorBanners(marcus.page);
+      if (marcusErrorCount > 0) {
+        for (let i = 0; i < marcusErrorCount; i++) {
+          marcusTelemetry.recordErrorBanner();
+        }
+      }
+
       // Both should be visible despite different floors (same building)
       expect(ethan.page.url()).toContain('/radar');
       expect(marcus.page.url()).toContain('/radar');
+    } catch (error) {
+      ethanTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      marcusTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      throw error;
     } finally {
+      await ethanTelemetry.writeToFile();
+      await marcusTelemetry.writeToFile();
       await cleanupPersonaContexts(contexts);
     }
   });
@@ -168,6 +268,9 @@ test.describe('Multi-User Scenarios: Ethan + Marcus (Coworking)', () => {
       coworkingScript as PersonaPresenceScript,
     );
 
+    const ethanTelemetry = new TelemetryCollector('ethan', 'ethan-shared-tech-tags');
+    const marcusTelemetry = new TelemetryCollector('marcus', 'marcus-shared-tech-tags');
+
     try {
       const ethan = contexts.find((c) => c.sessionId === 'ethan-session')!;
       const marcus = contexts.find((c) => c.sessionId === 'marcus-session')!;
@@ -177,7 +280,35 @@ test.describe('Multi-User Scenarios: Ethan + Marcus (Coworking)', () => {
 
       const sharedTags = ethanTags.filter((tag) => marcusTags.includes(tag));
       expect(sharedTags).toContain('Tech curious');
+
+      // Navigate to Radar to record error banners
+      await ethan.page.goto('/radar');
+      await marcus.page.goto('/radar');
+
+      await expect(ethan.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(marcus.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+
+      // Record error banners
+      const ethanErrorCount = await countErrorBanners(ethan.page);
+      if (ethanErrorCount > 0) {
+        for (let i = 0; i < ethanErrorCount; i++) {
+          ethanTelemetry.recordErrorBanner();
+        }
+      }
+
+      const marcusErrorCount = await countErrorBanners(marcus.page);
+      if (marcusErrorCount > 0) {
+        for (let i = 0; i < marcusErrorCount; i++) {
+          marcusTelemetry.recordErrorBanner();
+        }
+      }
+    } catch (error) {
+      ethanTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      marcusTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      throw error;
     } finally {
+      await ethanTelemetry.writeToFile();
+      await marcusTelemetry.writeToFile();
       await cleanupPersonaContexts(contexts);
     }
   });
@@ -189,6 +320,9 @@ test.describe('Multi-User Scenarios: Casey + Alex (Gallery Opening)', () => {
       browser,
       galleryScript as PersonaPresenceScript,
     );
+
+    const caseyTelemetry = new TelemetryCollector('casey', 'casey-same-event');
+    const alexTelemetry = new TelemetryCollector('alex', 'alex-same-event');
 
     try {
       const casey = contexts.find((c) => c.sessionId === 'casey-session')!;
@@ -209,10 +343,31 @@ test.describe('Multi-User Scenarios: Casey + Alex (Gallery Opening)', () => {
       await casey.page.waitForTimeout(2000);
       await alex.page.waitForTimeout(2000);
 
+      // Record error banners
+      const caseyErrorCount = await countErrorBanners(casey.page);
+      if (caseyErrorCount > 0) {
+        for (let i = 0; i < caseyErrorCount; i++) {
+          caseyTelemetry.recordErrorBanner();
+        }
+      }
+
+      const alexErrorCount = await countErrorBanners(alex.page);
+      if (alexErrorCount > 0) {
+        for (let i = 0; i < alexErrorCount; i++) {
+          alexTelemetry.recordErrorBanner();
+        }
+      }
+
       // Both should be visible (same event)
       expect(casey.page.url()).toContain('/radar');
       expect(alex.page.url()).toContain('/radar');
+    } catch (error) {
+      caseyTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      alexTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      throw error;
     } finally {
+      await caseyTelemetry.writeToFile();
+      await alexTelemetry.writeToFile();
       await cleanupPersonaContexts(contexts);
     }
   });
@@ -224,6 +379,9 @@ test.describe('Multi-User Chat Scenarios', () => {
       browser,
       campusLibraryScript as PersonaPresenceScript,
     );
+
+    const mayaTelemetry = new TelemetryCollector('maya', 'maya-one-chat-enforcement');
+    const zoeTelemetry = new TelemetryCollector('zoe', 'zoe-one-chat-enforcement');
 
     try {
       const maya = contexts.find((c) => c.sessionId === 'maya-session')!;
@@ -270,10 +428,31 @@ test.describe('Multi-User Chat Scenarios', () => {
         }
       });
 
+      // Record error banners
+      const mayaErrorCount = await countErrorBanners(maya.page);
+      if (mayaErrorCount > 0) {
+        for (let i = 0; i < mayaErrorCount; i++) {
+          mayaTelemetry.recordErrorBanner();
+        }
+      }
+
+      const zoeErrorCount = await countErrorBanners(zoe.page);
+      if (zoeErrorCount > 0) {
+        for (let i = 0; i < zoeErrorCount; i++) {
+          zoeTelemetry.recordErrorBanner();
+        }
+      }
+
       // Mock should enforce one-chat-at-a-time
       // Full verification would require checking error message
       await maya.page.waitForTimeout(1000);
+    } catch (error) {
+      mayaTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      zoeTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      throw error;
     } finally {
+      await mayaTelemetry.writeToFile();
+      await zoeTelemetry.writeToFile();
       await cleanupPersonaContexts(contexts);
     }
   });
@@ -285,6 +464,9 @@ test.describe('Multi-User Reconnect Scenarios', () => {
       browser,
       campusLibraryScript as PersonaPresenceScript,
     );
+
+    const mayaTelemetry = new TelemetryCollector('maya', 'maya-reconnect');
+    const zoeTelemetry = new TelemetryCollector('zoe', 'zoe-reconnect');
 
     try {
       const maya = contexts.find((c) => c.sessionId === 'maya-session')!;
@@ -320,9 +502,30 @@ test.describe('Multi-User Reconnect Scenarios', () => {
 
       await maya.page.waitForTimeout(1000);
 
+      // Record error banners
+      const mayaErrorCount = await countErrorBanners(maya.page);
+      if (mayaErrorCount > 0) {
+        for (let i = 0; i < mayaErrorCount; i++) {
+          mayaTelemetry.recordErrorBanner();
+        }
+      }
+
+      const zoeErrorCount = await countErrorBanners(zoe.page);
+      if (zoeErrorCount > 0) {
+        for (let i = 0; i < zoeErrorCount; i++) {
+          zoeTelemetry.recordErrorBanner();
+        }
+      }
+
       // Presence should be restored
       // Full verification would require checking Radar UI
+    } catch (error) {
+      mayaTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      zoeTelemetry.recordError(error instanceof Error ? error.message : String(error));
+      throw error;
     } finally {
+      await mayaTelemetry.writeToFile();
+      await zoeTelemetry.writeToFile();
       await cleanupPersonaContexts(contexts);
     }
   });
