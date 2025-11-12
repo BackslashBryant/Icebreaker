@@ -142,7 +142,8 @@ export default function Radar() {
           )}
 
           {/* Connection Error State */}
-          {status === "error" && (
+          {/* Only show error after reconnection attempts have been exhausted */}
+          {status === "error" && isConnected === false && (
             <div
               className="mb-6 p-4 border-2 border-destructive rounded-xl bg-card text-destructive font-mono text-sm"
               role="alert"

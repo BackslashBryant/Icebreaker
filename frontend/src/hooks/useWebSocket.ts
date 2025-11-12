@@ -52,13 +52,16 @@ export function useWebSocket(options: UseWebSocketOptions) {
           onDisconnect?.();
 
           // Attempt to reconnect if not manually closed
+          // Only set error status after exhausting all reconnection attempts
           if (reconnectAttemptsRef.current < maxReconnectAttempts) {
             reconnectAttemptsRef.current++;
             const delay = reconnectDelay * Math.pow(2, reconnectAttemptsRef.current - 1); // Exponential backoff
             reconnectTimeoutRef.current = setTimeout(() => {
               connect();
             }, delay);
+            // Keep status as "disconnected" during reconnection attempts, not "error"
           } else {
+            // Only set error status after all reconnection attempts failed
             setStatus("error");
           }
         },

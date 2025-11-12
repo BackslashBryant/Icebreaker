@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { VisibilityToggle } from "@/components/profile/VisibilityToggle";
 import { EmergencyContactInput } from "@/components/profile/EmergencyContactInput";
 import { AccessibilityToggles } from "@/components/profile/AccessibilityToggles";
+import { PanicButton } from "@/components/panic/PanicButton";
 
 /**
  * ProfileHeader Component
@@ -113,6 +114,9 @@ export default function Profile() {
           </ProfileSection>
         </div>
       </main>
+
+      {/* Panic Button FAB - Always accessible for safety */}
+      <PanicButton />
     </div>
   );
 }
