@@ -438,6 +438,152 @@ Each persona journey follows this flow:
 
 ---
 
+## Edge Cases by Persona Type
+
+### Anxious Users (Maya, Ethan, Zoe)
+
+**Edge Cases to Test**:
+
+1. **Visibility Toggle Behavior**
+   - **Scenario**: Maya toggles visibility off/on frequently during Radar view
+   - **Expected**: Visibility changes reflect immediately, no delay or confusion
+   - **Test**: Verify visibility toggle works instantly, Radar updates accordingly
+   - **Edge Case**: Rapid toggling doesn't cause UI glitches or state confusion
+
+2. **Shared Tag Compatibility**
+   - **Scenario**: Maya and Zoe both have "Overthinking Things" tag
+   - **Expected**: Signal score boosted for compatibility
+   - **Test**: Verify shared tags increase signal score appropriately
+   - **Edge Case**: Multiple shared tags don't cause score overflow or incorrect ranking
+
+3. **Ephemeral Chat Ending**
+   - **Scenario**: Zoe ends chat and verifies no history remains
+   - **Expected**: Chat ends cleanly, no history, no follow-up prompts
+   - **Test**: Verify chat history is completely deleted after ending
+   - **Edge Case**: Chat ending doesn't leave any residual data or UI artifacts
+
+4. **Panic Button Accessibility**
+   - **Scenario**: Anxious user needs immediate exit during chat
+   - **Expected**: Panic button always accessible, one-tap exit
+   - **Test**: Verify panic button works from any screen state
+   - **Edge Case**: Panic button works even if chat is in error state or loading
+
+5. **Onboarding Anxiety**
+   - **Scenario**: Maya reads consent checkbox carefully, may hesitate
+   - **Expected**: Clear messaging, no pressure, easy exit option
+   - **Test**: Verify onboarding allows graceful exit at any point
+   - **Edge Case**: Partial onboarding doesn't leave user in broken state
+
+---
+
+### Professional Users (Marcus, Casey, Alex, Morgan)
+
+**Edge Cases to Test**:
+
+1. **Proximity Matching Across Floors**
+   - **Scenario**: Marcus and Ethan in same building, different floors
+   - **Expected**: Proximity matching accounts for vertical distance
+   - **Test**: Verify signal scoring handles multi-floor proximity correctly
+   - **Edge Case**: Different floors don't break proximity matching entirely
+
+2. **One-Chat-at-a-Time Enforcement**
+   - **Scenario**: Marcus tries to start second chat while first is active
+   - **Expected**: Second chat blocked, clear message about one-chat limit
+   - **Test**: Verify one-chat enforcement works correctly
+   - **Edge Case**: Chat ending doesn't leave user in blocked state
+
+3. **Professional Boundary Respect**
+   - **Scenario**: Casey at event, wants casual but professional interactions
+   - **Expected**: Vibe selection ("banter") allows casual but respectful chats
+   - **Test**: Verify professional context doesn't create awkward interactions
+   - **Edge Case**: Professional users don't receive inappropriate content
+
+4. **Event Proximity Matching**
+   - **Scenario**: Alex at tech conference, wants to match with other attendees
+   - **Expected**: Event/venue proximity matching works accurately
+   - **Test**: Verify event attendees match correctly within venue
+   - **Edge Case**: Dense event spaces don't cause proximity matching failures
+
+5. **Ephemeral Networking**
+   - **Scenario**: Morgan at academic conference, wants ephemeral connections
+   - **Expected**: Clean chat endings, no LinkedIn/ResearchGate follow pressure
+   - **Test**: Verify ephemeral design prevents permanent connection pressure
+   - **Edge Case**: Professional users don't feel pressured to exchange contacts
+
+---
+
+### Privacy-Conscious Users (Jordan)
+
+**Edge Cases to Test**:
+
+1. **Visibility Toggle Privacy**
+   - **Scenario**: Jordan toggles visibility OFF initially, then ON selectively
+   - **Expected**: Visibility changes respect privacy preferences immediately
+   - **Test**: Verify visibility toggle works instantly, no data leakage
+   - **Edge Case**: Visibility OFF doesn't still show user in Radar briefly
+
+2. **No Message Content Storage**
+   - **Scenario**: Jordan verifies no message content is stored
+   - **Expected**: Messages are ephemeral, no database storage
+   - **Test**: Verify message content is not persisted anywhere
+   - **Edge Case**: Error states don't accidentally persist message content
+
+3. **Approximate Location Only**
+   - **Scenario**: Jordan grants location but expects approximate only
+   - **Expected**: Location is approximate, not precise coordinates
+   - **Test**: Verify location precision is reduced appropriately
+   - **Edge Case**: Location precision doesn't leak precise coordinates
+
+4. **Privacy-Respecting Signal Scoring**
+   - **Scenario**: Jordan with visibility OFF should still appear when toggled ON
+   - **Expected**: Signal scoring respects privacy preferences
+   - **Test**: Verify privacy preferences don't break signal scoring
+   - **Edge Case**: Privacy settings don't cause incorrect signal scores
+
+5. **Session Cleanup**
+   - **Scenario**: Jordan exits app, verifies no data persistence
+   - **Expected**: Session data cleared, no residual data
+   - **Test**: Verify session cleanup works completely
+   - **Edge Case**: Session cleanup doesn't leave any metadata behind
+
+---
+
+### Event Attendees (Casey, Alex, Sam, Morgan)
+
+**Edge Cases to Test**:
+
+1. **Dense Event Proximity Matching**
+   - **Scenario**: Multiple event attendees in same venue
+   - **Expected**: Proximity matching works accurately in dense spaces
+   - **Test**: Verify signal scoring handles multiple nearby users correctly
+   - **Edge Case**: Dense event spaces don't cause matching failures
+
+2. **Event Tag Compatibility**
+   - **Scenario**: Event attendees with shared event-related tags
+   - **Expected**: Shared tags boost compatibility appropriately
+   - **Test**: Verify event tag compatibility works correctly
+   - **Edge Case**: Event tags don't cause incorrect signal scores
+
+3. **Ephemeral Event Connections**
+   - **Scenario**: Event attendees want ephemeral connections, no follow-up
+   - **Expected**: Clean chat endings, no social media follow pressure
+   - **Test**: Verify ephemeral design prevents permanent connections
+   - **Edge Case**: Event connections don't create permanent social graph
+
+4. **Vibe Compatibility at Events**
+   - **Scenario**: Different vibes ("banter", "intros", "surprise") at same event
+   - **Expected**: Vibe compatibility works across all types
+   - **Test**: Verify vibe compatibility doesn't break at events
+   - **Edge Case**: Different vibes don't prevent matching at events
+
+5. **Event Exit Behavior**
+   - **Scenario**: User leaves event venue, proximity breaks
+   - **Expected**: Chat ends cleanly when proximity breaks
+   - **Test**: Verify proximity break triggers clean chat ending
+   - **Edge Case**: Proximity break doesn't leave chat in broken state
+
+---
+
 ## Feedback Collection
 
 After completing each persona journey, complete the persona-specific questionnaire:
@@ -454,6 +600,43 @@ After completing each persona journey, complete the persona-specific questionnai
 
 ---
 
-**Last Updated**: 2025-11-10  
-**Next Steps**: Complete persona testing with questionnaire feedback collection
+---
+
+## Edge Case Testing Checklist
+
+When testing each persona, verify these edge cases:
+
+### Anxious Users
+- [ ] Visibility toggle works instantly, no delay
+- [ ] Shared tags boost signal score correctly
+- [ ] Ephemeral chat ending leaves no history
+- [ ] Panic button accessible from all states
+- [ ] Onboarding allows graceful exit
+
+### Professional Users
+- [ ] Multi-floor proximity matching works
+- [ ] One-chat-at-a-time enforcement works
+- [ ] Professional boundaries respected
+- [ ] Event proximity matching accurate
+- [ ] No permanent connection pressure
+
+### Privacy-Conscious Users
+- [ ] Visibility toggle respects privacy immediately
+- [ ] No message content storage verified
+- [ ] Location precision is approximate only
+- [ ] Privacy preferences don't break signal scoring
+- [ ] Session cleanup complete
+
+### Event Attendees
+- [ ] Dense event proximity matching works
+- [ ] Event tag compatibility correct
+- [ ] Ephemeral connections prevent follow-up pressure
+- [ ] Vibe compatibility works at events
+- [ ] Proximity break triggers clean chat ending
+
+---
+
+**Last Updated**: 2025-01-27  
+**Status**: ✅ Complete - All 10 personas mapped with edge cases identified  
+**Next Steps**: Proceed to Step 2 - Core Persona Testing (College Students)
 

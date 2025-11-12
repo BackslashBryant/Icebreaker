@@ -1,16 +1,30 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// Calculate optimal worker count based on available CPU cores
+// - CI: Use 2 workers (conservative for resource-constrained environments)
+// - Local: Use 50% of CPU cores (Playwright's default is 50%, but we're explicit)
+// - Override: Set PLAYWRIGHT_WORKERS env var to override (e.g., "25%", "2", "4")
+function getWorkerCount(): number | string {
+  if (process.env.CI) {
+    return 2; // CI environments - conservative
+  }
+  
+  // Use percentage string for Playwright's built-in optimization
+  // This allows Playwright to adjust based on test complexity
+  return process.env.PLAYWRIGHT_WORKERS || '50%';
+}
+
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: false, // Run tests sequentially to avoid port conflicts
+  fullyParallel: true, // Enable parallel execution - servers are reused anyway
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: 1, // Single worker to avoid server conflicts
+  workers: getWorkerCount(), // Dynamic: 50% of CPU cores locally, 2 in CI
   timeout: 60000, // 60s timeout per test
-  maxFailures: 1, // Fail fast - stop on first failure
-  // Reporters: line for real-time progress (ASCII-friendly, clean, transparent), json for artifacts, html for review (never auto-open)
+  maxFailures: process.env.CI ? 1 : 3, // Fail fast in CI, allow more failures locally
+  // Reporters: list for clean output (ASCII-friendly, no Unicode artifacts), json for artifacts, html for review (never auto-open)
   reporter: [
-    ['line'], // Real-time single-line updates - shows current test name and progress, ASCII-only with NO_COLOR=1
+    ['list'], // Clean list output - ASCII-only, no Unicode characters, works perfectly in PowerShell
     ['json', { outputFile: '../artifacts/playwright-report.json' }], // Machine-readable for CI/review
     ['html', { 
       outputFolder: '../artifacts/playwright-report',

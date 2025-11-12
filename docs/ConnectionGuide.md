@@ -160,16 +160,12 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 ## 7. MCP Servers (Model Context Protocol)
 
 ### Baseline MCPs (Required for Workflow)
-- **GitHub MCP**: Agent workflow automation (branches, PRs, issues, labels)
-  - Required Env: `GITHUB_TOKEN` (PAT with `repo`, `workflow`, `issues` permissions)
-  - Fallback: GitHub web UI or `gh` CLI
-- **Ref Tools MCP**: Token-efficient documentation search for APIs, libraries, services
-  - Required Env: None (uses Smithery key)
-  - Fallback: Vendor docs in browser; cite manually in `/docs/research.md`
-  - Note: Supports private GitHub repos and PDFs; more token-efficient than alternatives
 - **Desktop Commander MCP**: Local shell/file automation with guardrails
   - Required Env: `GITHUB_TOKEN`
   - Fallback: Local terminal manually; respect `.cursor/tools/policy.md`
+- **GitHub Operations**: Use GitHub CLI (`gh`) directly - no MCP needed
+  - Setup: Run `gh auth login` once
+  - Fallback: GitHub web UI
 
 ### Optional MCPs (Feature-Specific)
 - **Playwright MCP**: UI testing, accessibility (axe), screenshots, Lighthouse
@@ -182,6 +178,35 @@ Track every port, endpoint, credential reference, and integration touchpoint her
   - Use Case: Database operations (if Supabase is selected in tech stack)
   - Fallback: Supabase dashboard or SQL CLI
   - Status: Conditional - defer decision until tech stack research complete
+- **Vercel MCP**: Deployments, project management, environment variables, domains
+  - Required Env: None (OAuth authentication handled by Cursor)
+  - Use Case: Deployment automation, project management, preview deployments
+  - Endpoint: `https://mcp.vercel.com` (or project-specific: `https://mcp.vercel.com/<teamSlug>/<projectSlug>`)
+  - Authentication: OAuth (click "Needs login" prompt in Cursor to authorize)
+  - Fallback: Vercel CLI (`vercel`) or Vercel dashboard
+  - Documentation: https://vercel.com/docs/mcp/vercel-mcp
+- **Railway MCP**: REMOVED - Package has zod dependency error preventing connection
+  - **Replacement**: Use Railway CLI directly (`railway` commands)
+  - Railway CLI is authenticated and working perfectly
+  - Available commands: `railway status`, `railway logs`, `railway variables`, `railway deploy`, `railway list`
+  - **Status**: Railway CLI provides all needed functionality - MCP integration not required
+  - Documentation: https://docs.railway.com/guides/cli
+- **Filesystem MCP**: File operations, reading project structure, code navigation
+  - Required Env: None
+  - Use Case: Automated file operations, reading project files, navigating codebase structure
+  - Package: `@modelcontextprotocol/server-filesystem` (via npx)
+  - Scope: Limited to workspace directory for security (uses absolute path on Windows)
+  - **Configuration**: Uses absolute path on Windows: `C:\Users\OrEo2\Desktop\DevOps\1. Projects\Icebreaker`
+  - Fallback: Desktop Commander MCP (provides same functionality) or manual file operations
+  - Documentation: https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem
+- **Time MCP**: Time and date operations, timezone conversions, scheduling
+  - Required Env: None
+  - Prerequisites: `uvx` (uv package manager) or Python 3.10+ with pip
+  - Use Case: Get current time, convert timezones, calculate time differences, format dates
+  - Package: `mcp-server-time` (via uvx or pip)
+  - Command: `uvx mcp-server-time` (recommended) or `python -m mcp_server_time`
+  - Fallback: Native JavaScript Date API or date libraries
+  - Documentation: https://github.com/modelcontextprotocol/servers/tree/main/src/time
 - **Toolbox MCP**: Search for and discover additional MCP servers in Smithery registry
   - Required Env: None (uses Smithery key)
   - Use Case: Finding new MCP servers for project needs

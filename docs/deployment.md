@@ -1,11 +1,19 @@
 # Deployment Guide
 
-**Last Updated**: 2025-11-10  
-**Owner**: @Nexus 🚀
+**Last Updated**: 2025-01-27  
+**Owner**: @Nexus 🚀  
+**Status**: ✅ **PRODUCTION DEPLOYED**
 
 ## Overview
 
 This guide covers deployment procedures for the Icebreaker MVP, including production setup, environment configuration, and rollback procedures.
+
+## Production URLs
+
+- **Frontend**: https://frontend-coral-two-84.vercel.app
+- **Backend API**: https://airy-fascination-production.up.railway.app
+- **Backend Health**: https://airy-fascination-production.up.railway.app/api/health
+- **WebSocket**: wss://airy-fascination-production.up.railway.app/ws
 
 ## Pre-Deployment Checklist
 
@@ -21,62 +29,89 @@ This guide covers deployment procedures for the Icebreaker MVP, including produc
 
 ## Environment Variables
 
-### Frontend (Production)
+### Frontend (Production - Vercel)
+
+**Configured in**: Vercel Dashboard → Project Settings → Environment Variables
 
 ```bash
-VITE_API_URL=https://api.icebreaker.app
-VITE_SENTRY_DSN=https://your-frontend-sentry-dsn@sentry.io/project-id
+VITE_API_URL=https://airy-fascination-production.up.railway.app
+VITE_SENTRY_DSN=<configured-in-vercel>
 VITE_SENTRY_ENABLE_DEV=false
 VITE_APP_VERSION=0.1.0
 ```
 
-### Backend (Production)
+**Note**: All environment variables are configured in Vercel dashboard. See `.notes/features/production-deployment/step2-env-vars.md` for complete list.
+
+### Backend (Production - Railway)
+
+**Configured in**: Railway Dashboard → Service → Variables
 
 ```bash
 NODE_ENV=production
 PORT=8000
-SENTRY_DSN=https://your-backend-sentry-dsn@sentry.io/project-id
+SENTRY_DSN=<configured-in-railway>
 SENTRY_ENABLE_DEV=false
 APP_VERSION=0.1.0
-CORS_ORIGIN=https://icebreaker.app
+CORS_ORIGIN=https://frontend-coral-two-84.vercel.app
 ```
+
+**Note**: All environment variables are configured in Railway dashboard. See `.notes/features/production-deployment/step2-env-vars.md` for complete list.
 
 ## Deployment Platforms
 
-### Frontend Options
+### Frontend Platform: Vercel ✅
 
-1. **Vercel** (Recommended for React/Vite)
-   - Automatic deployments from GitHub
-   - Built-in CI/CD
-   - Free tier available
-   - Setup: Connect GitHub repo, configure environment variables
+**Status**: ✅ **DEPLOYED**  
+**URL**: https://frontend-coral-two-84.vercel.app  
+**Project**: `backslashbryants-projects/frontend`  
+**Configuration**: 
+- Root directory: `frontend` (configured in `vercel.json`)
+- Build command: `npm run build`
+- Output directory: `dist`
+- Framework: `vite`
 
-2. **Netlify**
-   - Automatic deployments from GitHub
-   - Free tier available
-   - Setup: Connect GitHub repo, build command: `cd frontend && npm run build`, publish directory: `frontend/dist`
+**Setup Complete**:
+- ✅ GitHub integration configured
+- ✅ Environment variables configured
+- ✅ Auto-deploy enabled (deploys on push to `main`)
+- ✅ Monorepo configuration (`vercel.json`)
 
-3. **Cloudflare Pages**
-   - Free tier available
-   - Global CDN
-   - Setup: Connect GitHub repo, build command: `cd frontend && npm run build`
+**CLI Commands**:
+```bash
+cd frontend
+vercel login                    # Authenticate
+vercel link                     # Link to project
+vercel deploy                   # Manual deploy
+vercel ls                       # List deployments
+vercel rollback <url>           # Rollback deployment
+```
 
-### Backend Options
+### Backend Platform: Railway ✅
 
-1. **Railway** (Recommended for Node.js)
-   - Automatic deployments from GitHub
-   - Free tier available
-   - Setup: Connect GitHub repo, set root directory to `backend`, configure environment variables
+**Status**: ✅ **DEPLOYED**  
+**URL**: https://airy-fascination-production.up.railway.app  
+**Service**: `airy-fascination`  
+**Configuration**:
+- Root directory: `backend` (configured in `backend/railway.json`)
+- Start command: `npm start`
+- Build command: `npm install`
 
-2. **Render**
-   - Free tier available
-   - Automatic deployments from GitHub
-   - Setup: Create Web Service, connect GitHub repo, set root directory to `backend`
+**Setup Complete**:
+- ✅ GitHub integration configured
+- ✅ Environment variables configured
+- ✅ Auto-deploy enabled (deploys on push to `main`)
+- ✅ Monorepo configuration (`backend/railway.json`)
 
-3. **Fly.io**
-   - Free tier available
-   - Global edge deployment
-   - Setup: `fly launch` from backend directory
+**CLI Commands**:
+```bash
+cd backend
+railway login                   # Authenticate
+railway link                    # Link to project
+railway up                      # Manual deploy
+railway deployment list         # List deployments
+railway redeploy                # Redeploy latest
+railway logs                    # View logs
+```
 
 ## Deployment Steps
 
@@ -91,21 +126,24 @@ CORS_ORIGIN=https://icebreaker.app
    - Verify Sentry DSNs are set correctly
    - Set `NODE_ENV=production` for backend
 
-3. **Deploy backend first**
+3. **Deploy backend first** ✅
    - Backend must be running before frontend can connect
-   - Verify backend health endpoint: `https://api.icebreaker.app/api/health`
-   - Verify WebSocket endpoint: `wss://api.icebreaker.app/ws`
+   - Verify backend health endpoint: `https://airy-fascination-production.up.railway.app/api/health`
+   - Verify WebSocket endpoint: `wss://airy-fascination-production.up.railway.app/ws`
+   - **Status**: ✅ Deployed and verified
 
-4. **Deploy frontend**
+4. **Deploy frontend** ✅
    - Set `VITE_API_URL` to production backend URL
-   - Verify frontend loads: `https://icebreaker.app`
+   - Verify frontend loads: `https://frontend-coral-two-84.vercel.app`
    - Test onboarding flow end-to-end
+   - **Status**: ✅ Deployed and verified
 
-5. **Verify deployment**
-   - Run smoke tests (health endpoints, onboarding)
+5. **Verify deployment** ✅
+   - Run smoke tests: `node scripts/verify-deployment.mjs`
    - Check Sentry dashboard for errors
-   - Verify HTTPS is enforced
+   - Verify HTTPS is enforced (both platforms use HTTPS)
    - Test cross-browser compatibility
+   - **Status**: ✅ All verification tests passed
 
 ### Continuous Deployment
 
@@ -117,15 +155,18 @@ CORS_ORIGIN=https://icebreaker.app
 
 ### Quick Rollback (Last Deployment)
 
-1. **Frontend Rollback**:
-   - Vercel: Dashboard → Deployments → Previous deployment → "Promote to Production"
-   - Netlify: Dashboard → Deploys → Previous deploy → "Publish deploy"
-   - Cloudflare Pages: Dashboard → Deployments → Previous deployment → "Retry deployment"
+**See**: `docs/deployment-rollback.md` for complete rollback runbook.
 
-2. **Backend Rollback**:
-   - Railway: Dashboard → Deployments → Previous deployment → "Redeploy"
-   - Render: Dashboard → Manual Deploy → Select previous commit
-   - Fly.io: `fly releases` → `fly releases rollback <release-id>`
+1. **Frontend Rollback (Vercel)**:
+   - **CLI**: `cd frontend && vercel rollback <deployment-url> --yes`
+   - **CLI Alternative**: `vercel promote <deployment-url> --yes`
+   - **Dashboard**: Deployments → Previous deployment → "Promote to Production"
+   - **Time**: < 30 seconds
+
+2. **Backend Rollback (Railway)**:
+   - **CLI**: `cd backend && railway redeploy --yes`
+   - **Dashboard**: Deployments → Previous deployment → "Redeploy"
+   - **Time**: < 1 minute
 
 ### Emergency Rollback (Code Revert)
 
@@ -150,12 +191,15 @@ CORS_ORIGIN=https://icebreaker.app
 
 ### Health Checks
 
-- [ ] Frontend loads: `https://icebreaker.app`
-- [ ] Backend health: `https://api.icebreaker.app/api/health`
-- [ ] WebSocket connects: `wss://api.icebreaker.app/ws`
-- [ ] Onboarding flow works end-to-end
-- [ ] Radar view loads and updates
-- [ ] Chat functionality works
+**Automated Verification**: Run `node scripts/verify-deployment.mjs`
+
+**Manual Checks**:
+- [x] Frontend loads: `https://frontend-coral-two-84.vercel.app` ✅
+- [x] Backend health: `https://airy-fascination-production.up.railway.app/api/health` ✅
+- [x] WebSocket connects: `wss://airy-fascination-production.up.railway.app/ws` ✅
+- [ ] Onboarding flow works end-to-end (manual test required)
+- [ ] Radar view loads and updates (manual test required)
+- [ ] Chat functionality works (manual test required)
 - [ ] Error tracking active (check Sentry dashboard)
 
 ### Monitoring

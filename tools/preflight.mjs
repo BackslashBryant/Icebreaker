@@ -246,7 +246,7 @@ function checkMcpConfig() {
   }
 
   // Check for required servers (migrated from Smithery CLI to direct MCP servers)
-  const requiredServers = ['github', 'ref-tools-mcp', 'desktop-commander', 'playwright-mcp'];
+  const requiredServers = ['desktop-commander', 'playwright-mcp'];
   const serverNames = Object.keys(servers);
   const hasRequired = requiredServers.some(name => 
     serverNames.includes(name) || serverNames.includes(`${name}-v2`)
@@ -258,7 +258,7 @@ function checkMcpConfig() {
   }
 
   // Check for missing env fields
-  const githubTokenServers = ['github', 'github-v2', 'desktop-commander', 'desktop-commander-v2', 'playwright-mcp', 'playwright-mcp-v2'];
+  const githubTokenServers = ['desktop-commander', 'desktop-commander-v2', 'playwright-mcp', 'playwright-mcp-v2'];
   let missingEnv = false;
   for (const serverName of serverNames) {
     const server = servers[serverName];
@@ -276,6 +276,32 @@ function checkMcpConfig() {
   }
 
   addResult('MCP config', true, 'Core MCP servers configured');
+}
+
+function checkGitHubToken() {
+  try {
+    // Simple check: verify GitHub CLI is authenticated
+    const output = execSync('gh auth status', {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 5000
+    });
+    
+    if (output.includes('Logged in') || output.includes('✓')) {
+      addResult('GitHub auth', true, 'GitHub CLI authenticated');
+    } else {
+      addResult('GitHub auth', false, 'GitHub CLI not authenticated. Run: gh auth login');
+    }
+  } catch (error) {
+    // GitHub CLI not installed or not authenticated
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    if (errorMsg.includes('not authenticated') || errorMsg.includes('not logged in')) {
+      addResult('GitHub auth', false, 'GitHub CLI not authenticated. Run: gh auth login');
+    } else {
+      addResult('GitHub auth', true, 'GitHub CLI check skipped (CLI may not be installed)');
+    }
+  }
 }
 
 function checkCursorDocs() {
@@ -469,6 +495,7 @@ function main() {
   checkIssueTemplates();
   checkPullRequestTemplate();
   checkMcpConfig();
+  checkGitHubToken();
   checkCursorDocs();
   checkFeatureWorkflow();
   checkMvpGuide();

@@ -16,7 +16,7 @@ export default defineConfig({
   testDir: './e2e',
   // Smoke tests run faster - can use parallel execution
   fullyParallel: true,
-  workers: 2, // Allow 2 workers for smoke tests
+  workers: process.env.CI ? 2 : '50%', // Dynamic workers: 50% of CPU cores locally, 2 in CI
   timeout: 30000, // 30s timeout (shorter for smoke tests)
   maxFailures: 3, // Allow a few failures before stopping
   forbidOnly: !!process.env.CI,
@@ -25,9 +25,9 @@ export default defineConfig({
   // Only run tests tagged with @smoke
   grep: /@smoke/,
   
-  // Same reporters as full config
+  // Same reporters as full config - list for clean output
   reporter: [
-    ['line'],
+    ['list'], // Clean list output - ASCII-only, no Unicode characters
     ['json', { outputFile: '../artifacts/playwright-report-smoke.json' }],
     ['html', { 
       outputFolder: '../artifacts/playwright-report-smoke',
