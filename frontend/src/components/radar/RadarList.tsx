@@ -2,6 +2,7 @@ import { Person } from "@/hooks/useRadar";
 import { Button } from "@/components/ui/button";
 import { Tooltip } from "@/components/ui/tooltip";
 import { getProximityContextLabel, getProximityBadgeVariant } from "@/lib/proximity-context";
+import { Radar as RadarIcon } from "lucide-react";
 
 interface RadarListProps {
   people: Person[];
@@ -25,11 +26,19 @@ export function RadarList({
   if (people.length === 0) {
     return (
       <div
-        className="text-center py-12 text-muted-foreground font-mono"
+        className="flex flex-col items-center justify-center py-12 px-4"
         role="status"
         aria-live="polite"
       >
-        <p>{emptyMessage}</p>
+        <div className="p-6 sm:p-8 bg-accent/10 border-2 border-accent/50 rounded-xl max-w-md text-center">
+          <RadarIcon className="w-8 h-8 sm:w-10 sm:h-10 text-accent mx-auto mb-4 animate-pulse-slow" aria-hidden="true" />
+          <p className="text-accent text-sm sm:text-base font-mono mb-2 font-semibold">
+            No one nearby — yet.
+          </p>
+          <p className="text-muted-foreground text-xs sm:text-sm font-mono leading-relaxed">
+            Check back soon or enable location for better matching.
+          </p>
+        </div>
       </div>
     );
   }

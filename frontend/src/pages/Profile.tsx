@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { VisibilityToggle } from "@/components/profile/VisibilityToggle";
 import { EmergencyContactInput } from "@/components/profile/EmergencyContactInput";
 import { AccessibilityToggles } from "@/components/profile/AccessibilityToggles";
+import { Shield } from "lucide-react";
 
 /**
  * ProfileHeader Component
@@ -91,9 +92,11 @@ export default function Profile() {
               <p className="text-xl sm:text-2xl font-mono text-accent glow-accent">
                 @{session.handle}
               </p>
-              <p className="text-xs text-muted-foreground mt-3 font-mono">
-                Generated from your vibe and tags. Can't be changed.
-              </p>
+              <div className="mt-3 p-2 bg-muted/30 border border-accent/30 rounded-lg inline-block">
+                <p className="text-xs text-muted-foreground font-mono">
+                  Generated from your vibe and tags. <span className="text-accent">Can't be changed.</span>
+                </p>
+              </div>
             </div>
           </div>
 
@@ -104,9 +107,12 @@ export default function Profile() {
 
           {/* Emergency Contact Section */}
           <ProfileSection title="EMERGENCY CONTACT">
-            <p className="text-xs sm:text-sm text-muted-foreground mb-3 font-mono">
-              Used only in emergencies. Never shared with other users.
-            </p>
+            <div className="p-3 sm:p-4 bg-accent/10 border-2 border-accent/50 rounded-xl mb-4 flex items-start gap-3">
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-accent mt-0.5 flex-shrink-0" aria-hidden="true" />
+              <p className="text-xs sm:text-sm text-muted-foreground font-mono">
+                Used only in emergencies. Never shared with other users.
+              </p>
+            </div>
             <EmergencyContactInput />
           </ProfileSection>
 
