@@ -31,6 +31,8 @@ jobs:
         run: npm run guard:type
       - name: Guard Tests
         run: npm test
+      - name: Date validation check
+        run: node tools/check-dates.mjs --changed --json || { echo "Placeholder dates detected in changed files. Use Time MCP to get accurate dates."; exit 1; }
       - name: Connection Guide check
         run: |
           git fetch --no-tags --depth=1 origin ${{ github.base_ref }}

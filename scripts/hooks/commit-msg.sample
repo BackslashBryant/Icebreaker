@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Commit message validation hook
+# Install with: cp scripts/hooks/commit-msg.sample .git/hooks/commit-msg && chmod +x .git/hooks/commit-msg
+
+commit_msg=$(cat "$1")
+
+# Allow empty commit messages (for merge commits, etc.)
+if [ -z "$commit_msg" ]; then
+  exit 0
+fi
+
+# Check for conventional commit format
+# Pattern: <type>(<scope>): <description>
+# Types: feat, fix, chore, docs, refactor, test, style, perf, build, ci, revert
+if ! echo "$commit_msg" | grep -qE '^(feat|fix|chore|docs|refactor|test|style|perf|build|ci|revert)(\(.+\))?: .+'; then
+  echo "ERROR: Commit message must follow conventional commit format:"
+  echo ""
+  echo "  <type>: <description>"
+  echo ""
+  echo "Valid types: feat, fix, chore, docs, refactor, test, style, perf, build, ci, revert"
+  echo ""
+  echo "Examples:"
+  echo "  feat: Complete Issue #123 - Add user authentication"
+  echo "  fix: Issue #456 - Resolve memory leak in API"
+  echo "  chore: Update dependencies"
+  echo "  docs: Update README with setup instructions"
+  echo ""
+  echo "Your message: $commit_msg"
+  exit 1
+fi
+
+# For feat/fix commits, recommend issue number reference (warn, don't block)
+if echo "$commit_msg" | grep -qE '^(feat|fix):' && ! echo "$commit_msg" | grep -qiE '(issue|#)\s*\d+'; then
+  echo ""
+  echo "WARNING: Feature/fix commits should reference issue number:"
+  echo "  Example: feat: Complete Issue #123 - description"
+  echo ""
+  echo "Your message: $commit_msg"
+  echo ""
+  echo "Continue anyway? (y/N)"
+  read -r response
+  if [[ ! "$response" =~ ^[Yy]$ ]]; then
+    exit 1
+  fi
+fi
+
+exit 0
+

@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Post-checkout hook - Auto-setup after branch switches
+# Install with: cp scripts/hooks/post-checkout.sample .git/hooks/post-checkout && chmod +x .git/hooks/post-checkout
+
+# $1 = ref of the previous HEAD
+# $2 = flag: 1 if branch checkout, 0 if file checkout
+# $3 = flag: 1 if moving from detached HEAD state
+
+# Only run on branch checkout (not file checkout)
+if [ "$2" != "1" ]; then
+  exit 0
+fi
+
+prev_head="$1"
+new_head="$(git rev-parse HEAD)"
+
+echo "[post-checkout] Branch switched. Checking for setup requirements..."
+
+# Check if package.json changed between branches
+if [ -n "$prev_head" ] && git rev-parse --verify "$prev_head" >/dev/null 2>&1; then
+  if git diff --name-only "$prev_head" "$new_head" | grep -q 'package.json'; then
+    echo "[post-checkout] package.json changed. Checking dependencies..."
+    
+    # Check if node_modules exists and is up to date
+    if [ ! -d "node_modules" ] || [ "package.json" -nt "node_modules" ]; then
+      echo "[post-checkout] Dependencies may be out of date. Run 'npm install' to update."
+      if command -v npm >/dev/null 2>&1; then
+        read -p "Install dependencies now? (y/N) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          npm install
+          echo "[post-checkout] Dependencies installed."
+        fi
+      fi
+    fi
+  fi
+fi
+
+# Check if .env.example changed
+if [ -n "$prev_head" ] && git rev-parse --verify "$prev_head" >/dev/null 2>&1; then
+  if git diff --name-only "$prev_head" "$new_head" | grep -q '\.env\.example'; then
+    echo "[post-checkout] .env.example changed. Review and update your .env file if needed."
+  fi
+fi
+
+# Check for missing required files
+if [ ! -f ".env" ] && [ -f ".env.example" ]; then
+  echo "[post-checkout] WARNING: .env file not found. Copy .env.example to .env and configure."
+fi
+
+echo "[post-checkout] Done."
+
