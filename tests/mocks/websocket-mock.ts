@@ -6,21 +6,10 @@
  */
 
 import type { PersonaPresence, PersonaPresenceScript } from '../fixtures/persona-presence/schema';
+import type { WebSocketMessage, MockWebSocket, WsMockInterface } from './websocket-mock-interface';
 
-export type WebSocketMessage = {
-  type: string;
-  payload?: any;
-};
-
-export type MockWebSocket = {
-  readyState: number;
-  send: (message: string) => void;
-  close: () => void;
-  onopen: (() => void) | null;
-  onmessage: ((event: { data: string }) => void) | null;
-  onclose: (() => void) | null;
-  onerror: ((error: Event) => void) | null;
-};
+// Re-export types for backward compatibility
+export type { WebSocketMessage, MockWebSocket };
 
 const WS_OPEN = 1;
 const WS_CLOSED = 3;
@@ -30,8 +19,10 @@ const WS_CLOSED = 3;
  * 
  * Simulates WebSocket server behavior for multi-user persona testing.
  * Handles presence updates, chat requests, location updates, and visibility toggles.
+ * 
+ * Implements WsMockInterface to ensure contract compliance with the shim.
  */
-export class WsMock {
+export class WsMock implements WsMockInterface {
   private script: PersonaPresenceScript;
   private connections: Map<string, {
     ws: MockWebSocket;
@@ -140,6 +131,19 @@ export class WsMock {
       persona.geo = { lat, lon, floor };
       this.broadcastPresence();
     }
+  }
+
+  /**
+   * Reset all mock state (connections, chats, pending requests)
+   * Called during test teardown to prevent state leakage
+   */
+  reset(): void {
+    // Clear all connections
+    this.connections.clear();
+    // Clear all active chats
+    this.activeChats.clear();
+    // Clear all pending chat requests
+    this.pendingChatRequests.clear();
   }
 
   /**
