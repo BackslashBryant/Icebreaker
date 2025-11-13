@@ -1481,3 +1481,191 @@ This document collects feedback from persona testing sessions. Each persona's fe
 
 - **missing-panic-button**: High priority - investigate and fix
 - **missing-visibility-toggle**: High priority - investigate and fix
+
+
+---
+
+# Persona Test Feedback Summary
+
+**Generated**: 2025-11-13T01:18:38.988Z
+
+## Overall Statistics
+
+- **Total Runs**: 188
+- **Personas Tested**: 13
+
+## Per-Persona Statistics
+
+### alex
+- **Runs**: 12
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 24
+
+### casey
+- **Runs**: 16
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 32
+
+### cross-persona
+- **Runs**: 10
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 16
+
+### cross-persona-market-research
+- **Runs**: 6
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 12
+
+### cross-persona-professional
+- **Runs**: 10
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 20
+
+### ethan
+- **Runs**: 18
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 31
+
+### jordan
+- **Runs**: 14
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 22
+
+### marcus
+- **Runs**: 18
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 36
+
+### maya
+- **Runs**: 29
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 43
+
+### morgan
+- **Runs**: 10
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 20
+
+### river
+- **Runs**: 8
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 16
+
+### sam
+- **Runs**: 10
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 20
+
+### zoe
+- **Runs**: 27
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 0
+- **A11y Issues**: 0
+- **Affordance Issues**: 50
+
+## Top 5 Friction Patterns
+
+- 🔴 **missing-visibility-toggle**: 172 occurrences
+- 🔴 **missing-panic-button**: 170 occurrences
+
+## Executive Summary
+
+⚠️ **2 critical issue(s)** requiring immediate attention
+
+## Actionable Insights
+
+### 🔴 Visibility Toggle Not Detected (Impact: 95/100)
+
+**Priority**: CRITICAL | **Category**: privacy | **Affected Users**: 172
+
+**Description**: Visibility toggle affordance not found in most test runs, affecting privacy-conscious users who need control over their visibility.
+
+**Affected Personas**: alex, casey, cross-persona, cross-persona-market-research, cross-persona-professional
+
+**Recommendations**:
+- Verify visibility toggle is rendered on Profile page with correct selector
+- Check if toggle is conditionally rendered (may only show when user is visible)
+- Ensure data-testid="visibility-toggle" is present on toggle element
+- Update test helpers to check Profile page, not Radar page
+- Consider adding visibility toggle to Radar page for easier access
+
+**Code References**:
+- `tests/utils/telemetry.ts:checkVisibilityToggleVisible()`
+- `frontend/src/components/Profile.tsx (verify toggle rendering)`
+- `tests/e2e/personas/*.spec.ts (verify toggle checks navigate to Profile)`
+
+### 🔴 Panic Button Not Visible During Tests (Impact: 94/100)
+
+**Priority**: CRITICAL | **Category**: accessibility | **Affected Users**: 170
+
+**Description**: Panic button affordance not detected in majority of test runs, potentially impacting anxious users who need quick exit option.
+
+**Affected Personas**: alex, casey, cross-persona, cross-persona-market-research, cross-persona-professional
+
+**Recommendations**:
+- Verify panic button is rendered on Radar page with correct data-testid="panic-fab"
+- Ensure panic button is visible after onboarding completes
+- Check CSS visibility/display properties - may be hidden by default
+- Add telemetry check to verify panic button visibility in test helpers
+- Consider adding panic button to Profile page as well for consistency
+
+**Code References**:
+- `tests/utils/telemetry.ts:checkPanicButtonVisible()`
+- `frontend/src/components/Radar.tsx (verify panic button rendering)`
+- `tests/e2e/personas/*.spec.ts (verify panic button checks)`
+
+
+## Recommendations (Legacy Format)
+
+- **missing-visibility-toggle**: High priority - investigate and fix
+- **missing-panic-button**: High priority - investigate and fix
