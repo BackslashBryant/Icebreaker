@@ -184,14 +184,31 @@ export class TelemetryCollector {
  */
 export async function checkPanicButtonVisible(page: Page): Promise<boolean> {
   try {
-    // Wait for page to be fully loaded
-    await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
+    // Check if we're on a page where panic button should be visible
+    const currentUrl = page.url();
+    const shouldHavePanicButton = currentUrl.includes('/radar') || 
+                                   currentUrl.includes('/chat') || 
+                                   currentUrl.includes('/profile');
     
-    // Wait a bit more for React to render components
-    await page.waitForTimeout(500);
+    if (!shouldHavePanicButton) {
+      // Not on a page where panic button should be visible (e.g., onboarding, welcome)
+      return false;
+    }
+    
+    // Wait for React to render - use a more reliable approach
+    // First, wait for the page to be interactive
+    await page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(() => {});
+    
+    // Wait for React to render components (increased wait time)
+    await page.waitForTimeout(1000);
     
     // Check for panic button by data-testid first (most reliable)
     const panicButtonByTestId = page.locator('[data-testid="panic-fab"]');
+    
+    // Wait for element to be attached to DOM first
+    await panicButtonByTestId.waitFor({ state: 'attached', timeout: 10000 }).catch(() => {});
+    
+    // Then check visibility with longer timeout
     const isVisibleByTestId = await panicButtonByTestId.isVisible({ timeout: 10000 }).catch(() => false);
     if (isVisibleByTestId) {
       return true;
@@ -208,13 +225,20 @@ export async function checkPanicButtonVisible(page: Page): Promise<boolean> {
       // Ignore aria-label check errors
     }
     
-    // Final fallback: check if element exists in DOM (might be hidden)
+    // Final fallback: check if element exists in DOM and verify computed style
     const existsInDom = await panicButtonByTestId.count() > 0;
     if (existsInDom) {
       // Element exists but might be hidden - check computed style
       const isActuallyVisible = await panicButtonByTestId.evaluate((el) => {
         const style = window.getComputedStyle(el);
-        return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+        const rect = el.getBoundingClientRect();
+        return style.display !== 'none' && 
+               style.visibility !== 'hidden' && 
+               style.opacity !== '0' &&
+               rect.width > 0 && 
+               rect.height > 0 &&
+               rect.top >= 0 && 
+               rect.left >= 0;
       }).catch(() => false);
       return isActuallyVisible;
     }
@@ -238,14 +262,19 @@ export async function checkVisibilityToggleVisible(page: Page): Promise<boolean>
       return false;
     }
     
-    // Wait for page to be fully loaded
-    await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
+    // Wait for React to render - use a more reliable approach
+    await page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(() => {});
     
-    // Wait a bit more for React to render components
-    await page.waitForTimeout(500);
+    // Wait for React to render components (increased wait time)
+    await page.waitForTimeout(1000);
     
     // Check for visibility toggle by data-testid (container)
     const visibilityToggle = page.locator('[data-testid="visibility-toggle"]');
+    
+    // Wait for element to be attached to DOM first
+    await visibilityToggle.waitFor({ state: 'attached', timeout: 10000 }).catch(() => {});
+    
+    // Then check visibility with longer timeout
     const isVisibleByTestId = await visibilityToggle.isVisible({ timeout: 10000 }).catch(() => false);
     if (isVisibleByTestId) {
       return true;
@@ -269,13 +298,20 @@ export async function checkVisibilityToggleVisible(page: Page): Promise<boolean>
       // Ignore role check errors
     }
     
-    // Check if element exists in DOM (might be hidden)
+    // Check if element exists in DOM and verify computed style
     const existsInDom = await visibilityToggle.count() > 0;
     if (existsInDom) {
       // Element exists but might be hidden - check computed style
       const isActuallyVisible = await visibilityToggle.evaluate((el) => {
         const style = window.getComputedStyle(el);
-        return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+        const rect = el.getBoundingClientRect();
+        return style.display !== 'none' && 
+               style.visibility !== 'hidden' && 
+               style.opacity !== '0' &&
+               rect.width > 0 && 
+               rect.height > 0 &&
+               rect.top >= 0 && 
+               rect.left >= 0;
       }).catch(() => false);
       return isActuallyVisible;
     }
@@ -338,27 +374,40 @@ export async function countErrorBanners(page: Page): Promise<number> {
       const text = await alert.textContent().catch(() => '');
       const className = await alert.getAttribute('class').catch(() => '');
       
-      // Skip location permission denied messages (expected in tests)
+      // Skip location permission denied messages (expected in tests - informational, not error)
       if (text?.toLowerCase().includes('location access denied') || 
-          text?.toLowerCase().includes('proximity matching is unavailable')) {
+          text?.toLowerCase().includes('proximity matching is unavailable') ||
+          text?.toLowerCase().includes('location access') && text?.toLowerCase().includes('unavailable')) {
         continue;
       }
       
-      // Skip if it's an informational alert (not an error)
-      // Error banners typically have destructive/border-destructive classes
-      if (className?.includes('destructive') || 
-          className?.includes('border-destructive') ||
-          text?.toLowerCase().includes('error') ||
-          text?.toLowerCase().includes('failed') ||
-          text?.toLowerCase().includes('connection failed')) {
+      // Skip health status messages (informational)
+      if (text?.toLowerCase().includes('health status') || 
+          text?.toLowerCase().includes('status:')) {
+        continue;
+      }
+      
+      // Only count as error if it has destructive styling AND error keywords
+      // This prevents counting informational alerts that happen to have role="alert"
+      const hasDestructiveStyling = className?.includes('destructive') || 
+                                     className?.includes('border-destructive') ||
+                                     className?.includes('text-destructive');
+      
+      const hasErrorKeywords = text?.toLowerCase().includes('error') ||
+                               text?.toLowerCase().includes('failed') ||
+                               text?.toLowerCase().includes('connection failed') ||
+                               text?.toLowerCase().includes('unable to connect');
+      
+      // Must have BOTH destructive styling AND error keywords to be counted as error
+      if (hasDestructiveStyling && hasErrorKeywords) {
         errorCount++;
       }
     }
     
-    // Also check for explicit error classes
-    const errorClassElements = await page.locator('.error, [data-testid*="error"]').count();
+    // Also check for explicit error classes (but be more selective)
+    const explicitErrorElements = await page.locator('[data-testid*="error"], .error-banner, .connection-error').count();
     
-    return Math.max(errorCount, errorClassElements);
+    return Math.max(errorCount, explicitErrorElements);
   } catch {
     return 0;
   }

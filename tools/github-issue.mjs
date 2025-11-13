@@ -137,9 +137,6 @@ async function main() {
     body = loadTemplateBody(template.file);
   }
 
-  const token = getToken();
-  const repo = getRepo();
-
   const templateLabels = [];
   if (templateKey !== 'from-spec') {
     const frontMatterPath = path.join(issueTemplateDir, templateMap[templateKey].file);
