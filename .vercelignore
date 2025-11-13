@@ -1,0 +1,43 @@
+# Exclude non-app logic from Vercel deployments
+# Only app code should be deployed
+
+# Documentation and planning
+Docs/
+docs/
+.notes/
+
+# Mock files and design artifacts
+**/ui_ux_mocks/
+**/*mock*
+**/*Mock*
+
+# Test files
+tests/
+**/*.test.*
+**/*.spec.*
+
+# Tools and scripts
+tools/
+scripts/
+examples/
+
+# Development artifacts
+.cursor/
+artifacts/
+test-results/
+coverage/
+node_modules/
+
+# Backend (separate deployment)
+backend/
+
+# Git and config
+.git/
+.gitignore
+*.md
+!README.md
+
+# Environment files
+.env*
+!.env.example
+
