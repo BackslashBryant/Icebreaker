@@ -14,7 +14,7 @@ export function ConsentStep({ consent, onConsentChange, onContinue }: ConsentSte
         <div className="ascii-divider text-center mb-4">▼ ▼ ▼</div>
         <h2 className="text-xl sm:text-2xl font-bold text-accent font-mono glow-accent">AGE VERIFICATION</h2>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-          IceBreaker is for adults only. Confirm you're 18 or older to continue.
+          IceBreaker is 18+ only. Confirm you're 18 or older to continue.
         </p>
       </div>
 

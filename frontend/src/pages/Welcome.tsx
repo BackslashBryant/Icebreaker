@@ -60,8 +60,9 @@ export default function Welcome() {
             size="lg"
             className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-background font-mono text-base sm:text-lg h-12 sm:h-14 retro-button border-2 border-accent"
             data-testid="cta-press-start"
+            aria-label="Start onboarding"
           >
-            <Link to="/onboarding">PRESS START</Link>
+            <Link to="/onboarding">Get started</Link>
           </Button>
 
           <Button
