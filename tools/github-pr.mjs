@@ -20,48 +20,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 import { loadCurrentFeature } from './lib/workflow-utils.mjs';
+import { getRepo, createPullRequest } from './lib/github-api.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
-
-function getToken() {
-  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
-  if (!token) {
-    throw new Error('Set GITHUB_TOKEN (or GH_TOKEN) with repo scope before running this script.');
-  }
-  return token;
-}
-
-function parseRepoFromRemote(remote) {
-  if (!remote) {
-    throw new Error('Unable to determine GitHub repository. Set GITHUB_REPO=owner/name.');
-  }
-  const sshMatch = remote.match(/^git@github\.com:(.+?)\/(.+?)(?:\.git)?$/);
-  if (sshMatch) {
-    return `${sshMatch[1]}/${sshMatch[2]}`;
-  }
-  const httpsMatch = remote.match(/^https:\/\/github\.com\/(.+?)\/(.+?)(?:\.git)?$/);
-  if (httpsMatch) {
-    return `${httpsMatch[1]}/${httpsMatch[2]}`;
-  }
-  throw new Error(`Unrecognised GitHub remote format: ${remote}`);
-}
-
-function getRepo() {
-  if (process.env.GITHUB_REPO) {
-    return process.env.GITHUB_REPO;
-  }
-  try {
-    const remote = execSync('git config --get remote.origin.url', {
-      cwd: repoRoot,
-      stdio: ['ignore', 'pipe', 'ignore'],
-      encoding: 'utf8',
-    }).trim();
-    return parseRepoFromRemote(remote);
-  } catch (error) {
-    throw new Error('Failed to read remote.origin.url. Set GITHUB_REPO=owner/name and retry.');
-  }
-}
 
 function getCurrentBranch() {
   try {
@@ -196,33 +158,6 @@ function generatePRBody(currentFeature) {
   return body;
 }
 
-async function createPR({ repo, token, title, body, head, base }) {
-  const apiBase = process.env.GITHUB_API_URL || 'https://api.github.com';
-  const endpoint = `${apiBase}/repos/${repo}/pulls`;
-
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/vnd.github+json',
-      'User-Agent': 'cursor-agent-template',
-    },
-    body: JSON.stringify({
-      title,
-      body,
-      head,
-      base,
-      draft: false,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`GitHub API error (${response.status}): ${errorText}`);
-  }
-
-  return response.json();
-}
 
 async function main() {
   const rawArgs = process.argv.slice(2);
@@ -258,7 +193,6 @@ async function main() {
     throw new Error('Provide both branch and title when using manual mode.');
   }
 
-  const token = getToken();
   const repo = getRepo();
   const currentBranch = getCurrentBranch();
   const baseBranch = getBaseBranch();
@@ -310,7 +244,7 @@ async function main() {
     throw new Error(`Branch "${head}" is not on origin. Push with "git push -u origin ${head}" or rerun with --push.`);
   }
 
-  const result = await createPR({ repo, token, title, body, head, base: baseBranch });
+  const result = await createPullRequest(repo, { title, body, head, base: baseBranch, draft: false });
   console.log(`Created PR #${result.number}: ${result.html_url}`);
 
   if (currentFeature) {

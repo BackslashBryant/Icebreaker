@@ -55,12 +55,31 @@ These MCP servers are accelerators—not autopilot. Use them when they reduce ri
 - **Environment Variables**: Must be set as User-level variables in Windows (not just session variables) for Cursor to access them. Use `npm run mcp:load-env:win` to load from `.env` file.
 - **Supabase Keys**: Access tokens (`sbp_...`) are for Management API, not MCP. MCP requires `SUPABASE_ANON_KEY` (starts with `eyJ...`) from dashboard Settings → API.
 
+## GitHub API Usage (REST API Primary)
+
+**CRITICAL**: All GitHub API operations use REST API as primary method (not GraphQL). Tools automatically retrieve tokens from GitHub CLI keyring first, then fall back to env vars.
+
+**Pattern**:
+- **Node.js scripts**: Use `tools/lib/github-api.mjs` utilities (`getRepo()`, `createIssue()`, `listIssues()`, etc.)
+- **Token retrieval**: Automatic via `getGitHubToken()` - tries `gh auth token` first, then `GITHUB_TOKEN` env var
+- **API method**: REST API (`/repos/{owner}/{repo}/issues`, etc.) - more reliable than GraphQL
+- **Do NOT**: Set `GITHUB_TOKEN` in `.env` file - it interferes with GitHub CLI authentication
+
+**Tools using this pattern**:
+- `tools/verify-github-issue.mjs` - Issue number verification
+- `tools/github-issue.mjs` - Issue creation
+- `tools/github-pr.mjs` - Pull request creation
+- `tools/github-init-issues.mjs` - Initial issue seeding
+- `tools/github-labels.mjs` - Label synchronization
+
+**If authentication fails**: Run `tools/fix-github-auth.ps1` to clear conflicting env vars and re-authenticate.
+
 ## Fallback Protocol
 1. Pause and report the outage (include the MCP name and error).
-2. **For GitHub operations**: Always use `gh` CLI directly. If it fails with 401:
-   - Clear any invalid env var: `$env:GITHUB_TOKEN = $null`
-   - Use `gh` CLI directly: `gh issue comment 10 --body "..."` (it uses keyring token automatically)
-   - If `gh` CLI still fails, get token and use direct API: `$token = gh auth token; $headers = @{Authorization = "Bearer $token"}; Invoke-RestMethod ...`
+2. **For GitHub operations**: 
+   - **Node.js scripts**: Use `tools/lib/github-api.mjs` (REST API, automatic token from keyring)
+   - **CLI operations**: Use `gh` CLI directly (`gh issue comment`, `gh issue edit`, etc.)
+   - **If authentication fails**: Run `tools/fix-github-auth.ps1` to fix auth issues
 3. Suggest an approved fallback (CLI, SDK, manual step) if it stays within scope.
 4. Capture the variance in the plan or Current Issues log so future runs know why the MCP was skipped.
 

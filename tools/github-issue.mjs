@@ -16,52 +16,12 @@
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execSync } from 'node:child_process';
 import { loadCurrentFeature } from './lib/workflow-utils.mjs';
+import { getRepo, createIssue } from './lib/github-api.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 const issueTemplateDir = path.join(repoRoot, '.github', 'ISSUE_TEMPLATE');
-
-// Load .env file if it exists
-function loadEnvFile() {
-  const envPath = path.join(repoRoot, '.env');
-  if (!existsSync(envPath)) {
-    return; // .env file doesn't exist, skip
-  }
-
-  const envContent = readFileSync(envPath, 'utf8');
-  const lines = envContent.split(/\r?\n/);
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    // Skip comments and empty lines
-    if (!trimmed || trimmed.startsWith('#')) {
-      continue;
-    }
-
-    // Parse KEY=VALUE format
-    const match = trimmed.match(/^([^=]+)=(.*)$/);
-    if (match) {
-      const key = match[1].trim();
-      let value = match[2].trim();
-
-      // Remove quotes if present
-      if ((value.startsWith('"') && value.endsWith('"')) ||
-          (value.startsWith("'") && value.endsWith("'"))) {
-        value = value.slice(1, -1);
-      }
-
-      // Only set if not already in process.env (environment takes precedence)
-      if (key && value && !process.env[key]) {
-        process.env[key] = value;
-      }
-    }
-  }
-}
-
-// Load .env file before anything else
-loadEnvFile();
 
 const templateMap = {
   kickoff: {
@@ -90,48 +50,6 @@ const templateMap = {
   },
 };
 
-function getToken() {
-  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
-  if (!token) {
-    throw new Error('Set GITHUB_TOKEN (or GH_TOKEN) with repo scope before running this script.');
-  }
-  // Debug: Check if token was loaded (don't log full token for security)
-  if (process.env.DEBUG) {
-    console.log(`[DEBUG] Token loaded: ${token.substring(0, 7)}...${token.substring(token.length - 4)}`);
-  }
-  return token;
-}
-
-function parseRepoFromRemote(remote) {
-  if (!remote) {
-    throw new Error('Unable to determine GitHub repository. Set GITHUB_REPO=owner/name.');
-  }
-  const sshMatch = remote.match(/^git@github\.com:(.+?)\/(.+?)(?:\.git)?$/);
-  if (sshMatch) {
-    return `${sshMatch[1]}/${sshMatch[2]}`;
-  }
-  const httpsMatch = remote.match(/^https:\/\/github\.com\/(.+?)\/(.+?)(?:\.git)?$/);
-  if (httpsMatch) {
-    return `${httpsMatch[1]}/${httpsMatch[2]}`;
-  }
-  throw new Error(`Unrecognised GitHub remote format: ${remote}`);
-}
-
-function getRepo() {
-  if (process.env.GITHUB_REPO) {
-    return process.env.GITHUB_REPO;
-  }
-  try {
-    const remote = execSync('git config --get remote.origin.url', {
-      cwd: repoRoot,
-      stdio: ['ignore', 'pipe', 'ignore'],
-      encoding: 'utf8',
-    }).trim();
-    return parseRepoFromRemote(remote);
-  } catch (error) {
-    throw new Error('Failed to read remote.origin.url. Set GITHUB_REPO=owner/name and retry.');
-  }
-}
 
 function loadTemplateBody(templateFile) {
   const filePath = path.join(issueTemplateDir, templateFile);
@@ -147,30 +65,6 @@ function loadTemplateBody(templateFile) {
   return lines.slice(endIndex + 1).join('\n').trim();
 }
 
-async function createIssue({ repo, token, title, body, labels }) {
-  const apiBase = process.env.GITHUB_API_URL || 'https://api.github.com';
-  const endpoint = `${apiBase}/repos/${repo}/issues`;
-
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/vnd.github+json',
-      'User-Agent': 'cursor-agent-template',
-    },
-    body: JSON.stringify({
-      title,
-      body,
-      labels,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`GitHub API error (${response.status}): ${await response.text()}`);
-  }
-
-  return response.json();
-}
 
 function deriveLabelsFromBody(body) {
   const output = new Set();
@@ -268,7 +162,8 @@ async function main() {
   const inferred = deriveLabelsFromBody(body);
   const labels = Array.from(new Set([...templateLabels, ...inferred]));
 
-  const result = await createIssue({ repo, token, title, body, labels });
+  const repo = getRepo();
+  const result = await createIssue(repo, { title, body, labels });
   console.log(`Created issue #${result.number}: ${result.html_url}`);
 
   if (templateKey === 'from-spec') {
