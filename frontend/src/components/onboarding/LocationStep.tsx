@@ -41,6 +41,9 @@ export function LocationStep({ onEnable, onSkip }: LocationStepProps) {
             <br />→ <span className="text-accent">Your privacy matters</span>
           </p>
         </div>
+        <p className="text-xs sm:text-sm text-muted-foreground/80 font-mono italic">
+          Connect with people nearby — coworking spaces, neighborhoods, events.
+        </p>
       </div>
 
       {error && (

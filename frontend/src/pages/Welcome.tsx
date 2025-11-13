@@ -77,7 +77,7 @@ export default function Welcome() {
         </div>
 
         {/* Footer hint */}
-        <p className="text-[10px] sm:text-xs text-muted-foreground/60 font-mono">18+ · Ephemeral · Privacy-first</p>
+        <p className="text-[10px] sm:text-xs text-muted-foreground/60 font-mono">18+ · Local · Ephemeral · Privacy-first</p>
       </div>
     </div>
   );
