@@ -185,10 +185,12 @@ export class TelemetryCollector {
 export async function checkPanicButtonVisible(page: Page): Promise<boolean> {
   try {
     // Check if we're on a page where panic button should be visible
+    // Use pathname to avoid issues with query params or hash
     const currentUrl = page.url();
-    const shouldHavePanicButton = currentUrl.includes('/radar') || 
-                                   currentUrl.includes('/chat') || 
-                                   currentUrl.includes('/profile');
+    const urlPath = new URL(currentUrl).pathname;
+    const shouldHavePanicButton = urlPath.includes('/radar') || 
+                                   urlPath.includes('/chat') || 
+                                   urlPath.includes('/profile');
     
     if (!shouldHavePanicButton) {
       // Not on a page where panic button should be visible (e.g., onboarding, welcome)
@@ -205,8 +207,19 @@ export async function checkPanicButtonVisible(page: Page): Promise<boolean> {
     // Check for panic button by data-testid first (most reliable)
     const panicButtonByTestId = page.locator('[data-testid="panic-fab"]');
     
-    // Wait for element to be attached to DOM first
-    await panicButtonByTestId.waitFor({ state: 'attached', timeout: 10000 }).catch(() => {});
+    // Wait for element to be attached to DOM first (with better error handling)
+    try {
+      await panicButtonByTestId.waitFor({ state: 'attached', timeout: 10000 });
+    } catch {
+      // Element not attached yet, but continue to check visibility anyway
+    }
+    
+    // Check if element exists in DOM first
+    const count = await panicButtonByTestId.count();
+    if (count === 0) {
+      // Element doesn't exist in DOM at all
+      return false;
+    }
     
     // Then check visibility with longer timeout
     const isVisibleByTestId = await panicButtonByTestId.isVisible({ timeout: 10000 }).catch(() => false);
@@ -256,8 +269,10 @@ export async function checkPanicButtonVisible(page: Page): Promise<boolean> {
 export async function checkVisibilityToggleVisible(page: Page): Promise<boolean> {
   try {
     // Check if we're on Profile page
+    // Use pathname to avoid issues with query params or hash
     const currentUrl = page.url();
-    if (!currentUrl.includes('/profile')) {
+    const urlPath = new URL(currentUrl).pathname;
+    if (!urlPath.includes('/profile')) {
       // Not on Profile page - visibility toggle won't be visible
       return false;
     }
@@ -271,8 +286,19 @@ export async function checkVisibilityToggleVisible(page: Page): Promise<boolean>
     // Check for visibility toggle by data-testid (container)
     const visibilityToggle = page.locator('[data-testid="visibility-toggle"]');
     
-    // Wait for element to be attached to DOM first
-    await visibilityToggle.waitFor({ state: 'attached', timeout: 10000 }).catch(() => {});
+    // Wait for element to be attached to DOM first (with better error handling)
+    try {
+      await visibilityToggle.waitFor({ state: 'attached', timeout: 10000 });
+    } catch {
+      // Element not attached yet, but continue to check visibility anyway
+    }
+    
+    // Check if element exists in DOM first
+    const count = await visibilityToggle.count();
+    if (count === 0) {
+      // Element doesn't exist in DOM at all
+      return false;
+    }
     
     // Then check visibility with longer timeout
     const isVisibleByTestId = await visibilityToggle.isVisible({ timeout: 10000 }).catch(() => false);
