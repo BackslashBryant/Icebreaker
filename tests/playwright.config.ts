@@ -20,9 +20,9 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   timeout: 60000, // 60s timeout per test
   maxFailures: process.env.CI ? 1 : 3, // Fail fast in CI, allow more failures locally
-  // Reporters: list for clean output (ASCII-friendly, no Unicode artifacts), json for artifacts, html for review (never auto-open)
+  // Reporters: list for real-time output with pass/fail indicators, json for artifacts, html for review (never auto-open)
   reporter: [
-    ['list'], // Clean list output - ASCII-only, no Unicode characters, works perfectly in PowerShell
+    ['list'], // List reporter - shows tests as they run with ✓/✗ indicators, clean ASCII output
     ['json', { outputFile: '../artifacts/playwright-report.json' }], // Machine-readable for CI/review
     ['html', { 
       outputFolder: '../artifacts/playwright-report',

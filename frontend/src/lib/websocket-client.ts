@@ -1,6 +1,6 @@
 /**
  * WebSocket Client Utilities
- * 
+ *
  * Low-level WebSocket connection management for Radar View.
  */
 
@@ -29,17 +29,17 @@ export function createWebSocketConnection(
   callbacks: WebSocketCallbacks = {}
 ): WebSocket {
   // Check if WebSocket mock is enabled for Playwright tests
-  const useMock = 
-    import.meta.env.VITE_PLAYWRIGHT_WS_MOCK === '1' ||
+  const useMock =
+    (import.meta.env as any).VITE_PLAYWRIGHT_WS_MOCK === '1' ||
     (typeof window !== 'undefined' && (window as any).__PLAYWRIGHT_WS_MOCK__ === '1');
-  
+
   if (useMock && typeof window !== 'undefined' && (window as any).__WS_MOCK__) {
     // Use mock WebSocket for testing
     const mock = (window as any).__WS_MOCK__;
-    
+
     // Extract token from URL
     const token = new URL(url).searchParams.get('token') || '';
-    
+
     // Get sessionId from sessionStorage (tests set this up)
     let sessionId = token;
     try {
@@ -52,82 +52,120 @@ export function createWebSocketConnection(
       // Fall back to using token as sessionId
       sessionId = token || 'test-session';
     }
-    
-    // Connect to mock and get the mock WebSocket object
-    const mockWs = mock.connect(sessionId, (message: WebSocketMessage) => {
+
+    // Performance instrumentation: Mark connection start
+    if (typeof performance !== 'undefined' && performance.mark) {
+      performance.mark('websocket-connect-start');
+    }
+
+    // Connect to mock and get the mock WebSocket object directly
+    // CRITICAL: Don't wrap it - mutate the returned object so the mock's setTimeout
+    // closure references the same object we're assigning handlers to
+    let connectionEstablished = false;
+
+    const ws = mock.connect(sessionId, (message: WebSocketMessage) => {
+      // When mock sends "connected" message, trigger onConnect callback immediately
+      // This is a fallback in case ws.onopen() wasn't called by the mock
+      if (message.type === 'connected' && callbacks.onConnect && !connectionEstablished) {
+        connectionEstablished = true;
+        if (ws.readyState !== 1) {
+          ws.readyState = 1; // OPEN
+        }
+        // Performance instrumentation: Mark connection end
+        if (typeof performance !== 'undefined' && performance.mark) {
+          performance.mark('websocket-connect-end');
+          try {
+            performance.measure('websocket-connect', 'websocket-connect-start', 'websocket-connect-end');
+          } catch (e) {
+            // Ignore errors if marks don't exist
+          }
+        }
+        callbacks.onConnect();
+      }
       // Trigger callbacks when mock sends messages
       if (callbacks.onMessage) {
         callbacks.onMessage(message);
       }
-    });
-    
-    // Create a WebSocket-like object that wraps the mock
-    const ws = {
-      readyState: 0, // CONNECTING initially
-      url: url,
-      protocol: '',
-      extensions: '',
-      binaryType: 'blob' as BinaryType,
-      bufferedAmount: 0,
-      
-      send: (data: string | Blob | ArrayBuffer) => {
-        if (typeof data === 'string') {
-          // Use the mock WebSocket's send method
-          mockWs.send(data);
+    }) as any;
+
+    // Mutate the mock's ws object directly to assign our handlers
+    // The mock's setTimeout (line 67-77 in ws-mock.setup.ts) checks ws.onopen and calls it
+    // Since we're mutating the same object the mock returns, the setTimeout will see our handler
+
+    // If mock already set readyState to OPEN, fire handler immediately
+    // This prevents race condition where setTimeout fires before handler assignment
+    if (ws.readyState === 1) {
+      const immediateHandler = () => {
+        if (!connectionEstablished) {
+          connectionEstablished = true;
+          ws.readyState = 1; // OPEN
+          // Performance instrumentation: Mark connection end
+          if (typeof performance !== 'undefined' && performance.mark) {
+            performance.mark('websocket-connect-end');
+            try {
+              performance.measure('websocket-connect', 'websocket-connect-start', 'websocket-connect-end');
+            } catch (e) {
+              // Ignore errors if marks don't exist
+            }
+          }
+          callbacks.onConnect?.();
         }
-      },
-      
-      close: (code?: number, reason?: string) => {
-        mockWs.close();
-        ws.readyState = 3; // CLOSED
-        if (callbacks.onDisconnect) {
-          callbacks.onDisconnect();
+      };
+      immediateHandler();
+    }
+
+    ws.onopen = () => {
+      if (!connectionEstablished) {
+        connectionEstablished = true;
+        ws.readyState = 1; // OPEN
+        // Performance instrumentation: Mark connection end
+        if (typeof performance !== 'undefined' && performance.mark) {
+          performance.mark('websocket-connect-end');
+          try {
+            performance.measure('websocket-connect', 'websocket-connect-start', 'websocket-connect-end');
+          } catch (e) {
+            // Ignore errors if marks don't exist
+          }
         }
-      },
-      
-      onopen: null as ((event: Event) => void) | null,
-      onmessage: null as ((event: MessageEvent) => void) | null,
-      onclose: null as ((event: CloseEvent) => void) | null,
-      onerror: null as ((event: Event) => void) | null,
-      
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      dispatchEvent: () => true,
-    } as WebSocket;
-    
-    // Set up callbacks
-    ws.onopen = callbacks.onConnect ? () => {
-      ws.readyState = 1; // OPEN
-      callbacks.onConnect();
-    } : null;
-    
-    ws.onmessage = callbacks.onMessage ? (event: MessageEvent) => {
-      try {
-        const message: WebSocketMessage = JSON.parse(event.data);
-        callbacks.onMessage(message);
-      } catch (error) {
-        console.error("Failed to parse WebSocket message:", error);
+        callbacks.onConnect?.();
       }
-    } : null;
-    
-    ws.onclose = callbacks.onDisconnect ? () => {
+    };
+
+    ws.onclose = () => {
       ws.readyState = 3; // CLOSED
-      callbacks.onDisconnect();
-    } : null;
-    
-    ws.onerror = callbacks.onError ? (error: Event) => {
-      callbacks.onError(error);
-    } : null;
-    
-    // Simulate connection opening (mock will trigger this via onMessage callback)
-    setTimeout(() => {
-      ws.readyState = 1; // OPEN
-      if (ws.onopen) {
-        ws.onopen(new Event('open'));
-      }
-    }, 10);
-    
-    return ws;
+      callbacks.onDisconnect?.();
+    };
+
+    ws.onerror = (error: Event) => {
+      callbacks.onError?.(error);
+    };
+
+    // Ensure send and close methods exist (they should from the mock, but polyfill if needed)
+    if (!ws.send) {
+      ws.send = () => {};
+    }
+    if (!ws.close) {
+      ws.close = () => {
+        ws.readyState = 3; // CLOSED
+        callbacks.onDisconnect?.();
+      };
+    }
+
+    // Add WebSocket-like properties for compatibility
+    if (!ws.url) ws.url = url;
+    if (!ws.protocol) ws.protocol = '';
+    if (!ws.extensions) ws.extensions = '';
+    if (!ws.binaryType) ws.binaryType = 'blob' as BinaryType;
+    if (ws.bufferedAmount === undefined) ws.bufferedAmount = 0;
+    if (!ws.addEventListener) ws.addEventListener = () => {};
+    if (!ws.removeEventListener) ws.removeEventListener = () => {};
+    if (!ws.dispatchEvent) ws.dispatchEvent = () => true;
+
+    // The mock's setTimeout (10ms delay) will trigger ws.onopen(), which calls callbacks.onConnect()
+    // This assignment happens synchronously, so it's guaranteed to be set before the setTimeout fires
+    // If the mock's onopen isn't called, the fallback in messageHandler will trigger onConnect when "connected" message arrives
+
+    return ws as WebSocket;
   }
 
   // Use real WebSocket

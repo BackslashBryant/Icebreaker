@@ -173,3 +173,5 @@ temp/
 # Sentry
 .sentryclirc
 .notes/features/archive/
+
+.vercel
