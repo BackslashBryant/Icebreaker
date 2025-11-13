@@ -199,7 +199,7 @@ export function RadarSweep({
         role="status"
         aria-live="polite"
       >
-        <div className="p-6 sm:p-8 bg-accent/10 border-2 border-accent/50 rounded-xl max-w-md text-center">
+        <div className="p-6 sm:p-8 bg-accent/10 border-2 border-accent/50 rounded-xl max-w-md text-center animate-fade-in">
           <RadarIcon className="w-8 h-8 sm:w-10 sm:h-10 text-accent mx-auto mb-4 animate-pulse-slow" aria-hidden="true" />
           <p className="text-accent text-sm sm:text-base font-mono mb-2 font-semibold">
             No one nearby — yet.

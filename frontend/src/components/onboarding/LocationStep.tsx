@@ -41,7 +41,7 @@ export function LocationStep({ onEnable, onSkip }: LocationStepProps) {
             <br />→ <span className="text-accent">Your privacy matters</span>
           </p>
         </div>
-        <div className="p-3 sm:p-4 bg-accent/10 border-2 border-accent/50 rounded-xl">
+        <div className="p-3 sm:p-4 bg-accent/10 border-2 border-accent/50 rounded-xl mt-4 sm:mt-5">
           <p className="text-xs sm:text-sm font-mono text-accent mb-2 font-semibold">
             Connect with people nearby:
           </p>

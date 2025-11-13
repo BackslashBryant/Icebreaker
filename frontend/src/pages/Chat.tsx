@@ -7,6 +7,7 @@ import { ChatHeader } from "@/components/chat/ChatHeader";
 import { PanicButton } from "@/components/panic/PanicButton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Clock } from "lucide-react";
 
 /**
  * Chat Page
@@ -128,6 +129,7 @@ export default function Chat() {
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="p-4 sm:p-6 bg-accent/10 border-2 border-accent/50 rounded-xl max-w-md text-center">
+              <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-accent mx-auto mb-3 animate-pulse-slow" aria-hidden="true" />
               <p className="text-accent text-sm sm:text-base font-mono mb-2 font-semibold">
                 Chat started
               </p>

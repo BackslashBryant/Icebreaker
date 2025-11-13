@@ -17,7 +17,7 @@ export function VibeStep({ selectedVibe, onVibeSelect }: VibeStepProps) {
       <div>
         <div className="ascii-divider text-xs mb-2">▼ ▼ ▼</div>
         <h2 className="text-lg sm:text-xl font-bold text-accent font-mono glow-accent mb-1">YOUR VIBE</h2>
-        <p className="text-[10px] sm:text-xs text-muted-foreground/70 font-mono mb-2">(Required)</p>
+        <p className="text-xs sm:text-sm text-muted-foreground/70 font-mono mb-2">(Required)</p>
         <p className="text-xs sm:text-sm text-muted-foreground">
           What's your vibe right now?
         </p>

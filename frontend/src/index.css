@@ -111,6 +111,17 @@
   }
 }
 
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-sweep {
   animation: sweep 3s ease-in-out infinite;
 }
@@ -123,6 +134,10 @@
   animation: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
 /* Respect reduced motion preferences
  * VERIFIED: All animations (sweep, pulse-slow, radar-ping) are disabled
  * when user has prefers-reduced-motion enabled in OS settings.
@@ -131,7 +146,8 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-sweep,
   .animate-pulse-slow,
-  .animate-radar-ping {
+  .animate-radar-ping,
+  .animate-fade-in {
     animation: none;
   }
 }
@@ -153,6 +169,7 @@
   font-family: monospace;
   color: oklch(0.9 0.06 195);
   opacity: 1;
+  -webkit-user-select: none;
   user-select: none;
   letter-spacing: 0.1em;
 }
