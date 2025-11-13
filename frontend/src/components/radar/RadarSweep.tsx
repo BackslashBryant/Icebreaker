@@ -194,11 +194,18 @@ export function RadarSweep({
   if (people.length === 0) {
     return (
       <div
-        className="text-center py-12 text-muted-foreground font-mono"
+        className="flex flex-col items-center justify-center py-12 px-4"
         role="status"
         aria-live="polite"
       >
-        <p>{emptyMessage}</p>
+        <div className="p-6 sm:p-8 bg-muted/10 border-2 border-border rounded-md max-w-md text-center animate-fade-in">
+          <p className="text-foreground text-sm sm:text-base font-mono mb-2 font-semibold">
+            No one nearby — yet.
+          </p>
+          <p className="text-muted-foreground text-xs sm:text-sm font-mono leading-relaxed">
+            Check back soon or enable location for better matching.
+          </p>
+        </div>
       </div>
     );
   }

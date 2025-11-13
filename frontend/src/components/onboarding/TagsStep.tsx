@@ -29,7 +29,7 @@ export function TagsStep({
   return (
     <div className="space-y-6 sm:space-y-8">
       {username && (
-        <div className="p-3 border-2 border-accent/50 rounded-xl bg-accent/5 text-center">
+        <div className="p-3 border-2 border-border rounded-md bg-card text-center">
           <p className="text-xs text-muted-foreground mb-1">Your anonymous handle:</p>
           <p className="text-base sm:text-lg font-mono text-accent glow-accent">{username}</p>
         </div>
@@ -54,7 +54,7 @@ export function TagsStep({
               aria-pressed={selectedTags.includes(tag)}
               aria-label={`${tag}${selectedTags.includes(tag) ? " (selected)" : ""}`}
               data-testid={`tag-${tag}`}
-              className={`px-2.5 sm:px-3 py-1.5 sm:py-2 border-2 text-xs sm:text-sm font-mono transition-all ${
+              className={`px-2.5 sm:px-3 py-1.5 sm:py-2 border-2 rounded-md text-xs sm:text-sm font-mono transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-opacity-100 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                 selectedTags.includes(tag)
                   ? "border-accent bg-accent/10 text-accent"
                   : "border-muted/50 text-muted-foreground hover:border-accent/50"
@@ -71,7 +71,7 @@ export function TagsStep({
         )}
       </div>
 
-      <div className="flex items-center justify-between p-3 sm:p-4 border-2 border-accent/30 rounded-xl bg-card" data-testid="visibility-toggle">
+      <div className="flex items-center justify-between p-3 sm:p-4 border-2 border-border rounded-md bg-card" data-testid="visibility-toggle">
         <div className="flex-1 pr-3">
           <span className="font-mono text-xs sm:text-sm block mb-1">Show me on the radar</span>
           <span className="text-[10px] sm:text-xs text-muted-foreground/60">

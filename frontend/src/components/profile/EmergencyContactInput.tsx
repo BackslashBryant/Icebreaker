@@ -75,7 +75,7 @@ export function EmergencyContactInput() {
 
   if (!isEditing) {
     return (
-      <div className="p-3 sm:p-4 border-2 border-accent/30 rounded-xl bg-card space-y-2">
+      <div className="p-3 sm:p-4 border-2 border-border rounded-md bg-card space-y-2">
         <div className="flex items-center justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="font-mono text-xs sm:text-sm text-muted-foreground">
@@ -100,12 +100,12 @@ export function EmergencyContactInput() {
   }
 
   return (
-    <div className="p-3 sm:p-4 border-2 border-accent/30 rounded-xl bg-card space-y-2">
+    <div className="p-3 sm:p-4 border-2 border-border rounded-md bg-card space-y-2">
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="+1234567890 or email@example.com"
-        className="rounded-xl bg-background border-2 border-accent/30 font-mono text-sm focus:border-accent h-10 sm:h-12"
+        className="rounded-md bg-background border-2 border-border font-mono text-sm focus:border-accent h-10 sm:h-12"
         aria-label="Emergency contact"
         aria-invalid={validationError ? "true" : "false"}
         aria-describedby={validationError ? "emergency-contact-error" : undefined}

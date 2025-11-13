@@ -22,15 +22,17 @@ export function VibeStep({ selectedVibe, onVibeSelect }: VibeStepProps) {
         </p>
       </div>
       <div className="space-y-2">
-        {VIBES.map((vibe) => (
-          <button
-            key={vibe.id}
-            onClick={() => onVibeSelect(vibe.id)}
-            aria-pressed={selectedVibe === vibe.id}
-            aria-label={`${vibe.label}${selectedVibe === vibe.id ? " (selected)" : ""}`}
+        {VIBES.map((vibe) => {
+          const isSelected = selectedVibe === vibe.id;
+          return (
+            <button
+              key={vibe.id}
+              onClick={() => onVibeSelect(vibe.id)}
+              aria-pressed={isSelected ? "true" : "false"}
+              aria-label={`${vibe.label}${isSelected ? " (selected)" : ""}`}
             data-testid={`vibe-${vibe.id}`}
-            className={`w-full p-3 sm:p-4 rounded-xl border-2 transition-all text-left font-mono text-sm sm:text-base ${
-              selectedVibe === vibe.id
+            className={`w-full p-3 sm:p-4 rounded-md border-2 transition-all text-left font-mono text-sm sm:text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-opacity-100 focus-visible:ring-offset-4 focus-visible:ring-offset-background ${
+              isSelected
                 ? "border-accent bg-accent/10 text-accent"
                 : "border-muted/50 hover:border-accent/50"
             }`}
@@ -38,7 +40,8 @@ export function VibeStep({ selectedVibe, onVibeSelect }: VibeStepProps) {
             <span className="mr-2" aria-hidden="true">{vibe.emoji}</span>
             {vibe.label}
           </button>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

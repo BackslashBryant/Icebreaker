@@ -127,9 +127,14 @@ export default function Chat() {
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-muted-foreground text-sm">
-              Chat started. Say hello!
-            </p>
+            <div className="text-center space-y-2">
+              <p className="text-foreground text-sm font-mono">
+                Chat started.
+              </p>
+              <p className="text-muted-foreground text-xs sm:text-sm font-mono">
+                Messages are <span className="font-semibold">ephemeral</span> — they disappear when you leave.
+              </p>
+            </div>
           </div>
         ) : (
           messages.map((message, index) => {

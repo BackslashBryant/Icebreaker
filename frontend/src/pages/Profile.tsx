@@ -85,16 +85,18 @@ export default function Profile() {
           </h1>
           
           {/* Handle Display */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="ascii-divider text-center">▼ ▼ ▼</div>
-            <div className="p-4 sm:p-6 border-4 border-accent/50 bg-accent/5 text-center">
+            <div className="p-4 sm:p-6 border-2 border-border rounded-md bg-card text-center">
               <p className="text-xs text-muted-foreground mb-2 font-mono">YOUR HANDLE</p>
               <p className="text-xl sm:text-2xl font-mono text-accent glow-accent">
                 @{session.handle}
               </p>
-              <p className="text-xs text-muted-foreground mt-3 font-mono">
-                Auto-generated from your vibe & tags
-              </p>
+              <div className="mt-3 p-2 bg-muted/20 border border-border rounded-md inline-block">
+                <p className="text-xs text-muted-foreground font-mono">
+                  Generated from your vibe and tags. <span className="font-semibold text-foreground">Can't be changed.</span>
+                </p>
+              </div>
             </div>
           </div>
 
@@ -105,6 +107,9 @@ export default function Profile() {
 
           {/* Emergency Contact Section */}
           <ProfileSection title="EMERGENCY CONTACT">
+            <p className="text-xs sm:text-sm text-muted-foreground font-mono mb-3">
+              Used only in emergencies. Never shared with other users.
+            </p>
             <EmergencyContactInput />
           </ProfileSection>
 

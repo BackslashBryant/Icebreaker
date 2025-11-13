@@ -18,7 +18,7 @@ export function ConsentStep({ consent, onConsentChange, onContinue }: ConsentSte
         </p>
       </div>
 
-      <div className="flex items-start space-x-3 p-3 sm:p-4 border-2 border-accent/50 rounded-xl bg-card">
+      <div className="flex items-start space-x-3 p-3 sm:p-4 border-2 border-border rounded-md bg-card">
         <Checkbox
           id="consent"
           checked={consent}

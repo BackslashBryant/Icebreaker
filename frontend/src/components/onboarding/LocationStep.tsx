@@ -23,23 +23,32 @@ export function LocationStep({ onEnable, onSkip }: LocationStepProps) {
   }, [location, onEnable]);
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div className="space-y-4">
-        <div className="w-12 h-12 sm:w-14 sm:h-14 border-2 border-accent bg-accent/10 flex items-center justify-center">
-          <MapPin className="w-6 h-6 sm:w-7 sm:h-7 text-accent" />
+    <div className="space-y-8 sm:space-y-10">
+      <div className="space-y-6">
+        <div className="w-12 h-12 sm:w-14 sm:h-14 border-2 border-border bg-muted/10 flex items-center justify-center">
+          <MapPin className="w-6 h-6 sm:w-7 sm:h-7 text-muted-foreground" />
         </div>
         <div className="ascii-divider text-xs">- - - - - - - - - -</div>
         <h2 className="text-xl sm:text-2xl font-bold text-accent font-mono glow-accent">LOCATION ACCESS</h2>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-          We use <span className="text-accent">approximate location only, never exact coordinates</span> to connect you with nearby people. Not
-          stored long-term.
+          <span className="font-semibold text-foreground">Approximate location only.</span> Never exact. Not stored long-term.
         </p>
-        <div className="p-3 sm:p-4 bg-muted/30 border-2 border-accent/30 rounded-xl">
+        <div className="p-3 sm:p-4 bg-muted/20 border-2 border-border rounded-md">
           <p className="text-xs font-mono text-muted-foreground leading-relaxed">
             → Approximate distance only
             <br />→ No background tracking
             <br />→ Session-based only
-            <br />→ <span className="text-accent">Your privacy matters</span>
+            <br />→ <span className="font-semibold text-foreground">Your privacy matters</span>
+          </p>
+        </div>
+        <div className="mt-6 sm:mt-8">
+          <p className="text-xs sm:text-sm font-mono text-muted-foreground mb-2 font-semibold">
+            Connect with people nearby:
+          </p>
+          <p className="text-xs font-mono text-muted-foreground leading-relaxed">
+            → Coworking spaces
+            <br />→ Neighborhoods
+            <br />→ Events
           </p>
         </div>
       </div>
