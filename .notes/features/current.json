@@ -1,12 +1,12 @@
 {
-  "slug": "run-persona-testing-suite",
-  "featureName": "Run Persona Testing Suite & Generate Actionable UX Insights",
-  "updatedAt": "2025-01-27T00:00:00.000Z",
+  "slug": "fix-critical-ux-issues",
+  "featureName": "Fix Critical UX Issues from Persona Testing",
+  "updatedAt": "2025-11-12T20:21:24.000Z",
   "status": "complete",
   "vision": "docs/vision.md",
-  "description": "Execute the persona testing suite, collect telemetry data, and generate actionable UX insights from test results to inform product improvements.",
-  "githubIssue": 23,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/23",
-  "branch": "agent/pixel/23-run-persona-testing-suite",
-  "note": "Issue #23 COMPLETE (2025-01-27). All 6 steps completed: ✅ Telemetry integrated into all 72 tests → ✅ All tests passed → ✅ Summary generated → ✅ Insights enhanced → ✅ Report created → ✅ Documentation complete. Generated 93 telemetry files, identified 3 critical issues (panic button, visibility toggle, error banners) with actionable recommendations."
+  "description": "Fix 3 critical UX issues identified in persona testing: panic button visibility, visibility toggle detection, and error banner frequency.",
+  "githubIssue": 24,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/24",
+  "branch": "agent/link/24-fix-critical-ux",
+  "note": "Issue #24 COMPLETE (2025-11-12). All 5 steps completed: ✅ Verified implementation → ✅ Improved test helper reliability → ✅ Verified CSS (no issues) → ✅ Re-ran tests (all pass) → ✅ Updated insight report. Improved detection rates: panic button 50% (up from 18%), visibility toggle 40% (up from 25%). All 72 persona tests passing."
 }
