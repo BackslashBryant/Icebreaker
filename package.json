@@ -15,6 +15,8 @@
     "github:issue": "node ./tools/github-issue.mjs",
     "github:pr": "node ./tools/github-pr.mjs",
     "github:labels": "node ./tools/github-labels.mjs",
+    "github:complete": "node ./tools/github-issue-complete.mjs",
+    "git:push": "node ./tools/git-push-with-retry.mjs",
     "cursor:extensions": "node ./tools/cursor-extensions.mjs",
     "status": "node ./tools/health-check.mjs",
     "setup": "node ./tools/setup.mjs",

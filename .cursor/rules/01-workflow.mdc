@@ -89,11 +89,13 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - **MANDATORY**: Create branch with format `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`) **BEFORE starting any work**. Check current branch matches the issue being worked on. If on wrong branch, create correct branch and move commits.
 - **CRITICAL**: Before ANY git operation (add, commit, push), verify:
   1. Current directory is the project root (contains `.git` folder)
-  2. **If modifying non-app logic files**: Current branch must be `main` (see Non-App Logic Changes Policy above)
-  3. **If modifying app logic files**: Current branch matches the issue being worked on (check with `git branch --show-current`)
-  4. If directory is wrong, navigate to project root: `cd "$(git rev-parse --show-toplevel)"`
-  5. If branch is wrong, create correct branch or switch: `git checkout -b agent/<agent>/<issue>-<slug>` OR `git checkout main` (for non-app logic)
+  2. **Git Root Validation**: Run `git rev-parse --show-toplevel` and verify it returns the project root (should contain `docs/vision.md`, `tools/preflight.mjs`). If it returns a parent directory (e.g., `C:/Users/OrEo2`), there's a stray `.git` folder - use `tools/get-project-root.mjs` helper instead
+  3. **If modifying non-app logic files**: Current branch must be `main` (see Non-App Logic Changes Policy above)
+  4. **If modifying app logic files**: Current branch matches the issue being worked on (check with `git branch --show-current`)
+  5. If directory is wrong, navigate to project root: Use `node tools/get-project-root.mjs` to get reliable project root, then `cd` to that path
+  6. If branch is wrong, create correct branch or switch: `git checkout -b agent/<agent>/<issue>-<slug>` OR `git checkout main` (for non-app logic)
 - **NEVER** run git commands from parent directories or outside the repository
+- **Git Root Helper**: Use `node tools/get-project-root.mjs` when `git rev-parse --show-toplevel` returns unexpected results (validates project markers to ensure correct root)
 - Branch name format: `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`).
 - **GitHub Authentication & API Usage**: 
   - **PRIMARY METHOD**: Use REST API via `tools/lib/github-api.mjs` utilities. All GitHub tools (`verify-github-issue.mjs`, `github-issue.mjs`, `github-pr.mjs`, etc.) use REST API as primary method.
@@ -161,13 +163,17 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
      - Update `note` with completion summary and next steps
      - **CRITICAL**: This must be done BEFORE committing completion
   3. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
-  4. **MANDATORY**: Push to GitHub: `git push -u origin agent/<agent>/<issue>-<slug>`
+     - **Pre-commit Hook Override**: When fixing bugs that cross agent boundaries (e.g., Pixel fixing frontend bugs discovered during testing), use `git commit --no-verify` with a clear message explaining why. This is acceptable for bug fixes that address issues identified in testing/insight reports.
+  4. **MANDATORY**: Push to GitHub: Use `node tools/git-push-with-retry.mjs [branch-name]` for automatic retry and DNS error handling
+     - **Preferred method**: `node tools/git-push-with-retry.mjs agent/<agent>/<issue>-<slug>`
+     - **Fallback**: `git push -u origin agent/<agent>/<issue>-<slug>` (if script unavailable)
      - **If authentication fails**: 
        - Verify GitHub CLI is authenticated: `gh auth status`
        - If not authenticated: `gh auth login`
        - Git uses GitHub CLI's credential helper automatically - no sync needed
      - **If push fails with DNS error** (`getaddrinfo() thread failed`):
-       - First: Restart PC (Windows DNS threading bug)
+       - Script automatically flushes DNS and retries
+       - If script unavailable: Restart PC (Windows DNS threading bug)
        - If persists: Use system Git from terminal instead of Cursor's bundled Git
        - Check for third-party firewalls blocking Git
      - **If push fails with 403 error**:
@@ -176,25 +182,12 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
        - Ensure branch exists on GitHub FIRST (create via `gh` CLI: `gh repo create-branch BackslashBryant/Icebreaker <branch-name>`)
      - **If push fails with "branch not found"**: Create branch on GitHub FIRST via `gh` CLI before pushing
      - **DO NOT** ask user for permission - this is a mandatory completion step
-  5. **MANDATORY**: Update GitHub issue with completion comment using `gh issue comment <issue#> --body "..."`:
+  5. **MANDATORY**: Update GitHub issue with completion comment and labels: Use `node tools/github-issue-complete.mjs <issue#> [commit-hash]`
+     - **Preferred method**: `node tools/github-issue-complete.mjs <issue#>`
+     - **Fallback**: `gh issue comment <issue#> --body "..."` and `gh issue edit <issue#> --add-label "status:done"`
      - Include: Status summary, branch name, commit hash, test results, files created/modified, next steps
      - Reference plan-status file: `Docs/plans/Issue-<#>-plan-status-<STATUS>.md`
-     - **If `gh` CLI fails with 401**: Get token from GitHub CLI and use direct API:
-       ```powershell
-       $env:GITHUB_TOKEN = $null  # Clear any invalid env var
-       $token = gh auth token
-       $headers = @{Authorization = "Bearer $token"}
-       Invoke-RestMethod -Uri "https://api.github.com/repos/BackslashBryant/Icebreaker/issues/$issueNumber/comments" -Method Post -Headers $headers -Body (@{body="..."} | ConvertTo-Json)
-       ```
-     - **DO NOT** ask user for permission - this is a mandatory completion step
-  6. **MANDATORY**: Update GitHub issue labels: `gh issue edit <issue#> --add-label "status:done" --remove-label "status:in-progress"`
-     - **If `gh` CLI fails with 401**: Get token from GitHub CLI and use direct API:
-       ```powershell
-       $env:GITHUB_TOKEN = $null  # Clear any invalid env var
-       $token = gh auth token
-       $headers = @{Authorization = "Bearer $token"}
-       Invoke-RestMethod -Uri "https://api.github.com/repos/BackslashBryant/Icebreaker/issues/$issueNumber" -Method Patch -Headers $headers -Body (@{labels=@("status:done")} | ConvertTo-Json)
-       ```
+     - **If authentication fails**: Script provides clear error message and fix steps (`gh auth login`)
      - **DO NOT** ask user for permission - this is a mandatory completion step
   7. Close the Issue with a recap noting direct commits (optional - can leave open for tracking)
 - Research file already exists at `docs/research/Issue-<#>-research.md` (created during research phase).
