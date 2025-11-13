@@ -201,27 +201,43 @@ export async function checkPanicButtonVisible(page: Page): Promise<boolean> {
     // First, wait for the page to be interactive
     await page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(() => {});
     
-    // Wait for React to render components (increased wait time)
-    await page.waitForTimeout(1000);
-    
     // Check for panic button by data-testid first (most reliable)
     const panicButtonByTestId = page.locator('[data-testid="panic-fab"]');
     
-    // Wait for element to be attached to DOM first (with better error handling)
+    // Wait for element to appear in DOM (with longer timeout for React rendering)
     try {
-      await panicButtonByTestId.waitFor({ state: 'attached', timeout: 10000 });
+      // First try to wait for element to be attached
+      await panicButtonByTestId.waitFor({ state: 'attached', timeout: 15000 });
     } catch {
-      // Element not attached yet, but continue to check visibility anyway
+      // Element not attached yet - check if it exists at all
+      const count = await panicButtonByTestId.count();
+      if (count === 0) {
+        // Element doesn't exist in DOM - try aria-label fallback
+        try {
+          const panicButtonByAria = page.getByRole('button', { name: /Emergency panic button/i });
+          await panicButtonByAria.waitFor({ state: 'attached', timeout: 5000 });
+        } catch {
+          // Neither method found the element
+          return false;
+        }
+      }
     }
     
-    // Check if element exists in DOM first
+    // Check if element exists in DOM
     const count = await panicButtonByTestId.count();
     if (count === 0) {
-      // Element doesn't exist in DOM at all
-      return false;
+      // Try aria-label fallback
+      const panicButtonByAria = page.getByRole('button', { name: /Emergency panic button/i });
+      const ariaCount = await panicButtonByAria.count();
+      if (ariaCount === 0) {
+        return false;
+      }
+      // Use aria-label element for visibility check
+      const isVisibleByAria = await panicButtonByAria.isVisible({ timeout: 10000 }).catch(() => false);
+      return isVisibleByAria;
     }
     
-    // Then check visibility with longer timeout
+    // Element exists - check visibility with longer timeout
     const isVisibleByTestId = await panicButtonByTestId.isVisible({ timeout: 10000 }).catch(() => false);
     if (isVisibleByTestId) {
       return true;
@@ -280,27 +296,55 @@ export async function checkVisibilityToggleVisible(page: Page): Promise<boolean>
     // Wait for React to render - use a more reliable approach
     await page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(() => {});
     
-    // Wait for React to render components (increased wait time)
-    await page.waitForTimeout(1000);
-    
     // Check for visibility toggle by data-testid (container)
     const visibilityToggle = page.locator('[data-testid="visibility-toggle"]');
     
-    // Wait for element to be attached to DOM first (with better error handling)
+    // Wait for element to appear in DOM (with longer timeout for React rendering)
     try {
-      await visibilityToggle.waitFor({ state: 'attached', timeout: 10000 });
+      // First try to wait for element to be attached
+      await visibilityToggle.waitFor({ state: 'attached', timeout: 15000 });
     } catch {
-      // Element not attached yet, but continue to check visibility anyway
+      // Element not attached yet - check if it exists at all
+      const count = await visibilityToggle.count();
+      if (count === 0) {
+        // Try checkbox fallback
+        const visibilityCheckbox = page.locator('[data-testid="visibility-toggle-checkbox"]');
+        const checkboxCount = await visibilityCheckbox.count();
+        if (checkboxCount === 0) {
+          // Try role-based fallback
+          try {
+            const checkboxByRole = page.getByRole('checkbox', { name: /Show me on Radar|Hide from Radar/i });
+            await checkboxByRole.waitFor({ state: 'attached', timeout: 5000 });
+          } catch {
+            return false;
+          }
+        }
+      }
     }
     
-    // Check if element exists in DOM first
+    // Check if element exists in DOM
     const count = await visibilityToggle.count();
     if (count === 0) {
-      // Element doesn't exist in DOM at all
-      return false;
+      // Try checkbox fallback
+      const visibilityCheckbox = page.locator('[data-testid="visibility-toggle-checkbox"]');
+      const checkboxCount = await visibilityCheckbox.count();
+      if (checkboxCount === 0) {
+        // Try role-based fallback
+        const checkboxByRole = page.getByRole('checkbox', { name: /Show me on Radar|Hide from Radar/i });
+        const roleCount = await checkboxByRole.count();
+        if (roleCount === 0) {
+          return false;
+        }
+        // Use role-based element for visibility check
+        const isVisibleByRole = await checkboxByRole.isVisible({ timeout: 10000 }).catch(() => false);
+        return isVisibleByRole;
+      }
+      // Use checkbox for visibility check
+      const isVisibleByCheckbox = await visibilityCheckbox.isVisible({ timeout: 10000 }).catch(() => false);
+      return isVisibleByCheckbox;
     }
     
-    // Then check visibility with longer timeout
+    // Element exists - check visibility with longer timeout
     const isVisibleByTestId = await visibilityToggle.isVisible({ timeout: 10000 }).catch(() => false);
     if (isVisibleByTestId) {
       return true;
