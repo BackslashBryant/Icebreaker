@@ -92,7 +92,7 @@ export default function Profile() {
                 @{session.handle}
               </p>
               <p className="text-xs text-muted-foreground mt-3 font-mono">
-                Auto-generated from your vibe & tags
+                Generated from your vibe and tags. Can't be changed.
               </p>
             </div>
           </div>
@@ -104,6 +104,9 @@ export default function Profile() {
 
           {/* Emergency Contact Section */}
           <ProfileSection title="EMERGENCY CONTACT">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-3 font-mono">
+              Used only in emergencies. Never shared with other users.
+            </p>
             <EmergencyContactInput />
           </ProfileSection>
 

@@ -128,7 +128,7 @@ export default function Chat() {
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground text-sm">
-              Chat started. Say hello!
+              Chat started. Messages are ephemeral — they disappear when you leave.
             </p>
           </div>
         ) : (

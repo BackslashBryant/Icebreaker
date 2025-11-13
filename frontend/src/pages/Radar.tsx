@@ -135,8 +135,7 @@ export default function Radar() {
             >
               <p className="font-semibold mb-1">Location access denied</p>
               <p className="text-xs">
-                Proximity matching is unavailable. You can still view nearby people, but
-                sorting won't include distance.
+                You can still browse, but sorting won't include distance.
               </p>
             </div>
           )}
@@ -159,13 +158,13 @@ export default function Radar() {
             <RadarSweep
               people={people}
               onSelectPerson={selectPerson}
-              emptyMessage="No one here — yet."
+              emptyMessage="No one nearby — yet. Check back soon or enable location for better matching."
             />
           ) : (
             <RadarList
               people={people}
               onSelectPerson={selectPerson}
-              emptyMessage="No one here — yet."
+              emptyMessage="No one nearby — yet. Check back soon or enable location for better matching."
               userTags={session?.tags || []}
             />
           )}
