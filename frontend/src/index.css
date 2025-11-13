@@ -123,7 +123,11 @@
   animation: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-/* Respect reduced motion preferences */
+/* Respect reduced motion preferences
+ * VERIFIED: All animations (sweep, pulse-slow, radar-ping) are disabled
+ * when user has prefers-reduced-motion enabled in OS settings.
+ * This ensures WCAG AA compliance for motion-sensitive users.
+ */
 @media (prefers-reduced-motion: reduce) {
   .animate-sweep,
   .animate-pulse-slow,

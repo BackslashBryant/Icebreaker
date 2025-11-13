@@ -18,7 +18,7 @@ export function VibeStep({ selectedVibe, onVibeSelect }: VibeStepProps) {
         <div className="ascii-divider text-xs mb-2">▼ ▼ ▼</div>
         <h2 className="text-lg sm:text-xl font-bold text-accent font-mono glow-accent mb-2">YOUR VIBE</h2>
         <p className="text-xs sm:text-sm text-muted-foreground">
-          What kind of energy are you putting out right now?
+          What's your vibe right now?
         </p>
       </div>
       <div className="space-y-2">
@@ -29,7 +29,7 @@ export function VibeStep({ selectedVibe, onVibeSelect }: VibeStepProps) {
             aria-pressed={selectedVibe === vibe.id}
             aria-label={`${vibe.label}${selectedVibe === vibe.id ? " (selected)" : ""}`}
             data-testid={`vibe-${vibe.id}`}
-            className={`w-full p-3 sm:p-4 rounded-xl border-2 transition-all text-left font-mono text-sm sm:text-base ${
+            className={`w-full p-3 sm:p-4 rounded-xl border-2 transition-all text-left font-mono text-sm sm:text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-opacity-100 focus-visible:ring-offset-4 focus-visible:ring-offset-background ${
               selectedVibe === vibe.id
                 ? "border-accent bg-accent/10 text-accent"
                 : "border-muted/50 hover:border-accent/50"

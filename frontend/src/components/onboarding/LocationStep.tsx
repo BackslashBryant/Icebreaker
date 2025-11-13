@@ -31,8 +31,7 @@ export function LocationStep({ onEnable, onSkip }: LocationStepProps) {
         <div className="ascii-divider text-xs">- - - - - - - - - -</div>
         <h2 className="text-xl sm:text-2xl font-bold text-accent font-mono glow-accent">LOCATION ACCESS</h2>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-          We use <span className="text-accent">approximate location only, never exact coordinates</span> to connect you with nearby people. Not
-          stored long-term.
+          <span className="text-accent">Approximate location only.</span> Never exact. Not stored long-term.
         </p>
         <div className="p-3 sm:p-4 bg-muted/30 border-2 border-accent/30 rounded-xl">
           <p className="text-xs font-mono text-muted-foreground leading-relaxed">
