@@ -85,6 +85,25 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Before starting work on a feature branch, sync with `main`: `git merge main` or `git rebase main`
 - This ensures feature branches inherit latest workflow/configuration changes
 
+**File Categorization Helper**:
+- **MANDATORY**: Before committing, run `node tools/categorize-files.mjs --status` to check file categorization
+- This tool automatically categorizes files as:
+  - **General improvements** (tools, workflow rules, configs) → must go to `main`
+  - **Issue-specific** (plans, research, feature code) → must go to feature branch
+- **If mixed files detected**: Separate into two commits:
+  1. Commit general improvements to `main` first
+  2. Then commit issue-specific files to feature branch
+- **Workflow**:
+  1. Run `node tools/categorize-files.mjs --status` to see categorization
+  2. If general improvements detected on feature branch:
+     - Stash or commit issue-specific files first
+     - Switch to `main`: `git checkout main`
+     - Commit general improvements: `git add <general-files> && git commit -m "chore: ..."`
+     - Push to main: `git push origin main`
+     - Switch back to feature branch: `git checkout <feature-branch>`
+     - Merge main: `git merge main`
+  3. Then commit issue-specific files to feature branch
+
 ## 2. Branching & MCP Setup
 - **MANDATORY**: Create branch with format `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`) **BEFORE starting any work**. Check current branch matches the issue being worked on. If on wrong branch, create correct branch and move commits.
 - **CRITICAL**: Before ANY git operation (add, commit, push), verify:
@@ -122,6 +141,9 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any implementation files. Report which check failed and coordinate with Vector.
 - Stay in Plan Mode until the caller says "Proceed." Once approved, execute one checkpoint at a time.
 - Work within your agent branch and path scope.
+- **MANDATORY BEFORE COMMITTING**: Run `node tools/categorize-files.mjs --status` to check for mixed commits
+  - If general improvements detected: Commit them to `main` first, then merge into feature branch
+  - Only commit issue-specific files to feature branch
 - Commit early/often; reference the issue (`#1234`) in commit messages.
 - Run targeted tests right after each change; paste the command/output in chat.
 - **CRITICAL**: Update ONLY `Docs/plans/Issue-<#>-plan-status-<STATUS>.md` with progress. When status changes, rename the file to reflect new status.

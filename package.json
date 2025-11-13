@@ -17,6 +17,7 @@
     "github:labels": "node ./tools/github-labels.mjs",
     "github:complete": "node ./tools/github-issue-complete.mjs",
     "git:push": "node ./tools/git-push-with-retry.mjs",
+    "files:categorize": "node ./tools/categorize-files.mjs --status",
     "cursor:extensions": "node ./tools/cursor-extensions.mjs",
     "status": "node ./tools/health-check.mjs",
     "setup": "node ./tools/setup.mjs",
