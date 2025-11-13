@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Post-merge hook - Auto-update dependencies and sync configs after merges
+# Install with: cp scripts/hooks/post-merge.sample .git/hooks/post-merge && chmod +x .git/hooks/post-merge
+
+echo "[post-merge] Checking for dependency changes..."
+
+# Check if package.json or package-lock.json changed
+if git diff HEAD@{1} HEAD --name-only | grep -qE '(package\.json|package-lock\.json)'; then
+  echo "[post-merge] Dependencies changed. Running npm install..."
+  if command -v npm >/dev/null 2>&1; then
+    npm install
+    echo "[post-merge] Dependencies updated."
+  else
+    echo "[post-merge] WARNING: npm not found. Run 'npm install' manually."
+  fi
+fi
+
+# Check if MCP config changed
+if git diff HEAD@{1} HEAD --name-only | grep -q '\.cursor/mcp\.json'; then
+  echo "[post-merge] MCP config changed. Run 'npm run mcp:suggest' to review changes."
+fi
+
+# Check if .env.example changed (warn about .env sync)
+if git diff HEAD@{1} HEAD --name-only | grep -q '\.env\.example'; then
+  echo "[post-merge] .env.example changed. Review and update your .env file if needed."
+fi
+
+# Check if GitHub Actions workflows changed
+if git diff HEAD@{1} HEAD --name-only | grep -qE '\.github/workflows/'; then
+  echo "[post-merge] GitHub Actions workflows changed. Review CI/CD changes."
+fi
+
+echo "[post-merge] Done."
+

@@ -81,6 +81,13 @@ function getAvailableScripts(projectInfo) {
   const scripts = projectInfo.scripts || {};
   const dependencies = projectInfo.dependencies || {};
 
+  // Date validation check (always run)
+  availableScripts.push({
+    command: 'node tools/check-dates.mjs --changed',
+    description: 'Date validation (changed files)',
+    required: false,
+  });
+
   if (scripts.lint) {
     availableScripts.push({
       command: `npm run lint${config.fix ? ' --fix' : ''}`,

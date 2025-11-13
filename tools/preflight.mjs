@@ -7,6 +7,7 @@
  */
 
 import { readFileSync, existsSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { detectRepoMode } from './lib/repo-mode.mjs';
@@ -485,6 +486,42 @@ function checkDependencies() {
   }
 }
 
+function checkDates() {
+  try {
+    // Check only changed files for speed (staged + unstaged)
+    // Full scan happens in pre-commit hook or when explicitly requested
+    const output = execSync('node tools/check-dates.mjs --changed --json', {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    const result = JSON.parse(output);
+    if (result.ok) {
+      addResult('Date validation', true, 'No placeholder dates found in changed files');
+    } else {
+      const violationCount = result.violations?.length || 0;
+      const fileCount = new Set(result.violations?.map(v => v.file) || []).size;
+      const violations = result.violations?.slice(0, 3).map(v => `${v.file}:${v.line}`).join(', ') || '';
+      const more = violationCount > 3 ? ` and ${violationCount - 3} more` : '';
+      addResult('Date validation', false, `Found placeholder dates in ${fileCount} changed file(s) (use Time MCP)${violations ? `: ${violations}${more}` : ''}`);
+    }
+  } catch (error) {
+    // If check-dates.mjs fails, it means violations were found
+    const output = (error.stdout || error.stderr || '').toString();
+    try {
+      const result = JSON.parse(output);
+      const violationCount = result.violations?.length || 0;
+      const fileCount = new Set(result.violations?.map(v => v.file) || []).size;
+      const violations = result.violations?.slice(0, 3).map(v => `${v.file}:${v.line}`).join(', ') || '';
+      const more = violationCount > 3 ? ` and ${violationCount - 3} more` : '';
+      addResult('Date validation', false, `Found placeholder dates in ${fileCount} changed file(s) (use Time MCP)${violations ? `: ${violations}${more}` : ''}`);
+    } catch (parseError) {
+      // Fallback if JSON parsing fails
+      addResult('Date validation', false, 'Placeholder dates detected in changed files (use Time MCP)');
+    }
+  }
+}
+
 function main() {
   checkPlanScaffold();
   checkResearchLog();
@@ -502,6 +539,7 @@ function main() {
   checkRepoMode();
   checkBranchNaming();
   checkDependencies();
+  checkDates();
 
   const rawArgs = process.argv.slice(2);
   const wantsJson = rawArgs.includes('--json') || rawArgs.includes('--ci');

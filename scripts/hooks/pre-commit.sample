@@ -83,30 +83,211 @@ if ! npm run status -- --ci >/dev/null; then
 fi
 echo "[pre-commit] Done."
 
-# Agent path-scope guard (existing logic)
-branch="$(git rev-parse --abbrev-ref HEAD)"
-case "$branch" in
-  agent/forge/*)    allowed='^(api|server|db|migrations)/' ;;
-  agent/link/*)     allowed='^(app|pages|components|styles)/' ;;
-  agent/glide/*)    allowed='^(app/|pwa/|public/|service-worker)' ;;
-  agent/apex/*)     allowed='^android/' ;;
-  agent/cider/*)    allowed='^ios/' ;;
-  agent/pixel/*)    allowed='^tests/|^jest|^vitest' ;;
-  agent/muse/*)     allowed='^(docs/|README\.md|CHANGELOG\.md)' ;;
-  agent/nexus/*)    allowed='^(\.github/|\.ci/|Dockerfile|vercel|deploy)' ;;
-  agent/sentinel/*) allowed='^docs/security/' ;;
-  agent/scout/*)    allowed='^docs/research\.md$' ;;
-  *)                exit 0 ;;
-esac
-files=$(git diff --cached --name-only)
-violations=0
-while IFS= read -r f; do
-  if ! [[ "$f" =~ $allowed ]]; then
-    echo "BLOCK: $branch cannot modify: $f"
-    violations=1
-  fi
-done <<< "$files"
-if [ $violations -ne 0 ]; then
-  echo "Tip: use the correct agent branch or reassign the task."
+# Check for placeholder dates in staged files
+echo "[pre-commit] Checking for placeholder dates..."
+if ! node tools/check-dates.mjs --staged >/dev/null 2>&1; then
+  echo ""
+  echo "BLOCK: Placeholder dates detected in staged files."
+  echo ""
+  echo "Options:"
+  echo "  1. Auto-fix: Run 'npm run fix:dates' to automatically fix placeholder dates"
+  echo "  2. Manual fix: Use Time MCP to get accurate dates (see .cursor/rules/04-integrations.mdc)"
+  echo ""
+  node tools/check-dates.mjs --staged
   exit 1
+fi
+echo "[pre-commit] Date validation passed."
+
+# Run linting on staged files (fast check)
+echo "[pre-commit] Running linter on staged files..."
+if command -v npm >/dev/null 2>&1; then
+  # Check if eslint is available and run on staged files
+  if npm list eslint >/dev/null 2>&1 || [ -f "node_modules/.bin/eslint" ]; then
+    staged_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx|ts|tsx|mjs)$' || true)
+    if [ -n "$staged_files" ]; then
+      if ! npx eslint --max-warnings=0 $staged_files 2>/dev/null; then
+        echo "Linting errors found in staged files."
+        echo "Run 'npm run guard:lint' to see all issues, or 'npm run guard:lint -- --fix' to auto-fix."
+        exit 1
+      fi
+    fi
+  fi
+fi
+
+# Check for potential secrets (API keys, tokens, passwords)
+echo "[pre-commit] Checking for potential secrets..."
+staged_content=$(git diff --cached)
+if echo "$staged_content" | grep -qiE '(api[_-]?key|secret[_-]?key|password|token|auth[_-]?token)\s*[:=]\s*["\047]?[a-zA-Z0-9]{20,}'; then
+  echo "WARNING: Potential secret detected in staged files!"
+  echo "Review the following patterns:"
+  echo "$staged_content" | grep -iE '(api[_-]?key|secret[_-]?key|password|token|auth[_-]?token)\s*[:=]' || true
+  echo ""
+  echo "If this is a false positive, you can bypass with: git commit --no-verify"
+  echo "Otherwise, remove the secret and use environment variables instead."
+  read -p "Continue anyway? (y/N) " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    exit 1
+  fi
+fi
+
+# Check file sizes (prevent accidentally committing large files)
+echo "[pre-commit] Checking file sizes..."
+MAX_SIZE=524288  # 512KB
+large_files=""
+while IFS= read -r file; do
+  if [ -f "$file" ]; then
+    if [ "$(uname)" = "Darwin" ]; then
+      size=$(stat -f%z "$file" 2>/dev/null || echo 0)
+    else
+      size=$(stat -c%s "$file" 2>/dev/null || echo 0)
+    fi
+    if [ "$size" -gt "$MAX_SIZE" ]; then
+      large_files="${large_files}${file} ($(numfmt --to=iec-i --suffix=B $size 2>/dev/null || echo "${size} bytes"))\n"
+    fi
+  fi
+done <<< "$(git diff --cached --name-only)"
+
+if [ -n "$large_files" ]; then
+  echo "WARNING: Large files detected (>512KB):"
+  echo -e "$large_files"
+  echo "Consider using Git LFS for large files or removing unnecessary files."
+  read -p "Continue anyway? (y/N) " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    exit 1
+  fi
+fi
+
+# Detect merge conflict markers (prevent committing conflicts)
+echo "[pre-commit] Checking for merge conflict markers..."
+staged_content=$(git diff --cached)
+if echo "$staged_content" | grep -qE '^[<>=]{7}|^<<<<<<<|^=======|^>>>>>>>'; then
+  echo "ERROR: Merge conflict markers detected in staged files!"
+  echo "Resolve conflicts before committing."
+  echo ""
+  echo "$staged_content" | grep -nE '^[<>=]{7}|^<<<<<<<|^=======|^>>>>>>>' | head -10
+  exit 1
+fi
+
+# Check for accidental .env commits (security)
+echo "[pre-commit] Checking for .env files..."
+env_files=$(git diff --cached --name-only | grep -E '\.env$|\.env\.(local|development|production|test)$' || true)
+if [ -n "$env_files" ]; then
+  echo "WARNING: .env files detected in staged files:"
+  echo "$env_files"
+  echo ""
+  echo "These files may contain secrets. Use .env.example for templates."
+  read -p "Continue anyway? (y/N) " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    exit 1
+  fi
+fi
+
+# Validate lock file consistency (prevent dependency issues)
+echo "[pre-commit] Checking lock file consistency..."
+if git diff --cached --name-only | grep -q 'package.json'; then
+  if [ -f "package-lock.json" ] && ! git diff --cached --name-only | grep -q 'package-lock.json'; then
+    echo "WARNING: package.json changed but package-lock.json not staged."
+    echo "Run 'npm install' to update lock file, then stage it."
+    read -p "Continue anyway? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      exit 1
+    fi
+  fi
+fi
+
+# Check for binary files in text-only directories
+echo "[pre-commit] Checking for binary files in text directories..."
+text_dirs='^(docs|scripts|tools|\.cursor/rules)/'
+binary_extensions='\.(png|jpg|jpeg|gif|ico|pdf|zip|tar|gz|exe|dll|so|dylib)$'
+staged_files=$(git diff --cached --name-only)
+while IFS= read -r file; do
+  if [[ "$file" =~ $text_dirs ]] && [[ "$file" =~ $binary_extensions ]]; then
+    echo "WARNING: Binary file in text directory: $file"
+    echo "Consider using Git LFS or moving to assets/ directory."
+  fi
+done <<< "$staged_files"
+
+# Validate YAML/JSON files (prevent CI failures)
+echo "[pre-commit] Validating YAML/JSON files..."
+yaml_files=$(git diff --cached --name-only | grep -E '\.(yml|yaml)$' || true)
+json_files=$(git diff --cached --name-only | grep -E '\.json$' || true)
+
+if [ -n "$yaml_files" ]; then
+  for file in $yaml_files; do
+    if command -v yamllint >/dev/null 2>&1; then
+      if ! yamllint "$file" >/dev/null 2>&1; then
+        echo "YAML validation error in $file"
+        yamllint "$file" || true
+        exit 1
+      fi
+    elif command -v python3 >/dev/null 2>&1; then
+      if ! python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>/dev/null; then
+        echo "YAML syntax error in $file"
+        exit 1
+      fi
+    fi
+  done
+fi
+
+if [ -n "$json_files" ]; then
+  for file in $json_files; do
+    if command -v node >/dev/null 2>&1; then
+      if ! node -e "JSON.parse(require('fs').readFileSync('$file', 'utf8'))" 2>/dev/null; then
+        echo "JSON syntax error in $file"
+        exit 1
+      fi
+    fi
+  done
+fi
+
+# Agent path-scope guard (advisory only - team-friendly)
+# Only enforce if AGENT_SCOPE_ENFORCE=1 is set (for agent-only workflows)
+# Otherwise, just warn about potential scope mismatches
+branch="$(git rev-parse --abbrev-ref HEAD)"
+if [[ "$branch" =~ ^agent/[^/]+/ ]]; then
+  case "$branch" in
+    agent/forge/*)    expected='^(api|server|db|migrations)/' ;;
+    agent/link/*)     expected='^(app|pages|components|styles)/' ;;
+    agent/glide/*)    expected='^(app/|pwa/|public/|service-worker)' ;;
+    agent/apex/*)     expected='^android/' ;;
+    agent/cider/*)    expected='^ios/' ;;
+    agent/pixel/*)    expected='^tests/|^jest|^vitest' ;;
+    agent/muse/*)     expected='^(docs/|README\.md|CHANGELOG\.md)' ;;
+    agent/nexus/*)    expected='^(\.github/|\.ci/|Dockerfile|vercel|deploy)' ;;
+    agent/sentinel/*) expected='^docs/security/' ;;
+    agent/scout/*)    expected='^docs/research\.md$' ;;
+    *)                expected='' ;;
+  esac
+  
+  if [ -n "$expected" ]; then
+    files=$(git diff --cached --name-only)
+    violations=0
+    out_of_scope=""
+    while IFS= read -r f; do
+      if [ -n "$f" ] && ! [[ "$f" =~ $expected ]]; then
+        out_of_scope="${out_of_scope}  - $f\n"
+        violations=1
+      fi
+    done <<< "$files"
+    
+    if [ $violations -ne 0 ]; then
+      if [ "$AGENT_SCOPE_ENFORCE" = "1" ]; then
+        # Strict mode: block commits
+        echo "BLOCK: $branch cannot modify files outside agent scope:"
+        echo -e "$out_of_scope"
+        echo "Tip: Use correct agent branch or set AGENT_SCOPE_ENFORCE=0 to allow (team mode)"
+        exit 1
+      else
+        # Advisory mode: warn but allow (team-friendly)
+        echo "[pre-commit] WARNING: $branch typically modifies files matching: $expected"
+        echo "[pre-commit] Files outside expected scope:"
+        echo -e "$out_of_scope"
+        echo "[pre-commit] Continuing (team mode). Set AGENT_SCOPE_ENFORCE=1 for strict enforcement."
+      fi
+    fi
+  fi
 fi

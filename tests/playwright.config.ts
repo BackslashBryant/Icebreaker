@@ -16,10 +16,8 @@ function getWorkerCount(): number | string {
 
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: true, // Enable parallel execution - servers are reused anyway
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: getWorkerCount(), // Dynamic: 50% of CPU cores locally, 2 in CI
   timeout: 60000, // 60s timeout per test
   maxFailures: process.env.CI ? 1 : 3, // Fail fast in CI, allow more failures locally
   // Reporters: list for clean output (ASCII-friendly, no Unicode artifacts), json for artifacts, html for review (never auto-open)
@@ -38,11 +36,34 @@ export default defineConfig({
     trace: 'on-first-retry',
     actionTimeout: 10000, // 10s timeout for actions
     navigationTimeout: 30000, // 30s timeout for navigation
+    // Standardize browser launch options for consistency
+    launchOptions: {
+      args: ['--disable-dev-shm-usage', '--disable-gpu'],
+    },
   },
         projects: [
+    // Stateless tests: Fully parallel (health checks, visual diffs, smoke tests)
           {
-            name: 'chromium',
-            use: { ...devices['Desktop Chrome'] },
+      name: 'stateless',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true, // Enable parallel execution
+      workers: getWorkerCount(), // Dynamic: 50% of CPU cores locally, 2 in CI
+      use: { 
+        ...devices['Desktop Chrome'],
+        headless: process.env.CI ? true : undefined, // Headless in CI, default locally
+      },
+    },
+    // Stateful tests: Serial execution (performance, persona flows, WebSocket-dependent)
+    {
+      name: 'stateful',
+      testMatch: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      workers: 1, // Serial execution - one test at a time
+      fullyParallel: false, // Disable parallel execution for stateful tests
+      use: { 
+        ...devices['Desktop Chrome'],
+        headless: process.env.CI ? true : undefined, // Headless in CI, default locally
+      },
           },
           // Firefox and Edge tests disabled temporarily due to timeout issues
           // Re-enable after investigating server startup timing

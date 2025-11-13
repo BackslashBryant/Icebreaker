@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Copies the optional path-scope pre-commit hook into .git/hooks.
- * Safe to run repeatedly; use --force to overwrite an existing hook.
+ * Copies Git hooks into .git/hooks.
+ * Safe to run repeatedly; use --force to overwrite existing hooks.
+ * Installs: pre-commit, commit-msg, post-merge, pre-push, post-checkout
  */
 
 import { copyFileSync, existsSync, chmodSync } from 'node:fs';
@@ -11,8 +12,59 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
-const hookSample = path.join(repoRoot, 'scripts', 'hooks', 'pre-commit.sample');
-const hookTarget = path.join(repoRoot, '.git', 'hooks', 'pre-commit');
+const gitHooksDir = path.join(repoRoot, '.git', 'hooks');
+
+const hooks = [
+  {
+    name: 'pre-commit',
+    sample: path.join(repoRoot, 'scripts', 'hooks', 'pre-commit.sample'),
+    target: path.join(gitHooksDir, 'pre-commit'),
+  },
+  {
+    name: 'commit-msg',
+    sample: path.join(repoRoot, 'scripts', 'hooks', 'commit-msg.sample'),
+    target: path.join(gitHooksDir, 'commit-msg'),
+  },
+  {
+    name: 'post-merge',
+    sample: path.join(repoRoot, 'scripts', 'hooks', 'post-merge.sample'),
+    target: path.join(gitHooksDir, 'post-merge'),
+  },
+  {
+    name: 'pre-push',
+    sample: path.join(repoRoot, 'scripts', 'hooks', 'pre-push.sample'),
+    target: path.join(gitHooksDir, 'pre-push'),
+  },
+  {
+    name: 'post-checkout',
+    sample: path.join(repoRoot, 'scripts', 'hooks', 'post-checkout.sample'),
+    target: path.join(gitHooksDir, 'post-checkout'),
+  },
+];
+
+function installHook(hook, force) {
+  if (!existsSync(hook.sample)) {
+    console.warn(`⚠ ${hook.name} hook sample not found at ${hook.sample}`);
+    return false;
+  }
+
+  if (existsSync(hook.target) && !force) {
+    console.log(`  ${hook.name}: Already exists (use --force to overwrite)`);
+    return false;
+  }
+
+  copyFileSync(hook.sample, hook.target);
+
+  try {
+    chmodSync(hook.target, 0o755);
+  } catch (error) {
+    // chmod may fail on Windows; warn but continue.
+    console.warn(`Warning: unable to set execute bit on ${hook.name} hook. Set it manually if needed.`);
+  }
+
+  console.log(`✓ Installed ${hook.name} hook`);
+  return true;
+}
 
 function main() {
   const force = process.argv.includes('--force');
@@ -22,26 +74,20 @@ function main() {
     process.exit(1);
   }
 
-  if (!existsSync(hookSample)) {
-    console.error('Missing scripts/hooks/pre-commit.sample. Please restore it before installing.');
-    process.exit(1);
+  console.log('Installing Git hooks...\n');
+
+  let installed = 0;
+  for (const hook of hooks) {
+    if (installHook(hook, force)) {
+      installed++;
+    }
   }
 
-  if (existsSync(hookTarget) && !force) {
-    console.log('A pre-commit hook already exists. Re-run with --force to overwrite.');
-    process.exit(0);
+  if (installed === 0 && !force) {
+    console.log('\nAll hooks already installed. Use --force to overwrite.');
+  } else {
+    console.log(`\n✓ Installed ${installed} hook(s)`);
   }
-
-  copyFileSync(hookSample, hookTarget);
-
-  try {
-    chmodSync(hookTarget, 0o755);
-  } catch (error) {
-    // chmod may fail on Windows; warn but continue.
-    console.warn('Warning: unable to set execute bit on pre-commit hook. Set it manually if needed.');
-  }
-
-  console.log('Installed .git/hooks/pre-commit from scripts/hooks/pre-commit.sample');
 }
 
 try {
