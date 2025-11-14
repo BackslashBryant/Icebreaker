@@ -40,7 +40,7 @@ test.describe("Chat Request Cooldowns", () => {
     await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
     // Wait for radar content to be available (people list or empty state)
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one here/i))).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one nearby/i))).toBeVisible({ timeout: 5000 });
 
     // Create 3 target sessions that will decline
     const contexts = [];
@@ -129,7 +129,7 @@ test.describe("Chat Request Cooldowns", () => {
     await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
     // Wait for radar content to be available
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one here/i))).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one nearby/i))).toBeVisible({ timeout: 5000 });
 
     // Simulate cooldown by sending WebSocket error message
     // Note: In real E2E, we'd trigger actual cooldown via backend
@@ -205,7 +205,7 @@ test.describe("Chat Request Cooldowns", () => {
     await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
     // Wait for radar content to be available
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one here/i))).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one nearby/i))).toBeVisible({ timeout: 5000 });
 
     // Navigate to Radar
     await page.goto("/radar");
@@ -245,7 +245,7 @@ test.describe("Chat Request Cooldowns", () => {
     await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
     // Wait for radar content to be available
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one here/i))).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one nearby/i))).toBeVisible({ timeout: 5000 });
 
     // Navigate to Radar
     await page.goto("/radar");

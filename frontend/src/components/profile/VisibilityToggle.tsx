@@ -46,11 +46,11 @@ export function VisibilityToggle() {
   };
 
   return (
-    <div className="p-3 sm:p-4 border-2 border-accent/30 rounded-xl bg-card" data-testid="visibility-toggle">
+    <div className="p-3 sm:p-4 border-2 border-border rounded-md bg-card" data-testid="visibility-toggle">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           {visibility ? (
-            <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-accent shrink-0" aria-hidden="true" />
+            <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground shrink-0" aria-hidden="true" />
           ) : (
             <EyeOff className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground shrink-0" aria-hidden="true" />
           )}

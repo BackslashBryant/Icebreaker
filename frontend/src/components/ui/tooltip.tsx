@@ -56,7 +56,7 @@ export function Tooltip({ content, children, className = "" }: TooltipProps) {
           setIsVisible(false);
         }}
         onKeyDown={handleKeyDown}
-        className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-accent/50 bg-accent/5 text-accent hover:bg-accent/10 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+        className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-border bg-muted/20 text-muted-foreground hover:bg-muted/30 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
         aria-label="More information"
         aria-describedby={isVisible ? "tooltip-content" : undefined}
       >
@@ -66,14 +66,14 @@ export function Tooltip({ content, children, className = "" }: TooltipProps) {
         <div
           id="tooltip-content"
           role="tooltip"
-          className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-card border-2 border-accent/50 rounded-lg shadow-lg font-mono text-xs text-foreground z-50 pointer-events-none"
+          className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-card border-2 border-border rounded-md shadow-lg font-mono text-xs text-foreground z-50 pointer-events-none"
           style={{ maxWidth: "calc(100vw - 2rem)" }}
         >
-          <div className="text-accent font-semibold mb-1">Signal Score</div>
+          <div className="text-foreground font-semibold mb-1">Signal Score</div>
           <div className="text-muted-foreground leading-relaxed whitespace-normal">
             {content}
           </div>
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-accent/50" />
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-border" />
         </div>
       )}
     </div>

@@ -94,7 +94,7 @@ export function ChatHeader({
                       setShowMenu(false);
                       setShowReportDialog(true);
                     }}
-                    className="w-full text-left px-4 py-3 hover:bg-accent/10 text-foreground text-sm border-b border-border first:rounded-t-lg"
+                    className="w-full text-left px-4 py-3 hover:bg-muted/30 text-foreground text-sm border-b border-border first:rounded-t-lg"
                     aria-label="Report user"
                   >
                     Report
@@ -104,7 +104,7 @@ export function ChatHeader({
                       setShowMenu(false);
                       setShowBlockDialog(true);
                     }}
-                    className="w-full text-left px-4 py-3 hover:bg-accent/10 text-foreground text-sm rounded-b-lg"
+                    className="w-full text-left px-4 py-3 hover:bg-muted/30 text-foreground text-sm rounded-b-lg"
                     aria-label="Block user"
                   >
                     Block

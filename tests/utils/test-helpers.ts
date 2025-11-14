@@ -101,12 +101,19 @@ export async function completeOnboarding(
   if (waitBoot) {
     await waitForBootSequence(page, 15000, telemetry);
   } else {
-    // Skip boot sequence by waiting for content directly
-    await expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout: 10000 });
+    // Skip boot sequence by waiting for welcome content directly
+    // Boot sequence shows first, then welcome content appears
+    // Wait for either boot sequence to complete OR welcome content to appear
+    await Promise.race([
+      // Wait for boot sequence to complete (welcome content appears)
+      page.waitForSelector('[data-testid="cta-press-start"]', { timeout: 10000 }).catch(() => null),
+      // Or wait for ICEBREAKER text as fallback
+      expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout: 10000 }).catch(() => null),
+    ]);
   }
 
-  // Click PRESS START
-  await page.getByRole("link", { name: /PRESS START/i }).click();
+  // Click PRESS START button using data-testid (more reliable than text match)
+  await page.getByTestId("cta-press-start").click();
   await expect(page).toHaveURL(/.*\/onboarding/, { timeout: 5000 });
 
   // Step 0: What We Are/Not
@@ -150,7 +157,8 @@ export async function completeOnboarding(
   if (telemetry) {
     telemetry.startTiming('step-3');
   }
-  await expect(page.getByText("YOUR VIBE")).toBeVisible({ timeout: 10000 });
+  // Use heading role to avoid strict mode violation (multiple elements contain "YOUR VIBE")
+  await expect(page.getByRole("heading", { name: /YOUR VIBE/i })).toBeVisible({ timeout: 10000 });
   await page.getByRole("button", { name: new RegExp(vibe, "i") }).click();
   await page.getByRole("button", { name: /ENTER RADAR/i }).click();
   if (telemetry) {

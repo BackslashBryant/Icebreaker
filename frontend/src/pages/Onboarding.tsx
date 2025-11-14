@@ -115,10 +115,10 @@ export default function Onboarding() {
 
             <div className="space-y-4">
               {/* What We Are */}
-              <div className="p-4 border-2 border-accent/50 rounded-xl bg-accent/5">
+              <div className="p-4 border-2 border-border rounded-md bg-muted/20">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-accent">✓</span>
-                  <h3 className="font-mono text-sm text-accent font-bold">WE ARE</h3>
+                  <span className="text-foreground">✓</span>
+                  <h3 className="font-mono text-sm text-foreground font-bold">WE ARE</h3>
                 </div>
                 <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground font-mono">
                   <li>→ Proximity-based connections</li>
@@ -129,7 +129,7 @@ export default function Onboarding() {
               </div>
 
               {/* What We're Not */}
-              <div className="p-4 border-2 border-muted/50 rounded-xl bg-muted/5">
+              <div className="p-4 border-2 border-border rounded-md bg-muted/20">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-muted-foreground">✗</span>
                   <h3 className="font-mono text-sm text-muted-foreground font-bold">WE'RE NOT</h3>
@@ -186,7 +186,7 @@ export default function Onboarding() {
               username={username}
             />
             {error && (
-              <div className="p-3 border-2 border-destructive/50 rounded-xl bg-destructive/10" role="alert">
+              <div className="p-3 border-2 border-destructive/50 rounded-md bg-destructive/10" role="alert">
                 <p className="text-xs text-destructive font-mono">{error}</p>
               </div>
             )}

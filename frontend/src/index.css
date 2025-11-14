@@ -138,11 +138,7 @@
   animation: fade-in 0.5s ease-out;
 }
 
-/* Respect reduced motion preferences
- * VERIFIED: All animations (sweep, pulse-slow, radar-ping) are disabled
- * when user has prefers-reduced-motion enabled in OS settings.
- * This ensures WCAG AA compliance for motion-sensitive users.
- */
+/* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .animate-sweep,
   .animate-pulse-slow,

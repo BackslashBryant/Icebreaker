@@ -22,7 +22,7 @@ export default function DevIndex() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <Link
             to="/welcome"
-            className="p-4 sm:p-6 border-2 border-accent rounded-xl hover:bg-accent/10 transition-colors bg-card"
+            className="p-4 sm:p-6 border-2 border-border rounded-md hover:bg-muted/30 transition-colors bg-card"
           >
             <h2 className="text-lg sm:text-xl font-bold text-accent mb-2 font-mono glow-accent">01_WELCOME</h2>
             <div className="ascii-divider text-xs mb-2">- - - - -</div>
@@ -31,7 +31,7 @@ export default function DevIndex() {
 
           <Link
             to="/onboarding"
-            className="p-4 sm:p-6 border-2 border-accent rounded-xl hover:bg-accent/10 transition-colors bg-card"
+            className="p-4 sm:p-6 border-2 border-border rounded-md hover:bg-muted/30 transition-colors bg-card"
           >
             <h2 className="text-lg sm:text-xl font-bold text-accent mb-2 font-mono glow-accent">02_ONBOARDING</h2>
             <div className="ascii-divider text-xs mb-2">- - - - -</div>
@@ -40,14 +40,14 @@ export default function DevIndex() {
 
           <Link
             to="/radar"
-            className="p-4 sm:p-6 border-2 border-accent rounded-xl hover:bg-accent/10 transition-colors bg-card"
+            className="p-4 sm:p-6 border-2 border-border rounded-md hover:bg-muted/30 transition-colors bg-card"
           >
             <h2 className="text-lg sm:text-xl font-bold text-accent mb-2 font-mono glow-accent">03_RADAR</h2>
             <div className="ascii-divider text-xs mb-2">- - - - -</div>
             <p className="text-xs sm:text-sm text-muted-foreground">Ambient presence view</p>
           </Link>
 
-          <div className="p-4 sm:p-6 border-2 border-muted rounded-xl bg-card opacity-50">
+          <div className="p-4 sm:p-6 border-2 border-muted rounded-md bg-card opacity-50">
             <h2 className="text-lg sm:text-xl font-bold text-muted-foreground mb-2 font-mono">04_CHAT</h2>
             <div className="ascii-divider text-xs mb-2 text-muted-foreground/30">- - - - -</div>
             <p className="text-xs sm:text-sm text-muted-foreground/60">Coming soon</p>

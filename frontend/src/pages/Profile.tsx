@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { VisibilityToggle } from "@/components/profile/VisibilityToggle";
 import { EmergencyContactInput } from "@/components/profile/EmergencyContactInput";
 import { AccessibilityToggles } from "@/components/profile/AccessibilityToggles";
-import { Shield } from "lucide-react";
+import { PanicButton } from "@/components/panic/PanicButton";
 
 /**
  * ProfileHeader Component
@@ -22,7 +22,7 @@ function ProfileHeader({ onDone }: { onDone: () => void }) {
           onClick={onDone}
           variant="ghost"
           size="sm"
-          className="font-mono text-xs sm:text-sm text-muted-foreground hover:text-accent border-2 border-transparent hover:border-accent/50"
+          className="font-mono text-xs sm:text-sm text-muted-foreground hover:text-foreground border-2 border-transparent hover:border-border"
         >
           DONE
         </Button>
@@ -78,23 +78,23 @@ export default function Profile() {
       <ProfileHeader onDone={handleDone} />
 
       <main className="flex-1 overflow-y-auto p-4 sm:p-6" role="main">
-        <div className="w-full max-w-2xl mx-auto space-y-6 sm:space-y-8 pb-8">
+        <div className="w-full max-w-2xl mx-auto space-y-8 pb-8">
           {/* Page heading - visible h1 for accessibility */}
-          <h1 className="text-2xl font-bold text-accent font-mono glow-accent mb-4">
+          <h1 className="text-2xl font-bold text-accent font-mono glow-accent mb-6">
             Profile Settings
           </h1>
           
           {/* Handle Display */}
-          <div className="space-y-4">
+          <div className="space-y-8">
             <div className="ascii-divider text-center">▼ ▼ ▼</div>
-            <div className="p-4 sm:p-6 border-4 border-accent/50 bg-accent/5 text-center">
+            <div className="p-6 sm:p-8 border-2 border-border rounded-md bg-card text-center">
               <p className="text-xs text-muted-foreground mb-2 font-mono">YOUR HANDLE</p>
               <p className="text-xl sm:text-2xl font-mono text-accent glow-accent">
                 @{session.handle}
               </p>
-              <div className="mt-3 p-2 bg-muted/30 border border-accent/30 rounded-lg inline-block">
+              <div className="mt-3 p-2 bg-muted/20 border border-border rounded-md inline-block">
                 <p className="text-xs text-muted-foreground font-mono">
-                  Generated from your vibe and tags. <span className="text-accent">Can't be changed.</span>
+                  Generated from your vibe and tags. <span className="font-semibold text-foreground">Can't be changed.</span>
                 </p>
               </div>
             </div>
@@ -107,12 +107,9 @@ export default function Profile() {
 
           {/* Emergency Contact Section */}
           <ProfileSection title="EMERGENCY CONTACT">
-            <div className="p-3 sm:p-4 bg-accent/10 border-2 border-accent/50 rounded-xl mb-4 flex items-start gap-3">
-              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-accent mt-0.5 flex-shrink-0" aria-hidden="true" />
-              <p className="text-xs sm:text-sm text-muted-foreground font-mono">
-                Used only in emergencies. Never shared with other users.
-              </p>
-            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground font-mono mb-3">
+              Used only in emergencies. Never shared with other users.
+            </p>
             <EmergencyContactInput />
           </ProfileSection>
 
@@ -122,6 +119,9 @@ export default function Profile() {
           </ProfileSection>
         </div>
       </main>
+
+      {/* Panic Button FAB - Always accessible for safety */}
+      <PanicButton />
     </div>
   );
 }

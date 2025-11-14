@@ -17,7 +17,7 @@ export function AccessibilityToggles() {
   } = useAccessibility();
 
   return (
-    <div className="p-3 sm:p-4 border-2 border-accent/30 rounded-xl bg-card space-y-4">
+    <div className="p-3 sm:p-4 border-2 border-border rounded-md bg-card space-y-4">
       {/* Reduced Motion Toggle */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex-1 min-w-0">

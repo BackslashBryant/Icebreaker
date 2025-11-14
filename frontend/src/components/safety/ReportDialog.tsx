@@ -76,10 +76,10 @@ export function ReportDialog({ isOpen, onClose, onConfirm, partnerHandle }: Repo
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 border-2 border-accent/30 bg-accent/10 flex items-center justify-center rounded-full">
-              <Flag className="w-6 h-6 text-accent" aria-hidden="true" />
+            <div className="w-12 h-12 border-2 border-destructive bg-destructive/10 flex items-center justify-center rounded-full">
+              <Flag className="w-6 h-6 text-destructive" aria-hidden="true" />
             </div>
-            <DialogTitle className="text-xl font-bold text-accent font-mono">
+            <DialogTitle className="text-xl font-bold text-foreground font-mono">
               Report {partnerHandle}?
             </DialogTitle>
           </div>
@@ -94,8 +94,8 @@ export function ReportDialog({ isOpen, onClose, onConfirm, partnerHandle }: Repo
               onClick={() => setSelectedCategory(category.value)}
               className={`w-full text-left p-3 rounded-lg border-2 transition-all font-mono text-sm ${
                 selectedCategory === category.value
-                  ? "border-accent bg-accent/10 text-accent"
-                  : "border-border hover:border-accent/30 hover:bg-accent/5 text-foreground"
+                  ? "border-border bg-muted/20 font-semibold"
+                  : "border-border hover:bg-muted/30 text-foreground"
               }`}
               aria-pressed={selectedCategory === category.value}
               aria-label={`Select ${category.label}`}
@@ -117,7 +117,7 @@ export function ReportDialog({ isOpen, onClose, onConfirm, partnerHandle }: Repo
             onClick={onClose}
             variant="outline"
             disabled={isSubmitting}
-            className="w-full sm:w-auto border-2 border-accent/30 text-accent hover:bg-accent/10 font-mono bg-transparent"
+            className="w-full sm:w-auto border-2 border-border text-foreground hover:bg-muted/30 font-mono bg-transparent"
             aria-label="Cancel report"
           >
             Cancel

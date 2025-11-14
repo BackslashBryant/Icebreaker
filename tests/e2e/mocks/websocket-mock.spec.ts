@@ -43,5 +43,169 @@ test.describe('WebSocket Mock Infrastructure', () => {
     const url = page.url();
     expect(url).toContain('/radar');
   });
+
+  test('connect() triggers onConnect callback', async ({ page, wsMock }) => {
+    await page.goto('/welcome');
+    
+    let onConnectCalled = false;
+    let receivedMessage: any = null;
+
+    await page.evaluate(() => {
+      const mock = (window as any).__WS_MOCK__;
+      if (mock) {
+        const ws = mock.connect('test-session', (msg: any) => {
+          (window as any).__TEST_MESSAGE__ = msg;
+        });
+        ws.onopen = () => {
+          (window as any).__TEST_ONOPEN_CALLED__ = true;
+        };
+      }
+    });
+
+    // Wait for connection to establish (mock uses 10ms setTimeout)
+    await page.waitForTimeout(50);
+
+    const result = await page.evaluate(() => {
+      return {
+        onOpenCalled: (window as any).__TEST_ONOPEN_CALLED__ === true,
+        message: (window as any).__TEST_MESSAGE__,
+      };
+    });
+
+    expect(result.onOpenCalled).toBe(true);
+    expect(result.message).toBeDefined();
+    expect(result.message.type).toBe('connected');
+  });
+
+  test('reset() clears all connections and state', async ({ page, wsMock }) => {
+    await page.goto('/welcome');
+    
+    // Create a connection
+    await page.evaluate(() => {
+      const mock = (window as any).__WS_MOCK__;
+      if (mock) {
+        mock.connect('test-session-1', () => {});
+        mock.connect('test-session-2', () => {});
+      }
+    });
+
+    await page.waitForTimeout(50);
+
+    // Verify connections exist
+    const connectionsBefore = await page.evaluate(() => {
+      const mock = (window as any).__WS_MOCK__;
+      if (mock && mock.connections) {
+        return mock.connections.size;
+      }
+      return 0;
+    });
+    expect(connectionsBefore).toBeGreaterThan(0);
+
+    // Reset mock
+    await page.evaluate(() => {
+      if ((window as any).__WS_MOCK_RESET__) {
+        (window as any).__WS_MOCK_RESET__();
+      }
+    });
+
+    // Verify connections cleared
+    const connectionsAfter = await page.evaluate(() => {
+      const mock = (window as any).__WS_MOCK__;
+      if (mock && mock.connections) {
+        return mock.connections.size;
+      }
+      return 0;
+    });
+    expect(connectionsAfter).toBe(0);
+  });
+
+  test('disconnect() removes connection and triggers onclose', async ({ page, wsMock }) => {
+    await page.goto('/welcome');
+    
+    let onCloseCalled = false;
+
+    await page.evaluate(() => {
+      const mock = (window as any).__WS_MOCK__;
+      if (mock) {
+        const ws = mock.connect('test-session', () => {});
+        ws.onclose = () => {
+          (window as any).__TEST_ONCLOSE_CALLED__ = true;
+        };
+        (window as any).__TEST_WS__ = ws;
+      }
+    });
+
+    await page.waitForTimeout(50);
+
+    // Disconnect
+    await page.evaluate(() => {
+      const mock = (window as any).__WS_MOCK__;
+      const ws = (window as any).__TEST_WS__;
+      if (mock && ws) {
+        mock.disconnect('test-session');
+      }
+    });
+
+    await page.waitForTimeout(50);
+
+    const onCloseResult = await page.evaluate(() => {
+      return (window as any).__TEST_ONCLOSE_CALLED__ === true;
+    });
+
+    expect(onCloseResult).toBe(true);
+
+    // Verify connection removed
+    const connectionsAfter = await page.evaluate(() => {
+      const mock = (window as any).__WS_MOCK__;
+      if (mock && mock.connections) {
+        return mock.connections.size;
+      }
+      return 0;
+    });
+    expect(connectionsAfter).toBe(0);
+  });
+
+  test('message handling receives correct format', async ({ page, wsMock }) => {
+    await page.goto('/welcome');
+    
+    let receivedMessages: any[] = [];
+
+    // Use a session ID that exists in the persona script (maya-session)
+    await page.evaluate(() => {
+      const mock = (window as any).__WS_MOCK__;
+      if (mock) {
+        mock.connect('maya-session', (msg: any) => {
+          const messages = (window as any).__TEST_MESSAGES__ || [];
+          messages.push(msg);
+          (window as any).__TEST_MESSAGES__ = messages;
+        });
+      }
+    });
+
+    await page.waitForTimeout(50);
+
+    // Trigger a message via broadcastPresence (which sends radar:update)
+    // Note: broadcastPresence is automatically called on connect, but we call it again to test
+    await page.evaluate(() => {
+      const mock = (window as any).__WS_MOCK__;
+      if (mock && mock.broadcastPresence) {
+        mock.broadcastPresence();
+      }
+    });
+
+    await page.waitForTimeout(50);
+
+    const messages = await page.evaluate(() => {
+      return (window as any).__TEST_MESSAGES__ || [];
+    });
+
+    expect(messages.length).toBeGreaterThan(0);
+    
+    // Verify message format matches contract
+    const radarUpdate = messages.find((m: any) => m.type === 'radar:update');
+    expect(radarUpdate).toBeDefined();
+    expect(radarUpdate.payload).toBeDefined();
+    expect(Array.isArray(radarUpdate.payload.people)).toBe(true);
+  });
 });
 

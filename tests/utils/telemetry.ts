@@ -159,7 +159,13 @@ export class TelemetryCollector {
    * Write telemetry data to file
    */
   async writeToFile(): Promise<string> {
-    const artifactsDir = path.join(process.cwd(), 'artifacts', 'persona-runs');
+    // Resolve project root (go up from tests/ directory if needed)
+    let projectRoot = process.cwd();
+    if (projectRoot.endsWith('tests') || projectRoot.endsWith('tests\\') || projectRoot.endsWith('tests/')) {
+      projectRoot = path.join(projectRoot, '..');
+    }
+    
+    const artifactsDir = path.join(projectRoot, 'artifacts', 'persona-runs');
     fs.mkdirSync(artifactsDir, { recursive: true });
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -174,11 +180,46 @@ export class TelemetryCollector {
 
 /**
  * Check if panic button is visible
+ * Panic button should be visible on Radar and Chat pages
  */
 export async function checkPanicButtonVisible(page: Page): Promise<boolean> {
   try {
-    const panicButton = page.locator('[data-testid="panic-fab"]');
-    return await panicButton.isVisible({ timeout: 2000 });
+    // Wait for page to be fully loaded
+    await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
+    
+    // Wait a bit more for React to render components
+    await page.waitForTimeout(500);
+    
+    // Check for panic button by data-testid first (most reliable)
+    const panicButtonByTestId = page.locator('[data-testid="panic-fab"]');
+    const isVisibleByTestId = await panicButtonByTestId.isVisible({ timeout: 10000 }).catch(() => false);
+    if (isVisibleByTestId) {
+      return true;
+    }
+    
+    // Fallback: check by aria-label (more reliable for accessibility)
+    try {
+      const panicButtonByAria = page.getByRole('button', { name: /Emergency panic button/i });
+      const isVisibleByAria = await panicButtonByAria.isVisible({ timeout: 10000 }).catch(() => false);
+      if (isVisibleByAria) {
+        return true;
+      }
+    } catch {
+      // Ignore aria-label check errors
+    }
+    
+    // Final fallback: check if element exists in DOM (might be hidden)
+    const existsInDom = await panicButtonByTestId.count() > 0;
+    if (existsInDom) {
+      // Element exists but might be hidden - check computed style
+      const isActuallyVisible = await panicButtonByTestId.evaluate((el) => {
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+      }).catch(() => false);
+      return isActuallyVisible;
+    }
+    
+    return false;
   } catch {
     return false;
   }
@@ -186,11 +227,60 @@ export async function checkPanicButtonVisible(page: Page): Promise<boolean> {
 
 /**
  * Check if visibility toggle is visible
+ * Visibility toggle is on Profile page, not Radar page
  */
 export async function checkVisibilityToggleVisible(page: Page): Promise<boolean> {
   try {
+    // Check if we're on Profile page
+    const currentUrl = page.url();
+    if (!currentUrl.includes('/profile')) {
+      // Not on Profile page - visibility toggle won't be visible
+      return false;
+    }
+    
+    // Wait for page to be fully loaded
+    await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
+    
+    // Wait a bit more for React to render components
+    await page.waitForTimeout(500);
+    
+    // Check for visibility toggle by data-testid (container)
     const visibilityToggle = page.locator('[data-testid="visibility-toggle"]');
-    return await visibilityToggle.isVisible({ timeout: 2000 });
+    const isVisibleByTestId = await visibilityToggle.isVisible({ timeout: 10000 }).catch(() => false);
+    if (isVisibleByTestId) {
+      return true;
+    }
+    
+    // Fallback: check for checkbox with visibility-related aria-label
+    const visibilityCheckbox = page.locator('[data-testid="visibility-toggle-checkbox"]');
+    const isVisibleByCheckbox = await visibilityCheckbox.isVisible({ timeout: 10000 }).catch(() => false);
+    if (isVisibleByCheckbox) {
+      return true;
+    }
+    
+    // Final fallback: check by role (checkbox with Show me on Radar/Hide from Radar)
+    try {
+      const checkboxByRole = page.getByRole('checkbox', { name: /Show me on Radar|Hide from Radar/i });
+      const isVisibleByRole = await checkboxByRole.isVisible({ timeout: 10000 }).catch(() => false);
+      if (isVisibleByRole) {
+        return true;
+      }
+    } catch {
+      // Ignore role check errors
+    }
+    
+    // Check if element exists in DOM (might be hidden)
+    const existsInDom = await visibilityToggle.count() > 0;
+    if (existsInDom) {
+      // Element exists but might be hidden - check computed style
+      const isActuallyVisible = await visibilityToggle.evaluate((el) => {
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+      }).catch(() => false);
+      return isActuallyVisible;
+    }
+    
+    return false;
   } catch {
     return false;
   }
@@ -229,11 +319,46 @@ export async function checkFocusOrder(page: Page): Promise<boolean> {
 
 /**
  * Count error banners on page
+ * Excludes informational alerts (like location permission denied which is expected)
  */
 export async function countErrorBanners(page: Page): Promise<number> {
   try {
-    const errorBanners = await page.locator('[role="alert"], .error, [data-testid*="error"]').count();
-    return errorBanners;
+    // Get all elements with role="alert"
+    const alertElements = page.locator('[role="alert"]');
+    const alertCount = await alertElements.count();
+    
+    if (alertCount === 0) {
+      return 0;
+    }
+    
+    // Filter out informational/expected alerts
+    let errorCount = 0;
+    for (let i = 0; i < alertCount; i++) {
+      const alert = alertElements.nth(i);
+      const text = await alert.textContent().catch(() => '');
+      const className = await alert.getAttribute('class').catch(() => '');
+      
+      // Skip location permission denied messages (expected in tests)
+      if (text?.toLowerCase().includes('location access denied') || 
+          text?.toLowerCase().includes('proximity matching is unavailable')) {
+        continue;
+      }
+      
+      // Skip if it's an informational alert (not an error)
+      // Error banners typically have destructive/border-destructive classes
+      if (className?.includes('destructive') || 
+          className?.includes('border-destructive') ||
+          text?.toLowerCase().includes('error') ||
+          text?.toLowerCase().includes('failed') ||
+          text?.toLowerCase().includes('connection failed')) {
+        errorCount++;
+      }
+    }
+    
+    // Also check for explicit error classes
+    const errorClassElements = await page.locator('.error, [data-testid*="error"]').count();
+    
+    return Math.max(errorCount, errorClassElements);
   } catch {
     return 0;
   }

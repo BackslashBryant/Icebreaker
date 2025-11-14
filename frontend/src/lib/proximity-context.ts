@@ -38,9 +38,9 @@ export function getProximityBadgeVariant(tier: ProximityTier): string {
 
   switch (tier) {
     case "room":
-      return "border-accent bg-accent/10 text-accent";
+      return "border-border bg-muted/20 font-semibold";
     case "venue":
-      return "border-accent/70 bg-accent/5 text-accent/90";
+      return "border-border bg-muted/20 text-foreground";
     case "nearby":
       return "border-muted-foreground/50 bg-muted/30 text-muted-foreground";
     default:

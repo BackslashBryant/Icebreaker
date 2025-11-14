@@ -17,6 +17,13 @@ interface UseWebSocketOptions {
 export function useWebSocket(options: UseWebSocketOptions) {
   const { token, autoConnect = true, onMessage, onConnect, onDisconnect, onError } = options;
   const [status, setStatus] = useState<WebSocketStatus>("disconnected");
+  
+  // Expose status globally for test instrumentation
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__ICEBREAKER_WS_STATUS__ = status;
+    }
+  }, [status]);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttemptsRef = useRef(0);
@@ -111,4 +118,3 @@ export function useWebSocket(options: UseWebSocketOptions) {
     isConnected: status === "connected",
   };
 }
-
