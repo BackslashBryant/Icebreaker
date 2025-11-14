@@ -5,10 +5,10 @@ import { AlertCircle, Check } from "lucide-react";
 
 /**
  * PanicDialog Component
- * 
+ *
  * Confirmation dialog for panic button trigger.
  * Shows "Everything okay?" confirmation flow.
- * 
+ *
  * Brand: Calm, reassuring, never dramatic.
  */
 interface PanicDialogProps {
@@ -60,10 +60,10 @@ export function PanicDialog({ isOpen, onClose, onConfirm }: PanicDialogProps) {
         }
       }}
     >
-      <div className="max-w-md w-full space-y-6 bg-card border-2 border-accent/30 rounded-xl p-6" data-testid="panic-dialog">
+      <div className="max-w-md w-full space-y-6 bg-card border-2 border-destructive rounded-md p-6" data-testid="panic-dialog">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto border-4 border-accent bg-accent/10 flex items-center justify-center">
-            <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-accent" aria-hidden="true" />
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto border-4 border-destructive bg-destructive/10 flex items-center justify-center">
+            <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-destructive" aria-hidden="true" />
           </div>
           <div className="text-muted-foreground text-xs font-mono" role="separator">
             ▼ ▼ ▼
@@ -96,7 +96,7 @@ export function PanicDialog({ isOpen, onClose, onConfirm }: PanicDialogProps) {
             onClick={onClose}
             variant="outline"
             disabled={isConfirming}
-            className="w-full rounded-2xl border-2 border-accent/30 text-accent hover:bg-accent/10 font-mono bg-transparent text-sm"
+            className="w-full rounded-2xl border-2 border-border text-foreground hover:bg-muted/30 font-mono bg-transparent text-sm"
             aria-label="Cancel panic"
             data-testid="panic-cancel"
           >
@@ -110,7 +110,7 @@ export function PanicDialog({ isOpen, onClose, onConfirm }: PanicDialogProps) {
 
 /**
  * PanicSuccess Component
- * 
+ *
  * Success state after panic is triggered.
  * Shows "You're safe. Session ended." with notification details.
  */
@@ -161,7 +161,7 @@ export function PanicSuccess({ exclusionExpiresAt, onClose }: PanicSuccessProps)
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground">Session ended.</p>
         </div>
-        <div className="p-3 sm:p-4 bg-card border-2 border-accent/30 rounded-xl">
+        <div className="p-3 sm:p-4 bg-card border-2 border-border rounded-md">
           <p className="text-xs font-mono text-muted-foreground">
             Emergency contact notified with:
             <br />
@@ -173,7 +173,7 @@ export function PanicSuccess({ exclusionExpiresAt, onClose }: PanicSuccessProps)
         <Button
           onClick={onClose}
           variant="outline"
-          className="w-full rounded-2xl border-2 border-accent/30 text-accent hover:bg-accent/10 font-mono bg-transparent text-sm"
+          className="w-full rounded-2xl border-2 border-border text-foreground hover:bg-muted/30 font-mono bg-transparent text-sm"
         >
           Continue
         </Button>

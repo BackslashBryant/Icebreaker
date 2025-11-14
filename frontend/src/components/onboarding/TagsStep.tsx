@@ -36,7 +36,7 @@ export function TagsStep({
       )}
 
       {/* Tags */}
-      <div className="space-y-3 sm:space-y-4">
+      <div className="space-y-6 sm:space-y-8">
         <div>
           <div className="ascii-divider text-xs mb-2">- - - - - - - - - -</div>
           <h2 className="text-lg sm:text-xl font-bold text-accent font-mono glow-accent mb-2">
@@ -56,8 +56,8 @@ export function TagsStep({
               data-testid={`tag-${tag}`}
               className={`px-2.5 sm:px-3 py-1.5 sm:py-2 border-2 rounded-md text-xs sm:text-sm font-mono transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-opacity-100 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                 selectedTags.includes(tag)
-                  ? "border-accent bg-accent/10 text-accent"
-                  : "border-muted/50 text-muted-foreground hover:border-accent/50"
+                  ? "border-border bg-muted/20 font-semibold"
+                  : "border-muted/50 text-muted-foreground hover:border-border/80"
               }`}
             >
               {tag}

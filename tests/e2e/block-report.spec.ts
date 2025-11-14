@@ -130,7 +130,7 @@ test.describe("Block/Report Safety Controls", () => {
 
     // Wait for radar content to be available (people list or empty state)
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one here/i))).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one nearby/i))).toBeVisible({ timeout: 5000 });
 
     // Try to open PersonCard by clicking a person (if available)
     // For E2E, we'll check if people are available
@@ -182,7 +182,7 @@ test.describe("Block/Report Safety Controls", () => {
 
     // Wait for radar content to be available (people list or empty state)
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one here/i))).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one nearby/i))).toBeVisible({ timeout: 5000 });
 
     // Open PersonCard
     const personButtons = page.locator("ul[role='list'] li button");

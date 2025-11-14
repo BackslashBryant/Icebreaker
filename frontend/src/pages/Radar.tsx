@@ -12,7 +12,7 @@ import { List, Radar as RadarIcon, User } from "lucide-react";
 
 /**
  * Radar Page
- * 
+ *
  * Main Radar View with proximity-based presence visualization.
  * Supports CRT sweep visualization and accessible list view.
  */
@@ -97,7 +97,7 @@ export default function Radar() {
               onClick={() => navigate("/profile")}
               variant="ghost"
               size="icon"
-              className="font-mono text-xs sm:text-sm text-muted-foreground hover:text-accent border-2 border-transparent hover:border-accent/50"
+              className="font-mono text-xs sm:text-sm text-muted-foreground hover:text-foreground border-2 border-transparent hover:border-border"
               aria-label="Go to profile"
             >
               <User className="h-4 w-4" />
@@ -130,7 +130,7 @@ export default function Radar() {
           {/* Location Error State */}
           {locationError && (
             <div
-              className="mb-6 p-4 border-2 border-border rounded-xl bg-card text-muted-foreground font-mono text-sm"
+              className="mb-6 p-4 border-2 border-border rounded-md bg-muted/20 text-muted-foreground font-mono text-sm"
               role="alert"
             >
               <p className="font-semibold mb-1">Location access denied</p>
@@ -145,7 +145,7 @@ export default function Radar() {
           {/* Only show error after reconnection attempts have been exhausted */}
           {status === "error" && isConnected === false && (
             <div
-              className="mb-6 p-4 border-2 border-destructive rounded-xl bg-card text-destructive font-mono text-sm"
+              className="mb-6 p-4 border-2 border-destructive rounded-md bg-card text-destructive font-mono text-sm"
               role="alert"
             >
               <p className="font-semibold mb-1">Connection failed</p>
@@ -173,7 +173,7 @@ export default function Radar() {
 
           {/* Debug info (dev only) */}
           {import.meta.env.DEV && (
-            <div className="mt-6 p-4 border border-border rounded-xl bg-card/50 text-xs font-mono text-muted-foreground">
+            <div className="mt-6 p-4 border border-border rounded-md bg-card/50 text-xs font-mono text-muted-foreground">
               <p>People: {people.length}</p>
               <p>Status: {status}</p>
               <p>Location: {location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : "None"}</p>

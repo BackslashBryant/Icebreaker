@@ -13,7 +13,6 @@ import { ReportDialog } from "@/components/safety/ReportDialog";
 import { useSafety } from "@/hooks/useSafety";
 import { useCooldown } from "@/hooks/useCooldown";
 import { toast } from "sonner";
-import { Clock } from "lucide-react";
 import { Tooltip } from "@/components/ui/tooltip";
 import { getProximityContextLabel, getProximityBadgeVariant } from "@/lib/proximity-context";
 
@@ -175,7 +174,7 @@ export function PersonCard({ person, open, onClose, onChatRequest, userTags = []
                         key={index}
                         className={`px-2 py-1 text-xs border rounded-md ${
                           isShared
-                            ? "border-accent bg-accent/10 text-accent"
+                            ? "border-border bg-muted/20 font-semibold"
                             : "border-border bg-secondary/50 text-muted-foreground"
                         }`}
                       >
@@ -196,10 +195,7 @@ export function PersonCard({ person, open, onClose, onChatRequest, userTags = []
                 aria-label={isInCooldown ? `Cooldown active. Try again in ${cooldownRemainingFormatted}.` : "Start chat"}
               >
                 {isInCooldown ? (
-                  <span className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    Cooldown active
-                  </span>
+                  "COOLDOWN ACTIVE"
                 ) : (
                   "START CHAT →"
                 )}
@@ -243,7 +239,7 @@ export function PersonCard({ person, open, onClose, onChatRequest, userTags = []
                 setShowMenu(false);
                 setShowReportDialog(true);
               }}
-              className="w-full text-left px-4 py-3 hover:bg-accent/10 text-foreground text-sm border-b border-border first:rounded-t-lg"
+              className="w-full text-left px-4 py-3 hover:bg-muted/30 text-foreground text-sm border-b border-border first:rounded-t-lg"
               role="menuitem"
               aria-label="Report user"
             >
@@ -254,7 +250,7 @@ export function PersonCard({ person, open, onClose, onChatRequest, userTags = []
                 setShowMenu(false);
                 setShowBlockDialog(true);
               }}
-              className="w-full text-left px-4 py-3 hover:bg-accent/10 text-foreground text-sm rounded-b-lg"
+              className="w-full text-left px-4 py-3 hover:bg-muted/30 text-foreground text-sm rounded-b-lg"
               role="menuitem"
               aria-label="Block user"
             >

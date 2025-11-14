@@ -24,7 +24,7 @@ export function LocationStep({ onEnable, onSkip }: LocationStepProps) {
 
   return (
     <div className="space-y-8 sm:space-y-10">
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div className="w-12 h-12 sm:w-14 sm:h-14 border-2 border-border bg-muted/10 flex items-center justify-center">
           <MapPin className="w-6 h-6 sm:w-7 sm:h-7 text-muted-foreground" />
         </div>
@@ -54,7 +54,7 @@ export function LocationStep({ onEnable, onSkip }: LocationStepProps) {
       </div>
 
       {error && (
-        <div className="p-3 border-2 border-destructive/50 rounded-xl bg-destructive/10">
+        <div className="p-3 border-2 border-destructive/50 rounded-md bg-destructive/10">
           <p className="text-xs text-destructive font-mono">{error}</p>
         </div>
       )}

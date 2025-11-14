@@ -22,7 +22,7 @@ function ProfileHeader({ onDone }: { onDone: () => void }) {
           onClick={onDone}
           variant="ghost"
           size="sm"
-          className="font-mono text-xs sm:text-sm text-muted-foreground hover:text-accent border-2 border-transparent hover:border-accent/50"
+          className="font-mono text-xs sm:text-sm text-muted-foreground hover:text-foreground border-2 border-transparent hover:border-border"
         >
           DONE
         </Button>
@@ -78,16 +78,16 @@ export default function Profile() {
       <ProfileHeader onDone={handleDone} />
 
       <main className="flex-1 overflow-y-auto p-4 sm:p-6" role="main">
-        <div className="w-full max-w-2xl mx-auto space-y-6 sm:space-y-8 pb-8">
+        <div className="w-full max-w-2xl mx-auto space-y-8 pb-8">
           {/* Page heading - visible h1 for accessibility */}
-          <h1 className="text-2xl font-bold text-accent font-mono glow-accent mb-4">
+          <h1 className="text-2xl font-bold text-accent font-mono glow-accent mb-6">
             Profile Settings
           </h1>
           
           {/* Handle Display */}
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="ascii-divider text-center">▼ ▼ ▼</div>
-            <div className="p-4 sm:p-6 border-2 border-border rounded-md bg-card text-center">
+            <div className="p-6 sm:p-8 border-2 border-border rounded-md bg-card text-center">
               <p className="text-xs text-muted-foreground mb-2 font-mono">YOUR HANDLE</p>
               <p className="text-xl sm:text-2xl font-mono text-accent glow-accent">
                 @{session.handle}

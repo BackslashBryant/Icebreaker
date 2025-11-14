@@ -58,7 +58,7 @@ test.describe("Radar View", () => {
 
     // Check for empty state with proper ARIA
     const emptyState = page.getByRole("status");
-    await expect(emptyState).toContainText("No one here — yet.");
+    await expect(emptyState).toContainText("No one nearby — yet.");
   });
 
   test("reduced motion disables animations", async ({ page, context }) => {

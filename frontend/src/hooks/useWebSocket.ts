@@ -17,7 +17,7 @@ interface UseWebSocketOptions {
 export function useWebSocket(options: UseWebSocketOptions) {
   const { token, autoConnect = true, onMessage, onConnect, onDisconnect, onError } = options;
   const [status, setStatus] = useState<WebSocketStatus>("disconnected");
-
+  
   // Expose status globally for test instrumentation
   useEffect(() => {
     if (typeof window !== 'undefined') {

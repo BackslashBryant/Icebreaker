@@ -55,16 +55,6 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
           />
         </div>
 
-        {/* ASCII Art with subtle pulse */}
-        <div className="text-accent text-xs leading-tight text-center glow-accent">
-          <pre className="font-mono animate-pulse-slow">{`
- _____ _____ _____ _____ _____ _____ _____ _____ _____
-||     |     |   __|  _  |  _  |   __|  _  |  |  |   __|
-||-   -|   --|   __|     |   __|   __|     |    -|   __|
-||_____|_____|_____|__|__|__|  |_____|__|__|__|__|_____|
-          `}</pre>
-        </div>
-
         {/* Boot Messages with typewriter effect */}
         <div className="space-y-2 text-xs text-muted-foreground">
           {bootMessages.slice(0, stage + 1).map((msg, i) => (

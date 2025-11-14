@@ -89,7 +89,7 @@ export function EmergencyContactInput() {
             onClick={() => setIsEditing(true)}
             variant="ghost"
             size="sm"
-            className="font-mono text-xs border-2 border-transparent hover:border-accent/50"
+            className="font-mono text-xs border-2 border-transparent hover:border-border"
             aria-label="Edit emergency contact"
           >
             {value ? "Edit" : "Add"}
@@ -105,7 +105,7 @@ export function EmergencyContactInput() {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="+1234567890 or email@example.com"
-        className="rounded-md bg-background border-2 border-border font-mono text-sm focus:border-accent h-10 sm:h-12"
+        className="rounded-md bg-background border-2 border-border font-mono text-sm focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 h-10 sm:h-12"
         aria-label="Emergency contact"
         aria-invalid={validationError ? "true" : "false"}
         aria-describedby={validationError ? "emergency-contact-error" : undefined}

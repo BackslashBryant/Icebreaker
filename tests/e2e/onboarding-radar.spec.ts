@@ -118,7 +118,7 @@ test.describe("Onboarding → Radar Integration Flow", () => {
       }
     } else {
       // Empty state is also valid
-      await expect(page.getByText(/No one here/i)).toBeVisible();
+      await expect(page.getByText(/No one nearby/i)).toBeVisible();
     }
   });
 
@@ -176,7 +176,7 @@ test.describe("Onboarding → Radar Integration Flow", () => {
       }
     } else {
       // Empty state - chat initiation not applicable
-      await expect(page.getByText(/No one here/i)).toBeVisible();
+      await expect(page.getByText(/No one nearby/i)).toBeVisible();
     }
   });
 

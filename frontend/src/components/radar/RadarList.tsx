@@ -29,11 +29,11 @@ export function RadarList({
         role="status"
         aria-live="polite"
       >
-        <div className="p-6 sm:p-8 bg-muted/10 border-2 border-border rounded-md max-w-md text-center animate-fade-in">
-          <p className="text-foreground text-sm sm:text-base font-mono mb-2 font-semibold">
+        <div className="p-6 sm:p-8 bg-muted/20 border-2 border-border rounded-md max-w-md text-center animate-fade-in">
+          <p className="text-foreground text-sm sm:text-base font-mono font-semibold">
             No one nearby — yet.
           </p>
-          <p className="text-muted-foreground text-xs sm:text-sm font-mono leading-relaxed">
+          <p className="text-muted-foreground text-xs sm:text-sm font-mono leading-relaxed mt-2">
             Check back soon or enable location for better matching.
           </p>
         </div>
@@ -86,7 +86,7 @@ export function RadarList({
                         key={index}
                         className={`text-xs px-1.5 py-0.5 border rounded ${
                           isShared
-                            ? "border-accent bg-accent/10 text-accent"
+                            ? "border-border bg-muted/20 font-semibold"
                             : "border-border text-muted-foreground"
                         }`}
                       >

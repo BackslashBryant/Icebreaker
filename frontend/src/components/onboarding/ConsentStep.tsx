@@ -10,8 +10,8 @@ interface ConsentStepProps {
 export function ConsentStep({ consent, onConsentChange, onContinue }: ConsentStepProps) {
   return (
     <div className="space-y-6 sm:space-y-8">
-      <div className="space-y-4">
-        <div className="ascii-divider text-center mb-4">▼ ▼ ▼</div>
+      <div className="space-y-6">
+        <div className="ascii-divider text-center mb-6">▼ ▼ ▼</div>
         <h2 className="text-xl sm:text-2xl font-bold text-accent font-mono glow-accent">AGE VERIFICATION</h2>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
           IceBreaker is for adults only. Confirm you're 18 or older to continue.
