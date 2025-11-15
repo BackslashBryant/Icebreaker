@@ -22,7 +22,13 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 - **Two-Laptop Setup**: Set `HOST=0.0.0.0` and `CORS_ORIGIN=*` to allow remote connections
 - **Firewall**: Ensure port 8000 is open for LAN access (Windows Firewall, macOS Security, Linux UFW)
 - Endpoints:
-  - `GET /api/health` - Returns `{ status: "ok" }`
+  - `GET /api/health` - Health check endpoint
+    - Returns: `{ status: "ok", websocket: { connected: boolean, connectionCount: number, sessionCount: number } }`
+    - Used for: Uptime monitoring, general health checks
+  - `GET /api/health/ready` - Readiness endpoint
+    - Returns: `{ status: "ready" | "not ready", websocket: { connected: boolean } }`
+    - Status codes: `200` (ready), `503` (not ready)
+    - Used for: Deployment readiness checks (Kubernetes readiness probe, etc.)
   - `POST /api/onboarding` - Creates session from onboarding data
     - Request: `{ vibe: string, tags: string[], visibility: boolean, location?: { lat: number, lng: number } }`
     - Response: `{ sessionId: string, token: string, handle: string }`

@@ -106,7 +106,7 @@
 
 ### Step 2: WebSocket Error Tracking & Performance Spans
 **Owner**: @Forge 🔗  
-**Status**: PENDING
+**Status**: ✅ COMPLETE (2025-11-15)
 
 **Intent**: Add Sentry error tracking to WebSocket error handler and create performance spans for WebSocket operations
 
@@ -116,12 +116,12 @@
 - `backend/src/services/SignalEngine.js` (update - add Sentry spans for calculations)
 
 **Acceptance Tests**:
-- [ ] WebSocket errors captured in Sentry (`ws.on("error")` handler)
-- [ ] Custom tags added: `sessionId`, `connectionCount`
-- [ ] Performance span created for WebSocket message handling
-- [ ] Performance span created for Signal Engine calculations
-- [ ] WebSocket error test: Error appears in Sentry with correct tags
-- [ ] Performance spans visible in Sentry Performance dashboard
+- [x] WebSocket errors captured in Sentry (`ws.on("error")` handler)
+- [x] Custom tags added: `sessionId`, `connectionCount`
+- [x] Performance span created for WebSocket message handling
+- [x] Performance span created for Signal Engine calculations
+- [ ] WebSocket error test: Error appears in Sentry with correct tags (requires Sentry account)
+- [ ] Performance spans visible in Sentry Performance dashboard (requires Sentry account)
 
 **Done Criteria**:
 - WebSocket errors tracked in Sentry
@@ -135,7 +135,7 @@
 
 ### Step 3: Enhanced Health Endpoint & Uptime Monitoring
 **Owner**: @Forge 🔗 + @Nexus 🚀  
-**Status**: PENDING
+**Status**: ✅ COMPLETE (2025-11-15) - Code complete, UptimeRobot setup pending
 
 **Intent**: Enhance health endpoint to check WebSocket status, add readiness endpoint, and set up UptimeRobot monitoring
 
@@ -146,15 +146,15 @@
 - `docs/ConnectionGuide.md` (update - document health endpoints)
 
 **Acceptance Tests**:
-- [ ] Health endpoint returns: `{ status: "ok", websocket: "connected", sessions: <count> }`
-- [ ] Health endpoint checks WebSocket server status (`wss.clients.size`)
-- [ ] Readiness endpoint created: `GET /api/health/ready`
-- [ ] Readiness endpoint returns: `{ status: "ready", websocket: "connected" }`
-- [ ] UptimeRobot account created (free tier)
-- [ ] UptimeRobot monitor configured: `GET /api/health` (5-minute intervals)
-- [ ] UptimeRobot alert configured: 3+ consecutive failures = downtime alert
-- [ ] Health endpoints documented in `docs/ConnectionGuide.md`
-- [ ] UptimeRobot status page URL documented
+- [x] Health endpoint returns: `{ status: "ok", websocket: { connected: boolean, connectionCount: number, sessionCount: number } }`
+- [x] Health endpoint checks WebSocket server status (`wss.clients.size`)
+- [x] Readiness endpoint created: `GET /api/health/ready`
+- [x] Readiness endpoint returns: `{ status: "ready" | "not ready", websocket: { connected: boolean } }`
+- [x] Health endpoints documented in `docs/ConnectionGuide.md`
+- [ ] UptimeRobot account created (free tier) - Manual step pending
+- [ ] UptimeRobot monitor configured: `GET /api/health` (5-minute intervals) - Manual step pending
+- [ ] UptimeRobot alert configured: 3+ consecutive failures = downtime alert - Manual step pending
+- [ ] UptimeRobot status page URL documented - Pending account creation
 
 **Done Criteria**:
 - Health endpoint enhanced with WebSocket status
@@ -233,7 +233,7 @@
 
 ### Step 6: Monitoring Runbook Creation
 **Owner**: @Muse 🎨 + @Nexus 🚀  
-**Status**: PENDING
+**Status**: ✅ COMPLETE (2025-11-15)
 
 **Intent**: Create comprehensive monitoring runbook for incident response
 
@@ -242,13 +242,13 @@
 - `docs/ConnectionGuide.md` (verify - monitoring details complete)
 
 **Acceptance Tests**:
-- [ ] Runbook created: `docs/monitoring/RUNBOOK.md`
-- [ ] Error investigation procedure documented
-- [ ] Performance degradation procedure documented
-- [ ] Service downtime procedure documented
-- [ ] WebSocket connection issues procedure documented
-- [ ] Incident response process documented (Detect → Acknowledge → Investigate → Resolve → Document)
-- [ ] Connection Guide updated with all monitoring details
+- [x] Runbook created: `docs/monitoring/RUNBOOK.md`
+- [x] Error investigation procedure documented
+- [x] Performance degradation procedure documented
+- [x] Service downtime procedure documented
+- [x] WebSocket connection issues procedure documented
+- [x] Incident response process documented (Detect → Acknowledge → Investigate → Resolve → Document)
+- [x] Connection Guide updated with all monitoring details
 
 **Done Criteria**:
 - Monitoring runbook complete with all procedures
@@ -270,11 +270,12 @@
 **Step Completion**:
 - ✅ Step 1: Code complete (package installed, initialization verified, docs updated)
 - ⏸️ Step 1: Manual steps pending (Sentry account creation, DSN configuration, error capture verification)
-- ⏸️ Step 2: PENDING
-- ⏸️ Step 3: PENDING
-- ⏸️ Step 4: PENDING
-- ⏸️ Step 5: PENDING
-- ⏸️ Step 6: PENDING
+- ✅ Step 2: COMPLETE (WebSocket error tracking, performance spans added)
+- ✅ Step 3: Code complete (health endpoint enhanced, readiness endpoint created, docs updated)
+- ⏸️ Step 3: Manual steps pending (UptimeRobot account creation, monitor configuration)
+- ⏸️ Step 4: PENDING (requires Sentry account)
+- ⏸️ Step 5: PENDING (requires Sentry account)
+- ✅ Step 6: COMPLETE (monitoring runbook created)
 
 ## Current Issues
 

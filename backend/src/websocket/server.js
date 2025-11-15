@@ -2,6 +2,23 @@ import { WebSocketServer } from "ws";
 import { getSessionByToken } from "../services/SessionManager.js";
 import { handleMessage, sendPing, sendError } from "./handlers.js";
 
+// Lazy-loaded Sentry (only if package is installed)
+let Sentry = null;
+let sentryLoaded = false;
+
+async function loadSentry() {
+  if (sentryLoaded) return Sentry;
+  sentryLoaded = true;
+  try {
+    const sentryModule = await import("@sentry/node");
+    Sentry = sentryModule.default || sentryModule;
+    return Sentry;
+  } catch {
+    // Sentry not installed - that's OK, we'll skip it
+    return null;
+  }
+}
+
 /**
  * WebSocket Server
  * 
@@ -92,7 +109,9 @@ export function initializeWebSocketServer(server) {
 
     // Handle incoming messages
     ws.on("message", (data) => {
-      handleMessage(ws, session, data.toString());
+      handleMessage(ws, session, data.toString()).catch(err => {
+        console.error("Error handling message:", err);
+      });
     });
 
     // Handle pong (response to ping)
@@ -107,8 +126,29 @@ export function initializeWebSocketServer(server) {
     });
 
     // Handle errors
-    ws.on("error", (error) => {
+    ws.on("error", async (error) => {
       console.error(`WebSocket error for ${session.sessionId}:`, error);
+      
+      // Send error to Sentry with context
+      const sentry = await loadSentry();
+      if (sentry && process.env.SENTRY_DSN) {
+        try {
+          sentry.captureException(error, {
+            tags: {
+              sessionId: session.sessionId,
+              connectionCount: connections.get(session.sessionId)?.size || 0,
+              component: "websocket",
+            },
+            extra: {
+              handle: session.handle,
+              activeChatPartnerId: session.activeChatPartnerId,
+            },
+          });
+        } catch (sentryError) {
+          console.error("Sentry capture failed:", sentryError);
+        }
+      }
+      
       removeConnection(session.sessionId, ws);
     });
 
@@ -198,3 +238,18 @@ export function getConnectionCount() {
   return connections.size;
 }
 
+/**
+ * Get WebSocket server status
+ * @returns {Object} Status object with connection count and server state
+ */
+export function getWebSocketStatus() {
+  if (!wss) {
+    return { connected: false, connectionCount: 0, sessionCount: 0 };
+  }
+  
+  return {
+    connected: true,
+    connectionCount: wss.clients.size,
+    sessionCount: connections.size,
+  };
+}

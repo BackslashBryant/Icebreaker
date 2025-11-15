@@ -1,14 +1,44 @@
 import express from 'express';
+import { getWebSocketStatus } from '../websocket/server.js';
 
 const router = express.Router();
 
 /**
  * Health check endpoint
  * GET /api/health
- * Returns: { status: "ok" }
+ * Returns: { status: "ok", websocket: { connected: boolean, connectionCount: number, sessionCount: number } }
  */
 router.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+  const wsStatus = getWebSocketStatus();
+  
+  res.status(200).json({
+    status: 'ok',
+    websocket: {
+      connected: wsStatus.connected,
+      connectionCount: wsStatus.connectionCount || 0,
+      sessionCount: wsStatus.sessionCount || 0,
+    },
+  });
+});
+
+/**
+ * Readiness endpoint
+ * GET /api/health/ready
+ * Returns: { status: "ready", websocket: { connected: boolean } }
+ * Used for deployment checks (Kubernetes readiness probe, etc.)
+ */
+router.get('/health/ready', (req, res) => {
+  const wsStatus = getWebSocketStatus();
+  
+  // Ready if WebSocket server is connected
+  const ready = wsStatus.connected;
+  
+  res.status(ready ? 200 : 503).json({
+    status: ready ? 'ready' : 'not ready',
+    websocket: {
+      connected: wsStatus.connected,
+    },
+  });
 });
 
 export { router as healthRouter };
