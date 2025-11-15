@@ -11,7 +11,7 @@
  */
 
 import { execSync } from 'child_process';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join } from 'path';
 
 const PROJECT_ROOT = process.cwd();
@@ -26,18 +26,22 @@ function getCurrentBranch() {
 
 function getPlanFiles() {
   const plansDir = join(PROJECT_ROOT, 'Docs', 'plans');
-  const files = execSync(`ls "${plansDir}/Issue-*-plan-status*.md" 2>/dev/null || echo ""`, { encoding: 'utf-8' })
-    .trim()
-    .split('\n')
-    .filter(Boolean);
   
-  return files.map(file => {
-    const match = file.match(/Issue-(\d+)-plan-status-([^.]+)\.md/);
-    if (match) {
-      return { issue: parseInt(match[1]), status: match[2], path: file };
-    }
-    return null;
-  }).filter(Boolean);
+  try {
+    const files = readdirSync(plansDir)
+      .filter(file => file.match(/Issue-\d+-plan-status.*\.md$/))
+      .map(file => join(plansDir, file));
+    
+    return files.map(file => {
+      const match = file.match(/Issue-(\d+)-plan-status-([^.]+)\.md/);
+      if (match) {
+        return { issue: parseInt(match[1]), status: match[2], path: file };
+      }
+      return null;
+    }).filter(Boolean);
+  } catch {
+    return [];
+  }
 }
 
 function readPlanFile(filePath) {
