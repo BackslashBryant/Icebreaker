@@ -8,6 +8,7 @@
     "check:dependencies": "node ./tools/check-dependencies.mjs",
     "check:dates": "node ./tools/check-dates.mjs",
     "check:ui-tokens": "node ./tools/check-ui-tokens.mjs",
+    "check:completion-sync": "node ./tools/verify-completion-sync.mjs",
     "fix:dates": "node ./tools/pre-commit-date-fix.mjs",
     "mcp:suggest": "node ./tools/mcp-suggest.mjs",
     "mcp:heal": "node ./tools/mcp-self-heal.mjs",

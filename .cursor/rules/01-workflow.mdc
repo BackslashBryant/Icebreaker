@@ -184,6 +184,12 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
      - Update `branch` to actual branch name (not "main")
      - Update `note` with completion summary and next steps
      - **CRITICAL**: This must be done BEFORE committing completion
+  2.5. **MANDATORY SYNC VERIFICATION**: Before marking issue complete, verify completion status is synced:
+     - **Verify plan-status file on main**: Check that `Docs/plans/Issue-<#>-plan-status-COMPLETE.md` exists on main branch (not just feature branch)
+     - **Verify status is COMPLETE**: Plan file status must be "COMPLETE" (not "TESTING COMPLETE", "READY FOR VERIFICATION", or "IN-PROGRESS")
+     - **Sync plan file to main**: If plan file only exists on feature branch, copy it to main: `git checkout main; git checkout <branch> -- Docs/plans/Issue-<#>-plan-status-COMPLETE.md; git commit`
+     - **Run verification**: `node tools/verify-completion-sync.mjs` must pass before considering issue complete
+     - **CRITICAL**: This prevents confusion about what's actually complete - plan files on main are source of truth
   3. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
      - **Pre-commit Hook Override**: When fixing bugs that cross agent boundaries (e.g., Pixel fixing frontend bugs discovered during testing), use `git commit --no-verify` with a clear message explaining why. This is acceptable for bug fixes that address issues identified in testing/insight reports.
   4. **MANDATORY**: Push to GitHub: Use `node tools/git-push-with-retry.mjs [branch-name]` for automatic retry and DNS error handling
