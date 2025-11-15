@@ -279,20 +279,47 @@
 
 ## Current Issues
 
-**Manual Steps Required for Step 1**:
+**Manual Steps Required**:
+
+**Step 1 - Sentry Setup**:
 1. Create Sentry account (free tier): https://sentry.io/signup/
 2. Create frontend project (React platform): "Icebreaker Frontend"
 3. Create backend project (Node.js platform): "Icebreaker Backend"
 4. Configure DSNs in `.env`: `SENTRY_DSN` and `VITE_SENTRY_DSN`
 5. Test error capture: Trigger intentional errors, verify in Sentry dashboard
 
-**Blockers**: None - manual steps can proceed in parallel with code work
+**Step 3 - UptimeRobot Setup**:
+1. Create UptimeRobot account (free tier): https://uptimerobot.com/
+2. Create monitor: `GET /api/health` (5-minute intervals)
+3. Configure alert: 3+ consecutive failures = downtime alert
+4. Document status page URL in `docs/monitoring/DASHBOARDS.md`
+
+**Step 4 - Alerting Rules** (after Step 1):
+1. Configure Sentry alert rules (error rate, performance)
+2. Configure UptimeRobot alerts (downtime, performance)
+3. Test alert delivery (email)
+4. Document in `docs/monitoring/ALERTS.md`
+
+**Step 5 - Dashboard Setup** (after Step 1):
+1. Create Sentry performance dashboard
+2. Verify performance spans visible
+3. Document dashboard URLs in `docs/monitoring/DASHBOARDS.md`
+4. Share access with team
+
+**Blockers**: None - code work complete, manual account setup can proceed
 
 ## Next Steps
 
-1. Complete Step 1 manual steps (Sentry account creation, DSN configuration)
-2. Verify error capture works (frontend + backend)
-3. Proceed to Step 2: WebSocket Error Tracking & Performance Spans
+1. **Immediate**: Complete Step 1 manual steps (Sentry account creation, DSN configuration)
+2. **After Step 1**: Complete Step 3 manual steps (UptimeRobot account creation)
+3. **After Step 1**: Complete Step 4 (alerting rules configuration)
+4. **After Step 1**: Complete Step 5 (dashboard setup)
+5. **Verification**: Test all monitoring systems end-to-end
+
+**Documentation Ready**:
+- ✅ `docs/monitoring/RUNBOOK.md` - Incident response procedures
+- ✅ `docs/monitoring/ALERTS.md` - Alert rules documentation (template)
+- ✅ `docs/monitoring/DASHBOARDS.md` - Dashboard access guide (template)
 
 ---
 
