@@ -20,7 +20,7 @@ test.describe("Persona: River Martinez - Urban Neighborhood Resident", () => {
 
       // River reads carefully, appreciates clear messaging
       await expect(page.getByText("ICEBREAKER")).toBeVisible();
-      await page.getByRole("link", { name: /PRESS START/i }).click();
+      await page.getByTestId("cta-press-start").click();
       await expect(page).toHaveURL(/.*\/onboarding/);
 
       // Step 0: What We Are/Not
@@ -189,7 +189,7 @@ test.describe("Persona: Alex Kim - Tech Conference Attendee", () => {
 
       // Alex reads quickly, clicks PRESS START (conference efficiency)
       await expect(page.getByText("ICEBREAKER")).toBeVisible();
-      await page.getByRole("link", { name: /PRESS START/i }).click();
+      await page.getByTestId("cta-press-start").click();
       await expect(page).toHaveURL(/.*\/onboarding/);
 
       // Step 0: What We Are/Not
@@ -393,7 +393,7 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
 
       // Jordan reads very carefully, appreciates privacy messaging
       await expect(page.getByText("ICEBREAKER")).toBeVisible();
-      await page.getByRole("link", { name: /PRESS START/i }).click();
+      await page.getByTestId("cta-press-start").click();
       await expect(page).toHaveURL(/.*\/onboarding/);
 
       // Step 0: What We Are/Not
@@ -674,7 +674,7 @@ test.describe("Persona: Sam Taylor - Outgoing Introvert", () => {
 
       // Sam reads quickly, clicks PRESS START (event-focused)
       await expect(page.getByText("ICEBREAKER")).toBeVisible();
-      await page.getByRole("link", { name: /PRESS START/i }).click();
+      await page.getByTestId("cta-press-start").click();
       await expect(page).toHaveURL(/.*\/onboarding/);
 
       // Step 0: What We Are/Not
@@ -878,7 +878,7 @@ test.describe("Persona: Morgan Davis - Graduate Student & Researcher", () => {
 
       // Morgan reads carefully, appreciates clear messaging (academic thoroughness)
       await expect(page.getByText("ICEBREAKER")).toBeVisible();
-      await page.getByRole("link", { name: /PRESS START/i }).click();
+      await page.getByTestId("cta-press-start").click();
       await expect(page).toHaveURL(/.*\/onboarding/);
 
       // Step 0: What We Are/Not
@@ -1090,7 +1090,7 @@ test.describe("Cross-Persona: Market Research Personas", () => {
         await page.waitForLoadState("networkidle");
         await waitForBootSequence(page, 15000, telemetry);
 
-        await page.getByRole("link", { name: /PRESS START/i }).click();
+        await page.getByTestId("cta-press-start").click();
         await expect(page).toHaveURL(/.*\/onboarding/);
 
         await page.getByRole("button", { name: /GOT IT/i }).click();

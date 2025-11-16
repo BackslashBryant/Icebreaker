@@ -378,7 +378,7 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
       await waitForBootSequence(page, 15000, telemetry);
 
       // Ethan reads quickly, clicks PRESS START
-      await page.getByRole("link", { name: /PRESS START/i }).click();
+      await page.getByTestId("cta-press-start").click();
       await expect(page).toHaveURL(/.*\/onboarding/);
 
       // Step 0: What We Are/Not
@@ -558,7 +558,7 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
 
       // Zoe reads carefully, appreciates clear messaging
       await expect(page.getByText("ICEBREAKER")).toBeVisible();
-      await page.getByRole("link", { name: /PRESS START/i }).click();
+      await page.getByTestId("cta-press-start").click();
       await expect(page).toHaveURL(/.*\/onboarding/);
 
       // Step 0: What We Are/Not
@@ -784,7 +784,7 @@ test.describe("Cross-Persona: College Students", () => {
         await page.waitForLoadState("networkidle");
         await waitForBootSequence(page, 15000, telemetry);
 
-        await page.getByRole("link", { name: /PRESS START/i }).click();
+        await page.getByTestId("cta-press-start").click();
         await expect(page).toHaveURL(/.*\/onboarding/);
 
         await page.getByRole("button", { name: /GOT IT/i }).click();
