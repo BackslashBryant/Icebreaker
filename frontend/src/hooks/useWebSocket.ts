@@ -66,11 +66,21 @@ export function useWebSocket(options: UseWebSocketOptions) {
               connect();
             }, delay);
           } else {
-            setStatus("error");
+            // Only set error status after all reconnection attempts exhausted
+            // Add small delay to avoid showing error during brief disconnections
+            setTimeout(() => {
+              if (wsRef.current?.readyState !== WebSocket.OPEN) {
+                setStatus("error");
+              }
+            }, 1000);
           }
         },
         onError: (error) => {
-          setStatus("error");
+          // Don't immediately set error status - let reconnection logic handle it
+          // Only set error if we've exhausted reconnection attempts
+          if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+            setStatus("error");
+          }
           onError?.(error);
         },
       });

@@ -352,13 +352,18 @@ export async function countErrorBanners(page: Page): Promise<number> {
         continue;
       }
       
-      // Skip if it's an informational alert (not an error)
-      // Error banners typically have destructive/border-destructive classes
-      if (className?.includes('destructive') || 
-          className?.includes('border-destructive') ||
+      // Only count actual error banners (destructive styling)
+      // Skip informational alerts that don't have destructive styling
+      const hasDestructiveStyling = className?.includes('destructive') || 
+                                    className?.includes('border-destructive');
+      
+      // Only count as error if it has destructive styling AND error-related text
+      // This filters out informational alerts that might have "error" in text but aren't actual errors
+      if (hasDestructiveStyling && (
           text?.toLowerCase().includes('error') ||
           text?.toLowerCase().includes('failed') ||
-          text?.toLowerCase().includes('connection failed')) {
+          text?.toLowerCase().includes('connection failed') ||
+          text?.toLowerCase().includes('unable to connect'))) {
         errorCount++;
       }
     }

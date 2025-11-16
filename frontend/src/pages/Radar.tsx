@@ -142,11 +142,12 @@ export default function Radar() {
           )}
 
           {/* Connection Error State */}
-          {/* Only show error after reconnection attempts have been exhausted */}
+          {/* Only show error after reconnection attempts have been exhausted AND connection has been failed for a while */}
           {status === "error" && isConnected === false && (
             <div
               className="mb-6 p-4 border-2 border-destructive rounded-md bg-card text-destructive font-mono text-sm"
               role="alert"
+              data-testid="connection-error-banner"
             >
               <p className="font-semibold mb-1">Connection failed</p>
               <p className="text-xs">
