@@ -28,6 +28,16 @@ export function RadarSweep({
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Resize handler
+  const resizeCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const size = Math.min(window.innerWidth - 32, 400);
+    canvas.width = size;
+    canvas.height = size;
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -35,20 +45,23 @@ export function RadarSweep({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Set canvas size
-    const size = Math.min(window.innerWidth - 32, 400);
-    canvas.width = size;
-    canvas.height = size;
-
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const radius = Math.min(centerX, centerY) - 20;
+    // Set initial canvas size
+    resizeCanvas();
 
     // Calculate max signal for normalization
     const maxSignal = Math.max(...people.map((p) => p.signal), 1);
 
+    // Helper to get current dimensions (recalculated on each draw for resize support)
+    const getDimensions = () => {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = Math.min(centerX, centerY) - 20;
+      return { centerX, centerY, radius };
+    };
+
     // Draw radar background
     const drawBackground = () => {
+      const { centerX, centerY, radius } = getDimensions();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Draw concentric circles
@@ -71,6 +84,7 @@ export function RadarSweep({
 
     // Draw person dots
     const drawPeople = () => {
+      const { centerX, centerY, radius } = getDimensions();
       people.forEach((person) => {
         // Normalize signal (0-1) and map to distance from center
         const normalizedSignal = person.signal / maxSignal;
@@ -107,6 +121,7 @@ export function RadarSweep({
     const drawSweep = () => {
       if (prefersReducedMotion) return; // Skip sweep animation if reduced motion
 
+      const { centerX, centerY, radius } = getDimensions();
       const sweepLength = radius * 0.8;
       const endX = centerX + Math.cos(sweepAngleRef.current) * sweepLength;
       const endY = centerY + Math.sin(sweepAngleRef.current) * sweepLength;
@@ -140,7 +155,7 @@ export function RadarSweep({
       let closestPerson: Person | null = null;
       let closestDistance = Infinity;
 
-      const maxSignal = Math.max(...people.map((p) => p.signal), 1);
+      const { centerX, centerY, radius } = getDimensions();
 
       people.forEach((person) => {
         const normalizedSignal = person.signal / maxSignal;
@@ -168,6 +183,18 @@ export function RadarSweep({
 
     canvas.addEventListener("click", handleClick);
 
+    // ResizeObserver for canvas resizing
+    const resizeObserver = new ResizeObserver(() => {
+      resizeCanvas();
+    });
+    resizeObserver.observe(canvas);
+
+    // Fallback: window resize handler
+    const handleResize = () => {
+      resizeCanvas();
+    };
+    window.addEventListener("resize", handleResize);
+
     // Animation loop
     const animate = () => {
       drawBackground();
@@ -180,6 +207,8 @@ export function RadarSweep({
 
     return () => {
       canvas.removeEventListener("click", handleClick);
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", handleResize);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }

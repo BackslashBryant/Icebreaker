@@ -1,16 +1,31 @@
 import { useState, useEffect } from "react";
 import { selectBootMessages } from "@/data/bootMessages";
+import { Button } from "@/components/ui/button";
+import logo128 from "@/assets/logo-128.png";
 
 interface BootSequenceProps {
   onComplete: () => void;
+  onSkip?: () => void;
 }
 
-export function BootSequence({ onComplete }: BootSequenceProps) {
+export function BootSequence({ onComplete, onSkip }: BootSequenceProps) {
   const [stage, setStage] = useState(0);
   const [progress, setProgress] = useState(0);
   const [bootMessages] = useState(() => selectBootMessages(4)); // Select 4 random messages + "READY"
 
+  // Check for reduced motion preference
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   useEffect(() => {
+    // Skip immediately if reduced motion is preferred
+    if (prefersReducedMotion) {
+      onComplete();
+      return;
+    }
+
     // Stage progression - adjust based on number of messages
     const stageTimer = setTimeout(() => {
       if (stage < bootMessages.length - 1) {
@@ -32,7 +47,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
       clearTimeout(stageTimer);
       clearInterval(progressInterval);
     };
-  }, [stage, onComplete, bootMessages.length]);
+  }, [stage, onComplete, bootMessages.length, prefersReducedMotion]);
 
   return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center p-6 relative overflow-hidden">
@@ -43,11 +58,26 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
         }} />
       </div>
 
+      {/* Skip button */}
+      {onSkip && (
+        <div className="absolute top-4 right-4 z-20">
+          <Button
+            onClick={onSkip}
+            variant="ghost"
+            size="sm"
+            className="font-mono text-xs text-muted-foreground hover:text-foreground border-2 border-transparent hover:border-border"
+            aria-label="Skip boot sequence"
+          >
+            Skip intro
+          </Button>
+        </div>
+      )}
+
       <div className="max-w-md w-full space-y-8 font-mono relative z-10">
         {/* Logo with enhanced glow */}
         <div className="flex justify-center">
           <img
-            src="/logo-128.png"
+            src={logo128}
             alt="IceBreaker"
             width={80}
             height={80}

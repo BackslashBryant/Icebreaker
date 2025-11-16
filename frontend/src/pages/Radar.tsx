@@ -40,10 +40,16 @@ export default function Radar() {
     onChatRequest: (targetSessionId) => {
       // Navigate to chat with partner info
       const partner = people.find((p) => p.sessionId === targetSessionId);
+      const partnerHandle = partner?.handle || "Unknown";
+      
+      // Store in session storage for refresh resilience
+      sessionStorage.setItem("icebreaker:chat:partnerSessionId", targetSessionId);
+      sessionStorage.setItem("icebreaker:chat:partnerHandle", partnerHandle);
+      
       navigate("/chat", {
         state: {
           partnerSessionId: targetSessionId,
-          partnerHandle: partner?.handle || "Unknown",
+          partnerHandle,
         },
       });
     },
@@ -65,9 +71,6 @@ export default function Radar() {
     }
   }, [session, navigate]);
 
-  const handleToggleView = () => {
-    setViewMode((prev) => (prev === "sweep" ? "list" : "sweep"));
-  };
 
   if (!session) {
     return null;
@@ -105,8 +108,9 @@ export default function Radar() {
             <Button
               variant={viewMode === "sweep" ? "default" : "outline"}
               size="icon"
-              onClick={handleToggleView}
+              onClick={() => setViewMode("sweep")}
               aria-label="Switch to radar sweep view"
+              aria-pressed={viewMode === "sweep"}
               title="Radar view"
             >
               <RadarIcon className="h-4 w-4" />
@@ -114,8 +118,9 @@ export default function Radar() {
             <Button
               variant={viewMode === "list" ? "default" : "outline"}
               size="icon"
-              onClick={handleToggleView}
+              onClick={() => setViewMode("list")}
               aria-label="Switch to list view"
+              aria-pressed={viewMode === "list"}
               title="List view"
             >
               <List className="h-4 w-4" />

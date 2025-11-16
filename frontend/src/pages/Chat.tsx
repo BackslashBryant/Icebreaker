@@ -19,9 +19,27 @@ export default function Chat() {
   const location = useLocation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Get partner info from location state (passed from Radar)
-  const partnerSessionId = location.state?.partnerSessionId || null;
-  const partnerHandle = location.state?.partnerHandle || "Unknown";
+  // Get partner info from location state (passed from Radar) or session storage
+  const partnerSessionId = location.state?.partnerSessionId || sessionStorage.getItem("icebreaker:chat:partnerSessionId");
+  const partnerHandle = location.state?.partnerHandle || sessionStorage.getItem("icebreaker:chat:partnerHandle") || "Unknown";
+
+  // Safety net: redirect if partnerSessionId is missing
+  useEffect(() => {
+    if (!partnerSessionId) {
+      toast({
+        title: "Chat unavailable",
+        description: "No chat partner found. Returning to Radar.",
+      });
+      navigate("/radar", { replace: true });
+      return;
+    }
+    
+    // Store in session storage for refresh resilience
+    sessionStorage.setItem("icebreaker:chat:partnerSessionId", partnerSessionId);
+    if (partnerHandle) {
+      sessionStorage.setItem("icebreaker:chat:partnerHandle", partnerHandle);
+    }
+  }, [partnerSessionId, partnerHandle, navigate]);
 
   const {
     chatState,
@@ -33,9 +51,12 @@ export default function Chat() {
     endChat,
     isConnected,
   } = useChat({
-    partnerSessionId,
+    partnerSessionId: partnerSessionId || "",
     partnerHandle,
     onChatEnd: () => {
+      // Clear session storage on chat end
+      sessionStorage.removeItem("icebreaker:chat:partnerSessionId");
+      sessionStorage.removeItem("icebreaker:chat:partnerHandle");
       toast({
         title: "Chat ended",
         description: "Connection lost. Chat deleted.",
@@ -43,6 +64,11 @@ export default function Chat() {
       navigate("/radar");
     },
   });
+
+  // Early return if no partnerSessionId (will redirect via useEffect)
+  if (!partnerSessionId) {
+    return null;
+  }
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {

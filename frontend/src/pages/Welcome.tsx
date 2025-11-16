@@ -1,14 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BootSequence } from "@/components/custom/BootSequence";
+import logo256 from "@/assets/logo-256.png";
 
 export default function Welcome() {
   const [showBoot, setShowBoot] = useState(true); // Boot sequence enabled for cool brand moment
   const [showSweep, setShowSweep] = useState(true);
 
+  // Check for reduced motion preference and "seen boot" flag
+  useEffect(() => {
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const hasSeenBoot = sessionStorage.getItem("icebreaker:seen-boot") === "true";
+
+    if (prefersReducedMotion || hasSeenBoot) {
+      setShowBoot(false);
+    }
+  }, []);
+
   if (showBoot) {
-    return <BootSequence onComplete={() => setShowBoot(false)} />;
+    return (
+      <BootSequence
+        onComplete={() => {
+          sessionStorage.setItem("icebreaker:seen-boot", "true");
+          setShowBoot(false);
+        }}
+        onSkip={() => {
+          sessionStorage.setItem("icebreaker:seen-boot", "true");
+          setShowBoot(false);
+        }}
+      />
+    );
   }
 
   return (
@@ -23,7 +48,7 @@ export default function Welcome() {
         {/* Logo */}
         <div className="space-y-4 sm:space-y-6">
           <img
-            src="/logo-256.png"
+            src={logo256}
             alt="IceBreaker"
             width={140}
             height={140}
