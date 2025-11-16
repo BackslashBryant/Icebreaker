@@ -238,13 +238,21 @@ export async function checkVisibilityToggleVisible(page: Page): Promise<boolean>
       return false;
     }
     
+    // Wait for Profile page heading to appear (more reliable than networkidle)
+    // This ensures the page has loaded and React has rendered
+    try {
+      await page.getByRole('heading', { name: /Profile Settings|PROFILE/i }).waitFor({ timeout: 15000, state: 'visible' });
+    } catch {
+      // If heading not found, continue anyway
+    }
+    
     // Wait for page to be fully loaded
     await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
     
     // Wait a bit more for React to render components
     await page.waitForTimeout(500);
     
-    // Check for visibility toggle by data-testid (container)
+    // Check for visibility toggle by data-testid (container) - most reliable
     const visibilityToggle = page.locator('[data-testid="visibility-toggle"]');
     const isVisibleByTestId = await visibilityToggle.isVisible({ timeout: 10000 }).catch(() => false);
     if (isVisibleByTestId) {
