@@ -1,12 +1,12 @@
 {
-  "slug": "integration-testing-launch-preparation",
-  "featureName": "Integration Testing & Launch Preparation",
+  "slug": "persona-insights-fixes",
+  "featureName": "Persona Testing Insights Fixes & UX Improvements",
   "updatedAt": "2025-11-15T00:00:00-05:00",
-  "status": "complete",
+  "status": "in-progress",
   "vision": "docs/vision.md",
-  "description": "Comprehensive integration testing and production launch preparation. Cross-browser testing, accessibility audit, security audit, error tracking setup, and CI/CD verification.",
-  "githubIssue": 6,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/6",
-  "branch": "agent/nexus/6-integration-testing-launch-prep",
-  "note": "Issue #6 COMPLETE (2025-01-27). All 6 steps completed. Issue #21 COMPLETE (2025-01-27) - Production deployment. Issue #26 COMPLETE (2025-11-13) - UI/UX aesthetic correction. All major issues complete. Ready for next feature work."
+  "description": "Fix critical issues and implement UX improvements identified from persona testing insights report and persona feedback.",
+  "githubIssue": 27,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/27",
+  "branch": "agent/link/27-persona-insights-fixes",
+  "note": "Issue #27 IN-PROGRESS (2025-11-15). Fixing 3 critical issues (panic button, visibility toggle, error banners) and implementing 5 high-priority UX improvements from persona testing insights."
 }

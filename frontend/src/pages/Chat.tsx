@@ -72,6 +72,8 @@ export default function Chat() {
         <div className="flex-1 flex items-center justify-center">
           <p className="text-muted-foreground">Requesting chat...</p>
         </div>
+        {/* Panic Button FAB - Always accessible for safety */}
+        <PanicButton />
       </div>
     );
   }
@@ -96,6 +98,8 @@ export default function Chat() {
             </Button>
           </div>
         </div>
+        {/* Panic Button FAB - Always accessible for safety */}
+        <PanicButton />
       </div>
     );
   }
@@ -111,6 +115,8 @@ export default function Chat() {
             </Button>
           </div>
         </div>
+        {/* Panic Button FAB - Always accessible for safety */}
+        <PanicButton />
       </div>
     );
   }
