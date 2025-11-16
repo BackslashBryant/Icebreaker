@@ -16,11 +16,11 @@ export function getProximityContextLabel(tier: ProximityTier): string | null {
 
   switch (tier) {
     case "room":
-      return "Same room";
+      return "Same room / floor";
     case "venue":
-      return "Same venue";
+      return "Same building / venue";
     case "nearby":
-      return "Nearby neighborhood";
+      return "Nearby area";
     case "far":
       return null; // Don't show "far" as it's not useful context
     default:

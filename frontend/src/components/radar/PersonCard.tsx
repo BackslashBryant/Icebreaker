@@ -145,7 +145,7 @@ export function PersonCard({ person, open, onClose, onChatRequest, userTags = []
             <DialogDescription className="font-mono">
               <div className="flex items-center gap-2">
                 <span>Signal: {person.signal.toFixed(1)}</span>
-                <Tooltip content="Signal score combines: • Vibe compatibility • Shared tags • Proximity distance • Visibility status. Higher = better match" />
+                <Tooltip content="Signal score factors: • Vibe match (compatibility) • Shared tags (common interests) • Proximity (closer = higher) • Visibility (visible users only). Higher score = better match for you." />
                 {getProximityContextLabel(person.proximity) && (
                   <span
                     className={`text-xs px-1.5 py-0.5 border rounded font-mono ${getProximityBadgeVariant(person.proximity)}`}

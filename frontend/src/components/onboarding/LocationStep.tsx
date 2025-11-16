@@ -35,10 +35,11 @@ export function LocationStep({ onEnable, onSkip }: LocationStepProps) {
         </p>
         <div className="p-3 sm:p-4 bg-muted/20 border-2 border-border rounded-md">
           <p className="text-xs font-mono text-muted-foreground leading-relaxed">
-            → Approximate distance only
-            <br />→ No background tracking
-            <br />→ Session-based only
-            <br />→ <span className="font-semibold text-foreground">Your privacy matters</span>
+            → <span className="font-semibold text-foreground">Approximate distance only</span> - Never your exact location
+            <br />→ <span className="font-semibold text-foreground">No background tracking</span> - Only when app is open
+            <br />→ <span className="font-semibold text-foreground">Session-based only</span> - Deleted when you leave
+            <br />→ <span className="font-semibold text-foreground">Not shared</span> - Only used for matching, never stored
+            <br />→ <span className="font-semibold text-accent">Your privacy matters</span> - You can skip anytime
           </p>
         </div>
         <div className="mt-6 sm:mt-8">

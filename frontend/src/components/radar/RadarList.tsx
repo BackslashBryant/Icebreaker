@@ -62,7 +62,7 @@ export function RadarList({
                   <span className="text-xs text-muted-foreground">
                     {person.signal.toFixed(1)}
                   </span>
-                  <Tooltip content="Signal score combines: • Vibe compatibility • Shared tags • Proximity distance • Visibility status. Higher = better match" />
+                  <Tooltip content="Signal score factors: • Vibe match (compatibility) • Shared tags (common interests) • Proximity (closer = higher) • Visibility (visible users only). Higher score = better match for you." />
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-wrap">

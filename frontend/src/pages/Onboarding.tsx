@@ -124,7 +124,7 @@ export default function Onboarding() {
                   <li>→ Proximity-based connections</li>
                   <li>→ Ephemeral and anonymous</li>
                   <li>→ Brief, authentic moments</li>
-                  <li>→ Privacy-first and safe</li>
+                  <li>→ <span className="font-semibold text-foreground">Privacy-first and safe</span> - No data stored, no tracking</li>
                 </ul>
               </div>
 
