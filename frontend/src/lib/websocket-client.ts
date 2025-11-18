@@ -210,8 +210,17 @@ export function sendWebSocketMessage(ws: WebSocket | null, message: WebSocketMes
  * Get WebSocket URL for API endpoint
  */
 export function getWebSocketUrl(token: string): string {
+  const apiUrl = import.meta.env.VITE_API_URL || "";
+  
+  // If VITE_API_URL is set, use it (convert http/https to ws/wss)
+  if (apiUrl) {
+    const wsUrl = apiUrl.replace(/^http:/, "ws:").replace(/^https:/, "wss:");
+    return `${wsUrl}/ws?token=${token}`;
+  }
+  
+  // Fallback: use same origin as frontend
   const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  const apiHost = import.meta.env.VITE_API_URL?.replace(/^https?:\/\//, "") || "localhost:8000";
-  return `${wsProtocol}//${apiHost}/ws?token=${token}`;
+  const host = window.location.host;
+  return `${wsProtocol}//${host}/ws?token=${token}`;
 }
 
