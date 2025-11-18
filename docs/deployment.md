@@ -21,7 +21,7 @@ This guide covers deployment procedures for the Icebreaker MVP, including produc
 - [ ] Cross-browser tests passing (Chrome, Firefox, Edge)
 - [ ] Accessibility audit passing (WCAG AA)
 - [ ] Security audit complete (no high/critical vulnerabilities)
-- [ ] Error tracking configured (Sentry DSNs set)
+- [x] Error tracking configured (Sentry DSNs set) ✅
 - [ ] Environment variables configured in hosting platform
 - [ ] CI/CD pipeline verified
 - [ ] Production domains configured
@@ -35,7 +35,7 @@ This guide covers deployment procedures for the Icebreaker MVP, including produc
 
 ```bash
 VITE_API_URL=https://airy-fascination-production.up.railway.app
-VITE_SENTRY_DSN=<configured-in-vercel>
+VITE_SENTRY_DSN=https://ddac06c38c223c1b6b154d33493be0f4@o4510093969195008.ingest.us.sentry.io/4510093972602880
 VITE_SENTRY_ENABLE_DEV=false
 VITE_APP_VERSION=0.1.0
 ```
@@ -49,7 +49,7 @@ VITE_APP_VERSION=0.1.0
 ```bash
 NODE_ENV=production
 PORT=8000
-SENTRY_DSN=<configured-in-railway>
+SENTRY_DSN=https://5ca041bf861fa637b7b2a4e9a2a54f5c@o4510093969195008.ingest.us.sentry.io/4510093972602880
 SENTRY_ENABLE_DEV=false
 APP_VERSION=0.1.0
 CORS_ORIGIN=https://frontend-coral-two-84.vercel.app

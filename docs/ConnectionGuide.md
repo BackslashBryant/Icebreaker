@@ -10,6 +10,8 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 - Port: 3000
 - Startup command: `cd frontend && npm install && npm run dev`
 - Notes: React + Vite, proxy to backend on /api routes
+- **Two-Laptop Setup**: Set `VITE_API_URL` and `VITE_WS_URL` environment variables to connect to remote backend
+- **HTTPS Support**: Use `npm run dev -- --https` for HTTPS (required for Geolocation API on non-localhost)
 
 ### Backend API (Bootstrap MVP + Onboarding)
 - Name: Icebreaker API Server
@@ -17,6 +19,8 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 - Port: 8000
 - Startup command: `cd backend && npm install && npm run dev`
 - Notes: Express.js server, CORS enabled for frontend, JSON body parsing
+- **Two-Laptop Setup**: Set `HOST=0.0.0.0` and `CORS_ORIGIN=*` to allow remote connections
+- **Firewall**: Ensure port 8000 is open for LAN access (Windows Firewall, macOS Security, Linux UFW)
 - Endpoints:
   - `GET /api/health` - Returns `{ status: "ok" }`
   - `POST /api/onboarding` - Creates session from onboarding data
@@ -61,13 +65,17 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 
 ## 2. Remote APIs & Integrations
 
-### Location Services (TBD)
+### Location Services
 - Service: Browser Geolocation API / Device Location API
 - Base URL / Endpoint: Native browser/device APIs
 - Auth method: User permission (approximate location only)
 - Environment variables required: None
 - Owner: @Forge / @Link
-- Notes: Approximate location only; no precise coordinates stored; session-based
+- Notes: 
+  - Approximate location only; no precise coordinates stored; session-based
+  - **HTTPS Required**: Browser Geolocation API requires HTTPS for non-localhost origins
+  - **Two-Laptop Testing**: Use tunneling (ngrok/Cloudflare) or mkcert for HTTPS certificates
+  - **See**: `Docs/guides/two-laptop-field-test.md` for complete setup instructions
 
 ### OAuth Providers (Post-MVP)
 - Service: Spotify / Reddit / X (Twitter) - for social enrichment
@@ -135,20 +143,19 @@ Track every port, endpoint, credential reference, and integration touchpoint her
   - `SENTRY_ENABLE_DEV` - Enable Sentry in development (default: false)
   - `VITE_SENTRY_ENABLE_DEV` - Enable Sentry in frontend development (default: false)
 - **Dashboard Access**:
-  - **Sentry Dashboard**: https://sentry.io/ (login required)
-  - **Projects**: Create separate projects for frontend and backend (free tier allows multiple projects)
+  - **Sentry Dashboard**: https://backslashbryant.sentry.io
+  - **Organization**: backslashbryant
+  - **Project**: icebreaker (shared project with separate DSNs for frontend/backend)
   - **Issues Dashboard**: View errors, stack traces, and error trends
   - **Performance Dashboard**: View performance metrics, latency, throughput
   - **Releases Dashboard**: Track deployments and release health
-- **Setup Steps** (Manual - Issue #22 Step 1):
-  1. Create Sentry account at https://sentry.io/signup/ (free tier)
-  2. Create project for "Icebreaker Frontend" (React)
-  3. Create project for "Icebreaker Backend" (Node.js)
-  4. Copy DSNs from project settings
-  5. Add DSNs to `.env` file (not committed):
-     - `SENTRY_DSN=<backend-dsn>`
-     - `VITE_SENTRY_DSN=<frontend-dsn>`
-  6. Test error capture by triggering intentional errors
+- **Production DSNs** (Configured):
+  - **Frontend DSN**: `https://ddac06c38c223c1b6b154d33493be0f4@o4510093969195008.ingest.us.sentry.io/4510093972602880`
+    - Configured in Vercel as `VITE_SENTRY_DSN` (Production, Preview, Development)
+  - **Backend DSN**: `https://5ca041bf861fa637b7b2a4e9a2a54f5c@o4510093969195008.ingest.us.sentry.io/4510093972602880`
+    - Configured in Railway as `SENTRY_DSN` (Production)
+- **Setup Status**: ✅ **COMPLETE** - Both DSNs configured and active in production
+- **MCP Integration**: Sentry MCP server configured in `.cursor/mcp.json` for automated project/DSN management
 - **Notes**: 
   - Only initializes if DSN is provided (graceful degradation)
   - Development errors filtered unless `SENTRY_ENABLE_DEV=true`
@@ -185,6 +192,14 @@ Track every port, endpoint, credential reference, and integration touchpoint her
   - Authentication: OAuth (click "Needs login" prompt in Cursor to authorize)
   - Fallback: Vercel CLI (`vercel`) or Vercel dashboard
   - Documentation: https://vercel.com/docs/mcp/vercel-mcp
+- **Sentry MCP**: Error tracking, project management, DSN creation, issue analysis
+  - Required Env: None (OAuth authentication handled by Cursor)
+  - Use Case: Automated Sentry project/DSN management, error analysis, Seer integration
+  - Endpoint: `https://mcp.sentry.dev/mcp`
+  - Authentication: OAuth (click "Needs login" prompt in Cursor to authorize)
+  - Fallback: Sentry CLI (`sentry-cli`) or Sentry dashboard
+  - Documentation: https://docs.sentry.io/product/sentry-mcp
+  - Status: ✅ Configured and active
 - **Railway MCP**: REMOVED - Package has zod dependency error preventing connection
   - **Replacement**: Use Railway CLI directly (`railway` commands)
   - Railway CLI is authenticated and working perfectly
