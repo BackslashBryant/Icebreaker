@@ -25,19 +25,27 @@ export function authenticateSession(req, res, next) {
     : authHeader;
 
   // Validate token and get session
-  const session = getSessionByToken(token);
+  const result = getSessionByToken(token);
   
-  if (!session) {
+  if (result.error || !result.session) {
+    const errorMessages = {
+      invalid_format: "Invalid token format",
+      signature_mismatch: "Invalid token signature",
+      expired: "Token expired",
+      session_not_found: "Session not found",
+      validation_error: "Token validation error",
+    };
+    
     return res.status(401).json({
       error: {
         code: "UNAUTHORIZED",
-        message: "Invalid or expired token",
+        message: errorMessages[result.error] || "Invalid or expired token",
       },
     });
   }
 
   // Attach session to request for use in route handlers
-  req.session = session;
+  req.session = result.session;
   next();
 }
 

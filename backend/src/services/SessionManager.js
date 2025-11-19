@@ -65,14 +65,20 @@ export function getSession(sessionId) {
 
 /**
  * Get session by token
+ * Returns { session, error: null } if valid, { session: null, error: string } if invalid
  */
 export function getSessionByToken(token) {
-  const sessionId = verifySessionToken(token);
-  if (!sessionId) {
-    return null;
+  const verification = verifySessionToken(token);
+  if (verification.error) {
+    return { session: null, error: verification.error };
   }
 
-  return getSession(sessionId);
+  const session = getSession(verification.sessionId);
+  if (!session) {
+    return { session: null, error: "session_not_found" };
+  }
+
+  return { session, error: null };
 }
 
 /**

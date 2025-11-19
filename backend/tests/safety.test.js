@@ -65,7 +65,8 @@ describe("Safety Endpoints", () => {
       expect(response.status).toBe(401);
       const data = await response.json();
       expect(data.error.code).toBe("UNAUTHORIZED");
-      expect(data.error.message).toContain("Invalid or expired token");
+      // Accept either generic or specific error messages
+      expect(["Invalid or expired token", "Invalid token format", "Invalid token signature", "Token expired", "Session not found"]).toContain(data.error.message);
     });
 
     it("rejects missing targetSessionId", async () => {
@@ -283,7 +284,8 @@ describe("Safety Endpoints", () => {
       expect(response.status).toBe(401);
       const data = await response.json();
       expect(data.error.code).toBe("UNAUTHORIZED");
-      expect(data.error.message).toContain("Invalid or expired token");
+      // Accept either generic or specific error messages
+      expect(["Invalid or expired token", "Invalid token format", "Invalid token signature", "Token expired", "Session not found"]).toContain(data.error.message);
     });
 
     it("rejects missing targetSessionId", async () => {

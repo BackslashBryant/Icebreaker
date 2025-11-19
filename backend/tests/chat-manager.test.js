@@ -141,6 +141,11 @@ describe("ChatManager", () => {
     });
 
     it("fails when target is not visible", () => {
+      const session1 = createSession({
+        vibe: "banter",
+        tags: [],
+        visibility: true,
+      });
 
       const session2 = createSession({
         vibe: "intros",

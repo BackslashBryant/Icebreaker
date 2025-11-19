@@ -18,24 +18,28 @@ describe("Security Tests", () => {
     it("accepts valid token", () => {
       const sessionId = "test-session-123";
       const token = generateSessionToken(sessionId);
-      const verifiedSessionId = verifySessionToken(token);
-      expect(verifiedSessionId).toBe(sessionId);
+      const result = verifySessionToken(token);
+      expect(result.sessionId).toBe(sessionId);
+      expect(result.error).toBeNull();
     });
 
     it("rejects missing token", () => {
-      const verifiedSessionId = verifySessionToken(null);
-      expect(verifiedSessionId).toBeNull();
+      const result = verifySessionToken(null);
+      expect(result.sessionId).toBeNull();
+      expect(result.error).toBe("validation_error");
     });
 
     it("rejects empty token", () => {
-      const verifiedSessionId = verifySessionToken("");
-      expect(verifiedSessionId).toBeNull();
+      const result = verifySessionToken("");
+      expect(result.sessionId).toBeNull();
+      expect(result.error).toBe("invalid_format");
     });
 
     it("rejects malformed token (missing dot)", () => {
       const token = "invalid-token-without-dot";
-      const verifiedSessionId = verifySessionToken(token);
-      expect(verifiedSessionId).toBeNull();
+      const result = verifySessionToken(token);
+      expect(result.sessionId).toBeNull();
+      expect(result.error).toBe("invalid_format");
     });
 
     it("rejects tampered token (signature mismatch)", () => {
@@ -43,8 +47,9 @@ describe("Security Tests", () => {
       const token = generateSessionToken(sessionId);
       const [payload, signature] = token.split(".");
       const tamperedToken = `${payload}.tampered-signature`;
-      const verifiedSessionId = verifySessionToken(tamperedToken);
-      expect(verifiedSessionId).toBeNull();
+      const result = verifySessionToken(tamperedToken);
+      expect(result.sessionId).toBeNull();
+      expect(result.error).toBe("signature_mismatch");
     });
 
     it("rejects expired token", () => {
@@ -64,14 +69,16 @@ describe("Security Tests", () => {
         .digest("hex");
       
       const expiredToken = `${Buffer.from(JSON.stringify(payload)).toString("base64")}.${signature}`;
-      const verifiedSessionId = verifySessionToken(expiredToken);
-      expect(verifiedSessionId).toBeNull();
+      const result = verifySessionToken(expiredToken);
+      expect(result.sessionId).toBeNull();
+      expect(result.error).toBe("expired");
     });
 
     it("rejects token with invalid base64 payload", () => {
       const invalidToken = "invalid-base64-payload.signature";
-      const verifiedSessionId = verifySessionToken(invalidToken);
-      expect(verifiedSessionId).toBeNull();
+      const result = verifySessionToken(invalidToken);
+      expect(result.sessionId).toBeNull();
+      expect(result.error).toBe("invalid_format");
     });
   });
 

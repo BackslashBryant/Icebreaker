@@ -29,16 +29,22 @@ export function generateSessionToken(sessionId) {
 
 /**
  * Verify session token
- * Returns sessionId if valid, null if invalid or expired
+ * Returns { sessionId, error: null } if valid, { sessionId: null, error: string } if invalid
  */
 export function verifySessionToken(token) {
   try {
     const [payloadBase64, signature] = token.split(".");
     if (!payloadBase64 || !signature) {
-      return null;
+      return { sessionId: null, error: "invalid_format" };
     }
 
-    const payload = JSON.parse(Buffer.from(payloadBase64, "base64").toString());
+    let payload;
+    try {
+      payload = JSON.parse(Buffer.from(payloadBase64, "base64").toString());
+    } catch (parseError) {
+      return { sessionId: null, error: "invalid_format" };
+    }
+
     const secret = process.env.SESSION_SECRET || "icebreaker-mvp-secret-change-in-production";
     const expectedSignature = crypto
       .createHmac("sha256", secret)
@@ -46,18 +52,18 @@ export function verifySessionToken(token) {
       .digest("hex");
 
     if (signature !== expectedSignature) {
-      return null;
+      return { sessionId: null, error: "signature_mismatch" };
     }
 
     // Check token expiration (1 hour default, same as session TTL)
     const TOKEN_TTL = 3600000; // 1 hour in milliseconds
     const tokenAge = Date.now() - payload.timestamp;
     if (tokenAge > TOKEN_TTL) {
-      return null; // Token expired
+      return { sessionId: null, error: "expired" };
     }
 
-    return payload.sessionId;
+    return { sessionId: payload.sessionId, error: null };
   } catch (error) {
-    return null;
+    return { sessionId: null, error: "validation_error" };
   }
 }

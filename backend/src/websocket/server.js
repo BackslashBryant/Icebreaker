@@ -26,25 +26,55 @@ export function initializeWebSocketServer(server) {
   });
 
   wss.on("connection", (ws, request) => {
+    // Detect protocol from headers (Railway reverse proxy support)
+    const forwardedProto = request.headers["x-forwarded-proto"];
+    const isSecure = request.secure || forwardedProto === "https" || forwardedProto === "wss";
+    const protocol = isSecure ? "https" : "http";
+    
     // Extract token from query string
-    const url = new URL(request.url, `http://${request.headers.host}`);
-    const token = url.searchParams.get("token");
+    let token;
+    try {
+      const url = new URL(request.url, `${protocol}://${request.headers.host}`);
+      token = url.searchParams.get("token");
+    } catch (urlError) {
+      console.error(`WebSocket connection failed: URL parsing error - ${urlError.message}`);
+      console.error(`  Request URL: ${request.url}`);
+      console.error(`  Host: ${request.headers.host}`);
+      console.error(`  Protocol detected: ${protocol}`);
+      ws.close(1008, "Invalid connection URL");
+      return;
+    }
 
     if (!token) {
+      console.log(`WebSocket connection rejected: Missing token`);
+      console.log(`  Request URL: ${request.url}`);
       ws.close(1008, "Missing token");
       return;
     }
 
     // Validate session token
-    const session = getSessionByToken(token);
-    if (!session) {
-      ws.close(1008, "Invalid token");
+    const result = getSessionByToken(token);
+    if (result.error || !result.session) {
+      const errorMessages = {
+        invalid_format: "Invalid token format",
+        signature_mismatch: "Invalid token signature",
+        expired: "Token expired",
+        session_not_found: "Session not found",
+        validation_error: "Token validation error",
+      };
+      const errorMessage = errorMessages[result.error] || "Invalid token";
+      console.log(`WebSocket connection rejected: ${errorMessage} (${result.error || "unknown"})`);
+      console.log(`  Token preview: ${token.substring(0, 20)}...`);
+      ws.close(1008, errorMessage);
       return;
     }
+
+    const session = result.session;
 
     // Check connection limit per session
     const sessionConnections = connections.get(session.sessionId) || new Set();
     if (sessionConnections.size >= MAX_CONNECTIONS_PER_SESSION) {
+      console.log(`WebSocket connection rejected: Connection limit exceeded for session ${session.sessionId}`);
       ws.close(1008, "Connection limit exceeded");
       return;
     }
