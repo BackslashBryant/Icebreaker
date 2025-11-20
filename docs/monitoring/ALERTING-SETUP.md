@@ -1,7 +1,9 @@
 # Alerting Rules Setup Guide
 
-**Last Updated**: 2025-01-27  
+**Last Updated**: 2025-11-19  
 **Purpose**: Step-by-step guide for configuring alerting rules in Sentry and UptimeRobot (Issue #22 Step 4)
+
+**Status**: ⏸️ **DEFERRED** - Sentry alert rules require a paid Sentry plan (not available on free tier). This will be configured post-profit. UptimeRobot alerts can be configured independently (free tier supports alerts).
 
 ## Overview
 
