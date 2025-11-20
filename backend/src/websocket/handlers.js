@@ -6,6 +6,23 @@ import { requestChat, acceptChat, declineChat, endChat, validateActiveChat, chec
 import { checkRateLimit, clearRateLimit } from "../lib/rate-limiter.js";
 import { triggerPanic } from "../services/PanicManager.js";
 
+// Lazy-loaded Sentry (only if package is installed)
+let Sentry = null;
+let sentryLoaded = false;
+
+async function loadSentry() {
+  if (sentryLoaded) return Sentry;
+  sentryLoaded = true;
+  try {
+    const sentryModule = await import("@sentry/node");
+    Sentry = sentryModule.default || sentryModule;
+    return Sentry;
+  } catch {
+    // Sentry not installed - that's OK, we'll skip it
+    return null;
+  }
+}
+
 /**
  * WebSocket Message Handlers
  *
@@ -27,7 +44,9 @@ export function handleRadarSubscribe(ws, session, message) {
   }
 
   // Send initial radar update
-  sendRadarUpdate(ws, session);
+  sendRadarUpdate(ws, session).catch(err => {
+    console.error("Error sending radar update:", err);
+  });
 }
 
 /**
@@ -56,7 +75,9 @@ export function handleLocationUpdate(ws, session, message) {
   }
 
   // Send updated radar
-  sendRadarUpdate(ws, session);
+  sendRadarUpdate(ws, session).catch(err => {
+    console.error("Error sending radar update:", err);
+  });
 }
 
 /**
@@ -283,9 +304,9 @@ export function handlePanicTrigger(ws, session, message) {
  * Send radar update to client
  * Calculates compatibility scores and sends sorted list
  */
-function sendRadarUpdate(ws, session) {
+async function sendRadarUpdate(ws, session) {
   const allSessions = getAllSessions();
-  const radarResults = getRadarResults(session, allSessions);
+  const radarResults = await getRadarResults(session, allSessions);
 
   // Format results for client (exclude sensitive data)
   const people = radarResults.map(({ session: targetSession, score }) => ({
@@ -352,19 +373,35 @@ export function sendPing(ws) {
  * Handle incoming message from client
  * Routes message to appropriate handler
  */
-export function handleMessage(ws, session, rawMessage) {
+export async function handleMessage(ws, session, rawMessage) {
   // Check message size (prevent DoS)
   if (rawMessage.length > MAX_MESSAGE_SIZE) {
     sendError(ws, "Message too large", "message_too_large");
     return;
   }
 
+  // Create performance span for message handling
+  const sentry = await loadSentry();
+  const transaction = sentry && process.env.SENTRY_DSN
+    ? sentry.startTransaction({
+        op: "websocket.message",
+        name: "WebSocket Message Handling",
+      })
+    : null;
+
   try {
     const message = JSON.parse(rawMessage);
 
     if (!message.type) {
       sendError(ws, "Missing message type");
+      if (transaction) transaction.finish();
       return;
+    }
+
+    // Add message type to span
+    if (transaction) {
+      transaction.setTag("message.type", message.type);
+      transaction.setTag("sessionId", session.sessionId);
     }
 
     switch (message.type) {
@@ -395,8 +432,14 @@ export function handleMessage(ws, session, rawMessage) {
       default:
         sendError(ws, `Unknown message type: ${message.type}`);
     }
+
+    if (transaction) transaction.finish();
   } catch (error) {
     sendError(ws, "Invalid message format");
+    if (transaction) {
+      transaction.setStatus("internal_error");
+      transaction.finish();
+    }
   }
 }
 

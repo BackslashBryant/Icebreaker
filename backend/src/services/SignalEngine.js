@@ -4,6 +4,23 @@ import { getUniqueReporterCount } from "./ReportManager.js";
 import { getDeclineCountInWindow } from "./CooldownManager.js";
 import { getCooldownConfig } from "../config/cooldown-config.js";
 
+// Lazy-loaded Sentry (only if package is installed)
+let Sentry = null;
+let sentryLoaded = false;
+
+async function loadSentry() {
+  if (sentryLoaded) return Sentry;
+  sentryLoaded = true;
+  try {
+    const sentryModule = await import("@sentry/node");
+    Sentry = sentryModule.default || sentryModule;
+    return Sentry;
+  } catch {
+    // Sentry not installed - that's OK, we'll skip it
+    return null;
+  }
+}
+
 /**
  * Signal Engine Service
  *
@@ -165,7 +182,36 @@ export function calculateScores(sourceSession, targetSessions) {
  * @param {Array<Object>} allSessions - Array of all active sessions
  * @returns {Array<Object>} Array of { session, score } objects, sorted by compatibility
  */
-export function getRadarResults(sourceSession, allSessions) {
-  return calculateScores(sourceSession, allSessions);
+export async function getRadarResults(sourceSession, allSessions) {
+  // Create performance span for Signal Engine calculation
+  const sentry = await loadSentry();
+  const transaction = sentry && process.env.SENTRY_DSN
+    ? sentry.startTransaction({
+        op: "signal.engine",
+        name: "Signal Engine Calculation",
+      })
+    : null;
+
+  if (transaction) {
+    transaction.setTag("sourceSessionId", sourceSession.sessionId);
+    transaction.setTag("sessionCount", allSessions.length);
+  }
+
+  try {
+    const results = calculateScores(sourceSession, allSessions);
+    
+    if (transaction) {
+      transaction.setData("resultCount", results.length);
+      transaction.finish();
+    }
+    
+    return results;
+  } catch (error) {
+    if (transaction) {
+      transaction.setStatus("internal_error");
+      transaction.finish();
+    }
+    throw error;
+  }
 }
 
