@@ -7,8 +7,19 @@ const router = express.Router();
  * Health check endpoint
  * GET /api/health
  * Returns: { status: "ok", websocket: { connected: boolean, connectionCount: number, sessionCount: number } }
+ * 
+ * TEMPORARY TEST MODE: Set HEALTH_CHECK_TEST_FAIL=true to simulate downtime for alert testing
  */
 router.get('/health', (req, res) => {
+  // TEMPORARY: Test mode to trigger UptimeRobot alerts
+  if (process.env.HEALTH_CHECK_TEST_FAIL === 'true') {
+    console.log('[TEST] Health check intentionally failing for alert testing');
+    return res.status(500).json({
+      status: 'error',
+      message: 'Temporary test failure - alert testing in progress',
+    });
+  }
+
   const wsStatus = getWebSocketStatus();
   
   res.status(200).json({
