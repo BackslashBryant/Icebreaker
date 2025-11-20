@@ -50,10 +50,19 @@ The CLI will attempt to create:
 
 ### Option B: Via Dashboard (Manual)
 
+**Finding the Alerts Page**:
 1. Navigate to https://backslashbryant.sentry.io
 2. Log in with team credentials
-3. Select **"icebreaker"** project
-4. Go to **"Alerts"** → **"Create Alert Rule"**
+3. In the top navigation bar, click **"Alerts"** (organization-level, not project-level)
+4. You should see the "Alert Rules" tab with existing alert rules (if any)
+5. Click **"Create Alert Rule"** button (top right)
+
+**Note**: If you don't see "Alerts" in the top navigation:
+- Make sure you're at the organization level (backslashbryant), not inside a specific project
+- The Alerts page is at: https://backslashbryant.sentry.io/alerts/
+- You can also access it via: Project → Settings → Alerts (project-level alerts)
+
+**Creating Alert Rules**:
 
 **Configure Error Rate Alerts**:
 - **Alert Name**: `Error Rate Warning (>5/min)`
