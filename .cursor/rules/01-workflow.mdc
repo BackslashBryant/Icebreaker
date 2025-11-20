@@ -80,6 +80,7 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 4. Commit with message: `chore: <description of workflow change>`
 5. Merge to `main` immediately (these are universal improvements)
 6. **CRITICAL**: DO NOT commit non-app logic changes on feature branches
+   - Guard: `tools/check-nonapp-branch.mjs` (invoked via pre-commit hook) blocks commits when these files are staged off `main`. Run `npm run agents:install-hook` after pulling to ensure hooks are installed.
 
 **Feature Branch Sync**:
 - Before starting work on a feature branch, sync with `main`: `git merge main` or `git rebase main`

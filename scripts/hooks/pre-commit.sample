@@ -66,6 +66,12 @@ if ! check_cursor_files; then
   exit 1
 fi
 
+# Prevent non-app logic commits outside main
+if ! node tools/check-nonapp-branch.mjs >/dev/null 2>&1; then
+  node tools/check-nonapp-branch.mjs
+  exit 1
+fi
+
 # Check branch naming format (warn but don't block for now)
 branch="$(git rev-parse --abbrev-ref HEAD)"
 if [ "$branch" != "main" ] && [ "$branch" != "master" ]; then
