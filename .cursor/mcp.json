@@ -39,6 +39,12 @@
       "args": [
         "mcp-server-time"
       ]
+    },
+    "sentry": {
+      "url": "https://mcp.sentry.dev/mcp",
+      "env": {
+        "SENTRY_AUTH_TOKEN": "${env:SENTRY_AUTH_TOKEN}"
+      }
     }
   }
 }
