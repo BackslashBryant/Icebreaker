@@ -4,7 +4,7 @@
 **Branch**: `agent/nexus/22-monitoring`  
 **GitHub Issue**: #22  
 **Created**: 2025-11-11  
-**Last Updated**: 2025-11-15
+**Last Updated**: 2025-11-19
 
 ## Research Summary
 
@@ -272,7 +272,7 @@
 - ✅ Step 1: COMPLETE (Sentry account created, projects configured, DSNs in production, dashboard documented)
 - ✅ Step 2: COMPLETE (WebSocket error tracking, performance spans added, Sentry verified)
 - ✅ Step 3: MOSTLY COMPLETE (monitor created and active, CLI tool available, status page pending)
-- ⏸️ Step 4: PENDING (Sentry account ready, alerting rules configuration needed in dashboard)
+- ⏸️ Step 4: PENDING (Sentry MCP configured, CLI tools ready, need SENTRY_AUTH_TOKEN to configure alerts)
 - ✅ Step 5: MOSTLY COMPLETE (Sentry dashboards active and documented, UptimeRobot status page pending)
 - ✅ Step 6: COMPLETE (monitoring runbook created)
 
