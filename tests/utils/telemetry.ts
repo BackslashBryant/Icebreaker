@@ -180,12 +180,34 @@ export class TelemetryCollector {
 
 /**
  * Check if panic button is visible
- * Panic button should be visible on Radar and Chat pages
+ * Panic button should be visible on Radar and Chat pages, not on Profile/Welcome/Onboarding pages
  */
 export async function checkPanicButtonVisible(page: Page): Promise<boolean> {
   try {
+    // Check if we're on a page where panic button should be visible
+    const currentUrl = page.url();
+    const isRadarPage = currentUrl.includes('/radar');
+    const isChatPage = currentUrl.includes('/chat');
+    
+    if (!isRadarPage && !isChatPage) {
+      // Not on Radar or Chat page - panic button won't be visible (expected)
+      return false;
+    }
+    
     // Wait for page to be fully loaded
     await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
+    
+    // Wait for Radar/Chat heading to appear (ensures page has loaded and React has rendered)
+    try {
+      if (isRadarPage) {
+        await page.getByRole('heading', { name: /RADAR/i }).waitFor({ timeout: 15000, state: 'visible' });
+      } else if (isChatPage) {
+        // Chat page might not have a heading, wait for chat content instead
+        await page.waitForSelector('[data-testid="chat-input"], [data-testid="chat-messages"]', { timeout: 15000 }).catch(() => {});
+      }
+    } catch {
+      // If heading/chat content not found, continue anyway
+    }
     
     // Wait a bit more for React to render components
     await page.waitForTimeout(500);

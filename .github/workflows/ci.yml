@@ -82,6 +82,15 @@ jobs:
             artifacts/playwright-report-smoke/
             artifacts/test-results-smoke/
           retention-days: 7
+      - name: Verify telemetry files exist
+        if: always()
+        working-directory: .
+        run: |
+          if [ -d "artifacts/persona-runs" ] && [ "$(ls -A artifacts/persona-runs/*.json 2>/dev/null | wc -l)" -gt 0 ]; then
+            echo "✅ Telemetry files found: $(ls -1 artifacts/persona-runs/*.json | wc -l) files"
+          else
+            echo "⚠️ No telemetry files found - tests may not have run or telemetry collection failed"
+          fi
       - name: Generate telemetry summary
         if: always()
         working-directory: .
@@ -95,6 +104,19 @@ jobs:
             docs/testing/persona-feedback.md
             artifacts/persona-runs/
           retention-days: 30
+      - name: Telemetry summary
+        if: always()
+        run: |
+          echo "## Telemetry Collection Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -d "artifacts/persona-runs" ]; then
+            FILE_COUNT=$(ls -1 artifacts/persona-runs/*.json 2>/dev/null | wc -l)
+            echo "✅ **Telemetry files created**: $FILE_COUNT" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **No telemetry files found**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See telemetry-summary artifact for detailed feedback." >> $GITHUB_STEP_SUMMARY
 
   persona-full:
     runs-on: ubuntu-latest
@@ -130,6 +152,15 @@ jobs:
             artifacts/playwright-report/
             artifacts/test-results/
           retention-days: 30
+      - name: Verify telemetry files exist
+        if: always()
+        working-directory: .
+        run: |
+          if [ -d "artifacts/persona-runs" ] && [ "$(ls -A artifacts/persona-runs/*.json 2>/dev/null | wc -l)" -gt 0 ]; then
+            echo "✅ Telemetry files found: $(ls -1 artifacts/persona-runs/*.json | wc -l) files"
+          else
+            echo "⚠️ No telemetry files found - tests may not have run or telemetry collection failed"
+          fi
       - name: Generate telemetry summary
         if: always()
         working-directory: .
@@ -143,6 +174,19 @@ jobs:
             docs/testing/persona-feedback.md
             artifacts/persona-runs/
           retention-days: 30
+      - name: Telemetry summary
+        if: always()
+        run: |
+          echo "## Telemetry Collection Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -d "artifacts/persona-runs" ]; then
+            FILE_COUNT=$(ls -1 artifacts/persona-runs/*.json 2>/dev/null | wc -l)
+            echo "✅ **Telemetry files created**: $FILE_COUNT" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **No telemetry files found**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See telemetry-summary-full artifact for detailed feedback." >> $GITHUB_STEP_SUMMARY
 
   health-mvp:
     runs-on: ubuntu-latest
