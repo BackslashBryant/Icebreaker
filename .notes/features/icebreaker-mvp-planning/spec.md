@@ -1,7 +1,7 @@
 # Feature Spec: Icebreaker MVP Planning
 
 - Slug: `icebreaker-mvp-planning`
-- Created: 2025-01-27T00:00:00.000Z
+- Created: 2025-11-20T00:00:00.000Z
 - Owner: Vector 🎯
 
 ## Problem Statement

@@ -1,6 +1,6 @@
 # Template Evolution Analysis
 
-**Generated**: 2025-01-27  
+**Generated**: 2025-11-20  
 **Template Repo**: `cursor-template-project`  
 **Implementation Repo**: `Icebreaker`  
 **Analysis Scope**: Non-app logic only (`.cursor/`, `tools/`, `scripts/`, `Docs/`, `ops/`)

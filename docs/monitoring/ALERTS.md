@@ -79,8 +79,13 @@
 - [ ] New error type detected - **PENDING** (requires Sentry account)
 
 ### UptimeRobot Alerts
-- [ ] Health check fails 3+ times consecutively (downtime) - **PENDING** (requires UptimeRobot account)
-- [ ] Response time > 1s (performance) - **PENDING** (requires UptimeRobot account)
+- [x] Health check fails 3+ times consecutively (downtime) - ✅ **CONFIGURED** (2025-11-19)
+  - Monitor ID: 801829620
+  - Alert Contact: backslashbryant@gmail.com (ID: 7923063)
+  - Configured via CLI: `npm run uptimerobot:alerts`
+  - Alert after 3 consecutive failures (15 minutes downtime)
+  - Alert on recovery
+- [ ] Response time > 1s (performance) - **PENDING** (can be configured in dashboard)
 
 ## Alert Channels
 

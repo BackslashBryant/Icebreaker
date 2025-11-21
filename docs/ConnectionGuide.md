@@ -161,7 +161,10 @@ Track every port, endpoint, credential reference, and integration touchpoint her
   - **Backend DSN**: `https://5ca041bf861fa637b7b2a4e9a2a54f5c@o4510093969195008.ingest.us.sentry.io/4510093972602880`
     - Configured in Railway as `SENTRY_DSN` (Production)
 - **Setup Status**: ✅ **COMPLETE** - Both DSNs configured and active in production
-- **MCP Integration**: Sentry MCP server configured in `.cursor/mcp.json` for automated project/DSN management
+- **MCP Integration**: 
+  - Sentry MCP server configured in `.cursor/mcp.json` (hosted URL: `https://mcp.sentry.dev/mcp`)
+  - Requires `SENTRY_AUTH_TOKEN` environment variable for authentication
+  - Enables automated project/DSN management and alert configuration via CLI
 - **Notes**: 
   - Only initializes if DSN is provided (graceful degradation)
   - Development errors filtered unless `SENTRY_ENABLE_DEV=true`

@@ -357,7 +357,7 @@ See `docs/Plan.md` for complete implementation plan and acceptance criteria.
 
 See `.notes/features/onboarding-flow/gap-analysis.md` for complete DoD verification.
 
-## [0.1.0] - 2025-01-27
+## [0.1.0] - 2025-11-20
 
 ### Added
 

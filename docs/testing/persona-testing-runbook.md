@@ -1,6 +1,6 @@
 # Persona Testing Runbook
 
-**Last Updated**: 2025-01-27  
+**Last Updated**: 2025-11-20  
 **Owner**: QA Team (@Pixel 🖥️)
 
 This runbook provides step-by-step instructions for running the persona testing suite, collecting telemetry data, and generating actionable UX insights.
@@ -315,6 +315,6 @@ For questions or issues:
 
 ---
 
-**Last Updated**: 2025-01-27  
+**Last Updated**: 2025-11-20  
 **Maintained By**: QA Team
 

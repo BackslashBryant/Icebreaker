@@ -1,281 +1,431 @@
-# Edge Cases - Issue #10 Persona Testing
+# Edge Cases - Issue #16 Accessibility & Failure Coverage
 
-This document catalogs edge cases discovered during persona-based testing, their test coverage status, and prioritization for resolution.
+**Last Updated**: 2025-11-20  
+**Status**: ✅ **COMPLETE** - All edge cases documented for Issue #16 accessibility and failure coverage
+**Purpose**: Document all tested edge cases with expected behavior and recovery procedures
 
-**Last Updated**: 2025-11-11  
-**Status**: ⚠️ **IN PROGRESS** - Documenting edge cases from persona testing
+## Overview
 
----
+This document catalogs all edge cases tested in the accessibility and error recovery test suites for Issue #16, including keyboard navigation, screen reader support, WebSocket failures, and API error recovery. Each edge case includes expected behavior and recovery procedures.
 
-## Edge Case Categories
+## Keyboard Navigation Edge Cases
 
-### 1. Visibility Toggle Behavior
+### Onboarding Flow
 
-#### EC-001: Rapid Visibility Toggling
-- **Persona**: Anxious Users (Maya, Zoe, Jordan)
-- **Scenario**: User toggles visibility off/on rapidly during Radar view
-- **Expected**: Visibility changes reflect immediately, no delay or confusion
-- **Test Coverage**: ⚠️ **PARTIAL** - Basic toggle tested, rapid toggling not tested
-- **Test Location**: `tests/e2e/personas/college-students.spec.ts` (Maya, Zoe), `tests/e2e/personas/market-research.spec.ts` (Jordan)
-- **Edge Case**: Rapid toggling doesn't cause UI glitches or state confusion
-- **Severity**: 🟡 **MEDIUM** - Affects anxious users who toggle frequently
-- **Status**: ⏸️ **PENDING** - Needs dedicated test for rapid toggling
+**Edge Case**: User navigates through onboarding using only keyboard (Tab, Enter, Space)
 
-#### EC-002: Visibility Toggle During Active Chat
-- **Persona**: All personas
-- **Scenario**: User toggles visibility while in an active chat
-- **Expected**: Visibility change doesn't affect active chat
-- **Test Coverage**: ❌ **NOT TESTED**
-- **Edge Case**: Visibility toggle doesn't break active chat state
-- **Severity**: 🟡 **MEDIUM** - Could cause confusion if not handled correctly
-- **Status**: ⏸️ **PENDING** - Needs test coverage
+**Expected Behavior**:
+- All steps navigable with keyboard only
+- Focus order is logical (header → content → buttons)
+- Focus visible on all interactive elements
+- No keyboard traps
 
-#### EC-003: Visibility OFF Still Shows Briefly
-- **Persona**: Privacy-Conscious Users (Jordan)
-- **Scenario**: User toggles visibility OFF, but still appears in Radar briefly
-- **Expected**: Visibility changes respect privacy preferences immediately
-- **Test Coverage**: ✅ **FIXED** - Visibility filtering added to `calculateScores()` function
-- **Test Location**: `backend/tests/signal-engine.test.js` - "excludes sessions with visibility OFF (privacy)"
-- **Edge Case**: Visibility OFF doesn't still show user in Radar briefly
-- **Severity**: 🔴 **HIGH** - Privacy violation if user appears after toggling OFF
-- **Status**: ✅ **FIXED** - Users with `visibility === false` are now filtered out before scoring
+**Recovery Procedures**:
+- If focus order is incorrect: Review tab order in component code, ensure logical flow
+- If focus not visible: Check CSS for `focus-visible` styles, ensure outline/ring is visible
+- If keyboard trap detected: Review modal/dialog focus management, ensure Escape closes dialogs
 
----
+**Test Coverage**: `tests/e2e/accessibility/keyboard-onboarding.spec.ts`
 
-### 2. Proximity Matching Edge Cases
+### Radar Navigation
 
-#### EC-004: Proximity Matching Across Floors
-- **Persona**: Professional Users (Marcus)
-- **Scenario**: Marcus and Ethan in same building, different floors
-- **Expected**: Proximity matching accounts for vertical distance
-- **Test Coverage**: ⚠️ **PARTIAL** - Proximity matching tested, but multi-floor scenario not explicitly tested
-- **Test Location**: `tests/e2e/personas/professionals.spec.ts` (Marcus)
-- **Edge Case**: Different floors don't break proximity matching entirely
-- **Severity**: 🟡 **MEDIUM** - Affects coworking space use case
-- **Status**: ⏸️ **PENDING** - Needs explicit multi-floor test scenario
+**Edge Case**: User navigates radar view using only keyboard (view toggle, person selection, chat initiation)
 
-#### EC-005: Dense Event Proximity Matching
-- **Persona**: Event Attendees (Casey, Alex, Sam, Morgan)
-- **Scenario**: Multiple event attendees in same venue
-- **Expected**: Proximity matching works accurately in dense spaces
-- **Test Coverage**: ⚠️ **PARTIAL** - Basic proximity tested, dense event scenario not explicitly tested
-- **Test Location**: `tests/e2e/personas/market-research.spec.ts` (Casey, Alex, Sam, Morgan)
-- **Edge Case**: Dense event spaces don't cause matching failures
-- **Severity**: 🟡 **MEDIUM** - Affects event use cases
-- **Status**: ⏸️ **PENDING** - Needs explicit dense event test scenario
+**Expected Behavior**:
+- View toggle accessible via keyboard (Tab to button, Enter to switch)
+- Person cards accessible via keyboard (Tab to card, Enter to select)
+- Person card dialog navigable via keyboard (Tab through buttons, Enter to activate, Escape to close)
+- Panic button accessible via keyboard (Tab to button, Enter to open dialog)
 
-#### EC-006: Proximity Break During Active Chat
-- **Persona**: Event Attendees (Alex)
-- **Scenario**: User leaves event venue, proximity breaks during active chat
-- **Expected**: Chat ends cleanly when proximity breaks
-- **Test Coverage**: ❌ **NOT TESTED**
-- **Edge Case**: Proximity break doesn't leave chat in broken state
-- **Severity**: 🟡 **MEDIUM** - Could cause confusion if chat doesn't end properly
-- **Status**: ⏸️ **PENDING** - Needs test coverage
+**Recovery Procedures**:
+- If person cards not keyboard accessible: Ensure cards are buttons or have proper tabindex
+- If dialog not keyboard accessible: Review Dialog component focus management
+- If panic button not in tab order: Ensure button has proper tabindex or is in DOM order
 
-#### EC-007: Dense Urban Proximity Matching
-- **Persona**: Urban Neighborhood Resident (River)
-- **Scenario**: Multiple neighbors in same apartment building
-- **Expected**: Proximity matching works accurately in dense urban spaces
-- **Test Coverage**: ⚠️ **PARTIAL** - Basic proximity tested, dense urban scenario not explicitly tested
-- **Test Location**: `tests/e2e/personas/market-research.spec.ts` (River)
-- **Edge Case**: Dense urban spaces don't cause matching failures
-- **Severity**: 🟡 **MEDIUM** - Affects urban neighborhood use case
-- **Status**: ⏸️ **PENDING** - Needs explicit dense urban test scenario
+**Test Coverage**: `tests/e2e/accessibility/keyboard-radar.spec.ts`
 
----
+### Panic Button
 
-### 3. Signal Scoring Edge Cases
+**Edge Case**: User accesses panic button and dialog using only keyboard
 
-#### EC-008: Multiple Shared Tags Score Overflow
-- **Persona**: Anxious Users (Maya, Zoe)
-- **Scenario**: Maya and Zoe both have multiple shared tags ("Overthinking Things", etc.)
-- **Expected**: Signal score boosted appropriately for compatibility
-- **Test Coverage**: ⚠️ **PARTIAL** - Shared tags tested, but multiple shared tags scenario not explicitly tested
-- **Test Location**: `tests/e2e/personas/college-students.spec.ts` (Maya, Zoe)
-- **Edge Case**: Multiple shared tags don't cause score overflow or incorrect ranking
-- **Severity**: 🟡 **MEDIUM** - Could affect matching accuracy
-- **Status**: ⏸️ **PENDING** - Needs explicit multiple shared tags test scenario
+**Expected Behavior**:
+- Panic button accessible via keyboard (Tab to button, Enter to open)
+- Dialog receives focus when opened
+- Dialog buttons navigable via keyboard (Tab through buttons, Enter to activate)
+- Escape key closes dialog
 
-#### EC-009: Signal Score Transparency
-- **Persona**: Professional Users (Marcus, Ethan)
-- **Scenario**: User wants to understand what factors contribute to signal scores
-- **Expected**: Signal scores are transparent and explainable
-- **Test Coverage**: ❌ **NOT TESTED** - UI doesn't show signal score factors
-- **Edge Case**: Signal score factors are not visible to users
-- **Severity**: 🟢 **LOW** - UX improvement, not a bug
-- **Status**: ⏸️ **PENDING** - Documented as UX improvement in persona feedback
+**Recovery Procedures**:
+- If panic button not accessible: Ensure button is in tab order, check z-index doesn't block focus
+- If dialog doesn't receive focus: Review Dialog component focus trap implementation
+- If Escape doesn't close: Review keyboard event handlers in PanicDialog component
 
----
+**Test Coverage**: `tests/e2e/accessibility/keyboard-panic.spec.ts`
 
-### 4. Chat Edge Cases
+## Screen Reader Edge Cases
 
-#### EC-010: Ephemeral Chat Ending - No Residual Data
-- **Persona**: Overthinking Users (Zoe)
-- **Scenario**: Zoe ends chat and verifies no history remains
-- **Expected**: Chat ends cleanly, no history, no follow-up prompts
-- **Test Coverage**: ✅ **VERIFIED** - Rate limit cleanup happens on chat end (`handleChatEnd` clears rate limit), architecture confirms no message storage
-- **Test Location**: `backend/tests/rate-limiter.test.js` - "clears rate limit for a specific chat", `backend/src/websocket/handlers.js` line 244
-- **Edge Case**: Chat ending doesn't leave any residual data or UI artifacts
-- **Severity**: 🔴 **HIGH** - Privacy violation if data persists
-- **Status**: ✅ **VERIFIED** - Rate limit cleared on chat end, messages never stored (architecture confirms)
+### Visibility Toggle
 
-#### EC-011: One-Chat-at-a-Time Enforcement
-- **Persona**: Professional Users (Marcus)
-- **Scenario**: Marcus tries to start second chat while first is active
-- **Expected**: Second chat blocked, clear message about one-chat limit
-- **Test Coverage**: ⚠️ **PARTIAL** - One-chat enforcement tested, but edge case not explicitly tested
-- **Test Location**: `tests/e2e/personas/professionals.spec.ts` (Marcus)
-- **Edge Case**: Chat ending doesn't leave user in blocked state
-- **Severity**: 🟡 **MEDIUM** - Could cause confusion if user stuck in blocked state
-- **Status**: ⏸️ **PENDING** - Needs explicit blocked state recovery test
+**Edge Case**: Screen reader announces visibility toggle state (on/off)
 
-#### EC-012: Panic Button During Error State
-- **Persona**: Anxious Users (Maya, Ethan)
-- **Scenario**: Anxious user needs immediate exit during chat error state
-- **Expected**: Panic button always accessible, one-tap exit
-- **Test Coverage**: ⚠️ **PARTIAL** - PanicButton always rendered on Radar/Chat pages, but error state scenario not explicitly tested
-- **Test Location**: `frontend/src/components/panic/PanicButton.tsx` (always rendered), `frontend/src/pages/Chat.tsx` line 166
-- **Edge Case**: Panic button works even if chat is in error state or loading
-- **Severity**: 🔴 **HIGH** - Safety issue if panic button unavailable during errors
-- **Status**: ⚠️ **VERIFIED** - PanicButton is always rendered (fixed position, z-50), but needs explicit error state test
+**Expected Behavior**:
+- Toggle has proper ARIA attributes (`aria-pressed` for button, `checked` for checkbox)
+- Screen reader announces state change when toggled
+- Accessible name is clear ("Show on Radar" / "Hide from Radar")
 
----
+**Recovery Procedures**:
+- If state not announced: Add `aria-pressed` attribute or ensure checkbox has proper labeling
+- If name unclear: Update `aria-label` to be more descriptive
 
-### 5. Privacy Edge Cases
+**Test Coverage**: `tests/e2e/accessibility/screen-reader.spec.ts`
 
-#### EC-013: Approximate Location Only
-- **Persona**: Privacy-Conscious Users (Jordan)
-- **Scenario**: Jordan grants location but expects approximate only
-- **Expected**: Location is approximate, not precise coordinates
-- **Test Coverage**: ✅ **VERIFIED** - `approximateLocation()` rounds to ~3 decimal places (~100m precision), tests exist
-- **Test Location**: `frontend/tests/location-utils.test.ts` - "rounds coordinates to ~3 decimal places", `frontend/src/lib/location-utils.ts` line 13-23
-- **Edge Case**: Location precision doesn't leak precise coordinates
-- **Severity**: 🔴 **HIGH** - Privacy violation if precise coordinates leaked
-- **Status**: ✅ **VERIFIED** - Location approximation implemented and tested (~100m precision)
+### Panic Button
 
-#### EC-014: No Message Content Storage
-- **Persona**: Privacy-Conscious Users (Jordan)
-- **Scenario**: Jordan verifies no message content is stored
-- **Expected**: Messages are ephemeral, no database storage
-- **Test Coverage**: ✅ **VERIFIED** - Architecture confirms no message storage, messages only in WebSocket memory
-- **Test Location**: `Docs/architecture/ARCHITECTURE_TEMPLATE.md` line 324 - "Messages are never stored (ephemeral by design)"
-- **Edge Case**: Error states don't accidentally persist message content
-- **Severity**: 🔴 **HIGH** - Privacy violation if messages persisted
-- **Status**: ✅ **VERIFIED** - Architecture confirms no message storage, messages only exist in WebSocket connection memory
+**Edge Case**: Screen reader announces panic button purpose and state
 
-#### EC-015: Session Cleanup
-- **Persona**: Privacy-Conscious Users (Jordan)
-- **Scenario**: Jordan exits app, verifies no data persistence
-- **Expected**: Session data cleared, no residual data
-- **Test Coverage**: ✅ **VERIFIED** - TTL cleanup implemented, tests exist for `cleanupExpiredSessions`
-- **Test Location**: `backend/tests/SessionManager.test.js` - session cleanup tests, `backend/src/services/SessionManager.js` line 229
-- **Edge Case**: Session cleanup doesn't leave any metadata behind
-- **Severity**: 🔴 **HIGH** - Privacy violation if session data persists
-- **Status**: ✅ **VERIFIED** - TTL cleanup runs every minute, expired sessions removed automatically
+**Expected Behavior**:
+- Button has accessible name ("Emergency panic button")
+- Button role is "button"
+- Title attribute provides additional context
 
----
+**Recovery Procedures**:
+- If name not announced: Ensure `aria-label` is set correctly
+- If role incorrect: Ensure button uses native `<button>` element or has `role="button"`
 
-### 6. Onboarding Edge Cases
+**Test Coverage**: `tests/e2e/accessibility/screen-reader.spec.ts`
 
-#### EC-016: Partial Onboarding State
-- **Persona**: Anxious Users (Maya)
-- **Scenario**: Maya reads consent checkbox carefully, may hesitate and exit
-- **Expected**: Clear messaging, no pressure, easy exit option
-- **Test Coverage**: ⚠️ **PARTIAL** - Onboarding tested, but partial completion scenario not tested
-- **Test Location**: `tests/e2e/personas/college-students.spec.ts` (Maya)
-- **Edge Case**: Partial onboarding doesn't leave user in broken state
-- **Severity**: 🟡 **MEDIUM** - Could cause confusion if user stuck in partial state
-- **Status**: ⏸️ **PENDING** - Needs explicit partial onboarding test
+### Chat Status
 
----
+**Edge Case**: Screen reader announces connection state changes
 
-### 7. Vibe Compatibility Edge Cases
+**Expected Behavior**:
+- Connection status uses `role="status"` or `aria-live` for announcements
+- Status changes are announced immediately
+- Status text is clear ("Connected", "Connecting", "Disconnected")
 
-#### EC-017: Vibe Compatibility at Events
-- **Persona**: Event Attendees (Casey, Alex, Sam, Morgan)
-- **Scenario**: Different vibes ("banter", "intros", "surprise") at same event
-- **Expected**: Vibe compatibility works across all types
-- **Test Coverage**: ⚠️ **PARTIAL** - Vibe compatibility tested, but event scenario not explicitly tested
-- **Test Location**: `tests/e2e/personas/market-research.spec.ts` (Casey, Alex, Sam, Morgan)
-- **Edge Case**: Different vibes don't prevent matching at events
-- **Severity**: 🟢 **LOW** - Vibe compatibility already tested in signal engine
-- **Status**: ✅ **VERIFIED** - Vibe compatibility works correctly (tested in signal engine tests)
+**Recovery Procedures**:
+- If status not announced: Add `role="status"` or `aria-live="polite"` to status element
+- If announcements delayed: Use `aria-live="assertive"` for immediate announcements
 
----
+**Test Coverage**: `tests/e2e/accessibility/screen-reader.spec.ts`
 
-## Prioritization Summary
+### Error Banners
 
-### 🔴 High Priority (Privacy & Safety)
-1. ✅ **EC-003**: Visibility OFF still shows briefly (Privacy violation) - **FIXED** - Visibility filtering added to SignalEngine
-2. ✅ **EC-010**: Ephemeral chat ending - no residual data (Privacy violation) - **VERIFIED** - Rate limit cleanup on chat end, no message storage
-3. ⚠️ **EC-012**: Panic button during error state (Safety issue) - **VERIFIED** - Always rendered, but needs explicit error state test
-4. ✅ **EC-013**: Approximate location only (Privacy violation) - **VERIFIED** - Location approximation implemented (~100m precision)
-5. ✅ **EC-014**: No message content storage (Privacy violation) - **VERIFIED** - Architecture confirms no storage, messages only in WebSocket memory
-6. ✅ **EC-015**: Session cleanup (Privacy violation) - **VERIFIED** - TTL cleanup implemented and tested
+**Edge Case**: Screen reader announces errors immediately
 
-### 🟡 Medium Priority (UX & Functionality)
-1. **EC-001**: Rapid visibility toggling (Affects anxious users)
-2. **EC-002**: Visibility toggle during active chat (Could cause confusion)
-3. **EC-004**: Proximity matching across floors (Affects coworking use case)
-4. **EC-005**: Dense event proximity matching (Affects event use cases)
-5. **EC-006**: Proximity break during active chat (Could cause confusion)
-6. **EC-007**: Dense urban proximity matching (Affects urban use case)
-7. **EC-008**: Multiple shared tags score overflow (Could affect matching accuracy)
-8. **EC-011**: One-chat-at-a-time enforcement recovery (Could cause confusion)
-9. **EC-016**: Partial onboarding state (Could cause confusion)
+**Expected Behavior**:
+- Error banners use `role="alert"` for immediate announcements
+- Error messages are user-friendly (not technical jargon)
+- Recovery actions are clearly labeled
 
-### 🟢 Low Priority (Nice to Have)
-1. **EC-009**: Signal score transparency (UX improvement, not a bug)
-2. **EC-017**: Vibe compatibility at events (Already verified in signal engine)
+**Recovery Procedures**:
+- If errors not announced: Ensure `role="alert"` is set on error banner
+- If messages too technical: Update error messages to be user-friendly
+- If recovery unclear: Add clear labels to retry/refresh buttons
 
----
+**Test Coverage**: `tests/e2e/accessibility/screen-reader.spec.ts`
 
-## Test Coverage Status
+### Empty States
 
-### ✅ Fully Tested
-- Basic visibility toggle functionality
-- Basic proximity matching
-- Basic ephemeral chat design
-- Basic one-chat enforcement
-- Basic panic button accessibility
-- Vibe compatibility (tested in signal engine)
+**Edge Case**: Screen reader announces empty state when no people available
 
-### ⚠️ Partially Tested
-- Rapid visibility toggling (basic toggle tested, rapid toggling not tested)
-- Proximity matching across floors (basic proximity tested, multi-floor not tested)
-- Dense event proximity matching (basic proximity tested, dense event not tested)
-- Multiple shared tags (shared tags tested, multiple shared tags not tested)
-- Ephemeral chat ending residual data (ephemeral design tested, residual data check not explicit)
-- One-chat enforcement recovery (enforcement tested, recovery not tested)
-- Panic button during error state (panic button tested, error state not tested)
-- Partial onboarding state (onboarding tested, partial completion not tested)
+**Expected Behavior**:
+- Empty state uses `role="status"` for announcements
+- Message is clear ("No one nearby — yet.")
+- Status is announced when state changes
 
-### ❌ Not Tested
-- Visibility toggle during active chat
-- Proximity break during active chat
-- Signal score transparency (UI feature, not a bug)
-- Approximate location only (location precision not verified)
-- No message content storage (message storage not verified)
-- Session cleanup (session cleanup not verified)
+**Recovery Procedures**:
+- If empty state not announced: Add `role="status"` to empty state element
+- If message unclear: Update empty state message to be more descriptive
 
----
+**Test Coverage**: `tests/e2e/accessibility/screen-reader.spec.ts`
 
-## Next Steps
+## WebSocket Failure Edge Cases
 
-1. ✅ **High Priority**: Fixed EC-003 - Visibility filtering added to SignalEngine
-2. ✅ **High Priority**: Verified EC-010 - Ephemeral chat ending (rate limit cleanup verified, no message storage confirmed)
-3. ⚠️ **High Priority**: Verified EC-012 - Panic button always rendered, but needs explicit error state test
-4. ✅ **High Priority**: Verified EC-013 - Approximate location only (implementation and tests verified)
-5. ✅ **High Priority**: Verified EC-014 - No message content storage (architecture compliance verified)
-6. ✅ **High Priority**: Verified EC-015 - Session cleanup (TTL cleanup implementation and tests verified)
-7. **Medium Priority**: Create explicit test for panic button during error state (EC-012)
-8. **Medium Priority**: Create tests for rapid visibility toggling (EC-001)
-9. **Medium Priority**: Create tests for proximity matching edge cases (EC-004, EC-005, EC-006, EC-007)
-10. **Medium Priority**: Create tests for chat edge cases (EC-002, EC-011)
-11. **Medium Priority**: Create test for partial onboarding state (EC-016)
+### Disconnect During Use
 
----
+**Edge Case**: WebSocket disconnects during active chat or radar update
 
-**Status**: ⚠️ **IN PROGRESS**  
-**Next Action**: Create explicit test for panic button during error state (EC-012), then proceed to medium-priority edge cases
+**Expected Behavior**:
+- Error banner appears with user-friendly message
+- Connection status updates to "Disconnected" or "Error"
+- Recovery action (refresh/retry) is available
+- App remains usable (graceful degradation)
+
+**Recovery Procedures**:
+- Automatic reconnection (up to 5 attempts with exponential backoff)
+- If reconnection fails: Show error banner with refresh option
+- User can refresh page to reconnect
+
+**Test Coverage**: `tests/e2e/accessibility/websocket-failure.spec.ts`
+
+### Connection Failure
+
+**Edge Case**: Initial WebSocket connection fails
+
+**Expected Behavior**:
+- Error banner appears after reconnection attempts exhausted
+- Error message is user-friendly ("Connection failed. Please refresh the page.")
+- Recovery action (refresh) is available
+- App remains usable
+
+**Recovery Procedures**:
+- Automatic reconnection attempts (up to 5)
+- If all attempts fail: Show error banner
+- User can refresh page to retry connection
+
+**Test Coverage**: `tests/e2e/accessibility/websocket-failure.spec.ts`
+
+### Reconnection
+
+**Edge Case**: WebSocket reconnects after disconnect
+
+**Expected Behavior**:
+- Automatic reconnection attempts (up to 5 with exponential backoff)
+- Connection status updates to "Connecting" then "Connected"
+- Status is announced to screen readers
+- App functionality restored
+
+**Recovery Procedures**:
+- Reconnection happens automatically
+- If reconnection fails: Show error banner with refresh option
+- User can refresh page to force reconnection
+
+**Test Coverage**: `tests/e2e/accessibility/websocket-failure.spec.ts`
+
+## API Error Recovery Edge Cases
+
+### 4xx Validation Errors
+
+**Edge Case**: API returns 400 validation error
+
+**Expected Behavior**:
+- Error banner appears with user-friendly message
+- Error message does NOT contain technical details (no "400", "validation failed", etc.)
+- Recovery action (retry/fix and resubmit) is available
+- Form remains fillable (graceful degradation)
+
+**Recovery Procedures**:
+- User can fix validation errors and resubmit
+- Error message guides user to fix issues
+- Form state is preserved (user doesn't lose input)
+
+**Test Coverage**: `tests/e2e/accessibility/api-error-recovery.spec.ts`
+
+### 401 Unauthorized
+
+**Edge Case**: API returns 401 unauthorized error
+
+**Expected Behavior**:
+- Error banner appears with user-friendly message
+- Error message does NOT contain technical details (no "401", "unauthorized", etc.)
+- Recovery action (retry or re-authenticate) is available
+- App remains usable
+
+**Recovery Procedures**:
+- User can retry request
+- If token expired: User may need to restart onboarding
+- Error message guides user to retry
+
+**Test Coverage**: `tests/e2e/accessibility/api-error-recovery.spec.ts`
+
+### 404 Not Found
+
+**Edge Case**: API returns 404 not found error
+
+**Expected Behavior**:
+- Error banner appears with user-friendly message
+- Error message does NOT contain technical details (no "404", "not found", etc.)
+- Recovery action (retry) is available
+- App remains usable
+
+**Recovery Procedures**:
+- User can retry request
+- If endpoint changed: May need to refresh page or restart onboarding
+- Error message guides user to retry
+
+**Test Coverage**: `tests/e2e/accessibility/api-error-recovery.spec.ts`
+
+### 500 Server Error
+
+**Edge Case**: API returns 500 server error
+
+**Expected Behavior**:
+- Error banner appears with user-friendly message
+- Error message does NOT contain technical details (no "500", "internal server error", etc.)
+- Recovery action (retry) is available
+- App remains usable
+
+**Recovery Procedures**:
+- User can retry request
+- If server issue persists: User may need to wait and retry later
+- Error message guides user to retry
+
+**Test Coverage**: `tests/e2e/accessibility/api-error-recovery.spec.ts`
+
+### 503 Service Unavailable
+
+**Edge Case**: API returns 503 service unavailable error
+
+**Expected Behavior**:
+- Error banner appears with user-friendly message
+- Error message does NOT contain technical details (no "503", "service unavailable", etc.)
+- Recovery action (retry) is available
+- App remains usable
+
+**Recovery Procedures**:
+- User can retry request
+- If service down: User may need to wait and retry later
+- Error message indicates temporary issue
+
+**Test Coverage**: `tests/e2e/accessibility/api-error-recovery.spec.ts`
+
+## Accessibility Edge Cases
+
+### Keyboard Traps
+
+**Edge Case**: User gets trapped in a keyboard navigation loop
+
+**Expected Behavior**:
+- No keyboard traps exist
+- All interactive elements are reachable via keyboard
+- Escape key closes dialogs/modals
+- Tab order is logical and complete
+
+**Recovery Procedures**:
+- Review focus management in dialogs/modals
+- Ensure Escape key handlers are implemented
+- Verify tab order doesn't skip elements
+
+**Test Coverage**: All keyboard-only journey tests
+
+### Focus Management
+
+**Edge Case**: Focus is lost or not visible during navigation
+
+**Expected Behavior**:
+- Focus is always visible on interactive elements
+- Focus order is logical and preserves meaning
+- Focus moves correctly when dialogs open/close
+
+**Recovery Procedures**:
+- Ensure CSS includes `focus-visible` styles
+- Review focus management in dynamic components
+- Verify focus moves to dialog when opened
+
+**Test Coverage**: All keyboard-only journey tests
+
+### Screen Reader Announcements
+
+**Edge Case**: Screen reader doesn't announce state changes or errors
+
+**Expected Behavior**:
+- State changes are announced via `aria-live` or `role="status"`
+- Errors are announced immediately via `role="alert"`
+- Empty states are announced via `role="status"`
+
+**Recovery Procedures**:
+- Add `role="alert"` to error banners
+- Add `role="status"` to status messages
+- Use `aria-live="assertive"` for immediate announcements
+
+**Test Coverage**: `tests/e2e/accessibility/screen-reader.spec.ts`
+
+## Performance Under Stress Edge Cases
+
+### Network Issues
+
+**Edge Case**: App behavior during network issues or high latency
+
+**Expected Behavior**:
+- App remains usable when network is slow
+- Loading states are shown during API calls
+- Timeouts are handled gracefully
+- Error messages appear if requests fail
+
+**Recovery Procedures**:
+- User can retry failed requests
+- App doesn't crash on network errors
+- Loading states prevent duplicate requests
+
+**Test Coverage**: WebSocket failure and API error recovery tests
+
+### High Latency
+
+**Edge Case**: App behavior during high latency conditions
+
+**Expected Behavior**:
+- App remains responsive
+- Loading states are shown
+- Timeouts are handled gracefully
+- User can cancel long-running operations
+
+**Recovery Procedures**:
+- User can refresh page if operations hang
+- Timeouts prevent indefinite waiting
+- Error messages guide user to retry
+
+**Test Coverage**: WebSocket failure and API error recovery tests
+
+## Recovery Action Patterns
+
+### Error Messages
+
+**Pattern**: All error messages must be user-friendly
+
+**Requirements**:
+- No technical jargon (no HTTP status codes, error codes, stack traces)
+- Clear, actionable language ("Please try again", "Refresh the page")
+- Recovery guidance included in message
+
+**Examples**:
+- ✅ "Connection failed. Please refresh the page."
+- ❌ "WebSocket connection error: ECONNREFUSED"
+
+### Recovery Actions
+
+**Pattern**: All errors must have recovery actions
+
+**Requirements**:
+- Retry button for transient errors
+- Refresh button for connection errors
+- Fix and resubmit for validation errors
+- Clear error state when action taken
+
+**Examples**:
+- Retry button for API errors
+- Refresh button for WebSocket errors
+- Fix form and resubmit for validation errors
+
+### Status Communication
+
+**Pattern**: All status changes must be communicated
+
+**Requirements**:
+- Connection status visible and announced
+- Loading states shown during operations
+- Success/error states clearly indicated
+- Screen reader announcements for all status changes
+
+**Examples**:
+- "Connected" / "Connecting" / "Disconnected" status
+- Loading spinner during API calls
+- Success toast after operations complete
+
+## Test Coverage Summary
+
+All edge cases are covered by the following test files:
+
+- **Keyboard Navigation**: `tests/e2e/accessibility/keyboard-onboarding.spec.ts`, `tests/e2e/accessibility/keyboard-radar.spec.ts`, `tests/e2e/accessibility/keyboard-panic.spec.ts`
+- **Screen Reader**: `tests/e2e/accessibility/screen-reader.spec.ts`
+- **WebSocket Failure**: `tests/e2e/accessibility/websocket-failure.spec.ts`
+- **API Error Recovery**: `tests/e2e/accessibility/api-error-recovery.spec.ts`
+
+## Maintenance
+
+This document should be updated whenever:
+- New edge cases are discovered
+- Recovery procedures change
+- New error scenarios are added
+- Test coverage is expanded
+
+**Last Updated**: 2025-11-20
