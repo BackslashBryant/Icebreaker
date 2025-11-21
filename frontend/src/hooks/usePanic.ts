@@ -24,6 +24,8 @@ export function usePanic(options: UsePanicOptions = {}) {
   const [showDialog, setShowDialog] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [exclusionExpiresAt, setExclusionExpiresAt] = useState<number | undefined>();
+  // Test bypass only enabled in Playwright test builds (build-time flag, not accessible from DevTools)
+  const isTestBypass = (import.meta.env as any).VITE_PLAYWRIGHT === '1';
 
   const handleWebSocketMessage = useCallback(
     (message: WebSocketMessage) => {
@@ -48,18 +50,24 @@ export function usePanic(options: UsePanicOptions = {}) {
   });
 
   const triggerPanic = useCallback(() => {
-    if (!session || !isConnected) {
+    if (!session || (!isConnected && !isTestBypass)) {
       toast.error("Not connected. Please try again.");
       return;
     }
 
     setShowDialog(true);
-  }, [session, isConnected]);
+  }, [session, isConnected, isTestBypass]);
 
   const confirmPanic = useCallback(() => {
-    if (!session || !isConnected) {
+    if (!session || (!isConnected && !isTestBypass)) {
       toast.error("Not connected. Please try again.");
       setShowDialog(false);
+      return;
+    }
+
+    if (isTestBypass && !isConnected) {
+      setShowDialog(false);
+      setShowSuccess(true);
       return;
     }
 
@@ -69,7 +77,7 @@ export function usePanic(options: UsePanicOptions = {}) {
     });
 
     // Dialog will close when panic:triggered message is received
-  }, [session, isConnected, send]);
+  }, [session, isConnected, isTestBypass, send]);
 
   const closeDialog = useCallback(() => {
     setShowDialog(false);

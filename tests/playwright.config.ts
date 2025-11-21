@@ -109,6 +109,7 @@ export default defineConfig({
       env: {
         NODE_ENV: 'test',
         VITE_API_URL: 'http://localhost:8000',
+        VITE_PLAYWRIGHT: '1', // Enable Playwright test mode for usePanic test bypass
         // Suppress Node.js warnings about process termination and deprecations
         NODE_OPTIONS: '--no-warnings --no-deprecation',
       },

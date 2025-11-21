@@ -4,6 +4,7 @@
   "private": true,
   "description": "Icebreaker - A proximity-based ephemeral chat application for connecting people nearby",
   "scripts": {
+    "precommit": "npm run preflight && npm run check:dependencies",
     "preflight": "node ./tools/preflight.mjs",
     "check:dependencies": "node ./tools/check-dependencies.mjs",
     "check:dates": "node ./tools/check-dates.mjs",
