@@ -350,7 +350,7 @@ describe("SignalEngine", () => {
   });
 
   describe("getRadarResults", () => {
-    it("returns sorted radar results", () => {
+    it("returns sorted radar results", async () => {
       const source = createTestSession({ vibe: "banter", tags: ["shared"] });
       const allSessions = [
         createTestSession({ vibe: "intros", tags: [] }),
@@ -358,7 +358,7 @@ describe("SignalEngine", () => {
         source,
       ];
 
-      const results = getRadarResults(source, allSessions);
+      const results = await getRadarResults(source, allSessions);
       expect(results.length).toBe(2);
       expect(results[0].score).toBeGreaterThanOrEqual(results[1].score);
     });
