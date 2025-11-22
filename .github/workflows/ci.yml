@@ -86,8 +86,9 @@ jobs:
         if: always()
         working-directory: .
         run: |
-          if [ -d "artifacts/persona-runs" ] && [ "$(ls -A artifacts/persona-runs/*.json 2>/dev/null | wc -l)" -gt 0 ]; then
-            echo "✅ Telemetry files found: $(ls -1 artifacts/persona-runs/*.json | wc -l) files"
+          FILE_COUNT=$(find artifacts/persona-runs -maxdepth 1 -name '*.json' 2>/dev/null | wc -l)
+          if [ "$FILE_COUNT" -gt 0 ]; then
+            echo "✅ Telemetry files found: $FILE_COUNT files"
           else
             echo "⚠️ No telemetry files found - tests may not have run or telemetry collection failed"
           fi
@@ -109,8 +110,8 @@ jobs:
         run: |
           echo "## Telemetry Collection Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -d "artifacts/persona-runs" ]; then
-            FILE_COUNT=$(ls -1 artifacts/persona-runs/*.json 2>/dev/null | wc -l)
+          FILE_COUNT=$(find artifacts/persona-runs -maxdepth 1 -name '*.json' 2>/dev/null | wc -l)
+          if [ "$FILE_COUNT" -gt 0 ]; then
             echo "✅ **Telemetry files created**: $FILE_COUNT" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **No telemetry files found**" >> $GITHUB_STEP_SUMMARY
@@ -156,8 +157,9 @@ jobs:
         if: always()
         working-directory: .
         run: |
-          if [ -d "artifacts/persona-runs" ] && [ "$(ls -A artifacts/persona-runs/*.json 2>/dev/null | wc -l)" -gt 0 ]; then
-            echo "✅ Telemetry files found: $(ls -1 artifacts/persona-runs/*.json | wc -l) files"
+          FILE_COUNT=$(find artifacts/persona-runs -maxdepth 1 -name '*.json' 2>/dev/null | wc -l)
+          if [ "$FILE_COUNT" -gt 0 ]; then
+            echo "✅ Telemetry files found: $FILE_COUNT files"
           else
             echo "⚠️ No telemetry files found - tests may not have run or telemetry collection failed"
           fi
@@ -179,8 +181,8 @@ jobs:
         run: |
           echo "## Telemetry Collection Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -d "artifacts/persona-runs" ]; then
-            FILE_COUNT=$(ls -1 artifacts/persona-runs/*.json 2>/dev/null | wc -l)
+          FILE_COUNT=$(find artifacts/persona-runs -maxdepth 1 -name '*.json' 2>/dev/null | wc -l)
+          if [ "$FILE_COUNT" -gt 0 ]; then
             echo "✅ **Telemetry files created**: $FILE_COUNT" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **No telemetry files found**" >> $GITHUB_STEP_SUMMARY
