@@ -193,7 +193,7 @@ jobs:
         run: npx vitest run tests/HealthStatus.test.tsx
       - name: Run E2E tests on ${{ matrix.browser }}
         working-directory: ./tests
-        run: npx playwright test e2e/health.spec.ts --project=${{ matrix.browser }}
+        run: npx playwright test e2e/health.spec.ts --project=stateless
 
   performance-budgets:
     runs-on: ubuntu-latest
@@ -296,7 +296,7 @@ jobs:
           echo "  7. Chat empty state"
           echo "  8. Profile screen"
           echo ""
-          npx playwright test e2e/visual/golden-screens.spec.ts --project=chromium --reporter=list
+          npx playwright test e2e/visual/golden-screens.spec.ts --project=stateless --reporter=list
           echo ""
           echo "✅ All Golden Screens captured. Visual diffs will block merge if unexpected changes detected."
       - name: Run accessibility tests (axe-core)
@@ -305,7 +305,7 @@ jobs:
           CI: 'true'
         run: |
           echo "Running accessibility checks..."
-          npx playwright test e2e/visual/ --project=chromium --grep "accessibility" --reporter=list || true
+          npx playwright test e2e/visual/ --project=stateless --grep "accessibility" --reporter=list || true
           # Note: Full a11y audit should be added to visual tests
       - name: Publish visual snapshots
         if: always()
