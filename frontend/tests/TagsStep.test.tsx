@@ -55,7 +55,7 @@ describe("TagsStep", () => {
       />
     );
 
-    expect(screen.getByText(/No tags = reduced discoverability/i)).toBeInTheDocument();
+    expect(screen.getByText(/Tags help others find you, but they're optional/i)).toBeInTheDocument();
   });
 
   it("does not display warning when tags are selected", () => {
@@ -72,7 +72,7 @@ describe("TagsStep", () => {
       />
     );
 
-    expect(screen.queryByText(/No tags = reduced discoverability/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Tags help others find you, but they're optional/i)).not.toBeInTheDocument();
   });
 
   it("calls onTagToggle when a tag is clicked", async () => {
