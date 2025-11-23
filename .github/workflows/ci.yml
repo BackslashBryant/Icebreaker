@@ -292,13 +292,45 @@ jobs:
       - name: Install Playwright browsers
         working-directory: ./tests
         run: npx playwright install --with-deps chromium
-      - name: Build frontend
+      - name: Start backend server
+        working-directory: ./backend
+        run: npm run dev &
+      - name: Wait for backend server
+        run: |
+          timeout=30
+          elapsed=0
+          while ! curl -f http://localhost:8000/api/health > /dev/null 2>&1; do
+            if [ $elapsed -ge $timeout ]; then
+              echo "Backend server failed to start within $timeout seconds"
+              exit 1
+            fi
+            echo "Waiting for backend server... ($elapsed/$timeout seconds)"
+            sleep 2
+            elapsed=$((elapsed + 2))
+          done
+          echo "Backend server is ready"
+      - name: Start frontend server
         working-directory: ./frontend
-        run: npm run build
+        run: npm run dev &
+      - name: Wait for frontend server
+        run: |
+          timeout=30
+          elapsed=0
+          while ! curl -f http://localhost:3000 > /dev/null 2>&1; do
+            if [ $elapsed -ge $timeout ]; then
+              echo "Frontend server failed to start within $timeout seconds"
+              exit 1
+            fi
+            echo "Waiting for frontend server... ($elapsed/$timeout seconds)"
+            sleep 2
+            elapsed=$((elapsed + 2))
+          done
+          echo "Frontend server is ready"
       - name: Run visual regression tests (Golden Screens)
         working-directory: ./tests
         env:
           CI: 'true'
+          SKIP_WEB_SERVER: '1'
         run: |
           echo "Capturing Golden Screens..."
           echo "Golden Screens to capture:"
