@@ -312,6 +312,7 @@ jobs:
           path: |
             tests/artifacts/visual-snapshots/
             tests/test-results/
+            tests/e2e/visual/*-snapshots/
           retention-days: 30
       - name: Visual/A11y Summary
         if: always()
