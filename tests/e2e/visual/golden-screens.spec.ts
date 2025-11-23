@@ -64,8 +64,14 @@ test.describe('Golden Screens: Visual Regression', () => {
       await setViewport(page, viewport);
       await page.goto('/onboarding');
       await page.locator(SEL.onboardingGotIt).click();
+      // Check consent checkbox before clicking Continue
+      const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
+      await consentCheckbox.check();
       await page.locator(SEL.onboardingContinue).click();
+      // Skip location step to get to Vibe step
       await expect(page.locator(SEL.onboardingStep2)).toBeVisible({ timeout: 15000 });
+      await page.locator(SEL.onboardingSkipLocation).click();
+      await expect(page.locator(SEL.onboardingStep3)).toBeVisible({ timeout: 15000 });
 
       // Select a vibe for visual consistency
       await page.locator(SEL.vibeThinking).click();
@@ -80,6 +86,9 @@ test.describe('Golden Screens: Visual Regression', () => {
       await setViewport(page, viewport);
       await page.goto('/onboarding');
       await page.locator(SEL.onboardingGotIt).click();
+      // Check consent checkbox before clicking Continue
+      const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
+      await consentCheckbox.check();
       await page.locator(SEL.onboardingContinue).click();
       await page.locator(SEL.onboardingSkipLocation).click();
       await expect(page.locator(SEL.onboardingStep3)).toBeVisible({ timeout: 15000 });

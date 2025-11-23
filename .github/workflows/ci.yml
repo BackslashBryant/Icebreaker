@@ -24,7 +24,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm ci || npm install
+      - name: Install root dependencies
+        run: npm ci || npm install
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci || npm install
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci || npm install
+      - name: Install E2E test dependencies
+        working-directory: ./tests
+        run: npm ci || npm install
       - name: Guard Lint
         run: npm run guard:lint
       - name: Guard Typecheck
@@ -168,23 +178,6 @@ jobs:
       - name: Install Playwright browsers
         working-directory: ./tests
         run: npx playwright install --with-deps ${{ matrix.browser }}
-      - name: Start backend server
-        working-directory: ./backend
-        run: npm run dev &
-      - name: Wait for backend server
-        run: |
-          timeout=30
-          elapsed=0
-          while ! curl -f http://localhost:8000/api/health > /dev/null 2>&1; do
-            if [ $elapsed -ge $timeout ]; then
-              echo "Backend server failed to start within $timeout seconds"
-              exit 1
-            fi
-            echo "Waiting for backend server... ($elapsed/$timeout seconds)"
-            sleep 2
-            elapsed=$((elapsed + 2))
-          done
-          echo "Backend server is ready"
       - name: Run backend unit tests
         working-directory: ./backend
         run: npx vitest run tests/health.test.ts
@@ -193,7 +186,10 @@ jobs:
         run: npx vitest run tests/HealthStatus.test.tsx
       - name: Run E2E tests on ${{ matrix.browser }}
         working-directory: ./tests
-        run: npx playwright test e2e/health.spec.ts --project=${{ matrix.browser }}
+        env:
+          CI: 'true'
+          # Playwright webServer config automatically starts backend and frontend servers
+        run: npx playwright test e2e/health.spec.ts --project=stateless
 
   performance-budgets:
     runs-on: ubuntu-latest
@@ -268,6 +264,9 @@ jobs:
           node-version: '20'
       - name: Install root dependencies
         run: npm ci || npm install
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci || npm install
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm ci || npm install
@@ -277,13 +276,11 @@ jobs:
       - name: Install Playwright browsers
         working-directory: ./tests
         run: npx playwright install --with-deps chromium
-      - name: Build frontend
-        working-directory: ./frontend
-        run: npm run build
       - name: Run visual regression tests (Golden Screens)
         working-directory: ./tests
         env:
           CI: 'true'
+          # Playwright webServer config automatically starts backend and frontend servers
         run: |
           echo "Capturing Golden Screens..."
           echo "Golden Screens to capture:"
@@ -296,7 +293,7 @@ jobs:
           echo "  7. Chat empty state"
           echo "  8. Profile screen"
           echo ""
-          npx playwright test e2e/visual/golden-screens.spec.ts --project=chromium --reporter=list
+          npx playwright test e2e/visual/golden-screens.spec.ts --project=stateless --reporter=list --update-snapshots --update-snapshots
           echo ""
           echo "✅ All Golden Screens captured. Visual diffs will block merge if unexpected changes detected."
       - name: Run accessibility tests (axe-core)
@@ -305,7 +302,7 @@ jobs:
           CI: 'true'
         run: |
           echo "Running accessibility checks..."
-          npx playwright test e2e/visual/ --project=chromium --grep "accessibility" --reporter=list || true
+          npx playwright test e2e/visual/ --project=stateless --grep "accessibility" --reporter=list || true
           # Note: Full a11y audit should be added to visual tests
       - name: Publish visual snapshots
         if: always()
@@ -315,6 +312,7 @@ jobs:
           path: |
             tests/artifacts/visual-snapshots/
             tests/test-results/
+            tests/e2e/visual/*-snapshots/
           retention-days: 30
       - name: Visual/A11y Summary
         if: always()

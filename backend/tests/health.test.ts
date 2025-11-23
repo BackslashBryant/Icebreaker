@@ -27,7 +27,11 @@ describe('Health API Endpoint', () => {
     const response = await fetch(`${baseUrl}/api/health`);
     expect(response.status).toBe(200);
     const body = await response.json();
-    expect(body).toEqual({ status: 'ok' });
+    expect(body.status).toBe('ok');
+    expect(body).toHaveProperty('websocket');
+    expect(body.websocket).toHaveProperty('connected');
+    expect(body.websocket).toHaveProperty('connectionCount');
+    expect(body.websocket).toHaveProperty('sessionCount');
   });
 
   it('should return JSON content-type', async () => {

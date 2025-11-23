@@ -195,7 +195,7 @@ describe("Edge Cases", () => {
   });
 
   describe("Signal Engine Edge Cases", () => {
-    it("handles empty sessions array", () => {
+    it("handles empty sessions array", async () => {
       const sourceSession = createSession({
         vibe: "banter",
         tags: [],
@@ -203,11 +203,11 @@ describe("Edge Cases", () => {
       });
 
       const sessionData = getSession(sourceSession.sessionId);
-      const results = getRadarResults(sessionData, []);
+      const results = await getRadarResults(sessionData, []);
       expect(results).toEqual([]);
     });
 
-    it("handles all sessions with safety flags", () => {
+    it("handles all sessions with safety flags", async () => {
       const sourceSession = createSession({
         vibe: "banter",
         tags: [],
@@ -228,7 +228,7 @@ describe("Edge Cases", () => {
       }
 
       const sourceData = getSession(sourceSession.sessionId);
-      const results = getRadarResults(sourceData, targetSessions);
+      const results = await getRadarResults(sourceData, targetSessions);
       expect(results).toEqual([]); // All excluded
     });
 

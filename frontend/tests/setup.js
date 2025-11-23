@@ -38,3 +38,19 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: vi.fn(),
   })),
 });
+
+// Mock ResizeObserver (not available in jsdom test environment)
+global.ResizeObserver = class ResizeObserver {
+  constructor(cb) {
+    this.cb = cb;
+  }
+  observe() {
+    // Mock implementation - no-op
+  }
+  unobserve() {
+    // Mock implementation - no-op
+  }
+  disconnect() {
+    // Mock implementation - no-op
+  }
+};

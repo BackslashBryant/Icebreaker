@@ -40,7 +40,11 @@ describe("ReportDialog", () => {
     const harassmentButton = screen.getByLabelText("Select Harassment");
     await user.click(harassmentButton);
 
-    expect(harassmentButton).toHaveClass("border-accent");
+    // Selected category has border-border, bg-muted/20, and font-semibold
+    expect(harassmentButton).toHaveClass("border-border");
+    expect(harassmentButton).toHaveClass("bg-muted/20");
+    expect(harassmentButton).toHaveClass("font-semibold");
+    expect(harassmentButton).toHaveAttribute("aria-pressed", "true");
   });
 
   it("calls onConfirm with selected category when Submit is clicked", async () => {
@@ -116,13 +120,17 @@ describe("ReportDialog", () => {
 
     const harassmentButton = screen.getByLabelText("Select Harassment");
     await user.click(harassmentButton);
-    expect(harassmentButton).toHaveClass("border-accent");
+    expect(harassmentButton).toHaveClass("border-border");
+    expect(harassmentButton).toHaveClass("bg-muted/20");
+    expect(harassmentButton).toHaveAttribute("aria-pressed", "true");
 
     rerender(<ReportDialog {...defaultProps} isOpen={false} />);
     rerender(<ReportDialog {...defaultProps} isOpen={true} />);
 
     const harassmentButtonAfter = screen.getByLabelText("Select Harassment");
-    expect(harassmentButtonAfter).not.toHaveClass("border-accent");
+    expect(harassmentButtonAfter).not.toHaveClass("bg-muted/20");
+    expect(harassmentButtonAfter).not.toHaveClass("font-semibold");
+    expect(harassmentButtonAfter).toHaveAttribute("aria-pressed", "false");
   });
 
   it("has accessible labels", () => {
