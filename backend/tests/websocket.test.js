@@ -445,12 +445,23 @@ describe("WebSocket Server", () => {
       const { token } = createSession(sessionData);
       await new Promise((resolve, reject) => {
         const ws = new WebSocket(`${wsUrl}/ws?token=${token}`);
+        let resolved = false;
+
+        const cleanup = () => {
+          if (!resolved) {
+            resolved = true;
+            ws.removeAllListeners();
+            if (ws.readyState !== WebSocket.CLOSED) {
+              ws.close();
+            }
+          }
+        };
 
         ws.on("open", () => {
           ws.isAlive = true;
           ws.on("pong", () => {
             expect(ws.isAlive).toBe(true);
-            ws.close();
+            cleanup();
             resolve();
           });
 
@@ -459,8 +470,17 @@ describe("WebSocket Server", () => {
         });
 
         ws.on("error", (error) => {
+          cleanup();
           reject(error);
         });
+
+        // Timeout safety
+        setTimeout(() => {
+          if (!resolved) {
+            cleanup();
+            reject(new Error("Test timed out waiting for pong"));
+          }
+        }, 5000);
       });
     });
   });
@@ -488,6 +508,17 @@ describe("WebSocket Server", () => {
       // Connect with session1
       await new Promise((resolve, reject) => {
         const ws = new WebSocket(`${wsUrl}/ws?token=${session1.token}`);
+        let resolved = false;
+
+        const cleanup = () => {
+          if (!resolved) {
+            resolved = true;
+            ws.removeAllListeners();
+            if (ws.readyState !== WebSocket.CLOSED) {
+              ws.close();
+            }
+          }
+        };
 
         ws.on("open", () => {
           ws.on("message", (data) => {
@@ -513,7 +544,7 @@ describe("WebSocket Server", () => {
                 expect(typeof person.signal).toBe("number");
               });
 
-              ws.close();
+              cleanup();
               resolve();
             }
           });
@@ -526,8 +557,17 @@ describe("WebSocket Server", () => {
         });
 
         ws.on("error", (error) => {
+          cleanup();
           reject(error);
         });
+
+        // Timeout safety
+        setTimeout(() => {
+          if (!resolved) {
+            cleanup();
+            reject(new Error("Test timed out waiting for radar:update"));
+          }
+        }, 5000);
       });
     });
   });
