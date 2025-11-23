@@ -293,7 +293,7 @@ jobs:
           echo "  7. Chat empty state"
           echo "  8. Profile screen"
           echo ""
-          npx playwright test e2e/visual/golden-screens.spec.ts --project=stateless --reporter=list
+          npx playwright test e2e/visual/golden-screens.spec.ts --project=stateless --reporter=list --update-snapshots
           echo ""
           echo "✅ All Golden Screens captured. Visual diffs will block merge if unexpected changes detected."
       - name: Run accessibility tests (axe-core)
