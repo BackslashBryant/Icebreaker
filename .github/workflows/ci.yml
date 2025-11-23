@@ -203,6 +203,8 @@ jobs:
         run: npx vitest run tests/HealthStatus.test.tsx
       - name: Run E2E tests on ${{ matrix.browser }}
         working-directory: ./tests
+        env:
+          SKIP_WEB_SERVER: '1'
         run: npx playwright test e2e/health.spec.ts --project=stateless
 
   performance-budgets:
