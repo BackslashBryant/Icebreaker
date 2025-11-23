@@ -43,6 +43,6 @@ describe("VibeStep", () => {
     render(<VibeStep selectedVibe="banter" onVibeSelect={onVibeSelect} />);
 
     const banterButton = screen.getByText(/Up for banter/i).closest("button");
-    expect(banterButton).toHaveClass("border-accent", "bg-accent/10", "text-accent");
+    expect(banterButton).toHaveClass("border-border", "bg-muted/20", "font-semibold");
   });
 });

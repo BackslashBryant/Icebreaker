@@ -17,7 +17,7 @@ describe("ConsentStep", () => {
     );
 
     expect(screen.getByText("AGE VERIFICATION")).toBeInTheDocument();
-    expect(screen.getByText(/IceBreaker is for adults only/i)).toBeInTheDocument();
+    expect(screen.getByText(/IceBreaker is 18\+ only/i)).toBeInTheDocument();
   });
 
   it("renders consent checkbox", () => {

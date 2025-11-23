@@ -19,7 +19,7 @@ interface RadarListProps {
 export function RadarList({
   people,
   onSelectPerson,
-  emptyMessage = "No one here — yet.",
+  emptyMessage = "No one nearby — yet.",
   userTags = [],
 }: RadarListProps) {
   if (people.length === 0) {
@@ -31,7 +31,7 @@ export function RadarList({
       >
         <div className="p-6 sm:p-8 bg-muted/20 border-2 border-border rounded-md max-w-md text-center animate-fade-in">
           <p className="text-foreground text-sm sm:text-base font-mono font-semibold">
-            No one nearby — yet.
+            {emptyMessage}
           </p>
           <p className="text-muted-foreground text-xs sm:text-sm font-mono leading-relaxed mt-2">
             Check back soon or enable location for better matching.

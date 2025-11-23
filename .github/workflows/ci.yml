@@ -189,7 +189,7 @@ jobs:
         env:
           CI: 'true'
           # Playwright webServer config automatically starts backend and frontend servers
-        run: npx playwright test e2e/health.spec.ts --project=stateless
+        run: npx playwright test e2e/health.spec.ts --project=${{ matrix.browser }}
 
   performance-budgets:
     runs-on: ubuntu-latest

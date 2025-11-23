@@ -31,7 +31,7 @@ describe("Onboarding", () => {
     );
 
     expect(screen.getByText("WHAT IS ICEBREAKER?")).toBeInTheDocument();
-    expect(screen.getByText(/Before we start/i)).toBeInTheDocument();
+    expect(screen.getByText(/Let's be clear/i)).toBeInTheDocument();
   });
 
   it("navigates through all steps", async () => {
