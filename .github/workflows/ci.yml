@@ -178,23 +178,6 @@ jobs:
       - name: Install Playwright browsers
         working-directory: ./tests
         run: npx playwright install --with-deps ${{ matrix.browser }}
-      - name: Start backend server
-        working-directory: ./backend
-        run: npm run dev &
-      - name: Wait for backend server
-        run: |
-          timeout=30
-          elapsed=0
-          while ! curl -f http://localhost:8000/api/health > /dev/null 2>&1; do
-            if [ $elapsed -ge $timeout ]; then
-              echo "Backend server failed to start within $timeout seconds"
-              exit 1
-            fi
-            echo "Waiting for backend server... ($elapsed/$timeout seconds)"
-            sleep 2
-            elapsed=$((elapsed + 2))
-          done
-          echo "Backend server is ready"
       - name: Run backend unit tests
         working-directory: ./backend
         run: npx vitest run tests/health.test.ts
@@ -204,7 +187,8 @@ jobs:
       - name: Run E2E tests on ${{ matrix.browser }}
         working-directory: ./tests
         env:
-          SKIP_WEB_SERVER: '1'
+          CI: 'true'
+          # Playwright webServer config automatically starts backend and frontend servers
         run: npx playwright test e2e/health.spec.ts --project=stateless
 
   performance-budgets:
