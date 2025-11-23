@@ -34,42 +34,74 @@ describe("WebSocket Server", () => {
     it("rejects connection without token", async () => {
       await new Promise((resolve, reject) => {
         const ws = new WebSocket(`${wsUrl}/ws`);
+        let resolved = false;
+
+        const cleanup = () => {
+          if (!resolved) {
+            resolved = true;
+            if (ws.readyState !== WebSocket.CLOSED) {
+              ws.removeAllListeners();
+              ws.close();
+            }
+          }
+        };
 
         ws.on("close", (code, reason) => {
           expect(code).toBe(1008);
           expect(reason.toString()).toContain("Missing token");
+          cleanup();
           resolve();
         });
 
-        ws.on("error", (error) => {
-          // Connection will close, ignore error unless it prevents close
-          if (ws.readyState === WebSocket.CLOSED) {
-            resolve();
-          } else {
-            reject(error);
-          }
+        ws.on("error", () => {
+          // Connection will close, error is expected
+          // Wait for close event
         });
+
+        // Timeout safety
+        setTimeout(() => {
+          if (!resolved) {
+            cleanup();
+            reject(new Error("Test timed out waiting for connection close"));
+          }
+        }, 5000);
       });
     });
 
     it("rejects connection with invalid token", async () => {
       await new Promise((resolve, reject) => {
         const ws = new WebSocket(`${wsUrl}/ws?token=invalid-token`);
+        let resolved = false;
+
+        const cleanup = () => {
+          if (!resolved) {
+            resolved = true;
+            if (ws.readyState !== WebSocket.CLOSED) {
+              ws.removeAllListeners();
+              ws.close();
+            }
+          }
+        };
 
         ws.on("close", (code, reason) => {
           expect(code).toBe(1008);
           expect(reason.toString()).toContain("Invalid token");
+          cleanup();
           resolve();
         });
 
-        ws.on("error", (error) => {
-          // Connection will close, ignore error unless it prevents close
-          if (ws.readyState === WebSocket.CLOSED) {
-            resolve();
-          } else {
-            reject(error);
-          }
+        ws.on("error", () => {
+          // Connection will close, error is expected
+          // Wait for close event
         });
+
+        // Timeout safety
+        setTimeout(() => {
+          if (!resolved) {
+            cleanup();
+            reject(new Error("Test timed out waiting for connection close"));
+          }
+        }, 5000);
       });
     });
 
@@ -83,6 +115,17 @@ describe("WebSocket Server", () => {
       const { token } = createSession(sessionData);
       await new Promise((resolve, reject) => {
         const ws = new WebSocket(`${wsUrl}/ws?token=${token}`);
+        let resolved = false;
+
+        const cleanup = () => {
+          if (!resolved) {
+            resolved = true;
+            if (ws.readyState !== WebSocket.CLOSED) {
+              ws.removeAllListeners();
+              ws.close();
+            }
+          }
+        };
 
         ws.on("open", () => {
           ws.on("message", (data) => {
@@ -90,15 +133,24 @@ describe("WebSocket Server", () => {
             if (message.type === "connected") {
               expect(message.payload).toHaveProperty("sessionId");
               expect(message.payload).toHaveProperty("handle");
-              ws.close();
+              cleanup();
               resolve();
             }
           });
         });
 
         ws.on("error", (error) => {
+          cleanup();
           reject(error);
         });
+
+        // Timeout safety
+        setTimeout(() => {
+          if (!resolved) {
+            cleanup();
+            reject(new Error("Test timed out waiting for connected message"));
+          }
+        }, 5000);
       });
     });
   });
@@ -119,14 +171,32 @@ describe("WebSocket Server", () => {
 
       await new Promise((resolve, reject) => {
         ws = new WebSocket(`${wsUrl}/ws?token=${token}`);
+        let resolved = false;
+
+        const cleanup = () => {
+          if (!resolved && ws) {
+            resolved = true;
+            ws.removeAllListeners();
+          }
+        };
 
         ws.on("open", () => {
+          cleanup();
           resolve();
         });
 
         ws.on("error", (error) => {
+          cleanup();
           reject(error);
         });
+
+        // Timeout safety
+        setTimeout(() => {
+          if (!resolved) {
+            cleanup();
+            reject(new Error("beforeEach timed out waiting for WebSocket open"));
+          }
+        }, 5000);
       });
     });
 
@@ -138,22 +208,44 @@ describe("WebSocket Server", () => {
 
     it("handles radar:subscribe message", async () => {
       await new Promise((resolve, reject) => {
-        ws.on("message", (data) => {
+        let resolved = false;
+
+        const cleanup = () => {
+          if (!resolved) {
+            resolved = true;
+            ws.removeListener("message", messageHandler);
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.close();
+            }
+          }
+        };
+
+        const messageHandler = (data) => {
           const message = JSON.parse(data.toString());
           if (message.type === "radar:update") {
             expect(message.payload).toHaveProperty("people");
             expect(message.payload).toHaveProperty("timestamp");
             expect(Array.isArray(message.payload.people)).toBe(true);
-            ws.close();
+            cleanup();
             resolve();
           }
-        });
+        };
+
+        ws.on("message", messageHandler);
 
         ws.send(
           JSON.stringify({
             type: "radar:subscribe",
           })
         );
+
+        // Timeout safety
+        setTimeout(() => {
+          if (!resolved) {
+            cleanup();
+            reject(new Error("Test timed out waiting for radar:update message"));
+          }
+        }, 5000);
       });
     });
 
@@ -161,18 +253,32 @@ describe("WebSocket Server", () => {
       let updateCount = 0;
 
       await new Promise((resolve, reject) => {
-        ws.on("message", (data) => {
+        let resolved = false;
+
+        const cleanup = () => {
+          if (!resolved) {
+            resolved = true;
+            ws.removeListener("message", messageHandler);
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.close();
+            }
+          }
+        };
+
+        const messageHandler = (data) => {
           const message = JSON.parse(data.toString());
           if (message.type === "radar:update") {
             updateCount++;
             if (updateCount === 2) {
               // Should receive update after location change
               expect(message.payload).toHaveProperty("people");
-              ws.close();
+              cleanup();
               resolve();
             }
           }
-        });
+        };
+
+        ws.on("message", messageHandler);
 
         // Subscribe first
         ws.send(
@@ -193,20 +299,42 @@ describe("WebSocket Server", () => {
             })
           );
         }, 100);
+
+        // Timeout safety
+        setTimeout(() => {
+          if (!resolved) {
+            cleanup();
+            reject(new Error("Test timed out waiting for second radar:update"));
+          }
+        }, 5000);
       });
     });
 
     it("handles chat:request message", async () => {
       await new Promise((resolve, reject) => {
-        ws.on("message", (data) => {
+        let resolved = false;
+
+        const cleanup = () => {
+          if (!resolved) {
+            resolved = true;
+            ws.removeListener("message", messageHandler);
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.close();
+            }
+          }
+        };
+
+        const messageHandler = (data) => {
           const message = JSON.parse(data.toString());
           if (message.type === "chat:request:ack") {
             expect(message.payload).toHaveProperty("targetSessionId");
             expect(message.payload).toHaveProperty("status");
-            ws.close();
+            cleanup();
             resolve();
           }
-        });
+        };
+
+        ws.on("message", messageHandler);
 
         ws.send(
           JSON.stringify({
@@ -216,40 +344,92 @@ describe("WebSocket Server", () => {
             },
           })
         );
+
+        // Timeout safety
+        setTimeout(() => {
+          if (!resolved) {
+            cleanup();
+            reject(new Error("Test timed out waiting for chat:request:ack"));
+          }
+        }, 5000);
       });
     });
 
     it("sends error for invalid message", async () => {
       await new Promise((resolve, reject) => {
-        ws.on("message", (data) => {
+        let resolved = false;
+
+        const cleanup = () => {
+          if (!resolved) {
+            resolved = true;
+            ws.removeListener("message", messageHandler);
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.close();
+            }
+          }
+        };
+
+        const messageHandler = (data) => {
           const message = JSON.parse(data.toString());
           if (message.type === "error") {
             expect(message.payload).toHaveProperty("message");
-            ws.close();
+            cleanup();
             resolve();
           }
-        });
+        };
+
+        ws.on("message", messageHandler);
 
         ws.send(
           JSON.stringify({
             type: "unknown:message",
           })
         );
+
+        // Timeout safety
+        setTimeout(() => {
+          if (!resolved) {
+            cleanup();
+            reject(new Error("Test timed out waiting for error message"));
+          }
+        }, 5000);
       });
     });
 
     it("sends error for invalid message format", async () => {
       await new Promise((resolve, reject) => {
-        ws.on("message", (data) => {
+        let resolved = false;
+
+        const cleanup = () => {
+          if (!resolved) {
+            resolved = true;
+            ws.removeListener("message", messageHandler);
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.close();
+            }
+          }
+        };
+
+        const messageHandler = (data) => {
           const message = JSON.parse(data.toString());
           if (message.type === "error") {
             expect(message.payload.message).toBe("Invalid message format");
-            ws.close();
+            cleanup();
             resolve();
           }
-        });
+        };
+
+        ws.on("message", messageHandler);
 
         ws.send("invalid json");
+
+        // Timeout safety
+        setTimeout(() => {
+          if (!resolved) {
+            cleanup();
+            reject(new Error("Test timed out waiting for error message"));
+          }
+        }, 5000);
       });
     });
   });
