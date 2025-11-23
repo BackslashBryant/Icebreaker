@@ -64,6 +64,8 @@ test.describe('Golden Screens: Visual Regression', () => {
       await setViewport(page, viewport);
       await page.goto('/onboarding');
       await page.locator(SEL.onboardingGotIt).click();
+      // Check consent checkbox before clicking Continue
+      await page.locator('input[type="checkbox"][id="consent"]').check();
       await page.locator(SEL.onboardingContinue).click();
       await expect(page.locator(SEL.onboardingStep2)).toBeVisible({ timeout: 15000 });
 
@@ -80,6 +82,8 @@ test.describe('Golden Screens: Visual Regression', () => {
       await setViewport(page, viewport);
       await page.goto('/onboarding');
       await page.locator(SEL.onboardingGotIt).click();
+      // Check consent checkbox before clicking Continue
+      await page.locator('input[type="checkbox"][id="consent"]').check();
       await page.locator(SEL.onboardingContinue).click();
       await page.locator(SEL.onboardingSkipLocation).click();
       await expect(page.locator(SEL.onboardingStep3)).toBeVisible({ timeout: 15000 });
