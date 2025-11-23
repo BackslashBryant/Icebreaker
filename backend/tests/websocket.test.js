@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { WebSocket } from "ws";
 import { createSession } from "../src/services/SessionManager.js";
-import { createServer } from "http";
 import express from "express";
 import cors from "cors";
 import { initializeWebSocketServer } from "../src/websocket/server.js";
@@ -18,12 +17,14 @@ let wsUrl;
 
 describe("WebSocket Server", () => {
   beforeAll(async () => {
-    const httpServer = createServer(app);
-    initializeWebSocketServer(httpServer);
-    const result = await createWebSocketTestServer(httpServer);
+    // Pass the Express app to the helper - it will create and listen on the HTTP server
+    const result = await createWebSocketTestServer(app);
     testServer = result.server;
     testPort = result.port;
     wsUrl = result.wsUrl;
+    // Initialize WebSocket server on the HTTP server that the helper created
+    // Server is already listening at this point
+    initializeWebSocketServer(testServer);
   });
 
   afterAll(async () => {
@@ -311,6 +312,14 @@ describe("WebSocket Server", () => {
     });
 
     it("handles chat:request message", async () => {
+      // Create a valid target session for the chat request
+      const targetSessionData = {
+        vibe: "intros",
+        tags: ["tag1"],
+        visibility: true,
+      };
+      const targetSession = createSession(targetSessionData);
+
       await new Promise((resolve, reject) => {
         let resolved = false;
 
@@ -329,6 +338,8 @@ describe("WebSocket Server", () => {
           if (message.type === "chat:request:ack") {
             expect(message.payload).toHaveProperty("targetSessionId");
             expect(message.payload).toHaveProperty("status");
+            expect(message.payload.targetSessionId).toBe(targetSession.sessionId);
+            expect(message.payload.status).toBe("pending");
             cleanup();
             resolve();
           }
@@ -340,7 +351,7 @@ describe("WebSocket Server", () => {
           JSON.stringify({
             type: "chat:request",
             payload: {
-              targetSessionId: "test-session-id",
+              targetSessionId: targetSession.sessionId,
             },
           })
         );
