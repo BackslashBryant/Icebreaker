@@ -54,6 +54,18 @@ export default defineConfig({
         headless: process.env.CI ? true : undefined, // Headless in CI, default locally
       },
     },
+    // Chromium project for cross-browser matrix (matches CI health-mvp job)
+    {
+      name: 'chromium',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true,
+      workers: getWorkerCount(),
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: process.env.CI ? true : undefined,
+      },
+    },
     // Stateful tests: Serial execution (performance, persona flows, WebSocket-dependent)
     {
       name: 'stateful',
@@ -65,16 +77,29 @@ export default defineConfig({
         headless: process.env.CI ? true : undefined, // Headless in CI, default locally
       },
           },
-          // Firefox and Edge tests disabled temporarily due to timeout issues
-          // Re-enable after investigating server startup timing
-          // {
-          //   name: 'firefox',
-          //   use: { ...devices['Desktop Firefox'] },
-          // },
-          // {
-          //   name: 'msedge',
-          //   use: { ...devices['Desktop Edge'] },
-          // },
+    // Firefox and Edge projects for cross-browser testing
+    {
+      name: 'firefox',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true,
+      workers: getWorkerCount(),
+      use: {
+        ...devices['Desktop Firefox'],
+        headless: process.env.CI ? true : undefined,
+      },
+    },
+    {
+      name: 'msedge',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true,
+      workers: getWorkerCount(),
+      use: {
+        ...devices['Desktop Edge'],
+        headless: process.env.CI ? true : undefined,
+      },
+    },
         ],
   // Web servers - automatically start backend and frontend servers for tests
   // Set SKIP_WEB_SERVER=1 to use manually started servers instead
