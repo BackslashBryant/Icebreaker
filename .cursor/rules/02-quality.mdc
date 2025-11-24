@@ -89,6 +89,67 @@ async function loadSentry() {
 - `Template CI` currently runs the preflight check and best-effort verification helper.
 - Extend the workflow once your stack is generated (e.g., add matrix jobs for frontend/backend services) and hook in any new verification commands you introduced.
 
+## CI Job Configuration Requirements
+
+**MANDATORY**: When creating or modifying CI jobs, ensure all dependencies are installed before use:
+
+1. **Playwright Browser Installation**:
+   - **REQUIRED**: If a CI job runs Playwright tests (E2E tests), it MUST install browsers before running tests
+   - **Pattern**: Add step `npx playwright install --with-deps <browser>` before test execution
+   - **Example**: If job runs `npx playwright test`, it must have `npx playwright install --with-deps chromium` (or appropriate browser) in a previous step
+   - **Verification**: Check that browser installation step exists before any Playwright test commands
+
+2. **Test Runner Dependencies**:
+   - **REQUIRED**: If a job runs tests, ensure test dependencies are installed
+   - **Pattern**: Install dependencies in correct working directory before running tests
+   - **Example**: `npm ci || npm install` in `./frontend` before `npm test` in `./frontend`
+
+3. **Project Configuration**:
+   - **REQUIRED**: If using Playwright project matrix (e.g., `--project=${{ matrix.browser }}`), ensure projects exist in `playwright.config.ts`
+   - **Verification**: Verify project names in config match matrix values
+   - **Example**: If matrix has `browser: [chromium, firefox, msedge]`, config must have projects named `chromium`, `firefox`, `msedge`
+
+**NEVER**: Create CI jobs that run tests without installing required dependencies first.
+
+## Terminal Error Handling
+
+**MANDATORY**: Never ignore or dismiss terminal errors. All errors must be investigated and resolved:
+
+1. **Error Detection**:
+   - **REQUIRED**: Check exit codes of all commands (`$?` in bash, `$LASTEXITCODE` in PowerShell)
+   - **REQUIRED**: Read error messages completely - don't skip or truncate
+   - **REQUIRED**: Look for error patterns: `Error:`, `FAIL`, `exit code 1`, `Cannot find`, `doesn't exist`
+
+2. **Error Investigation**:
+   - **REQUIRED**: When an error occurs, investigate root cause before proceeding
+   - **REQUIRED**: Check if error is related to your changes or pre-existing infrastructure
+   - **REQUIRED**: Verify error in CI matches local reproduction (if possible)
+   - **REQUIRED**: Surface error details (first error snippet, stack trace, relevant context)
+
+3. **Error Resolution**:
+   - **REQUIRED**: Fix errors related to your changes before merging
+   - **REQUIRED**: Document pre-existing errors separately (don't ignore them)
+   - **REQUIRED**: If error is infrastructure-related, create issue or document in plan-status file
+
+4. **Unicode/Encoding Issues**:
+   - **Note**: PowerShell may display Unicode characters (emojis, checkmarks) as garbled text (e.g., `ΓöÇ`, `ΓòÉ`)
+   - **Action**: This is a display issue, not a code problem - focus on actual errors, not display artifacts
+   - **Workaround**: Use `gh` CLI or GitHub Actions UI for cleaner output if needed
+
+**NEVER**: 
+- Ignore non-zero exit codes
+- Skip error messages in output
+- Assume errors are "just display issues" without verification
+- Proceed with work when CI jobs are failing
+- Merge PRs with failing CI checks (unless explicitly approved for known issues)
+
+**ALWAYS**:
+- Check command exit codes
+- Read full error messages
+- Investigate root cause
+- Fix or document all errors
+- Verify fixes before proceeding
+
 ---
 
 # Security & Dependencies

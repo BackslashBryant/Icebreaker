@@ -161,6 +161,46 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Nexus confirms GitHub Actions succeeded, configures environment variables/Secrets, and keeps status checks enforced. Record every change in the Connection Guide.
 - Sentinel jumps in for auth/secret/PII-sensitive work, leaving notes under `/docs/security/`.
 
+## 4.5. CI Verification Protocol
+
+**MANDATORY**: Before merging any PR or considering work complete:
+
+1. **CI Status Check**:
+   - **REQUIRED**: Verify all CI jobs are passing (green) before merging
+   - **REQUIRED**: Check GitHub Actions UI or `gh pr checks` for job status
+   - **REQUIRED**: Wait for all jobs to complete (not just pending)
+
+2. **Error Investigation**:
+   - **REQUIRED**: If any job fails, investigate root cause immediately
+   - **REQUIRED**: Check job logs for first error snippet
+   - **REQUIRED**: Determine if error is related to your changes or pre-existing infrastructure
+   - **REQUIRED**: Fix errors related to your changes before merging
+   - **REQUIRED**: Document pre-existing errors separately (don't ignore them)
+
+3. **CI Configuration Verification**:
+   - **REQUIRED**: Verify CI jobs have all required dependencies installed
+   - **REQUIRED**: For Playwright tests, verify browsers are installed before test execution
+   - **REQUIRED**: Verify project names in Playwright config match matrix values
+   - **REQUIRED**: Verify test commands use correct project flags
+
+4. **Terminal Error Handling**:
+   - **REQUIRED**: Never ignore terminal errors or non-zero exit codes
+   - **REQUIRED**: Read error messages completely - don't skip or truncate
+   - **REQUIRED**: Investigate root cause before proceeding
+   - **REQUIRED**: Fix or document all errors before merging
+
+**NEVER**: 
+- Merge PRs with failing CI checks (unless explicitly approved for known issues)
+- Ignore terminal errors as "display issues" without verification
+- Skip browser installation "to save time" in CI jobs
+- Proceed with work when CI jobs are failing
+
+**ALWAYS**:
+- Wait for CI to complete before merging
+- Investigate failing jobs
+- Fix errors related to your changes
+- Document pre-existing issues separately
+
 ## 5. Direct Commits (No PRs)
 - Direct commits to feature branches. No PRs needed.
 - Commit messages should reference the issue: `feat: Complete Issue #X - [description]`

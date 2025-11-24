@@ -1,0 +1,282 @@
+# Testing Practices & Infrastructure
+
+## Tool Selection
+
+### Unit Tests
+- **Vitest**: Fast, Vite-native test runner
+- **React Testing Library**: Component testing for frontend
+- **@testing-library/jest-dom**: DOM matchers
+- **jsdom**: Browser environment simulation for frontend tests
+- **node**: Node.js environment for backend tests
+
+### Integration Tests
+- **Vitest**: Same runner as unit tests
+- **fetch() + test server utilities**: **PREFERRED** pattern for HTTP API testing (reliable, no timeouts)
+- **supertest**: HTTP assertion library - **AVOID** (known timeout issues, use fetch() instead)
+- **WebSocket testing**: Direct WebSocket client connections
+
+### E2E Tests
+- **Playwright**: Browser automation and E2E testing
+- **Playwright MCP**: **PRIMARY TOOL** - Use Playwright MCP for all E2E testing operations (screenshots, accessibility checks, test execution)
+- **@axe-core/playwright**: Accessibility testing integration
+- **CLI Fallback**: Only use `npm test` when MCP unavailable or for CI automation
+
+### Test Utilities
+- **`backend/tests/utils/test-server.js`**: Reusable server setup/teardown helpers
+
+## CI Configuration for Playwright Tests
+
+**MANDATORY**: When configuring CI jobs that run Playwright tests:
+
+1. **Browser Installation**:
+   - **REQUIRED**: Install browsers BEFORE running tests
+   - **Pattern**: `npx playwright install --with-deps <browser>` must run before `npx playwright test`
+   - **Location**: Install step must be in same job, before test step
+   - **Working Directory**: Install from `./tests` directory (where `playwright.config.ts` is located)
+
+2. **Project Matrix Configuration**:
+   - **REQUIRED**: If using `--project=${{ matrix.browser }}`, verify projects exist in `playwright.config.ts`
+   - **Verification**: Check that project names match matrix values exactly
+   - **Example**: Matrix `browser: [chromium, firefox, msedge]` requires projects named `chromium`, `firefox`, `msedge` in config
+
+3. **Test Command Verification**:
+   - **REQUIRED**: Verify test command uses correct project flag
+   - **Pattern**: `npx playwright test <spec> --project=<project-name>`
+   - **Check**: Ensure project name matches installed browser and config project name
+
+4. **Error Prevention**:
+   - **NEVER**: Run Playwright tests without browser installation step
+   - **NEVER**: Use project names that don't exist in config
+   - **NEVER**: Skip browser installation "to save time" - tests will fail
+
+**Example CI Job Structure**:
+```yaml
+- name: Install E2E test dependencies
+  working-directory: ./tests
+  run: npm ci || npm install
+- name: Install Playwright browsers
+  working-directory: ./tests
+  run: npx playwright install --with-deps ${{ matrix.browser }}
+- name: Run E2E tests
+  working-directory: ./tests
+  run: npx playwright test e2e/health.spec.ts --project=${{ matrix.browser }}
+```
+
+## Port Management
+
+### Dynamic Port Allocation
+**Always use dynamic port allocation for test servers to prevent conflicts.**
+
+```javascript
+import { createTestServer, closeTestServer } from './utils/test-server.js';
+
+let server;
+let baseUrl;
+
+beforeAll(async () => {
+  const result = await createTestServer(app);
+  server = result.server;
+  baseUrl = result.url;
+});
+
+afterAll(async () => {
+  await closeTestServer(server);
+});
+```
+
+**Why**: Tests run in parallel by default. Hardcoded ports cause conflicts when multiple test files run simultaneously.
+
+**Pattern**: Use `createTestServer()` or `createWebSocketTestServer()` from `backend/tests/utils/test-server.js`.
+
+### Server Cleanup
+**Always use `closeTestServer()` for robust cleanup.**
+
+```javascript
+afterAll(async () => {
+  await closeTestServer(server);
+});
+```
+
+**Why**: Ensures ports are released even if cleanup fails, preventing test hangs and port conflicts.
+
+## Integration Test Setup
+
+### HTTP API Testing Pattern (PREFERRED)
+**Use `fetch()` with test server utilities - this is the reliable pattern:**
+
+```javascript
+import { app } from '../src/index.js';
+import { createTestServer, closeTestServer } from './utils/test-server.js';
+
+let server;
+let baseUrl;
+
+beforeAll(async () => {
+  const result = await createTestServer(app);
+  server = result.server;
+  baseUrl = result.url;
+});
+
+afterAll(async () => {
+  await closeTestServer(server);
+});
+
+it('tests API endpoint', async () => {
+  const response = await fetch(`${baseUrl}/api/endpoint`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data: 'test' }),
+  });
+
+  expect(response.status).toBe(200);
+  const body = await response.json();
+  expect(body).toHaveProperty('expectedField');
+});
+```
+
+**Why**: This pattern is proven reliable, avoids timeout issues, and matches existing working tests (`onboarding.test.js`, `health.test.ts`).
+
+### Supertest (AVOID - Known Issues)
+**Supertest has persistent timeout issues. Use `fetch()` + test server instead.**
+
+If you must use supertest (not recommended):
+- Requires `express.json()` middleware at app level
+- Requires error handlers
+- May timeout even with correct setup
+- **Better**: Use `fetch()` pattern above
+
+## Test Organization
+
+### File Structure
+```
+backend/tests/
+  ├── utils/
+  │   └── test-server.js      # Test utilities
+  ├── *.test.js               # Unit tests
+  └── *.test.ts               # TypeScript unit tests
+
+tests/
+  └── e2e/
+      └── *.spec.ts           # E2E tests (Playwright)
+```
+
+### Test Naming
+- Unit tests: `*.test.js` or `*.test.ts`
+- E2E tests: `*.spec.ts`
+- Test utilities: `utils/*.js`
+
+## Timeout Configuration
+
+### Vitest Timeouts
+```javascript
+testTimeout: 10000,      // 10s per test - prevents hangs
+hookTimeout: 10000,      // 10s per hook - prevents setup/teardown hangs
+teardownTimeout: 5000,   // 5s teardown - ensures cleanup completes
+```
+
+**Why**: Prevents tests from hanging indefinitely. All test configs must include these timeouts.
+
+### Playwright Timeouts
+```javascript
+timeout: 60000,          // 60s per test
+actionTimeout: 10000,    // 10s for actions
+navigationTimeout: 30000 // 30s for navigation
+```
+
+### Playwright Output & Reporting
+- **Reporter**: `list` - Clean ASCII output, no Unicode artifacts
+- **Primary Tool**: Use Playwright MCP for all testing operations (cleaner output, better integration)
+- **CLI Usage**: Only when MCP unavailable or for CI automation
+- **Output Format**: Clean list format, no session IDs or encoding artifacts
+
+## Test Isolation
+
+### Vitest Configuration
+```javascript
+pool: 'forks',           // Isolate tests in separate processes
+poolOptions: {
+  forks: {
+    singleFork: false,   // Allow parallel execution (dynamic ports prevent conflicts)
+  },
+},
+```
+
+**Why**: Process isolation prevents shared state issues. Dynamic ports allow parallel execution without conflicts.
+
+## Logging
+
+### Test Logging Requirements
+- **All test runs must produce logs** in `artifacts/test-logs/`
+- **Logs overwrite previous runs** of the same type (by test suite name)
+- **Log format**: `{testSuiteName}-{timestamp}.log`
+
+**Implementation**: Use `scripts/test-logger.mjs` for consistent logging.
+
+## Coverage Thresholds
+
+### Minimum Coverage Requirements
+```javascript
+thresholds: {
+  lines: 80,
+  functions: 80,
+  branches: 80,
+  statements: 80,
+}
+```
+
+**Enforcement**: Coverage thresholds are enforced in CI and local test runs.
+
+## When to Use What
+
+### Unit Tests (Vitest)
+- **Use for**: Pure functions, utilities, component logic
+- **Environment**: `jsdom` (frontend) or `node` (backend)
+- **Speed**: Fast (< 1s per test)
+
+### Integration Tests (Vitest + fetch + test server)
+- **Use for**: API routes, Express middleware, route handlers
+- **Setup**: Use `createTestServer()` from `backend/tests/utils/test-server.js` with `fetch()`
+- **Speed**: Medium (< 5s per test)
+- **Pattern**: See `onboarding.test.js` and `health.test.ts` for reference
+
+### E2E Tests (Playwright)
+- **Use for**: Full user flows, browser interactions, accessibility
+- **Primary Tool**: Playwright MCP (use MCP tools for screenshots, accessibility checks, test execution)
+- **CLI Fallback**: `npm test` only when MCP unavailable or for CI automation
+- **Setup**: Automatic server startup (if configured)
+- **Speed**: Slow (< 60s per test)
+- **Output**: Clean list format via `--reporter=list`, no Unicode artifacts
+
+## Best Practices
+
+1. **Never use hardcoded ports** - Always use dynamic port allocation
+2. **Always clean up servers** - Use `closeTestServer()` in `afterAll`
+3. **Add timeouts to all configs** - Prevents hangs
+4. **Log all test runs** - Use test logger for consistency
+5. **Isolate tests** - Use Vitest fork pool for process isolation
+6. **Use fetch() + test server** - Preferred pattern for HTTP API tests (avoid supertest)
+7. **Never skip tests** - Fix root causes instead of skipping
+8. **Match test expectations to actual behavior** - Verify behavior first, then write tests
+9. **Run tests multiple times** - Verify consistency (no flaky tests)
+10. **Review logs when tests fail** - Investigate root causes, don't skip
+11. **Validate server startup** - Run `server-startup.test.js` to verify server can start before E2E tests
+12. **Check dependencies before tests** - Run `npm run check:dependencies` to catch missing imports
+13. **NEVER create report files** - Do NOT create `.md` files for test results, findings, or bug reports. Use GitHub Issues instead. Report findings in chat or add them to existing GitHub issues.
+
+## Common Issues & Solutions
+
+### Port Conflicts
+**Symptom**: `EADDRINUSE` errors
+**Solution**: Use dynamic port allocation via `createTestServer()`
+
+### Supertest Timeouts
+**Symptom**: Tests timeout with `ETIMEDOUT`
+**Solution**: **Don't use supertest** - use `fetch()` + test server utilities instead (see `onboarding.test.js` for pattern)
+
+### Test Hangs
+**Symptom**: Tests never complete
+**Solution**: Ensure timeouts are configured and cleanup completes
+
+### Flaky Tests
+**Symptom**: Tests pass/fail inconsistently
+**Solution**: Use process isolation (`pool: 'forks'`) and dynamic ports
