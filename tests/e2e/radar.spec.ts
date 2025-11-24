@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { SEL } from "../utils/selectors";
 
 test.describe("Radar View", () => {
   test.beforeEach(async ({ page }) => {
@@ -19,11 +20,11 @@ test.describe("Radar View", () => {
 
   test("displays radar view with accessibility", async ({ page }) => {
     // Check for main content (may be canvas, main, or heading)
-    const mainContent = page.getByRole("main").or(page.locator("canvas")).or(page.getByRole("heading", { name: /RADAR/i }));
+    const mainContent = page.getByRole("main").or(page.locator("canvas")).or(page.locator(SEL.radarHeading));
     await expect(mainContent.first()).toBeVisible({ timeout: 10000 });
     
     // Check for RADAR text or heading
-    const radarText = page.getByText("RADAR").or(page.getByRole("heading", { name: /RADAR/i }));
+    const radarText = page.getByText("RADAR").or(page.locator(SEL.radarHeading));
     await expect(radarText.first()).toBeVisible({ timeout: 5000 });
 
     // Run accessibility checks with axe

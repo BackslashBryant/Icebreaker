@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { completeOnboarding } from "../utils/test-helpers";
+import { SEL } from "../utils/selectors";
 
 test.describe("Profile/Settings Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -222,7 +223,7 @@ test.describe("Profile/Settings Page", () => {
     
     // Wait for radar page to fully load (ensures session is set in React state)
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("heading", { name: "RADAR" })).toBeVisible({ timeout: 10000 });
+    await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 10000 });
     
     // Navigate to profile using React Router (preserves JavaScript context/session)
     // Click the Profile button in the header instead of using page.goto()

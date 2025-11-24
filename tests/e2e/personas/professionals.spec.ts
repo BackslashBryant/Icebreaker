@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { waitForBootSequence, completeOnboarding, setupSession } from "../../utils/test-helpers";
 import { TelemetryCollector, checkPanicButtonVisible, checkVisibilityToggleVisible, checkFocusOrder, countErrorBanners } from "../../utils/telemetry";
+import { SEL } from "../../utils/selectors";
 
 /**
  * Persona-Based E2E Tests: Professional Personas
@@ -64,7 +65,7 @@ test.describe("Persona: Marcus Thompson - Remote Worker", () => {
       
       // Wait for navigation to radar (onboarding has 500ms delay + API call time)
       await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 10000 });
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -93,10 +94,10 @@ test.describe("Persona: Marcus Thompson - Remote Worker", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -128,10 +129,10 @@ test.describe("Persona: Marcus Thompson - Remote Worker", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -164,10 +165,10 @@ test.describe("Persona: Marcus Thompson - Remote Worker", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -199,10 +200,10 @@ test.describe("Persona: Marcus Thompson - Remote Worker", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -234,10 +235,10 @@ test.describe("Persona: Marcus Thompson - Remote Worker", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -269,7 +270,7 @@ test.describe("Persona: Marcus Thompson - Remote Worker", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Run accessibility check
       const accessibilityScanResults = await new AxeBuilder({ page })
@@ -339,7 +340,7 @@ test.describe("Persona: Casey Rivera - Creative Professional", () => {
       
       // Wait for navigation to radar (onboarding has 500ms delay + API call time)
       await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 10000 });
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -368,10 +369,10 @@ test.describe("Persona: Casey Rivera - Creative Professional", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -403,10 +404,10 @@ test.describe("Persona: Casey Rivera - Creative Professional", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -438,10 +439,10 @@ test.describe("Persona: Casey Rivera - Creative Professional", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -473,10 +474,10 @@ test.describe("Persona: Casey Rivera - Creative Professional", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -508,10 +509,10 @@ test.describe("Persona: Casey Rivera - Creative Professional", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -543,7 +544,7 @@ test.describe("Persona: Casey Rivera - Creative Professional", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Run accessibility check
       const accessibilityScanResults = await new AxeBuilder({ page })
@@ -645,10 +646,10 @@ test.describe("Cross-Persona: Professional Personas", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -682,10 +683,10 @@ test.describe("Cross-Persona: Professional Personas", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -719,7 +720,7 @@ test.describe("Cross-Persona: Professional Personas", () => {
         await page.waitForLoadState("networkidle");
 
         // Verify Radar loads
-        await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+        await expect(page.locator(SEL.radarHeading)).toBeVisible();
         
         // Record error banners for this persona
         const errorCount = await countErrorBanners(page);
@@ -755,7 +756,7 @@ test.describe("Cross-Persona: Professional Personas", () => {
         await page.waitForLoadState("networkidle");
 
         // Verify Radar loads
-        await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+        await expect(page.locator(SEL.radarHeading)).toBeVisible();
         
         // Record error banners for this persona
         const errorCount = await countErrorBanners(page);

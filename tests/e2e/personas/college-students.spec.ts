@@ -136,7 +136,7 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
       
       // Wait for navigation to radar (onboarding has 500ms delay + API call time)
       await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 10000 });
       
       // Record error banners if any
       const errorCount = await countErrorBanners(page);
@@ -181,7 +181,7 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Capture telemetry: check affordances
       const panicVisible = await checkPanicButtonVisible(page);
@@ -219,7 +219,7 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
         await page.getByRole("button", { name: /DONE/i }).click();
         await expect(page).toHaveURL(/.*\/radar/);
         // Wait for Radar heading again after returning from Profile
-        await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+        await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
       }
     } catch (error) {
       telemetry.recordError(error instanceof Error ? error.message : String(error));
@@ -245,10 +245,10 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads (Maya would see Zoe if both were active)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -280,7 +280,7 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify panic button is accessible (always-accessible FAB)
       // Panic button has aria-label="Emergency panic button"
@@ -344,7 +344,7 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Run accessibility check
       const accessibilityScanResults = await new AxeBuilder({ page })
@@ -416,7 +416,7 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
       
       // Wait for navigation to radar (onboarding has 500ms delay + API call time)
       await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 10000 });
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -451,10 +451,10 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -486,10 +486,10 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -521,7 +521,7 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify panic button is accessible
       const panicButton = page.getByRole("button", { name: /panic|emergency|help/i });
@@ -594,7 +594,7 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
       
       // Wait for navigation to radar (onboarding has 500ms delay + API call time)
       await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 10000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 10000 });
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -623,10 +623,10 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -658,10 +658,10 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -693,10 +693,10 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);
@@ -728,7 +728,7 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Zoe may toggle visibility off if overwhelmed
       // Note: Visibility toggle is on Profile page, not Radar page
@@ -848,10 +848,10 @@ test.describe("Cross-Persona: College Students", () => {
 
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Verify Radar loads
-      await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+      await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
       // Record error banners
       const errorCount = await countErrorBanners(page);

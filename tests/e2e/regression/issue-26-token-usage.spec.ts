@@ -142,7 +142,7 @@ test.describe("Regression: Issue #26 Token Usage", () => {
     });
     
     await page.goto("/radar");
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+    await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
     await page.waitForTimeout(1000);
     
     // Check empty state callout uses rounded-md

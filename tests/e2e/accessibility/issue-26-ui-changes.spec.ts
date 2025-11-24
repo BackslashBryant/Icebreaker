@@ -95,7 +95,7 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     });
     
     await page.goto("/radar");
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+    await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
     await page.waitForTimeout(1000); // Wait for empty state
     
     // Check for empty state with role="status"

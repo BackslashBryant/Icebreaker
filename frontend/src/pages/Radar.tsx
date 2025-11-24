@@ -82,7 +82,7 @@ export default function Radar() {
       <header className="border-b border-border p-4 sm:p-6" role="banner">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-accent font-mono glow-accent">
+            <h1 className="text-2xl font-bold text-accent font-mono glow-accent" data-testid="radar-heading">
               RADAR
             </h1>
             <p className="text-xs text-muted-foreground font-mono mt-1">
@@ -95,13 +95,14 @@ export default function Radar() {
           </div>
 
           {/* View Toggle */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" data-testid="radar-view-toggle">
             <Button
               onClick={() => navigate("/profile")}
               variant="ghost"
               size="icon"
               className="font-mono text-xs sm:text-sm text-muted-foreground hover:text-foreground border-2 border-transparent hover:border-border"
               aria-label="Go to profile"
+              data-testid="radar-profile-button"
             >
               <User className="h-4 w-4" />
             </Button>
