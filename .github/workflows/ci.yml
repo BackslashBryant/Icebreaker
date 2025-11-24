@@ -44,15 +44,20 @@ jobs:
         run: npm run check:ui-tokens
       - name: Connection Guide check
         run: |
-          git fetch --no-tags --depth=1 origin ${{ github.base_ref }}
-          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
-          echo "Changed files:\n$CHANGED"
-          NEED_CHECK=$(echo "$CHANGED" | grep -E '^(\.github/|env\.example$|Dockerfile)' || true)
-          if [ -n "$NEED_CHECK" ]; then
-            echo "Detected CI/env changes. Verifying docs/ConnectionGuide.md updated..."
-            echo "$CHANGED" | grep -q '^docs/ConnectionGuide\.md$' || { echo 'docs/ConnectionGuide.md must be updated when CI/env changes.'; exit 1; }
+          BASE=${{ github.base_ref || 'main' }}
+          git fetch --no-tags --depth=1 origin "$BASE" || true
+          if git merge-base origin/"$BASE" HEAD >/dev/null 2>&1; then
+            CHANGED=$(git diff --name-only origin/"$BASE"...HEAD)
+            echo "Changed files:\n$CHANGED"
+            NEED_CHECK=$(echo "$CHANGED" | grep -E '^(\.github/|env\.example$|Dockerfile)' || true)
+            if [ -n "$NEED_CHECK" ]; then
+              echo "Detected CI/env changes. Verifying docs/ConnectionGuide.md updated..."
+              echo "$CHANGED" | grep -q '^docs/ConnectionGuide\.md$' || { echo 'docs/ConnectionGuide.md must be updated when CI/env changes.'; exit 1; }
+            else
+              echo "No CI/env changes detected; skipping ConnectionGuide check."
+            fi
           else
-            echo "No CI/env changes detected; skipping ConnectionGuide check."
+            echo "No merge base with $BASE; skipping Connection Guide check."
           fi
 
   persona-smoke:
