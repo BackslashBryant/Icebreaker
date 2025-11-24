@@ -19,6 +19,7 @@ import { test, expect } from '@playwright/test';
 import { VIEWPORTS, getViewportNames, setViewport, MASK_SELECTORS } from '../../utils/viewports';
 import { setupSession, waitForBootSequence } from '../../utils/test-helpers';
 import { SEL } from '../../utils/selectors';
+import { SEL } from '../../utils/selectors';
 
 test.describe('Golden Screens: Visual Regression', () => {
   // Test each viewport
@@ -112,7 +113,7 @@ test.describe('Golden Screens: Visual Regression', () => {
       });
 
       await page.goto('/radar');
-      await expect(page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
       await page.waitForTimeout(1000); // Wait for empty state to render
 
       await expect(page).toHaveScreenshot(`golden-radar-empty-${viewport.name}.png`, {

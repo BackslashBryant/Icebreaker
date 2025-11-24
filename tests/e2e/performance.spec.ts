@@ -5,6 +5,7 @@ import { setupSession, completeOnboarding } from "../utils/test-helpers";
 import chatPerformanceScript from "../fixtures/persona-presence/chat-performance.json";
 import type { PersonaPresenceScript } from "../fixtures/persona-presence/schema";
 import { test as wsMockTest } from "./fixtures/ws-mock.setup";
+import { SEL } from "../utils/selectors";
 
 /**
  * Performance Test Suite
@@ -291,7 +292,7 @@ test.describe("Performance Tests", () => {
       // Use a more robust selector that works with the current UI
       // Use first() to avoid strict mode violation when multiple elements match
       await expect(
-        page.getByRole("heading", { name: /RADAR/i }).first()
+        page.locator(SEL.radarHeading).first()
       ).toBeVisible({ timeout: 5000 });
     
     const loadTime = Date.now() - startTime;
@@ -310,7 +311,7 @@ test.describe("Performance Tests", () => {
 
     // Wait for main content with improved selector
     await expect(
-      page.getByRole("heading", { name: /RADAR/i }).first()
+      page.locator(SEL.radarHeading).first()
     ).toBeVisible({ timeout: 10000 });
 
       // Run accessibility check with WCAG AA tags
@@ -605,7 +606,7 @@ test.describe("Performance Tests", () => {
     
     // Wait for radar heading to be visible
     await expect(
-      page.getByRole("heading", { name: /RADAR/i }).first()
+      page.locator(SEL.radarHeading).first()
     ).toBeVisible({ timeout: 10000 });
     
     const navTime = Date.now() - navStartTime;

@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { waitForBootSequence, getBaseURL } from "../utils/test-helpers";
+import { SEL } from "../utils/selectors";
 
 test.describe("Onboarding Flow", () => {
   test("complete onboarding flow: Welcome → Consent → Location (skip) → Vibe & Tags → API → Radar", async ({
@@ -56,7 +57,7 @@ test.describe("Onboarding Flow", () => {
 
     // Verify navigation to radar
     await expect(page).toHaveURL(/.*\/radar/);
-    await expect(page.getByRole("heading", { name: /RADAR/i })).toBeVisible();
+    await expect(page.locator(SEL.radarHeading)).toBeVisible();
   });
 
   test("accessibility: WCAG AA compliance check", async ({ page }) => {

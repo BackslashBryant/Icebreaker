@@ -29,7 +29,7 @@ test.describe('Visual Regression: Radar Screen', () => {
       });
 
       await page.goto('/radar');
-      await expect(page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Wait a bit for any loading states
       await page.waitForTimeout(1000);
