@@ -7,6 +7,7 @@ import Radar from './pages/Radar';
 import Chat from './pages/Chat';
 import Profile from './pages/Profile';
 import DevIndex from './pages/DevIndex';
+import Health from './pages/Health';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/welcome" replace />} />
           <Route path="/dev" element={<DevIndex />} />
+          <Route path="/health" element={<Health />} />
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/radar" element={<Radar />} />
