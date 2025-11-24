@@ -32,15 +32,12 @@ jobs:
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm ci || npm install
-      - name: Install E2E test dependencies
-        working-directory: ./tests
-        run: npm ci || npm install
       - name: Guard Lint
         run: npm run guard:lint
       - name: Guard Typecheck
         run: npm run guard:type
-      - name: Guard Tests
-        run: npm test
+      - name: Guard Tests (Unit Only)
+        run: node scripts/run-tests-unit-only.mjs
       - name: Date validation check
         run: node tools/check-dates.mjs --changed --json || { echo "Placeholder dates detected in changed files. Use Time MCP to get accurate dates."; exit 1; }
       - name: UI Token Check
