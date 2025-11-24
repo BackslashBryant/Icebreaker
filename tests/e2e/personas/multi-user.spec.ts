@@ -13,6 +13,7 @@ import { test, expect } from '@playwright/test';
 import { createMultiPersonaContexts, cleanupPersonaContexts, waitForMutualVisibility } from '../../utils/multi-persona';
 import type { PersonaPresenceScript } from '../../fixtures/persona-presence/schema';
 import { TelemetryCollector, countErrorBanners } from '../../utils/telemetry';
+import { SEL } from '../../utils/selectors';
 
 // Import presence scripts
 import campusLibraryScript from '../../fixtures/persona-presence/campus-library.json';
@@ -38,8 +39,8 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       await zoe.page.goto('/radar');
 
       // Wait for Radar to load
-      await expect(maya.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
-      await expect(zoe.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(maya.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+      await expect(zoe.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Wait for WebSocket presence updates
       await maya.page.waitForTimeout(2000);
@@ -100,8 +101,8 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       await maya.page.goto('/radar');
       await zoe.page.goto('/radar');
 
-      await expect(maya.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
-      await expect(zoe.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(maya.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+      await expect(zoe.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Wait for presence updates
       await maya.page.waitForTimeout(2000);
@@ -153,8 +154,8 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       await maya.page.goto('/radar');
       await zoe.page.goto('/radar');
 
-      await expect(maya.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
-      await expect(zoe.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(maya.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+      await expect(zoe.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Wait for initial presence
       await maya.page.waitForTimeout(2000);
@@ -226,8 +227,8 @@ test.describe('Multi-User Scenarios: Ethan + Marcus (Coworking)', () => {
       await ethan.page.goto('/radar');
       await marcus.page.goto('/radar');
 
-      await expect(ethan.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
-      await expect(marcus.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(ethan.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+      await expect(marcus.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Wait for presence updates
       await ethan.page.waitForTimeout(2000);
@@ -285,8 +286,8 @@ test.describe('Multi-User Scenarios: Ethan + Marcus (Coworking)', () => {
       await ethan.page.goto('/radar');
       await marcus.page.goto('/radar');
 
-      await expect(ethan.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
-      await expect(marcus.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(ethan.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+      await expect(marcus.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Record error banners
       const ethanErrorCount = await countErrorBanners(ethan.page);
@@ -336,8 +337,8 @@ test.describe('Multi-User Scenarios: Casey + Alex (Gallery Opening)', () => {
       await casey.page.goto('/radar');
       await alex.page.goto('/radar');
 
-      await expect(casey.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
-      await expect(alex.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(casey.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+      await expect(alex.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Wait for presence updates
       await casey.page.waitForTimeout(2000);
@@ -391,8 +392,8 @@ test.describe('Multi-User Chat Scenarios', () => {
       await maya.page.goto('/radar');
       await zoe.page.goto('/radar');
 
-      await expect(maya.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
-      await expect(zoe.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(maya.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+      await expect(zoe.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Wait for presence updates
       await maya.page.waitForTimeout(2000);
@@ -476,8 +477,8 @@ test.describe('Multi-User Reconnect Scenarios', () => {
       await maya.page.goto('/radar');
       await zoe.page.goto('/radar');
 
-      await expect(maya.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
-      await expect(zoe.page.getByRole('heading', { name: /RADAR/i })).toBeVisible({ timeout: 15000 });
+      await expect(maya.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+      await expect(zoe.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
       // Wait for initial presence
       await maya.page.waitForTimeout(2000);
