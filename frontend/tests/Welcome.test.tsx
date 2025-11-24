@@ -18,6 +18,24 @@ describe("Welcome", () => {
       ok: true,
       json: async () => ({ status: "ok" }),
     } as Response);
+
+    // Ensure window.matchMedia is properly mocked before component renders
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: vi.fn().mockImplementation((query) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+
+    // Skip boot sequence by setting seen-boot flag
+    sessionStorage.setItem("icebreaker:seen-boot", "true");
   });
 
   afterEach(() => {
@@ -41,16 +59,18 @@ describe("Welcome", () => {
     expect(screen.getByText(/Real connections/i)).toBeInTheDocument();
   });
 
-  it("renders PRESS START button", async () => {
+  it("renders Get started button", async () => {
     render(
       <BrowserRouter>
         <Welcome />
       </BrowserRouter>
     );
 
-    // Wait for button to render
+    // Wait for button to render (using testid since button wraps Link)
     await waitFor(() => {
-      expect(screen.getByRole("link", { name: /PRESS START/i })).toBeInTheDocument();
+      const button = screen.getByTestId("cta-press-start");
+      expect(button).toBeInTheDocument();
+      expect(button).toHaveTextContent(/Get started/i);
     });
   });
 
@@ -67,17 +87,22 @@ describe("Welcome", () => {
     });
   });
 
-  it("PRESS START navigates to onboarding", async () => {
+  it("Get started navigates to onboarding", async () => {
     render(
       <BrowserRouter>
         <Welcome />
       </BrowserRouter>
     );
 
-    // Wait for button to render
+    // Wait for button to render (Button with asChild renders as Link)
     await waitFor(() => {
-      const startButton = screen.getByRole("link", { name: /PRESS START/i });
-      expect(startButton).toHaveAttribute("href", "/onboarding");
+      const button = screen.getByTestId("cta-press-start");
+      expect(button).toBeInTheDocument();
     });
+    
+    // Button with asChild renders as the Link, so check the button itself
+    const button = screen.getByTestId("cta-press-start");
+    expect(button.tagName).toBe("A");
+    expect(button).toHaveAttribute("href", "/onboarding");
   });
 });

@@ -96,7 +96,7 @@ export default defineConfig({
       fullyParallel: true,
       workers: getWorkerCount(),
       use: {
-        ...devices['Desktop Edge'],
+        channel: 'msedge',
         headless: process.env.CI ? true : undefined,
       },
     },

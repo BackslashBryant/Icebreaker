@@ -73,6 +73,11 @@ function shouldSkipFile(filePath) {
     return true;
   }
 
+  // Skip .cursor/rules files (contain examples of placeholder dates in rule text)
+  if (relativePath.startsWith('.cursor/rules/')) {
+    return true;
+  }
+
   // Check if file is in .gitignore
   try {
     const result = execSync(`git check-ignore "${filePath}"`, {
@@ -175,12 +180,44 @@ function getStagedFiles() {
 }
 
 /**
+ * Get changed files from git (compared to base branch)
+ */
+function getChangedFiles() {
+  try {
+    // Try to get base branch from CI environment or default to main
+    const baseRef = process.env.GITHUB_BASE_REF || 'main';
+    const output = execSync(`git diff --name-only origin/${baseRef}...HEAD 2>&1`, {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    const files = output.trim().split('\n').filter(Boolean);
+    // Filter out error messages
+    return files.filter(f => !f.includes('fatal:') && !f.includes('error:'));
+  } catch (error) {
+    // If base branch doesn't exist or git fails, try main
+    try {
+      const output = execSync('git diff --name-only origin/main...HEAD 2>&1', {
+        cwd: repoRoot,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      });
+      const files = output.trim().split('\n').filter(Boolean);
+      return files.filter(f => !f.includes('fatal:') && !f.includes('error:'));
+    } catch (error2) {
+      return [];
+    }
+  }
+}
+
+/**
  * Main function
  */
 function main() {
   const args = process.argv.slice(2);
   const jsonMode = args.includes('--json');
   const stagedOnly = args.includes('--staged');
+  const changedOnly = args.includes('--changed');
 
   violations.length = 0; // Reset violations
 
@@ -196,6 +233,26 @@ function main() {
     }
     // Check each staged file
     stagedFiles.forEach(relativePath => {
+      const fullPath = path.join(repoRoot, relativePath);
+      if (existsSync(fullPath)) {
+        const stat = statSync(fullPath);
+        if (stat.isFile()) {
+          scanFile(fullPath);
+        }
+      }
+    });
+  } else if (changedOnly) {
+    const changedFiles = getChangedFiles();
+    if (changedFiles.length === 0) {
+      if (jsonMode) {
+        console.log(JSON.stringify({ ok: true, violations: [] }, null, 2));
+      } else {
+        console.log('No changed files to check.');
+      }
+      process.exit(0);
+    }
+    // Check each changed file
+    changedFiles.forEach(relativePath => {
       const fullPath = path.join(repoRoot, relativePath);
       if (existsSync(fullPath)) {
         const stat = statSync(fullPath);

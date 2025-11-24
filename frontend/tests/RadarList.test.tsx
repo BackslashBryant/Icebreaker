@@ -28,7 +28,7 @@ describe("RadarList", () => {
     const onSelectPerson = vi.fn();
     render(<RadarList people={[]} onSelectPerson={onSelectPerson} />);
 
-    expect(screen.getByText("No one here — yet.")).toBeInTheDocument();
+    expect(screen.getByText("No one nearby — yet.")).toBeInTheDocument();
   });
 
   it("renders custom empty message", () => {
