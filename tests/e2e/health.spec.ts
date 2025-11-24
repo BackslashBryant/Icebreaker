@@ -21,7 +21,12 @@ test.describe('Health Check E2E', () => {
     expect(response.ok()).toBeTruthy();
     expect(response.status()).toBe(200);
     const body = await response.json();
-    expect(body).toEqual({ status: 'ok' });
+    // Health API returns: { status: 'ok', websocket: { connected, connectionCount, sessionCount } }
+    expect(body.status).toBe('ok');
+    expect(body).toHaveProperty('websocket');
+    expect(body.websocket).toHaveProperty('connected');
+    expect(body.websocket).toHaveProperty('connectionCount');
+    expect(body.websocket).toHaveProperty('sessionCount');
   });
 
   test('should display health status on frontend page', async ({ page }) => {
