@@ -14,6 +14,10 @@ alwaysApply: false
 5. **Never**: Assume or guess the current date
 Format dates as YYYY-MM-DD. Always verify date accuracy before adding entries.
 
+## 2025-11-23: GitHub CLI - Clear GITHUB_TOKEN Before Operations
+
+**Trigger**: GitHub CLI (`gh`) commands failing with 401 errors even when keyring authentication was valid. `GITHUB_TOKEN` environment variable was interfering with GitHub CLI's keyring authentication. **Lesson**: **MANDATORY** - Always clear `GITHUB_TOKEN` env var before running ANY `gh` CLI command. GitHub CLI prioritizes env var tokens over keyring, and env var tokens may be expired/invalid. Clearing the env var forces GitHub CLI to use keyring authentication (SSH protocol preferred). **Rule**: Updated `.cursor/rules/01-workflow.mdc` to require clearing `GITHUB_TOKEN` before `gh` CLI commands: PowerShell `$env:GITHUB_TOKEN = $null; gh ...`, Bash `unset GITHUB_TOKEN && gh ...`. This ensures reliable keyring-based authentication for all GitHub CLI operations.
+
 ## 2025-11-11: GitHub API REST Primary & Keyring Authentication
 
 **Trigger**: GitHub CLI GraphQL API failing with 401 errors despite authentication. Tools needed reliable GitHub API access. **Lesson**: REST API is more reliable than GraphQL. Token retrieval should prioritize GitHub CLI keyring (`gh auth token`) over environment variables to avoid expired token issues. Setting `GITHUB_TOKEN` in `.env` file interferes with GitHub CLI authentication. **Rule**: Created `tools/lib/github-api.mjs` with REST API utilities and automatic keyring-first token retrieval. Updated all GitHub tools (`verify-github-issue.mjs`, `github-issue.mjs`, `github-pr.mjs`, `github-init-issues.mjs`, `github-labels.mjs`) to use REST API as primary. Deprecated `tools/sync-github-token.ps1` (causes auth issues). Created `tools/fix-github-auth.ps1` for auth troubleshooting. Updated `.cursor/rules/01-workflow.mdc` and `.cursor/rules/04-integrations.mdc` to document REST API primary pattern and keyring-first token retrieval. **CRITICAL**: Do NOT set `GITHUB_TOKEN` in `.env` file - tools get token from keyring automatically.

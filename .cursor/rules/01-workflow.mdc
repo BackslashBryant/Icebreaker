@@ -126,8 +126,13 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - **GitHub Operations**: 
   - **For Node.js scripts**: Use `tools/lib/github-api.mjs` utilities (REST API, automatic token from keyring).
   - **For CLI operations**: Use `gh` CLI directly for simple operations (`gh issue comment`, `gh issue edit`, etc.).
-  - **Examples**: `node tools/verify-github-issue.mjs`, `node tools/github-issue.mjs kickoff "Title"`, `gh issue comment 10 --body "..."`, `gh issue edit 10 --add-label "status:done"`
+  - **MANDATORY**: Before running ANY `gh` CLI command, clear `GITHUB_TOKEN` env var if set: `$env:GITHUB_TOKEN = $null` (PowerShell) or `unset GITHUB_TOKEN` (bash). This ensures GitHub CLI uses keyring authentication instead of potentially expired/invalid env var tokens.
+  - **Examples**: 
+    - PowerShell: `$env:GITHUB_TOKEN = $null; gh issue comment 10 --body "..."` 
+    - Bash: `unset GITHUB_TOKEN && gh issue comment 10 --body "..."`
+    - Node.js: `node tools/verify-github-issue.mjs`, `node tools/github-issue.mjs kickoff "Title"`
   - **CRITICAL**: Do NOT set `GITHUB_TOKEN` in `.env` file - it interferes with GitHub CLI authentication. Tools get token from keyring automatically.
+  - **CRITICAL**: Always clear `GITHUB_TOKEN` env var before `gh` CLI commands to use keyring authentication (SSH protocol preferred).
 - Nexus or the acting human runs `npm run agents:install-hook` to copy the path-scope pre-commit hook locally.
 - Run `npm run preflight` before pushing to ensure scaffolding is intact (includes branch name validation).
 - Execute `npm run mcp:suggest` after dependency or config changes and note the recommendations in `.notes/` or the active plan; run `npm run mcp:suggest -- --install <id>` to append required servers to `.cursor/mcp.json`.
