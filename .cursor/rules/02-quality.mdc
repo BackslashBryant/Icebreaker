@@ -89,6 +89,39 @@ async function loadSentry() {
 - `Template CI` currently runs the preflight check and best-effort verification helper.
 - Extend the workflow once your stack is generated (e.g., add matrix jobs for frontend/backend services) and hook in any new verification commands you introduced.
 
+## CI Monitoring Protocol
+
+**MANDATORY**: When pushing changes that affect CI, you MUST monitor the CI run until completion:
+
+1. **After pushing changes**:
+   - Check CI status immediately: `gh run list --branch <branch> --workflow "<workflow-name>" --limit 1`
+   - Wait for CI to start (status: `queued` or `in_progress`)
+
+2. **Monitor until completion**:
+   - **REQUIRED**: Poll CI status every 30-60 seconds until status is `completed`
+   - Use: `gh run view <run-id> --json status,conclusion,jobs` to check status
+   - **DO NOT** proceed to merge or next steps until CI is `completed`
+
+3. **On completion**:
+   - **If success**: Proceed with merge/next steps
+   - **If failure**: 
+     - Get error snippets: `gh run view <run-id> --log-failed` or `gh run view <run-id> --log --job <job-id>`
+     - Identify first error for each failing job
+     - Triage and fix before proceeding
+   - **DO NOT** assume CI will pass - always verify completion status
+
+4. **Key jobs to verify**:
+   - `checks` (lint, type, unit tests)
+   - `health-mvp` (all browser matrix jobs: chromium, firefox, msedge)
+   - `persona-smoke` (if applicable)
+   - `ui-visual-a11y` (if applicable)
+   - Any other jobs specific to the changes made
+
+5. **Never skip CI verification**:
+   - Do not merge without confirming CI is green
+   - Do not start new work until current CI is verified
+   - If CI is slow, wait - don't proceed on assumptions
+
 ---
 
 # Security & Dependencies

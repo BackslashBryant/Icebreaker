@@ -26,6 +26,10 @@ Format dates as YYYY-MM-DD. Always verify date accuracy before adding entries.
 
 **Trigger**: Test output showed Unicode artifacts (Γ£ô, ΓÇ║) and session IDs in PowerShell, making output unreadable. Also using only 1 worker unnecessarily slowed tests. **Lesson**: Use `list` reporter instead of `line` reporter, remove `FORCE_COLOR` env vars (let Playwright handle encoding), use Playwright MCP as primary tool for cleaner output, use dynamic workers (`50%` of CPU cores) instead of hardcoded `workers: 1`. **Rule**: Updated `.cursor/rules/08-testing.mdc` to prioritize Playwright MCP, use `list` reporter, document clean output approach, use `workers: '50%'` for dynamic resource adaptation.
 
+## 2025-11-23: CI Monitoring Protocol
+
+**Trigger**: Agent pushed changes and didn't monitor CI until completion, leading to unknown status and potential merge of failing changes. **Lesson**: **MANDATORY** - Always monitor CI runs until completion. After pushing, check status immediately, poll every 30-60 seconds until `completed`, verify all key jobs pass before proceeding. Never assume CI will pass or skip verification. **Rule**: Added CI Monitoring Protocol to `.cursor/rules/02-quality.mdc` - requires monitoring CI until completion, polling status, verifying all key jobs, and never skipping CI verification before merge or next steps.
+
 ## 2025-11-11: GitHub Issue Number Sync
 
 **Trigger**: Issue #11 conflict - main planning issue existed in docs but was never created on GitHub, causing Phase 2 backlog items to get wrong numbers. **Lesson**: Always verify GitHub issue numbers before creating, sync docs immediately after creation, check for conflicts when creating multiple issues. **Rule**: Added mandatory pre-creation verification step in `.cursor/rules/01-workflow.mdc`, created `tools/verify-github-issue.mjs` safeguard script, updated `tools/github-issue.mjs` with pre-check.
