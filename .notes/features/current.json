@@ -1,12 +1,12 @@
 {
-  "slug": "health-mvp-fix",
-  "featureName": "Health-MVP Test/App Mismatch Fix",
-  "updatedAt": "2025-11-24T00:00:00-05:00",
+  "slug": "suite-matrix",
+  "featureName": "Split Playwright Suites and Extend Browser Matrix",
+  "updatedAt": "2025-11-25T00:00:00-05:00",
   "status": "complete",
   "vision": "docs/vision.md",
-  "description": "Fix health-mvp test/app mismatch by adding /health page route for E2E health checks.",
-  "githubIssue": 33,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/33",
-  "branch": "agent/vector/33-health-page",
-  "note": "Issue #33 COMPLETE (2025-11-24). Added /health page route (frontend/src/pages/Health.tsx) and updated E2E tests to navigate to /health instead of root. All health-mvp matrix jobs passing (chromium, firefox, msedge). Fixed duplicate import in golden-screens.spec.ts. CI green on main."
+  "description": "Extend Playwright test suites with WebKit coverage, mobile viewports, improved artifact publishing, and flake tracking.",
+  "githubIssue": 15,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/15",
+  "branch": "agent/vector/15-suite-matrix",
+  "note": "Issue #15 COMPLETE (2025-11-25). Added WebKit to smoke suite (chromium-desktop, chromium-mobile, webkit-desktop). Extended full suite to 8 browser × viewport projects. Updated health-mvp to include WebKit. Created flake tracking file. All configs validated. CI ready for extended browser matrix."
 }

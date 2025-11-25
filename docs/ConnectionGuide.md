@@ -246,13 +246,33 @@ Track every port, endpoint, credential reference, and integration touchpoint her
 - **Trigger**: Pull requests to `main` or `master` branches
 - **Jobs**:
   - `checks`: Template guardrails (lint, typecheck, persona smoke tests)
+  - `persona-smoke`: Fast smoke tests (~2-3 min)
+    - Browsers: Chromium (desktop + mobile), WebKit (desktop)
+    - Projects: `chromium-desktop`, `chromium-mobile`, `webkit-desktop`
+    - Runs on: push, pull_request, workflow_dispatch
+    - Artifacts: 7-day retention (HTML reports always, screenshots/videos on failure)
+  - `persona-full`: Comprehensive test suite (10+ min)
+    - Browsers: Chromium, Firefox, WebKit, MS Edge (desktop + mobile)
+    - Projects: `chromium-desktop`, `chromium-mobile`, `firefox-desktop`, `firefox-mobile`, `webkit-desktop`, `webkit-mobile`, `msedge-desktop`, `msedge-mobile`
+    - Runs on: schedule (nightly 2 AM UTC), workflow_dispatch
+    - Artifacts: 30-day retention (HTML reports always, screenshots/videos on failure)
   - `health-mvp`: Health MVP test suite
+    - Browser matrix: Chromium, Firefox, WebKit, MS Edge (desktop)
     - Backend unit tests (Vitest)
     - Frontend unit tests (Vitest + React Testing Library)
     - E2E tests (Playwright)
     - Backend server starts automatically on port 8000
     - Frontend server starts automatically on port 3000 (via Playwright webServer)
-- **Last Updated**: 2024 (Bootstrap Web Health MVP - Step 6)
+  - `performance-budgets`: Performance budget checks
+  - `ui-visual-a11y`: Visual regression and accessibility tests
+- **Playwright Configs**:
+  - `tests/playwright.config.ts`: Full suite with browser × viewport matrix
+  - `tests/playwright.config.smoke.ts`: Smoke suite (chromium + webkit, desktop + mobile)
+- **Flake Policy**: Documented in `Docs/testing/FLAKY_TESTS.md`
+  - Smoke: 1 retry in CI
+  - Full: 2 retries in CI
+  - Health MVP: 1 retry in CI
+- **Last Updated**: 2025-11-25 (Issue #15 - Browser matrix extension)
 
 ## Maintenance Rules
 - Nexus keeps this file in sync with CI/deployment changes.

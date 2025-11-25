@@ -78,11 +78,20 @@ export default defineConfig({
     },
   ],
   
-  // Only Chromium for smoke tests (fastest)
+  // Smoke tests: Chromium (desktop + mobile) + WebKit (desktop) for fast feedback
+  // Runs in ~2-3 minutes with 3 projects in parallel
   projects: [
     {
-      name: 'chromium',
+      name: 'chromium-desktop',
       use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'chromium-mobile',
+      use: { ...devices['Mobile Chrome'] },
+    },
+    {
+      name: 'webkit-desktop',
+      use: { ...devices['Desktop Safari'] },
     },
   ],
 });

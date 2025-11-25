@@ -43,6 +43,7 @@ export default defineConfig({
   },
         projects: [
     // Stateless tests: Fully parallel (health checks, visual diffs, smoke tests)
+    // Kept for backward compatibility with existing test runs
           {
       name: 'stateless',
       testMatch: /.*\.(spec|test)\.ts/,
@@ -52,18 +53,6 @@ export default defineConfig({
       use: { 
         ...devices['Desktop Chrome'],
         headless: process.env.CI ? true : undefined, // Headless in CI, default locally
-      },
-    },
-    // Chromium project for cross-browser matrix (matches CI health-mvp job)
-    {
-      name: 'chromium',
-      testMatch: /.*\.(spec|test)\.ts/,
-      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
-      fullyParallel: true,
-      workers: getWorkerCount(),
-      use: {
-        ...devices['Desktop Chrome'],
-        headless: process.env.CI ? true : undefined,
       },
     },
     // Stateful tests: Serial execution (performance, persona flows, WebSocket-dependent)
@@ -76,8 +65,111 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         headless: process.env.CI ? true : undefined, // Headless in CI, default locally
       },
-          },
-    // Firefox and Edge projects for cross-browser testing
+    },
+    // Browser × Viewport Matrix Projects
+    // Desktop projects
+    {
+      name: 'chromium-desktop',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true,
+      workers: getWorkerCount(),
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: process.env.CI ? true : undefined,
+      },
+    },
+    {
+      name: 'chromium-mobile',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true,
+      workers: getWorkerCount(),
+      use: {
+        ...devices['Mobile Chrome'],
+        headless: process.env.CI ? true : undefined,
+      },
+    },
+    {
+      name: 'firefox-desktop',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true,
+      workers: getWorkerCount(),
+      use: {
+        ...devices['Desktop Firefox'],
+        headless: process.env.CI ? true : undefined,
+      },
+    },
+    {
+      name: 'firefox-mobile',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true,
+      workers: getWorkerCount(),
+      use: {
+        ...devices['Mobile Firefox'],
+        headless: process.env.CI ? true : undefined,
+      },
+    },
+    {
+      name: 'webkit-desktop',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true,
+      workers: getWorkerCount(),
+      use: {
+        ...devices['Desktop Safari'],
+        headless: process.env.CI ? true : undefined,
+      },
+    },
+    {
+      name: 'webkit-mobile',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true,
+      workers: getWorkerCount(),
+      use: {
+        ...devices['iPhone 13'],
+        headless: process.env.CI ? true : undefined,
+      },
+    },
+    {
+      name: 'msedge-desktop',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true,
+      workers: getWorkerCount(),
+      use: {
+        channel: 'msedge',
+        viewport: { width: 1280, height: 720 },
+        headless: process.env.CI ? true : undefined,
+      },
+    },
+    {
+      name: 'msedge-mobile',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true,
+      workers: getWorkerCount(),
+      use: {
+        channel: 'msedge',
+        ...devices['iPhone 13'],
+        headless: process.env.CI ? true : undefined,
+      },
+    },
+    // Legacy projects for backward compatibility (deprecated, use browser-viewport projects above)
+    {
+      name: 'chromium',
+      testMatch: /.*\.(spec|test)\.ts/,
+      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
+      fullyParallel: true,
+      workers: getWorkerCount(),
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: process.env.CI ? true : undefined,
+      },
+    },
     {
       name: 'firefox',
       testMatch: /.*\.(spec|test)\.ts/,
