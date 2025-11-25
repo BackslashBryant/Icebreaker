@@ -34,12 +34,6 @@
         "C:\\Users\\OrEo2\\Desktop\\DevOps\\1. Projects\\Icebreaker"
       ]
     },
-    "time": {
-      "command": "uvx",
-      "args": [
-        "mcp-server-time"
-      ]
-    },
     "sentry": {
       "url": "https://mcp.sentry.dev/mcp",
       "env": {
