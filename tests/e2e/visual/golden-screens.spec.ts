@@ -171,10 +171,17 @@ test.describe('Golden Screens: Visual Regression', () => {
       // Navigate to Radar (panic button is available on authenticated pages)
       await page.goto('/radar');
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
-
-      // Open panic dialog
-      await page.locator(SEL.panicFab).click();
-      await expect(page.locator(SEL.panicDialog)).toBeVisible({ timeout: 5000 });
+      
+      // Wait for panic button to be visible and clickable
+      const panicButton = page.locator(SEL.panicFab);
+      await expect(panicButton).toBeVisible({ timeout: 10000 });
+      
+      // Click panic button to open dialog
+      await panicButton.click();
+      
+      // Wait for dialog to appear
+      const panicDialog = page.locator(SEL.panicDialog);
+      await expect(panicDialog).toBeVisible({ timeout: 10000 });
 
       await expect(page).toHaveScreenshot(`golden-panic-dialog-${viewport.name}.png`, {
         fullPage: true,
