@@ -1,12 +1,12 @@
 {
-  "slug": "suite-matrix",
-  "featureName": "Split Playwright Suites and Extend Browser Matrix",
-  "updatedAt": "2025-11-25T00:00:00-05:00",
-  "status": "complete",
+  "slug": "visual-snapshots",
+  "featureName": "Add Playwright Visual Snapshots for Key Screens",
+  "updatedAt": "2025-11-24T00:00:00-05:00",
+  "status": "in-progress",
   "vision": "docs/vision.md",
-  "description": "Extend Playwright test suites with WebKit coverage, mobile viewports, improved artifact publishing, and flake tracking.",
-  "githubIssue": 15,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/15",
-  "branch": "agent/vector/15-suite-matrix",
-  "note": "Issue #15 COMPLETE (2025-11-25). Added WebKit to smoke suite (chromium-desktop, chromium-mobile, webkit-desktop). Extended full suite to 8 browser × viewport projects. Updated health-mvp to include WebKit. Created flake tracking file. All configs validated. CI ready for extended browser matrix."
+  "description": "Configure 2% diff threshold, fix CI comparison mode, add Panic dialog screen, regenerate ubuntu baselines, document baseline process.",
+  "githubIssue": 17,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/17",
+  "branch": "agent/pixel/17-visual-snapshots",
+  "note": "Issue #17 IN PLANNING (2025-11-24). Research complete. Plan created with 6 steps: threshold config, CI fix, Panic test, baseline regeneration, docs, verification. Awaiting team review."
 }

@@ -1,7 +1,7 @@
 /**
  * Golden Screens Visual Regression Tests
  * 
- * Captures the five "Golden Screens" that represent key user journeys:
+ * Captures the "Golden Screens" that represent key user journeys:
  * 1. Welcome screen
  * 2. Onboarding Step 0 (Consent)
  * 3. Onboarding Step 1 (Location)
@@ -10,9 +10,12 @@
  * 6. Radar empty state
  * 7. Chat empty state
  * 8. Profile screen
+ * 9. Panic dialog
  * 
  * These screens are used for visual regression testing and must pass before merge.
  * Any visual changes require explicit approval.
+ * 
+ * Config: 2% diff threshold (maxDiffPixelRatio: 0.02) in playwright.config.ts
  */
 
 import { test, expect } from '@playwright/test';
@@ -152,6 +155,28 @@ test.describe('Golden Screens: Visual Regression', () => {
       await expect(page.getByRole('heading', { name: /PROFILE/i })).toBeVisible({ timeout: 15000 });
 
       await expect(page).toHaveScreenshot(`golden-profile-${viewport.name}.png`, {
+        fullPage: true,
+        mask: MASK_SELECTORS.map((selector) => page.locator(selector)),
+      });
+    });
+
+    test(`Golden Screen 9: Panic Dialog - ${viewport.name}`, async ({ page }) => {
+      await setViewport(page, viewport);
+      await setupSession(page, {
+        sessionId: 'test-session',
+        token: 'test-token',
+        handle: 'TestUser',
+      });
+
+      // Navigate to Radar (panic button is available on authenticated pages)
+      await page.goto('/radar');
+      await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Open panic dialog
+      await page.locator(SEL.panicFab).click();
+      await expect(page.locator(SEL.panicDialog)).toBeVisible({ timeout: 5000 });
+
+      await expect(page).toHaveScreenshot(`golden-panic-dialog-${viewport.name}.png`, {
         fullPage: true,
         mask: MASK_SELECTORS.map((selector) => page.locator(selector)),
       });

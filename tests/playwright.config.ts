@@ -39,6 +39,14 @@ export default defineConfig({
     // Note: Chrome-specific launch options (--disable-dev-shm-usage, --disable-gpu)
     // are set per-project below to avoid WebKit compatibility issues
   },
+  // Visual regression settings (Issue #17)
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.02, // 2% diff threshold - fail if more than 2% of pixels differ
+      animations: 'disabled', // Disable animations for consistent snapshots
+      scale: 'css', // Use CSS pixels for consistent sizing across devices
+    },
+  },
         projects: [
     // Stateful tests: Serial execution (performance, persona flows, WebSocket-dependent)
     // Required for persona and performance tests that need sequential execution

@@ -301,20 +301,12 @@ jobs:
           CI: 'true'
           # Playwright webServer config automatically starts backend and frontend servers
         run: |
-          echo "Capturing Golden Screens..."
-          echo "Golden Screens to capture:"
-          echo "  1. Welcome screen"
-          echo "  2. Onboarding Step 0 (Consent)"
-          echo "  3. Onboarding Step 1 (Location)"
-          echo "  4. Onboarding Step 2 (Vibe)"
-          echo "  5. Onboarding Step 3 (Tags)"
-          echo "  6. Radar empty state"
-          echo "  7. Chat empty state"
-          echo "  8. Profile screen"
+          echo "Running Golden Screens visual regression tests..."
+          echo "Comparing against committed baselines (2% diff threshold)..."
           echo ""
-          npx playwright test e2e/visual/golden-screens.spec.ts --project=chromium-desktop --reporter=list --update-snapshots
+          npx playwright test e2e/visual/golden-screens.spec.ts --project=chromium-desktop --reporter=list
           echo ""
-          echo "✅ All Golden Screens captured. Visual diffs will block merge if unexpected changes detected."
+          echo "✅ Visual regression tests passed - no unexpected UI changes detected."
       - name: Run accessibility tests (axe-core)
         working-directory: ./tests
         env:
@@ -338,16 +330,11 @@ jobs:
         run: |
           echo "## Visual & Accessibility Checks" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Golden Screens Captured:" >> $GITHUB_STEP_SUMMARY
-          echo "- Welcome screen" >> $GITHUB_STEP_SUMMARY
-          echo "- Onboarding steps (Consent, Location, Vibe, Tags)" >> $GITHUB_STEP_SUMMARY
-          echo "- Radar empty state" >> $GITHUB_STEP_SUMMARY
-          echo "- Chat empty state" >> $GITHUB_STEP_SUMMARY
-          echo "- Profile screen" >> $GITHUB_STEP_SUMMARY
+          echo "### Visual Regression (2% diff threshold):" >> $GITHUB_STEP_SUMMARY
+          echo "- Welcome, Onboarding, Radar, Chat, Profile screens" >> $GITHUB_STEP_SUMMARY
+          echo "- Fails if visual changes exceed threshold" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Accessibility:" >> $GITHUB_STEP_SUMMARY
           echo "- WCAG AA compliance verified" >> $GITHUB_STEP_SUMMARY
-          echo "- Focus rings tested" >> $GITHUB_STEP_SUMMARY
-          echo "- Keyboard navigation verified" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "See visual snapshots artifact for before/after comparisons." >> $GITHUB_STEP_SUMMARY
+          echo "See visual-snapshots artifact for diff images on failure." >> $GITHUB_STEP_SUMMARY
