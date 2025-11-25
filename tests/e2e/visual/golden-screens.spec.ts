@@ -19,7 +19,6 @@ import { test, expect } from '@playwright/test';
 import { VIEWPORTS, getViewportNames, setViewport, MASK_SELECTORS } from '../../utils/viewports';
 import { setupSession, waitForBootSequence } from '../../utils/test-helpers';
 import { SEL } from '../../utils/selectors';
-import { SEL } from '../../utils/selectors';
 
 test.describe('Golden Screens: Visual Regression', () => {
   // Test each viewport
