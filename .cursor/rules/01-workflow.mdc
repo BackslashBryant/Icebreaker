@@ -47,6 +47,15 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
   3. If directory is wrong, navigate to project root: `cd "$(git rev-parse --show-toplevel)"`
   4. If branch is wrong, create correct branch or switch: `git checkout -b agent/<agent>/<issue>-<slug>`
 - **NEVER** run git commands from parent directories or outside the repository
+- **CRITICAL GUARDRAIL**: Before starting ANY new work, check for uncommitted changes:
+  1. Run `git status` to check for modified/untracked files
+  2. If uncommitted work exists, STOP and either:
+     - Commit work to appropriate feature branch (if work belongs to active issue)
+     - Stash work with clear message (if work incomplete: `git stash push -m "WIP: <description>"`)
+     - Create branch and commit (if work belongs to different issue)
+  3. **NEVER** leave work uncommitted on main branch - always commit to feature branch or stash explicitly
+  4. **NEVER** start new issue while uncommitted work exists - clean up first
+- **DAILY COMMIT POLICY**: Commit work daily, even if incomplete. Use `[WIP]` prefix for incomplete work. Never leave work uncommitted across sessions.
 - Branch name format: `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`).
 - Install/refresh GitHub MCP in Cursor; authenticate using a PAT with `repo`, `workflow`, `issues`.
 - Nexus or the acting human runs `npm run agents:install-hook` to copy the path-scope pre-commit hook locally.
@@ -127,4 +136,28 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - If MCP access changes (new services, revoked tokens), open an issue for Nexus to update `.cursor/config.json` and automation.
 - **Repository Mode**: Template repos track Cursor files (`.cursor/`). App repos block them. The pre-commit hook enforces this separation. See `docs/development/SEPARATION.md` for mode conversion and override procedures.
 
-Follow this loop for every change to keep GitHub the source of truth and Cursor Agents accountable.***
+Follow this loop for every change to keep GitHub the source of truth and Cursor Agents accountable.
+
+## Guardrails: Preventing Uncommitted Work
+
+**CRITICAL RULES** (learned from Issue #21 root cause analysis - see `.notes/process-improvements/uncommitted-work-analysis.md`):
+
+1. **Never leave work on main**: All feature work must be on feature branches. If work is incomplete, commit with `[WIP]` prefix or stash with clear message.
+
+2. **Pre-flight uncommitted work check**: Before starting ANY new issue or work session:
+   - Run `git status` to check for uncommitted changes
+   - If uncommitted work exists, STOP and clean up first (commit, stash, or create branch)
+   - Do not proceed until worktree is clean or work is properly stashed
+
+3. **Daily commit policy**: Commit work at least once per session, even if incomplete. Use `[WIP]` prefix for incomplete commits. Never leave work uncommitted across sessions.
+
+4. **Branch discipline**: One issue per branch. Never mix work from multiple issues. If work belongs to different issue, create appropriate branch.
+
+5. **End-of-session checklist**: Before ending work session:
+   - Commit all work (with `[WIP]` if incomplete) OR stash with clear message
+   - Push branch if work is complete
+   - Never leave uncommitted work on main branch
+
+6. **Work ownership**: If uncommitted work exists and ownership is unclear, create branch for appropriate issue and commit there. Do not leave work uncommitted.
+
+**Enforcement**: These rules are mandatory. Violations block new work and must be resolved before proceeding.***
