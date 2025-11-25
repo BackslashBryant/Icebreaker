@@ -36,10 +36,8 @@ export default defineConfig({
     trace: 'on-first-retry',
     actionTimeout: 10000, // 10s timeout for actions
     navigationTimeout: 30000, // 30s timeout for navigation
-    // Standardize browser launch options for consistency
-    launchOptions: {
-      args: ['--disable-dev-shm-usage', '--disable-gpu'],
-    },
+    // Note: Chrome-specific launch options (--disable-dev-shm-usage, --disable-gpu)
+    // are set per-project below to avoid WebKit compatibility issues
   },
         projects: [
     // Stateful tests: Serial execution (performance, persona flows, WebSocket-dependent)
@@ -52,6 +50,9 @@ export default defineConfig({
       use: { 
         ...devices['Desktop Chrome'],
         headless: process.env.CI ? true : undefined, // Headless in CI, default locally
+        launchOptions: {
+          args: ['--disable-dev-shm-usage', '--disable-gpu'],
+        },
       },
     },
     // Browser × Viewport Matrix Projects
@@ -65,6 +66,9 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         headless: process.env.CI ? true : undefined,
+        launchOptions: {
+          args: ['--disable-dev-shm-usage', '--disable-gpu'],
+        },
       },
     },
     {
@@ -76,6 +80,9 @@ export default defineConfig({
       use: {
         ...devices['Mobile Chrome'],
         headless: process.env.CI ? true : undefined,
+        launchOptions: {
+          args: ['--disable-dev-shm-usage', '--disable-gpu'],
+        },
       },
     },
     {
@@ -132,6 +139,9 @@ export default defineConfig({
         channel: 'msedge',
         viewport: { width: 1280, height: 720 },
         headless: process.env.CI ? true : undefined,
+        launchOptions: {
+          args: ['--disable-dev-shm-usage', '--disable-gpu'],
+        },
       },
     },
     {
@@ -144,6 +154,9 @@ export default defineConfig({
         channel: 'msedge',
         viewport: { width: 390, height: 844 }, // iPhone 13 viewport without device emulation (avoids channel conflicts)
         headless: process.env.CI ? true : undefined,
+        launchOptions: {
+          args: ['--disable-dev-shm-usage', '--disable-gpu'],
+        },
       },
     },
         ],

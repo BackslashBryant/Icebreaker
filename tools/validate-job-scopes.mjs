@@ -21,16 +21,16 @@ const warnings = [];
  */
 const JOB_SCOPES = {
   'checks': {
-    allowed: ['lint', 'type', 'unit'],
-    banned: ['e2e', 'playwright', 'test:e2e'],
+    allowed: ['lint', 'type', 'unit', 'check', 'guard', 'date', 'token', 'connection', 'git'],
+    banned: ['e2e', 'playwright', 'test:e2e', 'test:smoke'],
     description: 'Lint, typecheck, unit tests ONLY',
   },
   'persona-smoke': {
-    allowed: ['test:smoke', 'playwright', 'smoke'],
+    allowed: ['test:smoke', 'playwright', 'smoke', 'summarize', 'telemetry'],
     description: 'Minimal, time-bounded matrix (< 3 min)',
   },
   'persona-full': {
-    allowed: ['test', 'playwright', 'npm test'],
+    allowed: ['test', 'playwright', 'npm test', 'summarize', 'telemetry'],
     description: 'Full matrix, nightly runs',
   },
   'health-mvp': {
@@ -48,22 +48,90 @@ const JOB_SCOPES = {
 };
 
 /**
- * Extract job steps from workflow
+ * Extract job steps from workflow using proper YAML-aware parsing
  */
 function extractJobSteps(workflowContent, jobName) {
-  const jobStart = workflowContent.indexOf(`${jobName}:`);
-  if (jobStart === -1) return [];
-  
-  // Find next job or end of file
-  const nextJobMatch = workflowContent.substring(jobStart).match(/\n\s+(\w+):\s*\n\s*runs-on:/);
-  const jobEnd = nextJobMatch ? jobStart + nextJobMatch.index : workflowContent.length;
-  const jobContent = workflowContent.substring(jobStart, jobEnd);
-  
-  // Extract run: commands
-  const runMatches = jobContent.matchAll(/run:\s*([^\n]+(?:\n\s+[^\n]+)*)/g);
+  const lines = workflowContent.split('\n');
   const steps = [];
-  for (const match of runMatches) {
-    steps.push(match[1].trim());
+  let inJob = false;
+  let jobIndent = -1;
+  let currentRun = '';
+  let runIndent = -1;
+  
+  // Known job-level keys that are NOT sibling jobs
+  const JOB_LEVEL_KEYS = ['runs-on', 'needs', 'if', 'env', 'steps', 'strategy', 'matrix', 
+                          'timeout-minutes', 'continue-on-error', 'container', 'services',
+                          'outputs', 'permissions', 'environment', 'concurrency'];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trimStart();
+    const indent = line.length - trimmed.length;
+    
+    // Skip empty lines and comments
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    
+    // Check for job start (looking for "  jobName:" pattern under jobs:)
+    if (trimmed === `${jobName}:` || trimmed.startsWith(`${jobName}:`)) {
+      // Make sure we're at job level (typically 2 spaces under "jobs:")
+      inJob = true;
+      jobIndent = indent;
+      continue;
+    }
+    
+    // If we're in the job
+    if (inJob) {
+      // Check if we've exited to a sibling job - a line at same indent as job name
+      // that looks like a new job definition (word followed by colon, not a job-level key)
+      if (indent === jobIndent && trimmed.match(/^[\w-]+:\s*$/)) {
+        const keyName = trimmed.replace(':', '').trim();
+        if (!JOB_LEVEL_KEYS.includes(keyName)) {
+          // This is a new job, stop parsing
+          inJob = false;
+          break;
+        }
+      }
+      
+      // Look for run: commands at any indentation within the job
+      if (trimmed.startsWith('run:')) {
+        // Save any previous multi-line run command
+        if (currentRun) {
+          steps.push(currentRun.trim());
+          currentRun = '';
+        }
+        
+        const runContent = trimmed.replace(/^run:\s*/, '').trim();
+        runIndent = indent;
+        
+        // Handle single-line run (not starting with | or >)
+        if (runContent && !runContent.startsWith('|') && !runContent.startsWith('>')) {
+          steps.push(runContent);
+          runIndent = -1;
+        } else {
+          // Multi-line run, will collect content on subsequent lines
+          currentRun = '';
+        }
+        continue;
+      }
+      
+      // Collect multi-line run content (more indented than run:)
+      if (runIndent >= 0 && indent > runIndent && trimmed) {
+        currentRun += (currentRun ? ' ' : '') + trimmed;
+        continue;
+      } else if (runIndent >= 0 && indent <= runIndent) {
+        // End of multi-line run
+        if (currentRun) {
+          steps.push(currentRun.trim());
+        }
+        currentRun = '';
+        runIndent = -1;
+      }
+    }
+  }
+  
+  // Don't forget last run command
+  if (currentRun) {
+    steps.push(currentRun.trim());
   }
   
   return steps;
@@ -101,6 +169,7 @@ function validateJobScope(jobName, steps) {
 function main() {
   const args = process.argv.slice(2);
   const strictMode = args.includes('--strict');
+  const debugMode = args.includes('--debug');
   
   try {
     const workflowPath = path.join(repoRoot, CI_WORKFLOW);
@@ -108,6 +177,10 @@ function main() {
     
     Object.keys(JOB_SCOPES).forEach(jobName => {
       const steps = extractJobSteps(workflowContent, jobName);
+      if (debugMode) {
+        console.log(`\n[DEBUG] Job "${jobName}" steps:`);
+        steps.forEach((s, i) => console.log(`  ${i + 1}. ${s.substring(0, 80)}...`));
+      }
       if (steps.length > 0) {
         validateJobScope(jobName, steps);
       }

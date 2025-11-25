@@ -312,7 +312,7 @@ jobs:
           echo "  7. Chat empty state"
           echo "  8. Profile screen"
           echo ""
-          npx playwright test e2e/visual/golden-screens.spec.ts --project=stateless --reporter=list --update-snapshots --update-snapshots
+          npx playwright test e2e/visual/golden-screens.spec.ts --project=chromium-desktop --reporter=list --update-snapshots
           echo ""
           echo "✅ All Golden Screens captured. Visual diffs will block merge if unexpected changes detected."
       - name: Run accessibility tests (axe-core)
@@ -321,7 +321,7 @@ jobs:
           CI: 'true'
         run: |
           echo "Running accessibility checks..."
-          npx playwright test e2e/visual/ --project=stateless --grep "accessibility" --reporter=list || true
+          npx playwright test e2e/visual/ --project=chromium-desktop --grep "accessibility" --reporter=list || true
           # Note: Full a11y audit should be added to visual tests
       - name: Publish visual snapshots
         if: always()
