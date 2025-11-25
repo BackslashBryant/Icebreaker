@@ -30,15 +30,14 @@ test.describe('Health Check E2E', () => {
   });
 
   test('should display health status on frontend page', async ({ page }) => {
-    // Wait for API response before navigating
-    const responsePromise = page.waitForResponse(
-      (response) => response.url().includes('/api/health') && response.status() === 200
+    // Navigate to health page
+    await page.goto(`${FRONTEND_URL}/health`);
+
+    // Wait for API response (health page fetches /api/health on mount)
+    const response = await page.waitForResponse(
+      (response) => response.url().includes('/api/health') && response.status() === 200,
+      { timeout: 30000 }
     );
-
-    await page.goto(FRONTEND_URL);
-
-    // Wait for API response
-    const response = await responsePromise;
     expect(response.ok()).toBeTruthy();
 
     // Wait for health status to be displayed
@@ -47,10 +46,13 @@ test.describe('Health Check E2E', () => {
   });
 
   test('should show health status from API response', async ({ page }) => {
-    await page.goto(FRONTEND_URL);
+    await page.goto(`${FRONTEND_URL}/health`);
 
-    // Verify the displayed status matches API response
-    const statusText = await page.locator('text=/ok/i').textContent();
+    // Wait for health status to be displayed, then verify it matches API response
+    const healthStatus = page.locator('text=/ok/i');
+    await expect(healthStatus).toBeVisible({ timeout: 30000 });
+    
+    const statusText = await healthStatus.textContent();
     expect(statusText).toContain('ok');
   });
 });
