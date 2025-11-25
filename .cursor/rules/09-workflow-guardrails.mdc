@@ -1,0 +1,266 @@
+---
+description: "CI/Workflow guardrails and validation rules"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Workflow Guardrails & Validation Rules
+
+**Purpose**: Enforce workflow standards, prevent drift, and ensure self-correcting CI/workflow configurations.
+
+## 1. Job Scope Enforcement
+
+### CI Job Definitions
+- **`checks`**: Lint, typecheck, unit tests ONLY. **BAN E2E tests** in checks job.
+- **`persona-smoke`**: Minimal, time-bounded matrix (< 3 min). Fast feedback only.
+- **`persona-full`**: Full matrix, nightly runs. Comprehensive coverage.
+- **`health-mvp`**: Health endpoint validation across browsers.
+- **`performance-budgets`**: Performance metrics only.
+- **`ui-visual-a11y`**: Visual regression and accessibility checks.
+
+### Scope Expansion Rules
+- **MANDATORY**: Explicit justification required for expanding any job's scope.
+- **MANDATORY**: Document scope expansion in plan-status file with rationale.
+- **MANDATORY**: Update this rule file when scope changes are approved.
+
+### Validation
+- Pre-commit hook checks: `tools/validate-job-scopes.mjs`
+- CI workflow validation: Each job must declare its scope explicitly
+- Fail CI if E2E tests found in `checks` job
+
+## 2. Config Alignment Enforcement
+
+### Matrix ≡ Config Rule
+- **MANDATORY**: GitHub Actions matrix values MUST match Playwright project names exactly.
+- **MANDATORY**: When adding new browser/viewport projects, remove legacy/deprecated projects.
+- **MANDATORY**: No duplicate projects (same browser/viewport combination).
+
+### Pre-Merge Checklist Item
+```
+[ ] Matrix ≡ Config: GitHub Actions matrix matches Playwright projects
+[ ] No duplicate projects in config
+[ ] Legacy/deprecated projects removed
+```
+
+### Validation
+- Pre-commit hook: `tools/validate-matrix-config.mjs`
+- CI workflow: Fail if matrix browser lacks install step
+- Pre-merge check: `node tools/validate-matrix-config.mjs --strict`
+
+## 3. Dependency Validation Per Job
+
+### Browser Installation Rules
+- **MANDATORY**: Each CI job that runs Playwright MUST install matching browsers/channels.
+- **MANDATORY**: Matrix browser values MUST have corresponding `npx playwright install` step.
+- **MANDATORY**: Fail CI if matrix browser lacks install step.
+
+### Validation Script
+- `tools/validate-browser-deps.mjs`: Checks matrix → install step alignment
+- Pre-commit hook: Validates workflow files
+- CI workflow: Self-validates before running tests
+
+## 4. Placeholder Data Blocking
+
+### Placeholder Detection
+- **BAN**: Placeholder dates (`2025-01-XX`, `2025-01-27`, future dates)
+- **BAN**: Placeholder strings (`TODO`, `FIXME`, `PLACEHOLDER`, `XXX`)
+- **BAN**: Placeholder baselines (snapshots with placeholder data)
+
+### Pre-Commit Lint
+- `tools/check-placeholders.mjs`: Detects placeholder patterns
+- Rejects commits with placeholder dates/strings
+- Exception: `TODO` comments allowed if issue number referenced
+
+### Rule
+- **MANDATORY**: Use Time MCP or system date for all dates
+- **MANDATORY**: No placeholder baselines in snapshots
+- **MANDATORY**: All placeholder data must reference issue number
+
+## 5. Selector Standardization
+
+### data-testid Requirement
+- **MANDATORY**: Use `data-testid` attributes via central selector map
+- **MANDATORY**: Central selector map: `tests/utils/selectors.ts` (or equivalent)
+- **DISALLOW**: New `getByText`/`getByRole` locators unless justified
+
+### Validation
+- Lint check: `tools/validate-selectors.mjs` flags raw text/role locators
+- Pre-commit hook: Warns on new selectors without selector-map usage
+- Exception: Justified selectors (documented in test file)
+
+### Selector Map Structure
+```typescript
+// tests/utils/selectors.ts
+export const selectors = {
+  welcome: {
+    continueButton: '[data-testid="welcome-continue"]',
+    exitButton: '[data-testid="welcome-exit"]',
+  },
+  // ...
+};
+```
+
+## 6. Snapshot/Baseline Policy
+
+### Baseline Generation Rules
+- **MANDATORY**: Baselines MUST be generated on CI target OS (Ubuntu)
+- **MANDATORY**: No placeholder PNGs or mock snapshots
+- **MANDATORY**: Artifact → repo updates in same PR when snapshots change
+
+### Workflow
+1. Generate snapshots on CI (Ubuntu)
+2. Download artifacts
+3. Commit snapshot updates in same PR
+4. Verify snapshots match CI environment
+
+### Validation
+- Pre-commit: Check for placeholder PNGs
+- CI: Verify snapshots generated on Ubuntu
+- Pre-merge: Check snapshot updates match artifact changes
+
+## 7. Flake Handling Policy
+
+### Retry/Quarantine Rules
+- **Smoke**: 1 retry, then quarantine
+- **Full**: 2 retries, then quarantine
+- **Quarantine**: Use `test.describe.skip()` with owner/date
+- **Tracking**: Single flake log: `Docs/testing/FLAKY_TESTS.md`
+
+### Flake Log Format
+```markdown
+### Test Name: `path/to/test.spec.ts` - `test description`
+- **First Identified**: YYYY-MM-DD
+- **Frequency**: High/Medium/Low
+- **Owner**: @agent-name
+- **Status**: Active/Quarantined/Fixed
+- **Fix Date**: YYYY-MM-DD (if fixed)
+```
+
+### Merge Blocking
+- **BLOCK**: Merges if flake is unowned (no owner assigned)
+- **BLOCK**: Merges if flake > 1 week old without fix/quarantine
+- **REQUIRE**: Owner assignment within 24 hours
+
+### Validation
+- Pre-merge check: `tools/validate-flake-tracking.mjs`
+- CI: Track flake patterns automatically
+- Weekly review: Assign owners to unowned flakes
+
+## 8. Branch Hygiene & Readiness
+
+### Rebase-Before-Push Policy
+- **MANDATORY**: Rebase on `main` before pushing feature branches
+- **MANDATORY**: CI auto-fails if branch has no recent merge base with `main`
+- **MANDATORY**: Pre-push hook validates merge base freshness
+
+### Pre-Push Hook Checks
+1. Verify merge base with `main` - **FAIL** if outdated by >10 commits
+2. Run minimal lint on changed files
+3. Run quick test suite (if applicable)
+4. Block `--no-verify` without logged reason
+
+### Merge Base Validation
+```bash
+# Pre-push hook - FAIL if no recent merge base
+git fetch origin main
+MERGE_BASE=$(git merge-base HEAD origin/main)
+COMMITS_BEHIND=$(git rev-list --count $MERGE_BASE..origin/main)
+if [ "$COMMITS_BEHIND" -gt 10 ]; then
+  echo "ERROR: Branch is $COMMITS_BEHIND commits behind main. Rebase required."
+  exit 1
+fi
+```
+
+### --no-verify Policy (STRICT)
+- **FORBIDDEN**: `--no-verify` without documented reason
+- **MANDATORY**: If used, commit message MUST include: `[no-verify: <reason>]`
+- **LOGGED**: All `--no-verify` usage tracked in `.notes/no-verify-log.md`
+- **REVIEW**: Repeated `--no-verify` usage flagged for team review
+
+### Weekly Branch Pruning
+- **AUTOMATED**: `npm run branches:prune` deletes merged local branches
+- **SCHEDULE**: Run weekly or after each issue completion
+- **REMOTE**: Prune stale remote tracking: `git fetch --prune`
+
+### Branch Hygiene Commands
+```bash
+# Prune merged branches
+git branch --merged main | grep -v "main" | xargs git branch -d
+
+# Prune remote tracking
+git fetch origin --prune
+
+# Check merge base freshness
+git rev-list --count $(git merge-base HEAD origin/main)..origin/main
+```
+
+## Validation Scripts
+
+### Required Scripts
+1. `tools/validate-job-scopes.mjs` - Job scope validation
+2. `tools/validate-matrix-config.mjs` - Matrix/config alignment
+3. `tools/validate-browser-deps.mjs` - Browser dependency checks
+4. `tools/check-placeholders.mjs` - Placeholder detection (enhanced)
+5. `tools/validate-selectors.mjs` - Selector standardization
+6. `tools/validate-flake-tracking.mjs` - Flake tracking validation
+
+### Pre-Merge Checklist
+Run `node tools/pre-merge-checklist.mjs` before merging:
+- [ ] Matrix ≡ Config: GitHub Actions matrix matches Playwright projects
+- [ ] No duplicate projects in config
+- [ ] Legacy/deprecated projects removed
+- [ ] All matrix browsers have install steps
+- [ ] No placeholder dates/strings
+- [ ] Selectors use central map (or justified)
+- [ ] Snapshots generated on CI OS
+- [ ] Flake tracking up to date (all flakes owned)
+- [ ] Branch merged with main
+- [ ] Pre-push checks passed
+
+## Enforcement
+
+### Pre-Commit Hook
+- Validates: Placeholders, selectors, matrix/config alignment
+- Fast checks only (< 5 seconds)
+- **Script**: `scripts/hooks/pre-commit.sample`
+
+### Pre-Push Hook
+- Validates: Merge base freshness, minimal lint, quick tests
+- **BLOCKS**: `--no-verify` without `[no-verify: reason]` in recent commit
+- Logs: All `--no-verify` usage to `.notes/no-verify-log.md`
+- **Script**: `scripts/hooks/pre-push.sample`
+
+### CI Workflow - Gating Jobs
+- **`workflow-validation`**: GATING JOB - blocks all other jobs if failed
+  - `validate-matrix-config.mjs --strict`
+  - `validate-browser-deps.mjs`
+  - `validate-job-scopes.mjs --strict`
+- **All test jobs**: `needs: workflow-validation` (won't run if validation fails)
+- **Merge blocking**: PRs cannot merge with failed workflow-validation
+
+### Pre-Merge Checklist
+- Manual: Run `node tools/pre-merge-checklist.mjs`
+- Automated: CI runs validation suite as gating job
+- **REQUIRED**: All checklist items must pass before merge
+
+### Guardrail Scripts (CI-Enforced)
+| Script | Purpose | Runs In |
+|--------|---------|---------|
+| `validate-matrix-config.mjs` | Matrix ≡ Playwright projects | workflow-validation |
+| `validate-browser-deps.mjs` | Browser install steps exist | workflow-validation |
+| `validate-job-scopes.mjs` | Job scope boundaries | workflow-validation |
+| `validate-flake-tracking.mjs` | Flakes owned/tracked | pre-merge |
+| `check-dates.mjs` | No placeholder dates | pre-commit |
+| `pre-merge-checklist.mjs` | Full compliance check | manual/CI |
+
+## Exceptions
+
+### Justified Exceptions
+- Cross-agent bug fixes: `--no-verify` allowed with documented reason
+- Emergency hotfixes: Scope expansion allowed with post-merge documentation
+- Experimental features: Placeholder data allowed if clearly marked experimental
+
+### Exception Process
+1. Document exception in commit message or plan-status file
+2. Create follow-up issue to remove exception
+3. Update guardrails if exception becomes pattern
