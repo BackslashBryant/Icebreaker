@@ -302,12 +302,11 @@ jobs:
           # Playwright webServer config automatically starts backend and frontend servers
         run: |
           echo "Running Golden Screens visual regression tests..."
-          echo "Generating initial baselines on ubuntu CI (Issue #17)..."
+          echo "Comparing against ubuntu baselines (2% diff threshold)..."
           echo ""
-          # TODO: Remove --update-snapshots after baselines are committed
-          npx playwright test e2e/visual/golden-screens.spec.ts --project=chromium-desktop --reporter=list --update-snapshots
+          npx playwright test e2e/visual/golden-screens.spec.ts --project=chromium-desktop --reporter=list
           echo ""
-          echo "✅ Visual regression tests complete. Baselines generated/updated."
+          echo "✅ Visual regression tests passed - no unexpected UI changes detected."
       - name: Run accessibility tests (axe-core)
         working-directory: ./tests
         env:
