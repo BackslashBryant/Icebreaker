@@ -1,12 +1,12 @@
 {
-  "slug": "persona-insights-fixes",
-  "featureName": "Persona Testing Insights Fixes & UX Improvements",
-  "updatedAt": "2025-11-16T00:00:00-05:00",
+  "slug": "health-mvp-fix",
+  "featureName": "Health-MVP Test/App Mismatch Fix",
+  "updatedAt": "2025-11-24T00:00:00-05:00",
   "status": "complete",
   "vision": "docs/vision.md",
-  "description": "Fix critical issues and implement UX improvements identified from persona testing insights report and persona feedback.",
-  "githubIssue": 27,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/27",
-  "branch": "agent/link/27-persona-insights-fixes",
-  "note": "Issue #27 COMPLETE (2025-11-16). Fixed 3 critical issues (panic button visibility, visibility toggle detection, error banner frequency) and implemented 5 high-priority UX improvements (proximity clarity, signal score transparency, privacy reassurances). All 72 persona tests passing."
+  "description": "Fix health-mvp test/app mismatch by adding /health page route for E2E health checks.",
+  "githubIssue": 33,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/33",
+  "branch": "agent/vector/33-health-page",
+  "note": "Issue #33 COMPLETE (2025-11-24). Added /health page route (frontend/src/pages/Health.tsx) and updated E2E tests to navigate to /health instead of root. All health-mvp matrix jobs passing (chromium, firefox, msedge). Fixed duplicate import in golden-screens.spec.ts. CI green on main."
 }
