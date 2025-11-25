@@ -42,20 +42,8 @@ export default defineConfig({
     },
   },
         projects: [
-    // Stateless tests: Fully parallel (health checks, visual diffs, smoke tests)
-    // Kept for backward compatibility with existing test runs
-          {
-      name: 'stateless',
-      testMatch: /.*\.(spec|test)\.ts/,
-      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
-      fullyParallel: true, // Enable parallel execution
-      workers: getWorkerCount(), // Dynamic: 50% of CPU cores locally, 2 in CI
-      use: { 
-        ...devices['Desktop Chrome'],
-        headless: process.env.CI ? true : undefined, // Headless in CI, default locally
-      },
-    },
     // Stateful tests: Serial execution (performance, persona flows, WebSocket-dependent)
+    // Required for persona and performance tests that need sequential execution
     {
       name: 'stateful',
       testMatch: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
@@ -154,41 +142,7 @@ export default defineConfig({
       workers: getWorkerCount(),
       use: {
         channel: 'msedge',
-        ...devices['iPhone 13'],
-        headless: process.env.CI ? true : undefined,
-      },
-    },
-    // Legacy projects for backward compatibility (deprecated, use browser-viewport projects above)
-    {
-      name: 'chromium',
-      testMatch: /.*\.(spec|test)\.ts/,
-      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
-      fullyParallel: true,
-      workers: getWorkerCount(),
-      use: {
-        ...devices['Desktop Chrome'],
-        headless: process.env.CI ? true : undefined,
-      },
-    },
-    {
-      name: 'firefox',
-      testMatch: /.*\.(spec|test)\.ts/,
-      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
-      fullyParallel: true,
-      workers: getWorkerCount(),
-      use: {
-        ...devices['Desktop Firefox'],
-        headless: process.env.CI ? true : undefined,
-      },
-    },
-    {
-      name: 'msedge',
-      testMatch: /.*\.(spec|test)\.ts/,
-      testIgnore: [/performance\.spec\.ts/, /personas\/.*\.spec\.ts/],
-      fullyParallel: true,
-      workers: getWorkerCount(),
-      use: {
-        channel: 'msedge',
+        viewport: { width: 390, height: 844 }, // iPhone 13 viewport without device emulation (avoids channel conflicts)
         headless: process.env.CI ? true : undefined,
       },
     },

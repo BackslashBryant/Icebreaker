@@ -78,8 +78,8 @@ export default defineConfig({
     },
   ],
   
-  // Smoke tests: Chromium (desktop + mobile) + WebKit (desktop) for fast feedback
-  // Runs in ~2-3 minutes with 3 projects in parallel
+  // Smoke tests: Chromium (desktop + mobile) + WebKit (desktop + mobile) for fast feedback
+  // Runs in ~2-3 minutes with 4 projects in parallel
   projects: [
     {
       name: 'chromium-desktop',
@@ -92,6 +92,10 @@ export default defineConfig({
     {
       name: 'webkit-desktop',
       use: { ...devices['Desktop Safari'] },
+    },
+    {
+      name: 'webkit-mobile',
+      use: { ...devices['iPhone 13'] },
     },
   ],
 });
