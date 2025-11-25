@@ -16,6 +16,7 @@
     "verify": "node ./scripts/verify-all",
     "agents:install-hook": "node ./tools/install-agent-hook.mjs",
     "hooks:install": "node ./tools/install-agent-hook.mjs",
+    "branches:prune": "node ./tools/prune-branches.mjs",
     "hooks:install:force": "node ./tools/install-agent-hook.mjs --force",
     "agents:prompt": "node ./tools/agent-prompts.mjs",
     "github:issue": "node ./tools/github-issue.mjs",

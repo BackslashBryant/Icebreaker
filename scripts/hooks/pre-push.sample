@@ -37,21 +37,28 @@ else
   echo "[pre-push] Branch $branch exists on $remote. Will update."
 fi
 
-# Check merge base with main (branch readiness)
+# Check merge base with main (branch readiness) - STRICT
 echo "[pre-push] Checking merge base with main..."
-if git fetch origin main >/dev/null 2>&1; then
-  MERGE_BASE=$(git merge-base HEAD origin/main 2>/dev/null || echo "")
-  MAIN_HEAD=$(git rev-parse origin/main 2>/dev/null || echo "")
-  
-  if [ -n "$MERGE_BASE" ] && [ -n "$MAIN_HEAD" ] && [ "$MERGE_BASE" != "$MAIN_HEAD" ]; then
-    echo "WARNING: Branch is behind origin/main."
-    echo "  Merge base: $(git rev-parse --short $MERGE_BASE)"
-    echo "  Main HEAD:  $(git rev-parse --short $MAIN_HEAD)"
-    echo "Consider rebasing before pushing: git rebase origin/main"
-    read -p "Continue anyway? (y/N) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-      exit 1
+if [ "$branch" != "main" ] && [ "$branch" != "master" ]; then
+  if git fetch origin main >/dev/null 2>&1; then
+    MERGE_BASE=$(git merge-base HEAD origin/main 2>/dev/null || echo "")
+    MAIN_HEAD=$(git rev-parse origin/main 2>/dev/null || echo "")
+    
+    if [ -n "$MERGE_BASE" ] && [ -n "$MAIN_HEAD" ]; then
+      COMMITS_BEHIND=$(git rev-list --count "$MERGE_BASE".."$MAIN_HEAD" 2>/dev/null || echo "0")
+      
+      if [ "$COMMITS_BEHIND" -gt 10 ]; then
+        echo "ERROR: Branch is $COMMITS_BEHIND commits behind main."
+        echo "  Merge base: $(git rev-parse --short $MERGE_BASE)"
+        echo "  Main HEAD:  $(git rev-parse --short $MAIN_HEAD)"
+        echo ""
+        echo "REQUIRED: Rebase on main before pushing: git rebase origin/main"
+        echo "This ensures CI tests run against current main state."
+        exit 1
+      elif [ "$COMMITS_BEHIND" -gt 0 ]; then
+        echo "WARNING: Branch is $COMMITS_BEHIND commits behind main."
+        echo "Consider rebasing: git rebase origin/main"
+      fi
     fi
   fi
 fi
