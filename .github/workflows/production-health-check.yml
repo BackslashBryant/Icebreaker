@@ -1,0 +1,102 @@
+name: Production Health Check
+
+on:
+  schedule:
+    # Run weekly on Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    # Allow manual trigger
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci || npm install
+      - name: Install WebSocket dependency for validation
+        run: npm install ws --save-dev --workspace-root
+      - name: Verify Production Endpoints
+        run: npm run verify:production
+        continue-on-error: true
+      - name: Create Issue on Failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🚨 Production Endpoint Validation Failed';
+            const body = `Production endpoint validation failed on ${new Date().toISOString()}.
+            
+            **Action Required**: Check production deployments (Vercel + Railway) and verify endpoints are accessible.
+            
+            See workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            **Next Steps**:
+            1. Check Vercel dashboard: https://vercel.com/dashboard
+            2. Check Railway dashboard: https://railway.app/dashboard
+            3. Verify health endpoints manually
+            4. Check Sentry for errors
+            5. Re-run validation: \`npm run verify:production\`
+            
+            This issue will be auto-closed when validation passes.`;
+            
+            // Check if issue already exists
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'production-health',
+            });
+            
+            const existingIssue = issues.find(issue => issue.title === title);
+            
+            if (existingIssue) {
+              // Add comment to existing issue
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `Validation failed again on ${new Date().toISOString()}. See workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`,
+              });
+            } else {
+              // Create new issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['production-health', 'automated'],
+              });
+            }
+      - name: Close Issue on Success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Find and close any open production health issues
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'production-health',
+            });
+            
+            for (const issue of issues) {
+              if (issue.title.includes('Production Endpoint Validation Failed')) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: `✅ Production endpoints validated successfully on ${new Date().toISOString()}. Closing issue.`,
+                });
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  state: 'closed',
+                });
+              }
+            }
+
