@@ -37,6 +37,34 @@ else
   echo "[pre-push] Branch $branch exists on $remote. Will update."
 fi
 
+# Check merge base with main (branch readiness)
+echo "[pre-push] Checking merge base with main..."
+if git fetch origin main >/dev/null 2>&1; then
+  MERGE_BASE=$(git merge-base HEAD origin/main 2>/dev/null || echo "")
+  MAIN_HEAD=$(git rev-parse origin/main 2>/dev/null || echo "")
+  
+  if [ -n "$MERGE_BASE" ] && [ -n "$MAIN_HEAD" ] && [ "$MERGE_BASE" != "$MAIN_HEAD" ]; then
+    echo "WARNING: Branch is behind origin/main."
+    echo "  Merge base: $(git rev-parse --short $MERGE_BASE)"
+    echo "  Main HEAD:  $(git rev-parse --short $MAIN_HEAD)"
+    echo "Consider rebasing before pushing: git rebase origin/main"
+    read -p "Continue anyway? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      exit 1
+    fi
+  fi
+fi
+
+# Log --no-verify usage if detected
+if [ -n "$GIT_PUSH_NO_VERIFY" ] || echo "$*" | grep -q "no-verify"; then
+  echo "[pre-push] WARNING: --no-verify detected. Logging reason..."
+  REASON_FILE=".git/no-verify-log.txt"
+  TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+  echo "[$TIMESTAMP] Branch: $branch | Reason: ${GIT_PUSH_NO_VERIFY_REASON:-Not specified}" >> "$REASON_FILE"
+  echo "[pre-push] --no-verify logged. Reason should be documented in commit message."
+fi
+
 # Quick lint check on files being pushed (lightweight)
 echo "[pre-push] Running quick lint check..."
 if command -v npm >/dev/null 2>&1 && [ -f "package.json" ]; then
@@ -52,6 +80,32 @@ if command -v npm >/dev/null 2>&1 && [ -f "package.json" ]; then
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
           exit 1
         fi
+      fi
+    fi
+  fi
+fi
+
+# Validate workflow guardrails (matrix/config, browser deps)
+echo "[pre-push] Validating workflow guardrails..."
+if command -v node >/dev/null 2>&1; then
+  if [ -f "tools/validate-matrix-config.mjs" ]; then
+    if ! node tools/validate-matrix-config.mjs >/dev/null 2>&1; then
+      echo "WARNING: Matrix/config validation failed. Run: node tools/validate-matrix-config.mjs"
+      read -p "Continue anyway? (y/N) " -n 1 -r
+      echo
+      if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+      fi
+    fi
+  fi
+  
+  if [ -f "tools/validate-browser-deps.mjs" ]; then
+    if ! node tools/validate-browser-deps.mjs >/dev/null 2>&1; then
+      echo "WARNING: Browser dependency validation failed. Run: node tools/validate-browser-deps.mjs"
+      read -p "Continue anyway? (y/N) " -n 1 -r
+      echo
+      if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
       fi
     fi
   fi

@@ -17,8 +17,25 @@ on:
         type: boolean
 
 jobs:
+  workflow-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install root dependencies
+        run: npm ci || npm install
+      - name: Validate matrix/config alignment
+        run: node tools/validate-matrix-config.mjs --strict
+      - name: Validate browser dependencies
+        run: node tools/validate-browser-deps.mjs
+      - name: Validate job scopes
+        run: node tools/validate-job-scopes.mjs --strict
+
   checks:
     runs-on: ubuntu-latest
+    needs: workflow-validation
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

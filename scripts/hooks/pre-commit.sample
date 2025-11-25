@@ -108,6 +108,53 @@ if ! node tools/check-dates.mjs --staged >/dev/null 2>&1; then
 fi
 echo "[pre-commit] Date validation passed."
 
+# Validate workflow guardrails (matrix/config alignment, browser deps)
+echo "[pre-commit] Validating workflow guardrails..."
+if command -v node >/dev/null 2>&1; then
+  # Check if workflow or playwright config files are staged
+  staged_files=$(git diff --cached --name-only)
+  workflow_changed=$(echo "$staged_files" | grep -E '\.github/workflows/.*\.yml|tests/playwright\.config\.(ts|smoke\.ts)' || true)
+  
+  if [ -n "$workflow_changed" ]; then
+    if [ -f "tools/validate-matrix-config.mjs" ]; then
+      if ! node tools/validate-matrix-config.mjs >/dev/null 2>&1; then
+        echo ""
+        echo "BLOCK: Matrix/config validation failed."
+        echo ""
+        node tools/validate-matrix-config.mjs
+        exit 1
+      fi
+    fi
+    
+    if [ -f "tools/validate-browser-deps.mjs" ]; then
+      if ! node tools/validate-browser-deps.mjs >/dev/null 2>&1; then
+        echo ""
+        echo "BLOCK: Browser dependency validation failed."
+        echo ""
+        node tools/validate-browser-deps.mjs
+        exit 1
+      fi
+    fi
+    
+    if [ -f "tools/validate-job-scopes.mjs" ]; then
+      if ! node tools/validate-job-scopes.mjs >/dev/null 2>&1; then
+        echo ""
+        echo "WARNING: Job scope validation failed."
+        echo ""
+        node tools/validate-job-scopes.mjs
+        echo ""
+        echo "Review job scopes and fix violations."
+        read -p "Continue anyway? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+          exit 1
+        fi
+      fi
+    fi
+  fi
+fi
+echo "[pre-commit] Workflow guardrails validation passed."
+
 # Run linting on staged files (fast check)
 echo "[pre-commit] Running linter on staged files..."
 if command -v npm >/dev/null 2>&1; then

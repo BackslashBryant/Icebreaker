@@ -14,7 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 
 // Placeholder date patterns to detect
-const PLACEHOLDER_PATTERNS = [
+const PLACEHOLDER_DATE_PATTERNS = [
   // Common placeholder dates mentioned in rules
   /2025-01-27/g,
   /2025-01-XX/g,
@@ -25,6 +25,15 @@ const PLACEHOLDER_PATTERNS = [
   /\d{4}-XX-XX/g,
   // Common placeholder range: 2025-01 through 2025-09
   /2025-0[1-9]-\d{2}/g,
+];
+
+// Placeholder string patterns (ban unless issue number referenced)
+const PLACEHOLDER_STRING_PATTERNS = [
+  /\bPLACEHOLDER\b/gi,
+  /\bXXX\b/g, // XXX as placeholder (not in URLs or hex)
+  /\bTBD\b/gi,
+  /\bTODO\b/gi, // Allowed if issue number referenced
+  /\bFIXME\b/gi, // Allowed if issue number referenced
 ];
 
 // Binary file extensions to skip
@@ -112,7 +121,8 @@ function scanFile(filePath) {
     const lines = content.split(/\r?\n/);
 
     lines.forEach((line, index) => {
-      PLACEHOLDER_PATTERNS.forEach(pattern => {
+      // Check placeholder dates
+      PLACEHOLDER_DATE_PATTERNS.forEach(pattern => {
         const matches = line.matchAll(pattern);
         for (const match of matches) {
           const date = match[0];
@@ -122,8 +132,33 @@ function scanFile(filePath) {
             file: path.relative(repoRoot, filePath),
             line: index + 1,
             column: column + 1,
-            date: date,
+            type: 'date',
+            value: date,
             context: line.trim().substring(0, 100), // First 100 chars for context
+          });
+        }
+      });
+      
+      // Check placeholder strings (TODO/FIXME allowed if issue referenced)
+      PLACEHOLDER_STRING_PATTERNS.forEach(pattern => {
+        const matches = line.matchAll(pattern);
+        for (const match of matches) {
+          const placeholder = match[0];
+          const column = match.index;
+          
+          // Allow TODO/FIXME if issue number referenced (#123 or Issue #123)
+          if ((placeholder.toUpperCase() === 'TODO' || placeholder.toUpperCase() === 'FIXME') && 
+              /#\d+|Issue\s+#\d+/i.test(line)) {
+            continue; // Skip - has issue reference
+          }
+          
+          violations.push({
+            file: path.relative(repoRoot, filePath),
+            line: index + 1,
+            column: column + 1,
+            type: 'string',
+            value: placeholder,
+            context: line.trim().substring(0, 100),
           });
         }
       });
@@ -278,12 +313,14 @@ function main() {
       console.log('✓ No placeholder dates found.');
       process.exit(0);
     } else {
-      console.error(`✗ Found ${violations.length} placeholder date violation(s):\n`);
+      console.error(`✗ Found ${violations.length} placeholder violation(s):\n`);
       violations.forEach(v => {
-        console.error(`  ${v.file}:${v.line}:${v.column} - Found "${v.date}"`);
+        const typeLabel = v.type === 'date' ? 'placeholder date' : 'placeholder string';
+        console.error(`  ${v.file}:${v.line}:${v.column} - Found ${typeLabel} "${v.value}"`);
         console.error(`    ${v.context}`);
       });
-      console.error('\nUse Time MCP to get accurate dates. See .cursor/rules/04-integrations.mdc for details.');
+      console.error('\nPlaceholder dates: Use Time MCP to get accurate dates. See .cursor/rules/04-integrations.mdc');
+      console.error('Placeholder strings: Reference issue number (#123) or remove placeholder.');
       process.exit(1);
     }
   }
