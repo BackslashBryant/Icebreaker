@@ -162,24 +162,64 @@ test.describe('Golden Screens: Visual Regression', () => {
 
     test(`Golden Screen 9: Panic Dialog - ${viewport.name}`, async ({ page }) => {
       await setViewport(page, viewport);
+      
+      // Inject WebSocket mock BEFORE session setup (required for panic button)
+      await page.addInitScript(() => {
+        // Create minimal WebSocket mock for panic dialog test
+        const WS_OPEN = 1;
+        class MinimalWsMock {
+          private connections: Map<string, any> = new Map();
+          
+          connect(sessionId: string, onMessage: (msg: any) => void) {
+            const ws = {
+              readyState: WS_OPEN,
+              send: (message: string) => {
+                const parsed = JSON.parse(message);
+                if (parsed.type === 'panic:trigger') {
+                  // Simulate panic:triggered response
+                  setTimeout(() => {
+                    onMessage({
+                      type: 'panic:triggered',
+                      payload: { exclusionExpiresAt: Date.now() + 3600000 },
+                    });
+                  }, 100);
+                }
+              },
+              close: () => {},
+              onopen: null as any,
+              onmessage: null as any,
+              onclose: null as any,
+              onerror: null as any,
+            };
+            this.connections.set(sessionId, { ws, onMessage });
+            
+            // Trigger connection open
+            setTimeout(() => {
+              if (ws.onopen) ws.onopen();
+              onMessage({ type: 'connected', payload: { sessionId } });
+            }, 10);
+            
+            return ws;
+          }
+        }
+        
+        (window as any).__WS_MOCK__ = new MinimalWsMock();
+        (window as any).__PLAYWRIGHT_WS_MOCK__ = '1';
+      });
+      
       await setupSession(page, {
         sessionId: 'test-session',
         token: 'test-token',
         handle: 'TestUser',
       });
 
-      // Navigate to Radar (panic button is available on authenticated pages)
       await page.goto('/radar');
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
       
-      // Wait for panic button to be visible and clickable
       const panicButton = page.locator(SEL.panicFab);
       await expect(panicButton).toBeVisible({ timeout: 10000 });
-      
-      // Click panic button to open dialog
       await panicButton.click();
       
-      // Wait for dialog to appear
       const panicDialog = page.locator(SEL.panicDialog);
       await expect(panicDialog).toBeVisible({ timeout: 10000 });
 
