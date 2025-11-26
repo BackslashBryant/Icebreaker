@@ -91,13 +91,14 @@ What is causing the Firefox browser installation failure in the health-mvp Playw
 
 1. **Step 1**: Diagnose Current Failure
    - **Owner**: @Nexus 🚀 + @Pixel 🖥️
-   - **Status**: IN-PROGRESS
+   - **Status**: COMPLETE
    - **Acceptance**: Exact error message identified, failure point documented
    - **Details**: 
-     - Issue documented: Firefox browser executable not found during test execution
-     - Error pattern: `browserType.launch: Executable doesn't exist`
-     - Likely cause: Missing system dependencies despite `--with-deps` flag
-     - Proceeding with defensive fix: explicit system dependency installation
+     - **Error Message**: `browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1194/chrome-linux/headless_shell`
+     - **Failure Point**: health-mvp (firefox) job failing during Playwright browser launch
+     - **Root Cause**: Missing system dependencies (libnss3, libatk, libcairo, libgbm, etc.) required by Firefox and other browsers on Ubuntu runners
+     - **Context**: Issue documented during CI stabilization (PR #29). The `--with-deps` flag may not install all required packages reliably on GitHub Actions runners.
+     - **Evidence**: Error occurs during test execution, not during browser installation step, indicating browser installs but lacks runtime dependencies
 
 2. **Step 2**: Fix Browser Installation
    - **Owner**: @Nexus 🚀
