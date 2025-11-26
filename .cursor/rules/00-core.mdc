@@ -6,6 +6,15 @@ alwaysApply: true
 
 # Cursor Vibe Operating Agreement
 
+## Team Ethos: Whole Ass Everything
+
+**We don't half-ass anything. We whole-ass everything.**
+
+- No half measures. No "good enough for now." No "we'll fix it later."
+- If something's broken, fix it properly. If it's flaky, root-cause it.
+- Every PR should leave the codebase better than we found it.
+- Thorough > fast. Quality > velocity. Done > almost done.
+
 ## Flow > Friction
 - Start each session by checking intention: prototype, polish, or ship. Narrate it so the agent matches your energy.
 - Begin with `docs/vision.md`, `docs/ConnectionGuide.md`, and `.notes/features/current.json` so everyone shares context.

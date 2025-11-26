@@ -17,6 +17,19 @@
 - [ ] Research citations (if any) appended to `/docs/research.md`
 - [ ] Labels updated (agent + status)
 
+# Documentation Checklist
+- [ ] Plan-status file updated (`Docs/plans/Issue-<id>-plan-status-*.md`)
+- [ ] Research doc created/updated if new patterns or decisions were made (`Docs/research/Issue-<id>-research.md`)
+- [ ] Testing docs updated if suites/matrix/snapshots changed:
+  - [ ] `Docs/testing/FLAKY_TESTS.md` updated if tests quarantined or retry rules changed
+  - [ ] `Docs/testing/VISUAL-BASELINES.md` updated if baseline OS/browser matrix or regeneration process changed
+  - [ ] `Docs/testing/TESTING-BACKLOG.md` updated if new test ideas implemented
+- [ ] Monitoring/runbooks updated if health checks or alerts changed:
+  - [ ] `Docs/monitoring/*` updated (DASHBOARDS.md, ALERTS.md, RUNBOOK.md) if monitoring/alerting changed
+  - [ ] `Docs/verification/*` updated if deployment/rollback procedures or health validation changed
+  - [ ] `Docs/troubleshooting/*` updated if incident runbooks or known issues changed
+- [ ] No new top-level doc directories (everything under `Docs/`)
+
 # Workflow Guardrails Compliance
 <!-- Run `node tools/pre-merge-checklist.mjs` to auto-check these -->
 

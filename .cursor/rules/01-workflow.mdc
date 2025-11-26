@@ -22,10 +22,10 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 
 ## 0.5. Research (Scout) - MANDATORY FIRST STEP
 - **MANDATORY**: Scout must research the feature/issue BEFORE planning begins.
-- Create issue-specific research file: `docs/research/Issue-<#>-research.md`
-- Research question, sources, findings, recommendations, rollback options
+- Research goes directly into the plan-status file's **Research Summary** section (NOT a separate file).
+- Include: Research question, constraints, sources & findings, recommendations, rollback options.
 - **PAUSE**: Research must be complete and documented before Vector creates plan.
-- **NO EXCEPTIONS**: Do not proceed to planning without completed research.
+- **NO EXCEPTIONS**: Do not proceed to planning without completed research in the plan file.
 
 ## 1. Plan (Vector) - MANDATORY AFTER RESEARCH
 - **MANDATORY**: Vector must wait for Scout's research to be complete.
@@ -48,10 +48,10 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - **MANDATORY**: All agents review the plan and provide notes/feedback.
 - Vector coordinates team review session.
 - Address any concerns or gaps before proceeding.
-- **CRITICAL CHECKPOINT**: Create `.notes/features/<slug>/team-review-approved.md` file ONLY after all agents have reviewed and approved the plan.
-- **PAUSE**: Implementation cannot begin until plan is approved by team AND approval file exists.
-- **NO EXCEPTIONS**: Do not proceed to implementation without team approval AND approval file.
-- **VERIFICATION**: Before starting any implementation work, check that `.notes/features/<slug>/team-review-approved.md` exists. If missing, STOP and coordinate team review.
+- **CRITICAL CHECKPOINT**: Update the plan-status file's **Team Review** section to show "✅ APPROVED" with all agent approvals.
+- **PAUSE**: Implementation cannot begin until plan shows "Team review complete - approved for implementation."
+- **NO EXCEPTIONS**: Do not proceed to implementation without team approval documented in plan file.
+- **VERIFICATION**: Before starting implementation, verify plan-status file shows team approval. If missing, STOP and coordinate team review.
 
 ## 1.5. Non-App Logic Changes Policy
 
@@ -140,9 +140,9 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 
 ## 2. Implement (Forge/Link/Glide/Apex/Cider) - MANDATORY AFTER PLAN APPROVAL
 - **MANDATORY PRE-FLIGHT CHECKS** (must pass ALL before starting):
-  1. Research file exists: `docs/research/Issue-<#>-research.md`
-  2. Plan-status file exists: `Docs/plans/Issue-<#>-plan-status-<STATUS>.md` with checkpoints
-  3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
+  1. Plan-status file exists: `Docs/plans/Issue-<#>-plan-status-<STATUS>.md`
+  2. Plan contains **Research Summary** section (not empty)
+  3. Plan contains **Team Review** section showing "✅ APPROVED"
   4. Plan explicitly states "Team review complete - approved for implementation"
 - **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any implementation files. Report which check failed and coordinate with Vector.
 - Stay in Plan Mode until the caller says "Proceed." Once approved, execute one checkpoint at a time.
@@ -256,19 +256,38 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
        - Ensure branch exists on GitHub FIRST (create via `gh` CLI: `gh repo create-branch BackslashBryant/Icebreaker <branch-name>`)
      - **If push fails with "branch not found"**: Create branch on GitHub FIRST via `gh` CLI before pushing
      - **DO NOT** ask user for permission - this is a mandatory completion step
-  5. **MANDATORY**: Update GitHub issue with completion comment and labels: Use `node tools/github-issue-complete.mjs <issue#> [commit-hash]`
+  5. **MANDATORY**: Update GitHub issue AND close it: Use `node tools/github-issue-complete.mjs <issue#> [commit-hash]`
      - **Preferred method**: `node tools/github-issue-complete.mjs <issue#>`
-     - **Fallback**: `gh issue comment <issue#> --body "..."` and `gh issue edit <issue#> --add-label "status:done"`
+     - **Fallback (comment + label + close)**:
+       ```
+       gh issue comment <issue#> --body "..."
+       gh issue edit <issue#> --add-label "status:done"
+       gh issue close <issue#> --reason completed
+       ```
+     - **CRITICAL**: Adding `status:done` and closing are ONE ATOMIC ACTION - never separate them
      - Include: Status summary, branch name, commit hash, test results, files created/modified, next steps
      - Reference plan-status file: `Docs/plans/Issue-<#>-plan-status-<STATUS>.md`
      - **If authentication fails**: Script provides clear error message and fix steps (`gh auth login`)
      - **DO NOT** ask user for permission - this is a mandatory completion step
-  7. Close the Issue with a recap noting direct commits (optional - can leave open for tracking)
+     - **NEVER leave an issue open with `status:done` label** - if done, it's closed
 - Research file already exists at `docs/research/Issue-<#>-research.md` (created during research phase).
 - Archive security notes (if any) in `/docs/security/`.
 - Update `/docs/agents/KICKOFF.md` sanity checklist if the flow uncovered gaps.
 - **CRITICAL**: Never complete an issue without updating plan-status file and current.json FIRST, then pushing commits and updating the GitHub issue. This is mandatory, not optional. These steps should happen automatically without user reminders.
 - **PROCESS ENFORCEMENT**: If an issue is marked complete in commit message but plan-status file/current.json show incomplete status, STOP and update status files before proceeding. Status files are the source of truth for issue completion state.
+- **DOCUMENTATION GUARDRAIL**: No issue is `status:done` unless:
+  1. Matching `Docs/plans/Issue-<#>-plan-status-COMPLETE.md` file exists (not just status field updated)
+  2. File is renamed to `-COMPLETE` (follows naming convention: `Issue-<id>-plan-status-<STATE>.md`)
+  3. "Outcome" section is complete with all required information (status summary, completion date, branch, commit hash, verification results)
+- **TESTING DOCS REQUIREMENT**: When test suites, matrix configurations, or visual snapshots change:
+  1. Update `Docs/testing/FLAKY_TESTS.md` if tests are quarantined or retry rules change
+  2. Update `Docs/testing/VISUAL-BASELINES.md` if baseline OS/browser matrix or regeneration process changes
+  3. Update `Docs/testing/TESTING-BACKLOG.md` if new test ideas are implemented
+- **MONITORING DOCS REQUIREMENT**: When CI workflows, health checks, or alerts change:
+  1. Update `Docs/monitoring/*` (DASHBOARDS.md, ALERTS.md, RUNBOOK.md) if monitoring/alerting changes
+  2. Update `Docs/verification/*` if deployment/rollback procedures or health validation changes
+  3. Update `Docs/troubleshooting/*` if incident runbooks or known issues change
+- **NO TOP-LEVEL DOC SPRAWL**: No new top-level doc directories; everything goes under `Docs/`. New categories go as subfolders of closest existing area. One-off notes go in `Docs/research/` or `Docs/troubleshooting/` with clear names.
 
 ## Tooling & Automation
 - `npm run agents:prompt -- all` prints prompt bodies for all agents.
@@ -281,5 +300,6 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Keep secrets in GitHub Actions secrets or environment variables; never commit `.env` files.
 - If MCP access changes (new services, revoked tokens), open an issue for Nexus to update `.cursor/config.json` and automation.
 - **Repository Mode**: Template repos track Cursor files (`.cursor/`). App repos block them. The pre-commit hook enforces this separation. See `docs/development/SEPARATION.md` for mode conversion and override procedures.
+- **Documentation Standards**: See `Docs/README.md` for folder ownership and audience boundaries. All documentation must follow naming conventions in `Docs/plans/README.md`. No new top-level doc directories.
 
 Follow this loop for every change to keep GitHub the source of truth and Cursor Agents accountable.***
