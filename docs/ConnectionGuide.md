@@ -263,6 +263,7 @@ Track every port, endpoint, credential reference, and integration touchpoint her
     - E2E tests (Playwright)
     - Backend server starts automatically on port 8000
     - Frontend server starts automatically on port 3000 (via Playwright webServer)
+    - **System Dependencies**: Installs browser system dependencies (libnss3, libnspr4, libatk1.0-0, libatk-bridge2.0-0, libcups2, libdrm2, libdbus-1-3, libxkbcommon0, libxcomposite1, libxdamage1, libxfixes3, libxrandr2, libgbm1, libpango-1.0-0, libcairo2, libatspi2.0-0, libxshmfence1) before Playwright install; libasound2 intentionally omitted because Ubuntu runners lack it (Issue #31)
   - `performance-budgets`: Performance budget checks
   - `ui-visual-a11y`: Visual regression and accessibility tests
 - **Playwright Configs**:
