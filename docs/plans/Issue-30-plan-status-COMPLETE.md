@@ -1,10 +1,11 @@
 # Issue #30: Fix 8 Pre-existing Frontend Test Failures in Checks Job
 
-**Status**: IN-PROGRESS  
+**Status**: COMPLETE  
 **Issue**: [#30](https://github.com/BackslashBryant/Icebreaker/issues/30)  
-**Labels**: `status:plan`, `agent:pixel`, `chore`  
+**Labels**: `status:done`, `agent:pixel`, `chore`  
 **Created**: 2025-11-26  
-**Branch**: TBD
+**Completed**: 2025-11-26  
+**Branch**: `agent/pixel/30-frontend-test-failures`
 
 ---
 
@@ -98,40 +99,40 @@ What are the 8 pre-existing frontend test failures in the checks CI job, and why
 ### Checkpoint 1: Identify All Failures
 **Owner**: @Pixel 🖥️  
 **Acceptance**:
-- [ ] Get CI failure logs from recent failing run
-- [ ] List all 8 failing tests with exact error messages
-- [ ] Categorize failures (act() warnings, assertions, timing, etc.)
+- [x] Get CI failure logs from recent failing run
+- [x] List all 8 failing tests with exact error messages
+- [x] Categorize failures (act() warnings, assertions, timing, etc.)
 
 ### Checkpoint 2: Fix React act() Warnings
 **Owner**: @Pixel 🖥️  
 **Acceptance**:
-- [ ] Fix PanicButton act() warnings in Profile tests
-- [ ] Fix any other act() warnings in test suite
-- [ ] Verify tests pass locally with no warnings
-- [ ] Update test patterns to prevent future act() issues
+- [x] Fix PanicButton act() warnings in Profile tests
+- [x] Fix any other act() warnings in test suite
+- [x] Verify tests pass locally with no warnings
+- [x] Update test patterns to prevent future act() issues
 
 ### Checkpoint 3: Fix React Router Warnings
 **Owner**: @Pixel 🖥️  
 **Acceptance**:
-- [ ] Add future flags to BrowserRouter in test setup
-- [ ] Or configure test environment to suppress acceptable warnings
-- [ ] Verify warnings don't appear in test output
+- [x] Add future flags to BrowserRouter in test setup
+- [x] Or configure test environment to suppress acceptable warnings
+- [x] Verify warnings don't appear in test output
 
 ### Checkpoint 4: Fix Remaining Test Failures
 **Owner**: @Pixel 🖥️  
 **Acceptance**:
-- [ ] Fix ConsentStep test failures (if any)
-- [ ] Fix PanicButton test failures (if any)
-- [ ] Fix any other identified failures
-- [ ] All frontend tests pass in CI
+- [x] Fix ConsentStep test failures (if any)
+- [x] Fix PanicButton test failures (if any)
+- [x] Fix any other identified failures
+- [x] All frontend tests pass in CI
 
 ### Checkpoint 5: Verify CI Green
 **Owner**: @Pixel 🖥️  
 **Acceptance**:
-- [ ] All checks job tests passing (247 backend + all frontend)
-- [ ] No test failures in CI
-- [ ] Tests are stable and not flaky
-- [ ] CI run shows green status
+- [x] All checks job tests passing (247 backend + all frontend)
+- [x] No test failures in CI
+- [x] Tests are stable and not flaky
+- [x] CI run shows green status
 
 ---
 
@@ -190,7 +191,7 @@ Successfully fixed all 8 pre-existing frontend test failures in the checks CI jo
 3. **Test Results**:
    - **Local**: All 172 frontend tests passing (24 test files)
    - **CI**: All checks job tests passing (247 backend + 172 frontend)
-   - **CI Run**: #19709486926 - All jobs passed (workflow-validation, checks, health-mvp, persona-smoke, ui-visual-a11y, performance-budgets)
+   - **CI Run**: [#19709486926](https://github.com/BackslashBryant/Icebreaker/actions/runs/19709486926) on branch `agent/pixel/30-frontend-test-failures` - All jobs passed (workflow-validation, checks, health-mvp, persona-smoke, ui-visual-a11y, performance-budgets)
 
 ### Verification Results
 
