@@ -2,11 +2,11 @@
   "slug": "frontend-test-failures",
   "featureName": "Fix 8 Pre-existing Frontend Test Failures in Checks Job",
   "updatedAt": "2025-11-26T05:40:00-05:00",
-  "status": "plan",
+  "status": "in-progress",
   "vision": "docs/vision.md",
   "description": "Fix 8 pre-existing frontend test failures in checks job (ConsentStep, PanicButton, etc.) identified during CI stabilization (PR #29).",
   "githubIssue": 30,
   "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/30",
   "branch": "agent/pixel/30-frontend-test-failures",
-  "note": "Issue #30 IN PROGRESS (2025-11-26). Research complete - identified React act() warnings and React Router warnings as likely causes. Plan created with 5 checkpoints. Awaiting team review before implementation."
+  "note": "Issue #30 IN PROGRESS (2025-11-26). Checkpoints 1-4 complete: Fixed React act() warnings (usePanic mocks), suppressed React Router warnings, all 172 frontend tests passing locally. Pending CI verification (checkpoint 5) to confirm fixes work in CI environment."
 }

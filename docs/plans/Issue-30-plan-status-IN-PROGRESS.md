@@ -147,7 +147,15 @@ What are the 8 pre-existing frontend test failures in the checks CI job, and why
 
 ## Current Issues
 
-**2025-11-26**: Fixed React act() warnings and React Router warnings. All 172 frontend tests passing locally. Ready for CI verification.
+**2025-11-26**: 
+- ✅ Fixed React act() warnings and React Router warnings
+- ✅ All 172 frontend tests passing locally
+- ⏳ Pending CI verification (checkpoint 5)
+
+**Known Test Output Warnings (Acceptable)**:
+- **DOM Nesting Warnings**: `validateDOMNesting` warnings for `<div>` inside `<p>` and `<button>` inside `<button>` in PersonCard and RadarList components. These are React warnings about HTML structure but don't cause test failures. Acceptable for now - can be addressed in future UI refactoring.
+- **Error Logs in useSafety Tests**: Explicit "Error blocking user" and "Error reporting user" messages in `useSafety.test.tsx` are intentional - they test error handling paths. These appear in stderr but are expected behavior, not failures.
+- **Rationale**: These warnings/logs don't cause test failures and are either intentional (error testing) or acceptable technical debt (DOM nesting). If CI treats warnings as errors, we'll need to suppress them, but current CI configuration should not fail on these.
 
 ---
 
