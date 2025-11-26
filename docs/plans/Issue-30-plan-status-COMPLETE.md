@@ -141,7 +141,7 @@ What are the 8 pre-existing frontend test failures in the checks CI job, and why
 - [x] Checkpoint 2: Fix React act() Warnings (Added usePanic mocks in Profile and Radar tests)
 - [x] Checkpoint 3: Fix React Router Warnings (Suppressed in test setup.js)
 - [x] Checkpoint 4: Fix Remaining Test Failures (All 172 tests passing locally)
-- [ ] Checkpoint 5: Verify CI Green (Pending CI run)
+- [x] Checkpoint 5: Verify CI Green (✅ CI run #19709486926 - all jobs passed)
 
 ---
 
@@ -167,5 +167,55 @@ What are the 8 pre-existing frontend test failures in the checks CI job, and why
 
 ## Outcome
 
-_To be completed when issue is finished_
+**Status**: ✅ **COMPLETE**  
+**Completion Date**: 2025-11-26  
+**Branch**: `agent/pixel/30-frontend-test-failures`  
+**Final Commit**: `671ecb3` (plus CI verification commit)
+
+### Summary
+
+Successfully fixed all 8 pre-existing frontend test failures in the checks CI job by addressing React `act()` warnings and React Router future flag warnings.
+
+### Changes Made
+
+1. **React act() Warnings Fixed**:
+   - Added `usePanic` mock in `frontend/tests/Profile.test.tsx` to prevent state updates during render
+   - Added `usePanic` mock in `frontend/tests/Radar.test.tsx` to prevent state updates during render
+   - Eliminated all React `act()` warnings in test output
+
+2. **React Router Warnings Suppressed**:
+   - Added console.warn suppression in `frontend/tests/setup.js` for React Router future flag warnings
+   - Warnings are expected and will be addressed when upgrading to React Router v7
+
+3. **Test Results**:
+   - **Local**: All 172 frontend tests passing (24 test files)
+   - **CI**: All checks job tests passing (247 backend + 172 frontend)
+   - **CI Run**: #19709486926 - All jobs passed (workflow-validation, checks, health-mvp, persona-smoke, ui-visual-a11y, performance-budgets)
+
+### Verification Results
+
+- ✅ All frontend unit tests pass locally (172/172)
+- ✅ All backend unit tests pass in CI (247/247)
+- ✅ All frontend unit tests pass in CI (172/172)
+- ✅ No React act() warnings in test output
+- ✅ No React Router warnings in test output
+- ✅ CI checks job green
+- ✅ All CI jobs passing (workflow-validation, checks, health-mvp, persona-smoke, ui-visual-a11y, performance-budgets)
+
+### Known Warnings (Documented)
+
+- **DOM Nesting Warnings**: `validateDOMNesting` warnings for `<div>` inside `<p>` and `<button>` inside `<button>` in PersonCard and RadarList components. Acceptable technical debt - can be addressed in future UI refactoring.
+- **Error Logs in useSafety Tests**: Explicit "Error blocking user" and "Error reporting user" messages are intentional - they test error handling paths. Expected behavior, not failures.
+
+### Files Modified
+
+- `frontend/tests/Profile.test.tsx` - Added usePanic mock
+- `frontend/tests/Radar.test.tsx` - Added usePanic mock
+- `frontend/tests/setup.js` - Suppressed React Router warnings
+- `Docs/plans/Issue-30-plan-status-COMPLETE.md` - Plan documentation
+- `.notes/features/current.json` - Status tracking
+
+### Next Steps
+
+Issue #30 is complete. All frontend test failures have been resolved and verified in CI.
 
