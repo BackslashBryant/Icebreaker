@@ -122,15 +122,16 @@ What is causing the Firefox browser installation failure in the health-mvp Playw
 
 4. **Step 4**: Verify Fix in CI
    - **Owner**: @Nexus 🚀
-   - **Status**: PENDING
+   - **Status**: IN-PROGRESS
    - **Acceptance**: health-mvp (firefox) job passes in GitHub Actions
    - **Details**:
      - ✅ Changes committed to feature branch
      - ✅ Pushed to `agent/nexus/31-playwright-firefox-fix`
-     - ⏸️ CI will run when PR is created or branch is merged to main
-     - ⏸️ Monitor health-mvp (firefox) job when CI runs
+     - ✅ CI triggered via workflow_dispatch (run ID: 19693001577)
+     - ✅ ConnectionGuide.md updated to pass guardrails check
+     - ⏸️ Monitoring health-mvp (firefox) job execution
      - ⏸️ Verify all matrix jobs pass (chromium, firefox, webkit, msedge)
-     - ⏸️ Capture passing output/logs
+     - ⏸️ Capture passing output/logs when complete
 
 5. **Step 5**: Document Fix
    - **Owner**: @Muse 🎨
