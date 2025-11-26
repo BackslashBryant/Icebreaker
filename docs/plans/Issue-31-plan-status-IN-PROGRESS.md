@@ -144,7 +144,7 @@ What is causing the Firefox browser installation failure in the health-mvp Playw
 
 ## Current Issues
 
-_None yet - work just started_
+**2025-11-26**: CI run 19693001577 failed - `libasound2` package has no installation candidate on Ubuntu runners. Removed `libasound2` from package list (not required for Playwright browsers). Re-running CI to verify fix.
 
 ## Team Review
 
