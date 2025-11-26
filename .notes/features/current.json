@@ -1,12 +1,12 @@
 {
-  "slug": "suite-matrix",
-  "featureName": "Split Playwright Suites and Extend Browser Matrix",
-  "updatedAt": "2025-11-25T00:00:00-05:00",
+  "slug": "playwright-firefox-fix",
+  "featureName": "Fix Playwright Browser Installation for health-mvp (firefox)",
+  "updatedAt": "2025-11-26T00:00:00-05:00",
   "status": "complete",
   "vision": "docs/vision.md",
-  "description": "Extend Playwright test suites with WebKit coverage, mobile viewports, improved artifact publishing, and flake tracking.",
-  "githubIssue": 15,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/15",
-  "branch": "agent/vector/15-suite-matrix",
-  "note": "Issue #15 COMPLETE (2025-11-25). Added WebKit to smoke suite (chromium-desktop, chromium-mobile, webkit-desktop). Extended full suite to 8 browser × viewport projects. Updated health-mvp to include WebKit. Created flake tracking file. All configs validated. CI ready for extended browser matrix."
+  "description": "Fix Firefox browser installation failure in health-mvp Playwright job by adding explicit system dependency installation step.",
+  "githubIssue": 31,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/31",
+  "branch": "agent/nexus/31-playwright-firefox-fix",
+  "note": "Issue #31 COMPLETE (2025-11-26). Added explicit system dependency installation step before Playwright browser installation in health-mvp job. Removed libasound2 (not available on Ubuntu). All health-mvp matrix jobs now passing: chromium ✅, firefox ✅, webkit ✅, msedge ✅. CI run 19693282037 verified fix. Next: Issue #30 (frontend test failures)."
 }
