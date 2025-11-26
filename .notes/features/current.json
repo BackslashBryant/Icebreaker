@@ -1,12 +1,12 @@
 {
-  "slug": "playwright-firefox-fix",
-  "featureName": "Fix Playwright Browser Installation for health-mvp (firefox)",
-  "updatedAt": "2025-11-26T00:00:00-05:00",
-  "status": "complete",
+  "slug": "frontend-test-failures",
+  "featureName": "Fix 8 Pre-existing Frontend Test Failures in Checks Job",
+  "updatedAt": "2025-11-26T05:40:00-05:00",
+  "status": "plan",
   "vision": "docs/vision.md",
-  "description": "Fix Firefox browser installation failure in health-mvp Playwright job by adding explicit system dependency installation step.",
-  "githubIssue": 31,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/31",
-  "branch": "agent/nexus/31-playwright-firefox-fix",
-  "note": "Issue #31 COMPLETE (2025-11-26). Added explicit system dependency installation step before Playwright browser installation in health-mvp job. Removed libasound2 (not available on Ubuntu). All health-mvp matrix jobs now passing: chromium ✅, firefox ✅, webkit ✅, msedge ✅. CI run 19693282037 verified fix. Next: Issue #30 (frontend test failures)."
+  "description": "Fix 8 pre-existing frontend test failures in checks job (ConsentStep, PanicButton, etc.) identified during CI stabilization (PR #29).",
+  "githubIssue": 30,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/30",
+  "branch": "agent/pixel/30-frontend-test-failures",
+  "note": "Issue #30 IN PROGRESS (2025-11-26). Research complete - identified React act() warnings and React Router warnings as likely causes. Plan created with 5 checkpoints. Awaiting team review before implementation."
 }

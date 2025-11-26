@@ -2,6 +2,23 @@
 import { vi } from "vitest";
 import "@testing-library/jest-dom";
 
+// Suppress React Router future flag warnings in tests
+// These warnings are expected and will be addressed when upgrading to React Router v7
+const originalConsoleWarn = console.warn;
+console.warn = (...args) => {
+  const message = args[0];
+  if (
+    typeof message === "string" &&
+    (message.includes("React Router Future Flag Warning") ||
+      message.includes("v7_startTransition") ||
+      message.includes("v7_relativeSplatPath"))
+  ) {
+    // Suppress React Router future flag warnings
+    return;
+  }
+  originalConsoleWarn.apply(console, args);
+};
+
 // Mock HTMLCanvasElement.getContext for jsdom
 HTMLCanvasElement.prototype.getContext = vi.fn(function (contextType) {
   if (contextType === "2d") {

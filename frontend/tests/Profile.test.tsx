@@ -23,6 +23,17 @@ vi.mock("@/hooks/useAccessibility", () => ({
     loading: false,
   }),
 }));
+vi.mock("@/hooks/usePanic", () => ({
+  usePanic: () => ({
+    showDialog: false,
+    showSuccess: false,
+    exclusionExpiresAt: undefined,
+    triggerPanic: vi.fn(),
+    confirmPanic: vi.fn(),
+    closeDialog: vi.fn(),
+    closeSuccess: vi.fn(),
+  }),
+}));
 vi.mock("sonner", () => ({
   toast: {
     success: vi.fn(),

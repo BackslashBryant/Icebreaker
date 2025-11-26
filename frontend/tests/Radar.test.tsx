@@ -59,6 +59,18 @@ vi.mock("@/hooks/useRadar", () => ({
   useRadar: () => mockUseRadar(),
 }));
 
+vi.mock("@/hooks/usePanic", () => ({
+  usePanic: () => ({
+    showDialog: false,
+    showSuccess: false,
+    exclusionExpiresAt: undefined,
+    triggerPanic: vi.fn(),
+    confirmPanic: vi.fn(),
+    closeDialog: vi.fn(),
+    closeSuccess: vi.fn(),
+  }),
+}));
+
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
   return {
