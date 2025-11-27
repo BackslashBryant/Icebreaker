@@ -7,6 +7,7 @@ import logo256 from "@/assets/logo-256.png";
 export default function Welcome() {
   const [showBoot, setShowBoot] = useState(true); // Boot sequence enabled for cool brand moment
   const [showSweep, setShowSweep] = useState(true);
+  const [showFooter, setShowFooter] = useState(false); // Delayed footer reveal
 
   // Check for reduced motion preference and "seen boot" flag
   useEffect(() => {
@@ -20,6 +21,14 @@ export default function Welcome() {
       setShowBoot(false);
     }
   }, []);
+
+  // Delayed footer reveal for subtle entrance
+  useEffect(() => {
+    if (!showBoot) {
+      const timer = setTimeout(() => setShowFooter(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [showBoot]);
 
   if (showBoot) {
     return (
@@ -44,18 +53,18 @@ export default function Welcome() {
         </div>
       )}
 
-      <div className="max-w-md w-full space-y-8 sm:space-y-12 text-center relative z-10">
-        {/* Logo */}
-        <div className="space-y-4 sm:space-y-6">
+      <div className="max-w-md w-full space-y-8 sm:space-y-10 text-center relative z-10">
+        {/* Logo with shimmer */}
+        <div className="space-y-6 sm:space-y-8">
           <img
             src={logo256}
             alt="IceBreaker"
             width={140}
             height={140}
-            className="mx-auto animate-pulse-slow w-32 h-32 sm:w-40 sm:h-40"
+            className="mx-auto animate-shimmer w-32 h-32 sm:w-40 sm:h-40"
           />
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <h1 className="text-3xl sm:text-4xl font-bold text-accent font-mono tracking-tight glow-accent">
               ICEBREAKER
             </h1>
@@ -63,8 +72,9 @@ export default function Welcome() {
           </div>
         </div>
 
-        {/* Tagline */}
-        <div className="space-y-4">
+        {/* Tagline — minimal, trust onboarding */}
+        <div className="space-y-5">
+          {/* Philosophy line */}
           <p className="text-lg sm:text-xl text-foreground font-mono leading-relaxed">
             Real world.
             <br />
@@ -72,20 +82,19 @@ export default function Welcome() {
             <br />
             Real connections.
           </p>
-          <p className="text-sm sm:text-base text-muted-foreground font-mono">
-            A quiet ping for the people around you.
-          </p>
-          <p className="text-xs text-muted-foreground/70 font-mono">
+          
+          {/* Closer — the mic drop */}
+          <p className="text-sm sm:text-base text-accent/80 font-mono font-medium tracking-wide">
             No feed. No followers. Just now.
           </p>
         </div>
 
         {/* CTAs */}
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-3 sm:space-y-4 pt-2">
           <Button
             asChild
             size="lg"
-            className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-background font-mono text-base sm:text-lg h-12 sm:h-14 retro-button border-2 border-accent"
+            className="w-full rounded-2xl bg-accent hover:bg-accent/90 text-background font-mono text-lg sm:text-xl h-14 sm:h-16 retro-button border-2 border-accent hover-glow"
             data-testid="cta-press-start"
             aria-label="Start onboarding"
           >
@@ -103,8 +112,14 @@ export default function Welcome() {
           </Button>
         </div>
 
-        {/* Footer hint */}
-        <p className="text-[10px] sm:text-xs text-muted-foreground/60 font-mono">18+ · Local · Ephemeral · Privacy-first</p>
+        {/* Footer hint — delayed fade in */}
+        <p 
+          className={`text-[10px] sm:text-xs text-muted-foreground/70 font-mono transition-opacity duration-700 ${
+            showFooter ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          18+ · Local · Ephemeral · Privacy-first
+        </p>
       </div>
     </div>
   );
