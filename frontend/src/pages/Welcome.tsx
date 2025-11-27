@@ -72,9 +72,11 @@ export default function Welcome() {
             <br />
             Real connections.
           </p>
-          <p className="text-xs sm:text-sm text-muted-foreground">Brief moments with nearby people</p>
-          <p className="text-xs text-muted-foreground/70 font-mono italic">
-            No pressure. No permanent connections. Just brief moments.
+          <p className="text-sm sm:text-base text-muted-foreground font-mono">
+            A quiet ping for the people around you.
+          </p>
+          <p className="text-xs text-muted-foreground/70 font-mono">
+            No feed. No followers. Just now.
           </p>
         </div>
 
@@ -87,7 +89,7 @@ export default function Welcome() {
             data-testid="cta-press-start"
             aria-label="Start onboarding"
           >
-            <Link to="/onboarding">Get started</Link>
+            <Link to="/onboarding">Press Start</Link>
           </Button>
 
           <Button

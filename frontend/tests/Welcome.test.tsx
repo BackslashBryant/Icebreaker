@@ -59,7 +59,7 @@ describe("Welcome", () => {
     expect(screen.getByText(/Real connections/i)).toBeInTheDocument();
   });
 
-  it("renders Get started button", async () => {
+  it("renders Press Start button", async () => {
     render(
       <BrowserRouter>
         <Welcome />
@@ -70,7 +70,7 @@ describe("Welcome", () => {
     await waitFor(() => {
       const button = screen.getByTestId("cta-press-start");
       expect(button).toBeInTheDocument();
-      expect(button).toHaveTextContent(/Get started/i);
+      expect(button).toHaveTextContent(/Press Start/i);
     });
   });
 
