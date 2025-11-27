@@ -1,0 +1,13 @@
+{
+  "slug": "dual-browser-e2e",
+  "featureName": "Upgrade Persona E2E Suites to Dual-Browser",
+  "updatedAt": "2025-11-26T00:00:00-05:00",
+  "status": "complete",
+  "vision": "docs/vision.md",
+  "description": "Enable dual-browser (Chromium + Firefox) coverage for persona E2E test suites, unblocking downstream testing work (telemetry, visual validation).",
+  "githubIssue": 11,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/11",
+  "branch": "agent/pixel/11-dual-browser-e2e",
+  "note": "Issue #11 COMPLETE (2025-11-26). Created dual-browser stateful projects (stateful-chromium, stateful-firefox). Updated CI workflows to run both projects. Fixed Firefox navigation timeouts with page.waitForURL() and extended timeouts. All 72 tests pass on both browsers (Chromium: 4.6m, Firefox: 40.9m). Documentation updated (runbook, Connection Guide, testing summaries)."
+}
+
