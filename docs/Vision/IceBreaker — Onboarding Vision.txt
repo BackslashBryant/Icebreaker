@@ -20,8 +20,8 @@ No tricks. No forced identity performance.
 
 1. **Welcome**
 
-   * Brand moment. Retro logo + calm headline: *“Real world. Real time. Real connections.”*
-   * Two clean CTAs: **Press Start** / **Not for me** (graceful exit screen).
+   * Brand moment. Retro logo + calm headline: *"Real world. Real time. Real connections."* + *"No feed. No followers. Just now."*
+   * Minimal splash (invite, don't explain). Two clean CTAs: **Press Start** / **Not for me** (graceful exit screen).
 
 2. **18+ Consent**
 

@@ -19,7 +19,7 @@ People want real-world connection without the baggage of social graphs, profiles
 
 ### Happy-path narrative (step-by-step walkthrough)
 
-1. **Welcome** → "Real world. Real time. Real connections." Clear choice to continue or bounce. Brand moment with retro logo.
+1. **Welcome** → "Real world. Real time. Real connections." + "No feed. No followers. Just now." Minimal splash (invite, don't explain). Clear choice to continue or bounce. Brand moment with retro logo.
 2. **18+ Consent** → Single checkbox confirmation. Adult space, safety first.
 3. **Location Explainer** → Plain-language explainer: approximate, session-based location. User can skip (reduced experience).
 4. **Vibe & Tags** → Required current mood (Up for banter / Open to intros / Thinking out loud / Killing time / Surprise me). Optional tags for wavelength hints. Visibility toggle. Skipping tags allowed but reduces discoverability (soft penalty).

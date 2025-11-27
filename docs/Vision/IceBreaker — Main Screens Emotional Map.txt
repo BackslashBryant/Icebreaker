@@ -7,7 +7,7 @@
 ## 1) Splash / Welcome
 
 **Feel:** Quiet confidence; retro‑handheld wink; intentional choice.
-**Promise:** "This is different. Real world, real time, real connections."
+**Promise:** "This is different. Real world, real time, real connections. No feed. No followers. Just now."
 **Must not:** Beg, hype, or trap.
 **Microcopy anchor:** *“Press Start”* · *“Not for me”*
 **A11y note:** Reduced‑motion disables sweep; buttons have visible focus.

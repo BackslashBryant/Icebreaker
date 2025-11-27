@@ -45,7 +45,7 @@
 * **Voice:** Confident, succinct, slightly playful; never clingy or hypey.
 * **Examples:**
 
-  * Welcome: *“Real world. Real time. Real connections.”*
+  * Welcome: *"Real world. Real time. Real connections."* + *"No feed. No followers. Just now."*
   * Empty Radar: *“No one here — yet.”*
   * Chat end: *“Connection lost. Chat deleted.”*
   * Panic confirm: *“Everything okay?”*

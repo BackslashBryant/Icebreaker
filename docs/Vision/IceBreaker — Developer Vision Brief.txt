@@ -38,7 +38,7 @@ They value: control, subtlety, safety, and a vibe that doesn’t try too hard.
 
 ## 🌀 Core Experience (end‑to‑end)
 
-1. **Welcome** → "Real world. Real time. Real connections." Clear choice to continue or bounce.
+1. **Welcome** → "Real world. Real time. Real connections." + "No feed. No followers. Just now." Minimal splash (invite, don't explain). Clear choice to continue or bounce.
 2. **Consent & Clarity** → 18+ confirm; plain‑language location explainer.
 3. **Vibe & Optional Tags** → *Required current mood; optional identity hints.* Skipping tags is allowed but lowers discoverability.
 4. **Radar** → Ambient presence; see who’s open nearby.
