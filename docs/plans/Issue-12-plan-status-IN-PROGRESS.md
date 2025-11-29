@@ -7,6 +7,35 @@
 **Issue**: #12  
 **Issue URL**: https://github.com/BackslashBryant/Icebreaker/issues/12
 
+## Goals & Success Metrics
+
+- **Goal**: Automate visual and accessibility validation for our core flows across all supported viewports, themes, and accessibility preferences so regressions are caught before release.
+- **Success Metrics**:
+  - Screenshot artifacts generated for every viewport × theme × accessibility combination on each CI run.
+  - Tests fail automatically when CSS/UX regressions are detected (visual diff or Axe violation).
+  - Documentation clearly lists the matrix expectations so QA and agents can reproduce results locally.
+
+## Plan Steps
+
+1. Implement dark mode CSS variables so visual tests have parity across themes.
+2. Build reusable helpers that apply theme/viewport/reduced-motion/high-contrast combinations.
+3. Author a Playwright matrix spec that captures screenshots + Axe checks for key flows.
+4. Update docs with the matrix expectations, screenshot naming, and review process.
+5. Ensure CI publishes screenshot artifacts and enforces the visual regression suite.
+
+## Current Status
+
+- Research (`docs/research/Issue-12-research.md`) completed with actionable findings.
+- Plan drafted and awaiting team review; no checkpoints started yet.
+- Dark mode prerequisite (Checkpoint 1) is still outstanding and blocks automated testing work.
+
+## Acceptance Tests
+
+- Playwright matrix spec runs cleanly across all combinations with screenshots stored using the documented naming convention.
+- Axe accessibility checks pass for every combination.
+- Documentation updates merged (`docs/testing/*`) describing the workflow.
+- CI job uploads screenshot artifacts and fails when diffs exceed thresholds.
+
 ## Research Summary
 
 **Research Question**: How should we implement comprehensive visual and accessibility validation across multiple viewports (small/medium mobile, tablet, desktop), themes (light/dark), and accessibility settings (prefers-reduced-motion, high-contrast) to ensure consistent look-and-feel and catch CSS regressions?

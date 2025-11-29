@@ -126,7 +126,7 @@ People want real-world connection without the baggage of social graphs, profiles
 ## 6. Links & Artifacts
 
 ### GitHub issue(s)
-- TBD — Create first issue for MVP planning
+- Issue #12 — Validate Look-and-Feel Across Devices, Themes, Reduced Motion (plan + research ready for implementation)
 
 ### Design mocks
 - Logo assets: `Docs/Vision/icebreaker_logo_exports/`
@@ -144,7 +144,7 @@ People want real-world connection without the baggage of social graphs, profiles
 - See `docs/personas/README.md` for overview and usage
 
 ### Connection guide (`docs/ConnectionGuide.md`)
-- TBD — Initialize with ports, endpoints, services as architecture is defined
+- Tracks current port mappings, backend/frontend services, and deployment endpoints (kept current with each milestone)
 
 ### Vision source documents
 - `Docs/Vision/IceBreaker — Developer Vision Brief.txt` — North Star
