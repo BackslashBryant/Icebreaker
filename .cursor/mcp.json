@@ -33,12 +33,6 @@
         "@modelcontextprotocol/server-filesystem",
         "C:\\Users\\OrEo2\\Desktop\\DevOps\\1. Projects\\Icebreaker"
       ]
-    },
-    "sentry": {
-      "url": "https://mcp.sentry.dev/mcp",
-      "env": {
-        "SENTRY_AUTH_TOKEN": "${env:SENTRY_AUTH_TOKEN}"
-      }
     }
   }
 }
