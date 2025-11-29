@@ -1,6 +1,6 @@
 /**
  * Viewport Matrix Helper
- * 
+ *
  * Provides standardized viewport configurations for visual regression testing.
  * Ensures consistent testing across mobile, tablet, and desktop viewports.
  */
@@ -83,7 +83,7 @@ export async function setViewport(
 
 /**
  * Mask dynamic content in screenshots
- * 
+ *
  * Common patterns to mask:
  * - Handles/usernames
  * - Timestamps

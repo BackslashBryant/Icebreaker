@@ -115,12 +115,12 @@
 ### Checkpoint 3: Create Visual Regression Test Matrix
 **Owner**: @Pixel 🖥️
 **Acceptance Criteria**:
-- [ ] New test file `tests/e2e/visual/theme-matrix.spec.ts` created
-- [ ] Tests cover key screens: Welcome, Onboarding steps (0-3), Radar, Chat, Profile
-- [ ] All 24 combinations tested per screen (3 viewports × 2 themes × 2 reduced-motion × 2 high-contrast)
-- [ ] Screenshots captured with descriptive names
-- [ ] Accessibility checks (Axe) run for each combination
-- [ ] Tests fail on CSS regressions (screenshot mismatch)
+- [x] New test file `tests/e2e/visual/theme-matrix.spec.ts` created
+- [x] Tests cover key screens: Welcome, Onboarding steps (0-3), Radar, Chat, Profile
+- [x] All 24 combinations tested per screen (3 viewports × 2 themes × 2 reduced-motion × 2 high-contrast)
+- [x] Screenshots captured with descriptive names
+- [x] Accessibility checks (Axe) run for each combination
+- [x] Tests fail on CSS regressions (screenshot mismatch)
 
 **Files to Create/Modify**:
 - `tests/e2e/visual/theme-matrix.spec.ts` - New test file
@@ -202,10 +202,10 @@
 - [x] Completed: 2025-11-29
 
 ### Checkpoint 3: Create Visual Regression Test Matrix
-- [ ] Status: PENDING
-- [ ] Owner: @Pixel 🖥️
-- [ ] Started: _(not started)_
-- [ ] Completed: _(not started)_
+- [x] Status: COMPLETE
+- [x] Owner: @Pixel 🖥️
+- [x] Started: 2025-11-29
+- [x] Completed: 2025-11-29
 
 ### Checkpoint 4: Update Documentation
 - [ ] Status: PENDING

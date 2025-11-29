@@ -110,7 +110,7 @@ describe('theme-matrix', () => {
       const matrix = getThemeMatrix(['mobile']);
       const themes = matrix.map(m => m.theme);
       expect(themes).toHaveLength(8);
-      
+
       // Verify all 8 combinations are present
       const uniqueThemes = new Set(themes.map(t => JSON.stringify(t)));
       expect(uniqueThemes.size).toBe(8);
