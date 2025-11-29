@@ -163,32 +163,32 @@
 ### Checkpoint 1: Implement Dark Mode CSS Variables
 - [ ] Status: PENDING
 - [ ] Owner: @Link 🌐
-- [ ] Started: TBD
-- [ ] Completed: TBD
+- [ ] Started: _(not started)_
+- [ ] Completed: _(not started)_
 
 ### Checkpoint 2: Create Theme/Viewport Test Matrix Infrastructure
 - [ ] Status: PENDING
 - [ ] Owner: @Pixel 🖥️
-- [ ] Started: TBD
-- [ ] Completed: TBD
+- [ ] Started: _(not started)_
+- [ ] Completed: _(not started)_
 
 ### Checkpoint 3: Create Visual Regression Test Matrix
 - [ ] Status: PENDING
 - [ ] Owner: @Pixel 🖥️
-- [ ] Started: TBD
-- [ ] Completed: TBD
+- [ ] Started: _(not started)_
+- [ ] Completed: _(not started)_
 
 ### Checkpoint 4: Update Documentation
 - [ ] Status: PENDING
 - [ ] Owner: @Muse 🎨
-- [ ] Started: TBD
-- [ ] Completed: TBD
+- [ ] Started: _(not started)_
+- [ ] Completed: _(not started)_
 
 ### Checkpoint 5: CI Integration & Artifact Publishing
 - [ ] Status: PENDING
 - [ ] Owner: @Nexus 🚀
-- [ ] Started: TBD
-- [ ] Completed: TBD
+- [ ] Started: _(not started)_
+- [ ] Completed: _(not started)_
 
 ## Current Issues
 

@@ -322,7 +322,7 @@ test.describe("Persona: Alex Kim - Tech Conference Attendee", () => {
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
-      
+
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -369,7 +369,7 @@ test.describe("Persona: Alex Kim - Tech Conference Attendee", () => {
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
-      
+
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -416,7 +416,7 @@ test.describe("Persona: Alex Kim - Tech Conference Attendee", () => {
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
-      
+
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -695,7 +695,7 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
-      
+
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -742,7 +742,7 @@ test.describe("Persona: Jordan Park - Privacy-Focused Professional", () => {
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
-      
+
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -903,7 +903,7 @@ test.describe("Persona: Sam Taylor - Outgoing Introvert", () => {
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
-      
+
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -950,7 +950,7 @@ test.describe("Persona: Sam Taylor - Outgoing Introvert", () => {
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
-      
+
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -997,7 +997,7 @@ test.describe("Persona: Sam Taylor - Outgoing Introvert", () => {
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
-      
+
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -1158,7 +1158,7 @@ test.describe("Persona: Morgan Davis - Graduate Student & Researcher", () => {
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
-      
+
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -1205,7 +1205,7 @@ test.describe("Persona: Morgan Davis - Graduate Student & Researcher", () => {
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
-      
+
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -1252,7 +1252,7 @@ test.describe("Persona: Morgan Davis - Graduate Student & Researcher", () => {
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
-      
+
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
