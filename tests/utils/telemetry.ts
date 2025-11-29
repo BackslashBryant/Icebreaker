@@ -17,6 +17,15 @@ export interface TelemetryData {
     bootMs?: number;
     onboardingMs?: number;
     stepTimes?: Record<number, number>;
+    websocketConnectMs?: number;
+  };
+  networkTimings?: {
+    [endpoint: string]: {
+      requestTime: number;
+      responseTime: number;
+      totalTime: number;
+      statusCode?: number;
+    }[];
   };
   interactions: {
     stepsRetried: number;
@@ -136,6 +145,32 @@ export class TelemetryCollector {
    */
   recordAffordance(name: 'panicButton' | 'visibilityToggle', visible: boolean): void {
     this.data.accessibility!.visibleAffordances![name] = visible;
+  }
+
+  /**
+   * Record WebSocket connection time
+   */
+  recordWebSocketConnectTime(ms: number): void {
+    this.data.timings!.websocketConnectMs = ms;
+  }
+
+  /**
+   * Record network request timing
+   * Accumulates multiple requests to the same endpoint
+   */
+  recordNetworkRequest(endpoint: string, timing: {
+    requestTime: number;
+    responseTime: number;
+    totalTime: number;
+    statusCode?: number;
+  }): void {
+    if (!this.data.networkTimings) {
+      this.data.networkTimings = {};
+    }
+    if (!this.data.networkTimings[endpoint]) {
+      this.data.networkTimings[endpoint] = [];
+    }
+    this.data.networkTimings[endpoint].push(timing);
   }
 
   /**
@@ -322,6 +357,39 @@ export async function checkFocusOrder(page: Page): Promise<boolean> {
     return focusableElements.length > 0;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Extract WebSocket connection timing from performance marks
+ * Returns connection time in milliseconds, or null if not available
+ */
+export async function extractWebSocketTiming(page: Page): Promise<number | null> {
+  try {
+    const timing = await page.evaluate(() => {
+      // Get performance measure for 'websocket-connect'
+      const measures = performance.getEntriesByType('measure');
+      const wsMeasure = measures.find((entry) => entry.name === 'websocket-connect');
+      
+      if (wsMeasure && wsMeasure.duration) {
+        return Math.round(wsMeasure.duration);
+      }
+      
+      // Fallback: try to calculate from marks if measure doesn't exist
+      const marks = performance.getEntriesByType('mark');
+      const startMark = marks.find((entry) => entry.name === 'websocket-connect-start');
+      const endMark = marks.find((entry) => entry.name === 'websocket-connect-end');
+      
+      if (startMark && endMark) {
+        return Math.round(endMark.startTime - startMark.startTime);
+      }
+      
+      return null;
+    });
+    
+    return timing;
+  } catch {
+    return null;
   }
 }
 

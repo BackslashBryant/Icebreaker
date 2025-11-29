@@ -4,7 +4,7 @@
  * Shared helpers to reduce duplication and improve test reliability.
  */
 
-import { Page, expect } from "@playwright/test";
+import { Page, expect, Route } from "@playwright/test";
 import { TelemetryCollector } from "./telemetry";
 
 /**
@@ -212,5 +212,82 @@ export function getBaseURL(): string {
  */
 export function getBackendURL(): string {
   return process.env.BACKEND_URL || "http://localhost:8000";
+}
+
+/**
+ * Set up network request interception for telemetry
+ * Intercepts API requests and records timing information
+ * 
+ * @param page - Playwright page object
+ * @param telemetry - Telemetry collector to record network timings
+ * @param endpoints - Optional list of endpoint patterns to intercept (default: all /api/*)
+ */
+export async function setupNetworkTelemetry(
+  page: Page,
+  telemetry: TelemetryCollector,
+  endpoints: string[] = ['**/api/**']
+): Promise<void> {
+  // Track request start times
+  const requestStartTimes = new Map<string, number>();
+
+  for (const endpointPattern of endpoints) {
+    await page.route(endpointPattern, async (route: Route) => {
+      const request = route.request();
+      const url = request.url();
+      
+      // Extract endpoint path (e.g., /api/onboarding from full URL)
+      const urlObj = new URL(url);
+      const endpoint = urlObj.pathname;
+      
+      // Record request start time
+      const requestStart = Date.now();
+      requestStartTimes.set(request.url(), requestStart);
+      
+      // Use continue() to allow request to proceed normally without blocking
+      // Then wait for response asynchronously to avoid blocking the frontend
+      await route.continue();
+      
+      // Wait for response and record timing asynchronously (don't block the route handler)
+      // Use request.response() which waits for the response from any handler
+      // Add timeout to prevent hanging if backend doesn't respond
+      request.response().then((response) => {
+        if (response) {
+          const responseTime = Date.now();
+          const requestTime = requestStartTimes.get(request.url()) || requestStart;
+          const totalTime = responseTime - requestTime;
+          
+          // Get timing from request if available
+          const timing = request.timing();
+          const requestTimeMs = timing.requestStart > 0 
+            ? timing.responseStart - timing.requestStart 
+            : totalTime;
+          const responseTimeMs = timing.responseEnd > 0 
+            ? timing.responseEnd - timing.responseStart 
+            : totalTime;
+          
+          // Record in telemetry
+          telemetry.recordNetworkRequest(endpoint, {
+            requestTime: requestTimeMs,
+            responseTime: responseTimeMs,
+            totalTime: totalTime,
+            statusCode: response.status(),
+          });
+        }
+        requestStartTimes.delete(request.url());
+      }).catch((error) => {
+        // Request may have failed, still record timing
+        const responseTime = Date.now();
+        const requestTime = requestStartTimes.get(request.url()) || requestStart;
+        const totalTime = responseTime - requestTime;
+        
+        telemetry.recordNetworkRequest(endpoint, {
+          requestTime: 0,
+          responseTime: 0,
+          totalTime: totalTime,
+        });
+        requestStartTimes.delete(request.url());
+      });
+    });
+  }
 }
 

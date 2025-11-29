@@ -12,7 +12,8 @@
 import { test, expect } from '@playwright/test';
 import { createMultiPersonaContexts, cleanupPersonaContexts, waitForMutualVisibility } from '../../utils/multi-persona';
 import type { PersonaPresenceScript } from '../../fixtures/persona-presence/schema';
-import { TelemetryCollector, countErrorBanners } from '../../utils/telemetry';
+import { TelemetryCollector, countErrorBanners, extractWebSocketTiming } from '../../utils/telemetry';
+import { setupNetworkTelemetry } from '../../utils/test-helpers';
 import { SEL } from '../../utils/selectors';
 
 // Import presence scripts
@@ -34,6 +35,10 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       const maya = contexts.find((c) => c.sessionId === 'maya-session')!;
       const zoe = contexts.find((c) => c.sessionId === 'zoe-session')!;
 
+      // Set up network telemetry for both pages
+      await setupNetworkTelemetry(maya.page, mayaTelemetry);
+      await setupNetworkTelemetry(zoe.page, zoeTelemetry);
+
       // Navigate both to Radar
       await maya.page.goto('/radar');
       await zoe.page.goto('/radar');
@@ -42,9 +47,20 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       await expect(maya.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
       await expect(zoe.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
-      // Wait for WebSocket presence updates
+      // Wait for WebSocket presence updates and connection establishment
       await maya.page.waitForTimeout(2000);
       await zoe.page.waitForTimeout(2000);
+      
+      // Extract and record WebSocket connection timing for both
+      const mayaWsTiming = await extractWebSocketTiming(maya.page);
+      if (mayaWsTiming !== null) {
+        mayaTelemetry.recordWebSocketConnectTime(mayaWsTiming);
+      }
+      
+      const zoeWsTiming = await extractWebSocketTiming(zoe.page);
+      if (zoeWsTiming !== null) {
+        zoeTelemetry.recordWebSocketConnectTime(zoeWsTiming);
+      }
 
       // Record error banners for both personas
       const mayaErrorCount = await countErrorBanners(maya.page);
@@ -89,6 +105,10 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       const maya = contexts.find((c) => c.sessionId === 'maya-session')!;
       const zoe = contexts.find((c) => c.sessionId === 'zoe-session')!;
 
+      // Set up network telemetry for both pages
+      await setupNetworkTelemetry(maya.page, mayaTelemetry);
+      await setupNetworkTelemetry(zoe.page, zoeTelemetry);
+
       // Both have "Overthinking Things" tag - should boost compatibility
       const mayaTags = campusLibraryScript.personas.find((p) => p.sessionId === 'maya-session')?.tags || [];
       const zoeTags = campusLibraryScript.personas.find((p) => p.sessionId === 'zoe-session')?.tags || [];
@@ -104,9 +124,20 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       await expect(maya.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
       await expect(zoe.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
-      // Wait for presence updates
+      // Wait for presence updates and WebSocket connection
       await maya.page.waitForTimeout(2000);
       await zoe.page.waitForTimeout(2000);
+      
+      // Extract and record WebSocket connection timing for both
+      const mayaWsTiming = await extractWebSocketTiming(maya.page);
+      if (mayaWsTiming !== null) {
+        mayaTelemetry.recordWebSocketConnectTime(mayaWsTiming);
+      }
+      
+      const zoeWsTiming = await extractWebSocketTiming(zoe.page);
+      if (zoeWsTiming !== null) {
+        zoeTelemetry.recordWebSocketConnectTime(zoeWsTiming);
+      }
 
       // Record error banners
       const mayaErrorCount = await countErrorBanners(maya.page);
@@ -150,6 +181,10 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       const maya = contexts.find((c) => c.sessionId === 'maya-session')!;
       const zoe = contexts.find((c) => c.sessionId === 'zoe-session')!;
 
+      // Set up network telemetry for both pages
+      await setupNetworkTelemetry(maya.page, mayaTelemetry);
+      await setupNetworkTelemetry(zoe.page, zoeTelemetry);
+
       // Navigate both to Radar
       await maya.page.goto('/radar');
       await zoe.page.goto('/radar');
@@ -157,9 +192,20 @@ test.describe('Multi-User Scenarios: Maya + Zoe (Campus Library)', () => {
       await expect(maya.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
       await expect(zoe.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
-      // Wait for initial presence
+      // Wait for initial presence and WebSocket connection
       await maya.page.waitForTimeout(2000);
       await zoe.page.waitForTimeout(2000);
+      
+      // Extract and record WebSocket connection timing for both
+      const mayaWsTiming = await extractWebSocketTiming(maya.page);
+      if (mayaWsTiming !== null) {
+        mayaTelemetry.recordWebSocketConnectTime(mayaWsTiming);
+      }
+      
+      const zoeWsTiming = await extractWebSocketTiming(zoe.page);
+      if (zoeWsTiming !== null) {
+        zoeTelemetry.recordWebSocketConnectTime(zoeWsTiming);
+      }
 
       // Toggle Maya's visibility off via mock
       await maya.page.evaluate(() => {
@@ -219,6 +265,10 @@ test.describe('Multi-User Scenarios: Ethan + Marcus (Coworking)', () => {
       const ethan = contexts.find((c) => c.sessionId === 'ethan-session')!;
       const marcus = contexts.find((c) => c.sessionId === 'marcus-session')!;
 
+      // Set up network telemetry for both pages
+      await setupNetworkTelemetry(ethan.page, ethanTelemetry);
+      await setupNetworkTelemetry(marcus.page, marcusTelemetry);
+
       // Verify different floors
       expect(ethan.geo?.floor).toBe(2);
       expect(marcus.geo?.floor).toBe(3);
@@ -230,9 +280,20 @@ test.describe('Multi-User Scenarios: Ethan + Marcus (Coworking)', () => {
       await expect(ethan.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
       await expect(marcus.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
-      // Wait for presence updates
+      // Wait for presence updates and WebSocket connection
       await ethan.page.waitForTimeout(2000);
       await marcus.page.waitForTimeout(2000);
+      
+      // Extract and record WebSocket connection timing for both
+      const ethanWsTiming = await extractWebSocketTiming(ethan.page);
+      if (ethanWsTiming !== null) {
+        ethanTelemetry.recordWebSocketConnectTime(ethanWsTiming);
+      }
+      
+      const marcusWsTiming = await extractWebSocketTiming(marcus.page);
+      if (marcusWsTiming !== null) {
+        marcusTelemetry.recordWebSocketConnectTime(marcusWsTiming);
+      }
 
       // Record error banners
       const ethanErrorCount = await countErrorBanners(ethan.page);
@@ -276,6 +337,10 @@ test.describe('Multi-User Scenarios: Ethan + Marcus (Coworking)', () => {
       const ethan = contexts.find((c) => c.sessionId === 'ethan-session')!;
       const marcus = contexts.find((c) => c.sessionId === 'marcus-session')!;
 
+      // Set up network telemetry for both pages
+      await setupNetworkTelemetry(ethan.page, ethanTelemetry);
+      await setupNetworkTelemetry(marcus.page, marcusTelemetry);
+
       const ethanTags = coworkingScript.personas.find((p) => p.sessionId === 'ethan-session')?.tags || [];
       const marcusTags = coworkingScript.personas.find((p) => p.sessionId === 'marcus-session')?.tags || [];
 
@@ -288,6 +353,21 @@ test.describe('Multi-User Scenarios: Ethan + Marcus (Coworking)', () => {
 
       await expect(ethan.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
       await expect(marcus.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Wait for WebSocket connection
+      await ethan.page.waitForTimeout(2000);
+      await marcus.page.waitForTimeout(2000);
+      
+      // Extract and record WebSocket connection timing for both
+      const ethanWsTiming = await extractWebSocketTiming(ethan.page);
+      if (ethanWsTiming !== null) {
+        ethanTelemetry.recordWebSocketConnectTime(ethanWsTiming);
+      }
+      
+      const marcusWsTiming = await extractWebSocketTiming(marcus.page);
+      if (marcusWsTiming !== null) {
+        marcusTelemetry.recordWebSocketConnectTime(marcusWsTiming);
+      }
 
       // Record error banners
       const ethanErrorCount = await countErrorBanners(ethan.page);
@@ -329,6 +409,10 @@ test.describe('Multi-User Scenarios: Casey + Alex (Gallery Opening)', () => {
       const casey = contexts.find((c) => c.sessionId === 'casey-session')!;
       const alex = contexts.find((c) => c.sessionId === 'alex-session')!;
 
+      // Set up network telemetry for both pages
+      await setupNetworkTelemetry(casey.page, caseyTelemetry);
+      await setupNetworkTelemetry(alex.page, alexTelemetry);
+
       // Verify same coordinates (same event)
       expect(casey.geo?.lat).toBe(alex.geo?.lat);
       expect(casey.geo?.lon).toBe(alex.geo?.lon);
@@ -340,9 +424,20 @@ test.describe('Multi-User Scenarios: Casey + Alex (Gallery Opening)', () => {
       await expect(casey.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
       await expect(alex.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
-      // Wait for presence updates
+      // Wait for presence updates and WebSocket connection
       await casey.page.waitForTimeout(2000);
       await alex.page.waitForTimeout(2000);
+      
+      // Extract and record WebSocket connection timing for both
+      const caseyWsTiming = await extractWebSocketTiming(casey.page);
+      if (caseyWsTiming !== null) {
+        caseyTelemetry.recordWebSocketConnectTime(caseyWsTiming);
+      }
+      
+      const alexWsTiming = await extractWebSocketTiming(alex.page);
+      if (alexWsTiming !== null) {
+        alexTelemetry.recordWebSocketConnectTime(alexWsTiming);
+      }
 
       // Record error banners
       const caseyErrorCount = await countErrorBanners(casey.page);
@@ -388,6 +483,10 @@ test.describe('Multi-User Chat Scenarios', () => {
       const maya = contexts.find((c) => c.sessionId === 'maya-session')!;
       const zoe = contexts.find((c) => c.sessionId === 'zoe-session')!;
 
+      // Set up network telemetry for both pages
+      await setupNetworkTelemetry(maya.page, mayaTelemetry);
+      await setupNetworkTelemetry(zoe.page, zoeTelemetry);
+
       // Navigate both to Radar
       await maya.page.goto('/radar');
       await zoe.page.goto('/radar');
@@ -395,9 +494,20 @@ test.describe('Multi-User Chat Scenarios', () => {
       await expect(maya.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
       await expect(zoe.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
-      // Wait for presence updates
+      // Wait for presence updates and WebSocket connection
       await maya.page.waitForTimeout(2000);
       await zoe.page.waitForTimeout(2000);
+      
+      // Extract and record WebSocket connection timing for both
+      const mayaWsTiming = await extractWebSocketTiming(maya.page);
+      if (mayaWsTiming !== null) {
+        mayaTelemetry.recordWebSocketConnectTime(mayaWsTiming);
+      }
+      
+      const zoeWsTiming = await extractWebSocketTiming(zoe.page);
+      if (zoeWsTiming !== null) {
+        zoeTelemetry.recordWebSocketConnectTime(zoeWsTiming);
+      }
 
       // Maya initiates chat with Zoe (via mock)
       await maya.page.evaluate(() => {
@@ -473,6 +583,10 @@ test.describe('Multi-User Reconnect Scenarios', () => {
       const maya = contexts.find((c) => c.sessionId === 'maya-session')!;
       const zoe = contexts.find((c) => c.sessionId === 'zoe-session')!;
 
+      // Set up network telemetry for both pages
+      await setupNetworkTelemetry(maya.page, mayaTelemetry);
+      await setupNetworkTelemetry(zoe.page, zoeTelemetry);
+
       // Navigate both to Radar
       await maya.page.goto('/radar');
       await zoe.page.goto('/radar');
@@ -480,8 +594,20 @@ test.describe('Multi-User Reconnect Scenarios', () => {
       await expect(maya.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
       await expect(zoe.page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
-      // Wait for initial presence
+      // Wait for initial presence and WebSocket connection
       await maya.page.waitForTimeout(2000);
+      await zoe.page.waitForTimeout(2000);
+      
+      // Extract and record WebSocket connection timing for both
+      const mayaWsTiming = await extractWebSocketTiming(maya.page);
+      if (mayaWsTiming !== null) {
+        mayaTelemetry.recordWebSocketConnectTime(mayaWsTiming);
+      }
+      
+      const zoeWsTiming = await extractWebSocketTiming(zoe.page);
+      if (zoeWsTiming !== null) {
+        zoeTelemetry.recordWebSocketConnectTime(zoeWsTiming);
+      }
 
       // Disconnect Maya's WebSocket
       await maya.page.evaluate(() => {

@@ -1,10 +1,10 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { waitForBootSequence, completeOnboarding, setupSession } from "../../utils/test-helpers";
+import { waitForBootSequence, completeOnboarding, setupSession, setupNetworkTelemetry } from "../../utils/test-helpers";
 import { setPersonaGeo, denyGeolocation } from "../../utils/geolocation";
 import locations from "../../fixtures/locations.json";
 import { SEL } from "../../utils/selectors";
-import { TelemetryCollector, checkPanicButtonVisible, checkVisibilityToggleVisible, checkFocusOrder, countErrorBanners } from "../../utils/telemetry";
+import { TelemetryCollector, checkPanicButtonVisible, checkVisibilityToggleVisible, checkFocusOrder, countErrorBanners, extractWebSocketTiming } from "../../utils/telemetry";
 
 /**
  * Persona-Based E2E Tests: College Students
@@ -23,6 +23,9 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
 
   test("@smoke completes onboarding with anxious user pattern", async ({ page }) => {
     const telemetry = new TelemetryCollector('maya', 'maya-onboarding-smoke');
+    
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
     
     // RESEARCH: Capture network requests and console logs before submitting
     const networkErrors: string[] = [];
@@ -138,6 +141,15 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
       await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 10000 });
       
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
+      
       // Record error banners if any
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -165,6 +177,9 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
     // Set up telemetry collector
     const telemetry = new TelemetryCollector('maya', 'maya-visibility-test');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       // Set up Maya's session
       await setupSession(page, {
@@ -182,6 +197,15 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
 
       // Capture telemetry: check affordances
       const panicVisible = await checkPanicButtonVisible(page);
@@ -232,6 +256,9 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
   test("shared tag compatibility boosts signal score", async ({ page, context }) => {
     const telemetry = new TelemetryCollector('maya', 'maya-shared-tags');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       // This test requires simulating two personas (Maya + Zoe) with shared tags
       // For now, we'll test that Maya's tags are correctly configured
@@ -246,6 +273,15 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
 
       // Verify Radar loads (Maya would see Zoe if both were active)
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
@@ -271,6 +307,9 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
   test("panic button is accessible", async ({ page }) => {
     const telemetry = new TelemetryCollector('maya', 'maya-panic-button');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       await setupSession(page, {
         sessionId: "maya-session",
@@ -281,6 +320,15 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
 
       // Verify panic button is accessible (always-accessible FAB)
       // Panic button has aria-label="Emergency panic button"
@@ -335,6 +383,9 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
   test("accessibility: WCAG AA compliance for anxious users", async ({ page }) => {
     const telemetry = new TelemetryCollector('maya', 'maya-a11y');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       await setupSession(page, {
         sessionId: "maya-session",
@@ -345,6 +396,15 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
 
       // Run accessibility check
       const accessibilityScanResults = await new AxeBuilder({ page })
@@ -371,6 +431,9 @@ test.describe("Persona: Maya Patel - Anxious First-Year Student", () => {
 test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
   test("completes onboarding with socially anxious pattern", async ({ page }) => {
     const telemetry = new TelemetryCollector('ethan', 'ethan-onboarding');
+    
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
     
     try {
       await page.goto("/welcome");
@@ -418,6 +481,15 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
       await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 10000 });
       
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
+      
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -453,6 +525,15 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
 
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
+
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
       
@@ -477,6 +558,9 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
   test("one-on-one chat format avoids group dynamics", async ({ page }) => {
     const telemetry = new TelemetryCollector('ethan', 'ethan-chat-format');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       await setupSession(page, {
         sessionId: "ethan-session",
@@ -487,6 +571,15 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
@@ -512,6 +605,9 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
   test("panic button is accessible for socially anxious users", async ({ page }) => {
     const telemetry = new TelemetryCollector('ethan', 'ethan-panic-button');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       await setupSession(page, {
         sessionId: "ethan-session",
@@ -522,6 +618,15 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
 
       // Verify panic button is accessible
       const panicButton = page.getByRole("button", { name: /panic|emergency|help/i });
@@ -550,6 +655,9 @@ test.describe("Persona: Ethan Chen - Socially Anxious Sophomore", () => {
 test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
   test("completes onboarding with overthinker pattern", async ({ page }) => {
     const telemetry = new TelemetryCollector('zoe', 'zoe-onboarding');
+    
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
     
     try {
       await page.goto("/welcome");
@@ -596,6 +704,15 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
       await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 10000 });
       
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
+      
       // Record error banners
       const errorCount = await countErrorBanners(page);
       if (errorCount > 0) {
@@ -614,6 +731,9 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
   test("shared tag compatibility with Maya boosts signal score", async ({ page }) => {
     const telemetry = new TelemetryCollector('zoe', 'zoe-shared-tags-maya');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       await setupSession(page, {
         sessionId: "zoe-session",
@@ -624,6 +744,15 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
@@ -649,6 +778,9 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
   test("surprise vibe is compatible with all other vibes", async ({ page }) => {
     const telemetry = new TelemetryCollector('zoe', 'zoe-surprise-vibe');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       await setupSession(page, {
         sessionId: "zoe-session",
@@ -659,6 +791,15 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
@@ -684,6 +825,9 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
   test("ephemeral chat design prevents overthinking", async ({ page }) => {
     const telemetry = new TelemetryCollector('zoe', 'zoe-ephemeral-chat');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       await setupSession(page, {
         sessionId: "zoe-session",
@@ -694,6 +838,15 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
@@ -719,6 +872,9 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
   test("visibility toggle works when overwhelmed", async ({ page }) => {
     const telemetry = new TelemetryCollector('zoe', 'zoe-visibility-toggle');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       await setupSession(page, {
         sessionId: "zoe-session",
@@ -729,6 +885,15 @@ test.describe("Persona: Zoe Kim - Overthinking Junior", () => {
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
 
       // Zoe may toggle visibility off if overwhelmed
       // Note: Visibility toggle is on Profile page, not Radar page
@@ -772,6 +937,9 @@ test.describe("Cross-Persona: College Students", () => {
     
     const telemetry = new TelemetryCollector('cross-persona', 'all-onboarding');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       const personas = [
         { name: "Maya", vibe: "Thinking out loud", tags: ["Quietly Curious", "Overthinking Things"] },
@@ -811,6 +979,15 @@ test.describe("Cross-Persona: College Students", () => {
         // Wait for navigation to radar (onboarding has 500ms delay + API call time)
         await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
         
+        // Wait a bit for WebSocket connection to establish and performance marks to be created
+        await page.waitForTimeout(1000);
+        
+        // Extract and record WebSocket connection timing
+        const wsTiming = await extractWebSocketTiming(page);
+        if (wsTiming !== null) {
+          telemetry.recordWebSocketConnectTime(wsTiming);
+        }
+        
         // Record error banners for this persona
         const errorCount = await countErrorBanners(page);
         if (errorCount > 0) {
@@ -836,6 +1013,9 @@ test.describe("Cross-Persona: College Students", () => {
   test("shared tags boost signal scores (Maya + Zoe)", async ({ page }) => {
     const telemetry = new TelemetryCollector('cross-persona', 'shared-tags-maya-zoe');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       // This test verifies that shared tags boost signal scores
       // Full implementation would require WebSocket mocking or integration tests
@@ -849,6 +1029,15 @@ test.describe("Cross-Persona: College Students", () => {
       await page.goto("/radar");
       // Wait for Radar heading to appear (more reliable than networkidle with WebSocket connections)
       await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+
+      // Wait a bit for WebSocket connection to establish and performance marks to be created
+      await page.waitForTimeout(1000);
+      
+      // Extract and record WebSocket connection timing
+      const wsTiming = await extractWebSocketTiming(page);
+      if (wsTiming !== null) {
+        telemetry.recordWebSocketConnectTime(wsTiming);
+      }
 
       // Verify Radar loads
       await expect(page.locator(SEL.radarHeading)).toBeVisible();
@@ -874,6 +1063,9 @@ test.describe("Cross-Persona: College Students", () => {
   test("panic button accessible for all college student personas", async ({ page }) => {
     const telemetry = new TelemetryCollector('cross-persona', 'panic-button-all');
     
+    // Set up network request interception for telemetry
+    await setupNetworkTelemetry(page, telemetry);
+    
     try {
       const personas = [
         { sessionId: "maya-session", token: "maya-token", handle: "QuietThinker42" },
@@ -884,7 +1076,16 @@ test.describe("Cross-Persona: College Students", () => {
       for (const persona of personas) {
         await setupSession(page, persona);
         await page.goto("/radar");
-        await page.waitForLoadState("networkidle");
+        await expect(page.locator(SEL.radarHeading)).toBeVisible({ timeout: 15000 });
+        
+        // Wait a bit for WebSocket connection to establish and performance marks to be created
+        await page.waitForTimeout(1000);
+        
+        // Extract and record WebSocket connection timing
+        const wsTiming = await extractWebSocketTiming(page);
+        if (wsTiming !== null) {
+          telemetry.recordWebSocketConnectTime(wsTiming);
+        }
 
         const panicButton = page.getByRole("button", { name: /panic|emergency|help/i });
         await expect(panicButton).toBeVisible({ timeout: 5000 });
