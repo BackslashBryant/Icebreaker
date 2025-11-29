@@ -19,6 +19,34 @@ const repoRoot = path.resolve(__dirname, '..');
 const featuresDir = path.join(repoRoot, '.notes', 'features');
 const featureStatePath = path.join(featuresDir, 'current.json');
 
+function loadLocalEnv() {
+  const envPath = path.join(repoRoot, '.env');
+  if (!existsSync(envPath)) {
+    return;
+  }
+
+  const content = readFileSync(envPath, 'utf8');
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) {
+      continue;
+    }
+
+    const eqIndex = line.indexOf('=');
+    if (eqIndex === -1) {
+      continue;
+    }
+
+    const key = line.slice(0, eqIndex).trim();
+    const value = line.slice(eqIndex + 1).trim();
+    if (key && !process.env[key]) {
+      process.env[key] = value;
+    }
+  }
+}
+
+loadLocalEnv();
+
 const checks = [];
 
 // Status indicators
