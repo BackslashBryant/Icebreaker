@@ -72,10 +72,10 @@
 ### Checkpoint 1: Implement Dark Mode CSS Variables (Prerequisite)
 **Owner**: @Link 🌐
 **Acceptance Criteria**:
-- [ ] Dark theme CSS variables defined in `frontend/src/index.css`
-- [ ] Dark mode activated via `:root.dark` or `@media (prefers-color-scheme: dark)`
-- [ ] All components render correctly in dark mode
-- [ ] Visual verification: Manual check of key screens in dark mode
+- [x] Dark theme CSS variables defined in `frontend/src/index.css`
+- [x] Dark mode activated via `:root.dark` or `@media (prefers-color-scheme: dark)`
+- [x] All components render correctly in dark mode
+- [x] Visual verification: Manual check of key screens in dark mode
 
 **Files to Modify**:
 - `frontend/src/index.css` - Add dark theme CSS variables
@@ -190,10 +190,10 @@
 ## Status Tracking
 
 ### Checkpoint 1: Implement Dark Mode CSS Variables
-- [ ] Status: IN PROGRESS
-- [ ] Owner: @Link 🌐
-- [ ] Started: 2025-11-29
-- [ ] Completed: _(in progress)_
+- [x] Status: COMPLETE
+- [x] Owner: @Link 🌐
+- [x] Started: 2025-11-29
+- [x] Completed: 2025-11-29
 
 ### Checkpoint 2: Create Theme/Viewport Test Matrix Infrastructure
 - [ ] Status: PENDING
