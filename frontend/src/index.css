@@ -3,7 +3,31 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* IceBreaker brand colors in oklch format */
+  /* IceBreaker light theme (default) - oklch format */
+  --background: oklch(0.98 0 0); /* Off-white #FAFAFA */
+  --foreground: oklch(0.12 0.02 250); /* Deep navy #0A0F1F */
+  --card: oklch(1 0 0); /* Pure white for cards */
+  --card-foreground: oklch(0.12 0.02 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.12 0.02 250);
+  --primary: oklch(0.7 0.12 195); /* Neon teal #00B8D9 */
+  --primary-foreground: oklch(0.98 0 0); /* Light text on teal */
+  --secondary: oklch(0.95 0 0); /* Light gray */
+  --secondary-foreground: oklch(0.12 0.02 250); /* Dark navy text */
+  --muted: oklch(0.95 0 0);
+  --muted-foreground: oklch(0.45 0 0); /* Medium gray */
+  --accent: oklch(0.7 0.12 195); /* Neon teal */
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.85 0 0); /* Light gray border */
+  --input: oklch(0.95 0 0);
+  --ring: oklch(0.7 0.12 195); /* Teal focus ring */
+  --radius: 1rem;
+}
+
+:root.dark {
+  /* IceBreaker dark theme - oklch format */
   --background: oklch(0.12 0.02 250); /* Deep navy #0A0F1F */
   --foreground: oklch(0.92 0 0); /* Light gray #E5E5E5 */
   --card: oklch(0.15 0.02 250); /* Slightly lighter navy for cards */
