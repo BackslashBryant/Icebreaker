@@ -93,10 +93,10 @@
 ### Checkpoint 2: Create Theme/Viewport Test Matrix Infrastructure
 **Owner**: @Pixel 🖥️
 **Acceptance Criteria**:
-- [ ] Test helper function to apply theme/viewport/accessibility combinations
-- [ ] Viewport configs include small mobile (320×568) if needed
-- [ ] Helper generates descriptive screenshot names with all parameters
-- [ ] Helper supports: viewport, colorScheme, reducedMotion, highContrast
+- [x] Test helper function to apply theme/viewport/accessibility combinations
+- [x] Viewport configs include small mobile (320×568) if needed
+- [x] Helper generates descriptive screenshot names with all parameters
+- [x] Helper supports: viewport, colorScheme, reducedMotion, highContrast
 
 **Files to Create/Modify**:
 - `tests/utils/theme-matrix.ts` - New helper for theme/viewport combinations
@@ -196,10 +196,10 @@
 - [x] Completed: 2025-11-29
 
 ### Checkpoint 2: Create Theme/Viewport Test Matrix Infrastructure
-- [ ] Status: PENDING
-- [ ] Owner: @Pixel 🖥️
-- [ ] Started: _(not started)_
-- [ ] Completed: _(not started)_
+- [x] Status: COMPLETE
+- [x] Owner: @Pixel 🖥️
+- [x] Started: 2025-11-29
+- [x] Completed: 2025-11-29
 
 ### Checkpoint 3: Create Visual Regression Test Matrix
 - [ ] Status: PENDING
