@@ -27,6 +27,7 @@
     "files:categorize": "node ./tools/categorize-files.mjs --status",
     "cursor:extensions": "node ./tools/cursor-extensions.mjs",
     "status": "node ./tools/health-check.mjs",
+    "precommit": "npm run status -- --ci",
     "setup": "node ./tools/setup.mjs",
     "setup:tokens": "node ./tools/token-wizard.mjs",
     "mcp:load-env": "node ./tools/load-env-to-system.mjs",
