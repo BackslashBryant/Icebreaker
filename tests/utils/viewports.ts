@@ -20,6 +20,14 @@ export interface ViewportConfig {
  * Standard viewport configurations for visual regression testing
  */
 export const VIEWPORTS: Record<string, ViewportConfig> = {
+  'small-mobile': {
+    name: 'small-mobile',
+    width: 320,
+    height: 568,
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  },
   mobile: {
     name: 'mobile',
     width: 375,
