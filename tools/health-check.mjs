@@ -227,7 +227,13 @@ function checkMcpConfig() {
     const config = JSON.parse(readFileSync(mcpConfigPath, 'utf8'));
     const servers = config?.mcpServers || {};
 
-    const requiredServers = ['github', 'desktop-commander', 'playwright-mcp'];
+    // github MCP server is optional if we have desktop-commander or playwright-mcp (both use GITHUB_TOKEN)
+    // Check if we have at least one server that uses GITHUB_TOKEN
+    const hasGithubTokenServer = servers['desktop-commander'] || servers['playwright-mcp'] || 
+                                  servers['desktop-commander-v2'] || servers['playwright-mcp-v2'];
+    const requiredServers = hasGithubTokenServer 
+      ? ['desktop-commander', 'playwright-mcp']  // github not required if we have token-using servers
+      : ['github', 'desktop-commander', 'playwright-mcp'];  // require github if no token servers
     const configuredServers = Object.keys(servers);
 
     for (const serverName of requiredServers) {
@@ -311,6 +317,15 @@ function checkMcpConfig() {
                 `${serverName} -> ${envVar}`,
                 STATUS.READY,
                 `${envVar} not set (optional - only needed for legacy npm package)`,
+              );
+            } else if (serverName === 'sentry' && varName === 'SENTRY_AUTH_TOKEN') {
+              // Sentry MCP can work without token if authenticated via Cursor UI
+              addCheck(
+                'MCP Configuration',
+                `${serverName} -> ${envVar}`,
+                STATUS.NEEDS_SETUP,
+                `${envVar} not set (optional - Sentry MCP can authenticate via Cursor UI)`,
+                `Set ${envVar} environment variable if needed for Node.js scripts: export ${envVar}=your_value`,
               );
             } else {
               addCheck(
