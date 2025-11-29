@@ -318,6 +318,15 @@ function checkMcpConfig() {
                 STATUS.READY,
                 `${envVar} not set (optional - only needed for legacy npm package)`,
               );
+            } else if (serverName === 'sentry' && varName === 'SENTRY_AUTH_TOKEN') {
+              // Sentry MCP can work without token if authenticated via Cursor UI
+              addCheck(
+                'MCP Configuration',
+                `${serverName} -> ${envVar}`,
+                STATUS.NEEDS_SETUP,
+                `${envVar} not set (optional - Sentry MCP can authenticate via Cursor UI)`,
+                `Set ${envVar} environment variable if needed for Node.js scripts: export ${envVar}=your_value`,
+              );
             } else {
               addCheck(
                 'MCP Configuration',
