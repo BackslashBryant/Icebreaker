@@ -1,12 +1,12 @@
 {
-  "slug": "suite-matrix",
-  "featureName": "Split Playwright Suites and Extend Browser Matrix",
-  "updatedAt": "2025-11-25T00:00:00-05:00",
-  "status": "complete",
+  "slug": "visual-accessibility-validation",
+  "featureName": "Validate Look-and-Feel Across Devices, Themes, Reduced Motion",
+  "updatedAt": "2025-11-29T00:00:00-05:00",
+  "status": "in-progress",
   "vision": "docs/vision.md",
-  "description": "Extend Playwright test suites with WebKit coverage, mobile viewports, improved artifact publishing, and flake tracking.",
-  "githubIssue": 15,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/15",
-  "branch": "agent/vector/15-suite-matrix",
-  "note": "Issue #15 COMPLETE (2025-11-25). Added WebKit to smoke suite (chromium-desktop, chromium-mobile, webkit-desktop). Extended full suite to 8 browser × viewport projects. Updated health-mvp to include WebKit. Created flake tracking file. All configs validated. CI ready for extended browser matrix."
+  "description": "Add comprehensive visual and accessibility validation across multiple viewports, themes, and accessibility settings to ensure consistent look-and-feel and catch CSS regressions.",
+  "githubIssue": 12,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/12",
+  "branch": "agent/pixel/12-visual-accessibility-validation",
+  "note": "Issue #12 IN-PROGRESS. Research and plan complete. Waiting for team review and dark mode CSS variables implementation (Checkpoint 1 prerequisite)."
 }
