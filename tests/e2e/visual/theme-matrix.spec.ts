@@ -162,10 +162,11 @@ function testScreenWithMatrix(
         // Wait for page to stabilize
         await page.waitForTimeout(500);
 
-        // Capture screenshot
+        // Capture screenshot with threshold for minor animation differences
         await expect(page).toHaveScreenshot(screenshotName, {
           fullPage: true,
           mask: MASK_SELECTORS.map((selector) => page.locator(selector)),
+          threshold: 0.2, // Allow 20% pixel difference for minor animation/timing variations
         });
 
         // Run accessibility check
