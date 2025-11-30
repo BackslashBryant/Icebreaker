@@ -2,6 +2,46 @@
 
 This document defines test scenarios for each persona's primary use case, including expected interactions, outcomes, and edge cases to test.
 
+## Visual Regression Testing Matrix
+
+All persona flows are validated across a comprehensive visual regression test matrix to ensure consistent look-and-feel across devices, themes, and accessibility settings.
+
+### Matrix Coverage
+
+The visual regression suite (`tests/e2e/visual/theme-matrix.spec.ts`) tests 8 key screens across **24 combinations** per screen:
+
+- **Viewports**: mobile (375×812), tablet (768×1024), desktop (1440×900)
+- **Themes**: light, dark
+- **Reduced Motion**: reduce, no-preference
+- **High Contrast**: on, off
+
+**Total**: 8 screens × 24 combinations = **192 tests**
+
+### Screens Tested
+
+- Welcome screen
+- Onboarding steps (0-3)
+- Radar interface
+- Chat interface
+- Profile settings
+
+### Screenshot Naming
+
+Screenshots follow the pattern: `{screen}-{viewport}-{theme}-{motion}-{contrast}.png`
+
+Example: `welcome-mobile-light-normal-motion-normal-contrast.png`
+
+### Running Subsets
+
+For faster local testing or PR checks, use environment variables:
+
+```bash
+# PR subset: mobile + desktop, light theme (128 tests)
+THEME_MATRIX_VIEWPORT=mobile,desktop THEME_MATRIX_THEME=light npm test -- tests/e2e/visual/theme-matrix.spec.ts
+```
+
+See [Visual Regression Testing Guide](./visual-regression.md) for complete documentation.
+
 ## Test Scenario Structure
 
 Each persona scenario includes:

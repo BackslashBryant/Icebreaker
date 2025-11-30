@@ -12,6 +12,7 @@ This directory contains testing procedures, data, and results for the project.
 - [Unit Tests](procedures.md#unit-tests)
 - [Integration Tests](procedures.md#integration-tests)
 - [E2E Tests](procedures.md#e2e-tests)
+- [Visual Regression Tests](visual-regression.md) - Theme/viewport/accessibility matrix testing
 - [Performance Tests](procedures.md#performance-tests)
 
 ## Test Data
