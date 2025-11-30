@@ -1293,3 +1293,241 @@ This document collects feedback from persona testing sessions. Each persona's fe
 
 - **missing-panic-button**: High priority - investigate and fix
 - **missing-visibility-toggle**: High priority - investigate and fix
+
+
+---
+
+# Persona Test Feedback Summary
+
+**Generated**: 2025-11-30T19:14:06.278Z
+
+**⚠️ Important Note**: This summary aggregates **1,252 historical telemetry files** from multiple test runs over time, including runs from before Issue #27 fixes were applied. The high occurrence counts for "missing-panic-button" and "missing-visibility-toggle" reflect historical data, not current regressions. 
+
+**✅ Verification Status (2025-11-30)**: All 72 persona tests passed successfully in the latest run, confirming that all Issue #27 fixes are working correctly. See `Docs/plans/Issue-27-plan-status-IN-PROGRESS.md` for complete verification details.
+
+## Overall Statistics
+
+- **Total Runs**: 1252
+- **Personas Tested**: 13
+
+## Per-Persona Statistics
+
+### alex
+- **Runs**: 75
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 4
+- **A11y Issues**: 0
+- **Affordance Issues**: 150
+
+### casey
+- **Runs**: 130
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 7
+- **A11y Issues**: 0
+- **Affordance Issues**: 260
+
+### cross-persona
+- **Runs**: 67
+- **Avg Boot Time**: 90ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 5
+- **A11y Issues**: 0
+- **Affordance Issues**: 112
+
+### cross-persona-market-research
+- **Runs**: 30
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 2
+- **A11y Issues**: 0
+- **Affordance Issues**: 60
+
+### cross-persona-professional
+- **Runs**: 69
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 6
+- **A11y Issues**: 0
+- **Affordance Issues**: 138
+
+### ethan
+- **Runs**: 127
+- **Avg Boot Time**: 101ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 7
+- **A11y Issues**: 0
+- **Affordance Issues**: 226
+
+### jordan
+- **Runs**: 65
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 4
+- **A11y Issues**: 0
+- **Affordance Issues**: 108
+
+### marcus
+- **Runs**: 150
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 10
+- **A11y Issues**: 0
+- **Affordance Issues**: 300
+
+### maya
+- **Runs**: 202
+- **Avg Boot Time**: 248ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 198
+- **A11y Issues**: 0
+- **Affordance Issues**: 312
+
+### morgan
+- **Runs**: 50
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 1
+- **A11y Issues**: 0
+- **Affordance Issues**: 100
+
+### river
+- **Runs**: 60
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 8
+- **A11y Issues**: 0
+- **Affordance Issues**: 120
+
+### sam
+- **Runs**: 50
+- **Avg Boot Time**: 0ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 2
+- **A11y Issues**: 0
+- **Affordance Issues**: 100
+
+### zoe
+- **Runs**: 177
+- **Avg Boot Time**: 69ms
+- **Avg Onboarding Time**: 0ms
+- **Total Retries**: 0
+- **Total Errors**: 5
+- **A11y Issues**: 0
+- **Affordance Issues**: 328
+
+## Top 5 Friction Patterns
+
+**Note**: These counts aggregate historical telemetry data (1,252 files) and include pre-fix runs. The 2025-11-30 verification run confirmed all 72 tests passing with fixes working correctly.
+
+- 🔴 **missing-visibility-toggle**: 1167 occurrences (historical - fixed in Issue #27)
+- 🔴 **missing-panic-button**: 1147 occurrences (historical - fixed in Issue #27)
+- 🔴 **runtime-errors**: 259 occurrences
+- 🟡 **slow-boot**: 6 occurrences
+
+## Executive Summary
+
+⚠️ **2 critical issue(s)** requiring immediate attention (Note: These reflect historical data; Issue #27 fixes verified 2025-11-30)
+🔴 **1 high-priority issue(s)** should be addressed soon
+
+## Actionable Insights
+
+### 🔴 Visibility Toggle Not Detected (Impact: 96/100)
+
+**Priority**: CRITICAL | **Category**: privacy | **Affected Users**: 1167
+
+**Description**: Visibility toggle affordance not found in most test runs, affecting privacy-conscious users who need control over their visibility.
+
+**Affected Personas**: alex, casey, cross-persona, cross-persona-market-research, cross-persona-professional
+
+**Recommendations**:
+- Verify visibility toggle is rendered on Profile page with correct selector
+- Check if toggle is conditionally rendered (may only show when user is visible)
+- Ensure data-testid="visibility-toggle" is present on toggle element
+- Update test helpers to check Profile page, not Radar page
+- Consider adding visibility toggle to Radar page for easier access
+
+**Code References**:
+- `tests/utils/telemetry.ts:checkVisibilityToggleVisible()`
+- `frontend/src/components/Profile.tsx (verify toggle rendering)`
+- `tests/e2e/personas/*.spec.ts (verify toggle checks navigate to Profile)`
+
+### 🔴 Panic Button Not Visible During Tests (Impact: 95/100)
+
+**Priority**: CRITICAL | **Category**: accessibility | **Affected Users**: 1147
+
+**Description**: Panic button affordance not detected in majority of test runs, potentially impacting anxious users who need quick exit option.
+
+**Affected Personas**: alex, casey, cross-persona, cross-persona-market-research, cross-persona-professional
+
+**Recommendations**:
+- Verify panic button is rendered on Radar page with correct data-testid="panic-fab"
+- Ensure panic button is visible after onboarding completes
+- Check CSS visibility/display properties - may be hidden by default
+- Add telemetry check to verify panic button visibility in test helpers
+- Consider adding panic button to Profile page as well for consistency
+
+**Code References**:
+- `tests/utils/telemetry.ts:checkPanicButtonVisible()`
+- `frontend/src/components/Radar.tsx (verify panic button rendering)`
+- `tests/e2e/personas/*.spec.ts (verify panic button checks)`
+
+### 🟠 Runtime Errors During Tests (Impact: 52/100)
+
+**Priority**: HIGH | **Category**: reliability | **Affected Users**: 259
+
+**Description**: JavaScript runtime errors detected, indicating potential bugs or unhandled exceptions.
+
+**Affected Personas**: alex, casey, cross-persona, cross-persona-market-research, cross-persona-professional
+
+**Recommendations**:
+- Review error logs to identify specific error types
+- Add error boundaries to catch React errors
+- Improve error handling in async operations
+- Add comprehensive error logging
+- Fix identified bugs causing runtime errors
+
+**Code References**:
+- `frontend/src/utils/error-handling.ts`
+- `frontend/src/components/ErrorBoundary.tsx`
+
+### 🟢 Slow Application Boot Time (Impact: 24/100)
+
+**Priority**: LOW | **Category**: performance | **Affected Users**: 6
+
+**Description**: Application boot time exceeds 3 seconds in multiple test runs, impacting first impression and user experience.
+
+**Affected Personas**: ethan, maya, zoe
+
+**Recommendations**:
+- Optimize initial bundle size (code splitting, lazy loading)
+- Review initial API calls - may be blocking render
+- Check WebSocket connection timing - may delay boot
+- Consider adding loading states to improve perceived performance
+- Profile boot sequence to identify bottlenecks
+
+**Code References**:
+- `frontend/src/app.tsx (boot sequence)`
+- `frontend/src/utils/websocket.ts (connection timing)`
+- `tests/utils/test-helpers.ts:waitForBootSequence()`
+
+
+## Recommendations (Legacy Format)
+
+- **missing-visibility-toggle**: High priority - investigate and fix
+- **missing-panic-button**: High priority - investigate and fix
+- **runtime-errors**: High priority - investigate and fix
+- **slow-boot**: Medium priority - monitor and improve
