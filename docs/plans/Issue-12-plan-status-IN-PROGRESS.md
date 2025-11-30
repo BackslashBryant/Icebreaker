@@ -143,6 +143,12 @@
 - Verify all combinations generate screenshots
 - Verify accessibility checks pass
 
+**Performance Notes**:
+- Profile screen optimized to use `setupSession()` instead of full onboarding flow (avoids repeating onboarding 24 times)
+- Total test count: 192 tests (8 screens × 24 combinations)
+- Expected runtime: ~30-60 minutes for full matrix (depends on CI resources)
+- Recommendation: Run full matrix in nightly CI, use subset (e.g., mobile viewport only) for PR checks
+
 ### Checkpoint 4: Update Documentation
 **Owner**: @Muse 🎨
 **Acceptance Criteria**:
