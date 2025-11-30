@@ -1,6 +1,6 @@
 /**
  * Visual Regression Tests: Theme/Viewport Matrix
- * 
+ *
  * Tests all key screens across all theme/viewport/accessibility combinations.
  * Generates 24 combinations per screen (3 viewports × 2 themes × 2 reduced-motion × 2 high-contrast).
  * Captures screenshots and runs accessibility checks for each combination.
@@ -29,17 +29,17 @@ async function navigateToOnboardingStep(
   step: number,
 ): Promise<void> {
   await page.goto('/onboarding');
-  
+
   if (step >= 1) {
     await page.locator(SEL.onboardingGotIt).click();
     await expect(page.locator(SEL.onboardingStep1)).toBeVisible({ timeout: 15000 });
   }
-  
+
   if (step >= 2) {
     await page.locator(SEL.onboardingContinue).click();
     await expect(page.locator(SEL.onboardingStep2)).toBeVisible({ timeout: 15000 });
   }
-  
+
   if (step >= 3) {
     await page.locator(SEL.onboardingSkipLocation).click();
     await expect(page.locator(SEL.onboardingStep3)).toBeVisible({ timeout: 15000 });
@@ -56,7 +56,7 @@ async function runAccessibilityCheck(page: any): Promise<void> {
   const accessibilityScanResults = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
     .analyze();
-  
+
   expect(accessibilityScanResults.violations).toEqual([]);
 }
 
@@ -75,33 +75,33 @@ function testScreenWithMatrix(
         config.viewport.name,
         config.theme,
       );
-      
+
       const testName = `${screenName} - ${config.viewport.name} - ${config.theme.colorScheme} - ${config.theme.reducedMotion} - ${config.theme.highContrast}`;
-      
+
       test(testName, async ({ page }) => {
         // Set viewport
         await setViewport(page, config.viewport);
-        
+
         // Apply theme settings
         await applyThemeSettings(page, config.theme);
-        
+
         // Navigate to screen
         await navigateFn(page, config);
-        
+
         // Wait for content to be visible
         if (waitForVisible) {
           await expect(page.locator(waitForVisible)).toBeVisible({ timeout: 15000 });
         }
-        
+
         // Wait for page to stabilize
         await page.waitForTimeout(500);
-        
+
         // Capture screenshot
         await expect(page).toHaveScreenshot(screenshotName, {
           fullPage: true,
           mask: MASK_SELECTORS.map((selector) => page.locator(selector)),
         });
-        
+
         // Run accessibility check
         await runAccessibilityCheck(page);
       });
@@ -184,24 +184,10 @@ testScreenWithMatrix(
 );
 
 // Profile Screen
+// Note: Uses setupSession to avoid full onboarding flow for each combination (performance optimization)
 testScreenWithMatrix(
   'profile',
   async (page) => {
-    // Mock session creation API
-    await page.route('**/api/onboarding', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          sessionId: 'test-session-id',
-          token: 'test-token',
-          handle: 'TestUser',
-          visibility: true,
-          emergencyContact: null,
-        }),
-      });
-    });
-    
     // Mock profile API endpoints
     await page.route('**/api/profile/visibility', async (route) => {
       await route.fulfill({
@@ -210,26 +196,16 @@ testScreenWithMatrix(
         body: JSON.stringify({ success: true, visibility: true }),
       });
     });
-    
-    // Complete onboarding to create session
-    await page.goto('/welcome');
-    await page.waitForLoadState('networkidle');
-    await expect(page.getByText('ICEBREAKER')).toBeVisible({ timeout: 10000 });
-    await page.getByRole('link', { name: /PRESS START/i }).click();
-    await page.getByRole('button', { name: /GOT IT/i }).click();
-    await expect(page.getByText('AGE VERIFICATION')).toBeVisible({ timeout: 10000 });
-    await page.waitForLoadState('networkidle');
-    await page.getByRole('checkbox', { name: /I am 18 or older/i }).check();
-    await page.getByRole('button', { name: /CONTINUE/i }).click();
-    await page.getByRole('button', { name: /Skip for now/i }).click();
-    await page.getByText(/Thinking out loud/i).click();
-    await page.getByText('Quietly Curious').click();
-    await page.getByRole('button', { name: /ENTER RADAR/i }).click();
-    await expect(page).toHaveURL(/.*\/radar/, { timeout: 15000 });
-    
-    // Navigate to profile
-    await page.locator(SEL.radarProfileButton).click();
-    await expect(page).toHaveURL(/.*\/profile/, { timeout: 10000 });
+
+    // Use setupSession instead of full onboarding to avoid repeating onboarding 24 times
+    await setupSession(page, {
+      sessionId: 'test-session-id',
+      token: 'test-token',
+      handle: 'TestUser',
+    });
+
+    // Navigate directly to profile
+    await page.goto('/profile');
   },
   SEL.visibilityToggle,
 );
