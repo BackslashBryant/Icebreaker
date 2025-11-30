@@ -579,45 +579,6 @@ function checkAgents() {
       STATUS.READY,
       `All ${agents.length} agent prompts available`,
     );
-
-    // Check for agent state file (users can create this manually after creating agents)
-    const agentStatePath = path.join(repoRoot, '.cursor', 'agents-state.json');
-    if (existsSync(agentStatePath)) {
-      try {
-        const state = JSON.parse(readFileSync(agentStatePath, 'utf8'));
-        const createdAgents = state?.createdAgents || [];
-        if (createdAgents.length >= agents.length) {
-          addCheck(
-            'Agents',
-            'Agents Created',
-            STATUS.READY,
-            `All ${agents.length} agents created in Cursor (verified via state file)`,
-          );
-        } else {
-          const missingAgents = agents.filter(a => !createdAgents.includes(a));
-          addCheck(
-            'Agents',
-            'Agents Created',
-            STATUS.READY,
-            `${createdAgents.length}/${agents.length} saved agents configured (optional). Missing: ${missingAgents.join(', ')}.`,
-          );
-        }
-      } catch {
-        addCheck(
-          'Agents',
-          'Agents Created',
-          STATUS.READY,
-          'Saved agent state file exists but could not be read (optional feature).',
-        );
-      }
-    } else {
-      addCheck(
-        'Agents',
-        'Agents Created',
-        STATUS.READY,
-        'Auto-routing enabled. Saved agents are optional; run npm run setup:agents if you want them pinned in the sidebar.',
-      );
-    }
   } else {
     addCheck(
       'Agents',
