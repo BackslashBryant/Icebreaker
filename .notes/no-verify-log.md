@@ -49,3 +49,8 @@ Use `npm run log:no-verify -- --reason "<details>" [--commit <sha>]` to append e
 - **Commit**: `91a6184`
 - **Files changed**: .notes/no-verify-log.md
 
+### [2025-11-30 22:01:25 UTC] Branch: `agent/pixel/27-verification-notes`
+- **Reason**: Pre-commit hook failing due to pre-existing preflight issues (missing Issue-15 plan, missing research.md) unrelated to documentation-only changes. This commit updates the no-verify log itself to document previous bypass reasons, so it's a meta-documentation change that doesn't affect runtime code.
+- **Commit**: `1595a0e`
+- **Files changed**: .notes/no-verify-log.md
+
