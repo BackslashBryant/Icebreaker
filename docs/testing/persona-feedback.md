@@ -1301,9 +1301,15 @@ This document collects feedback from persona testing sessions. Each persona's fe
 
 **Generated**: 2025-11-30T19:14:06.278Z
 
-**⚠️ Important Note**: This summary aggregates **1,252 historical telemetry files** from multiple test runs over time, including runs from before Issue #27 fixes were applied. The high occurrence counts for "missing-panic-button" and "missing-visibility-toggle" reflect historical data, not current regressions. 
+## ⚠️ Critical Context: Historical Data Aggregation
 
-**✅ Verification Status (2025-11-30)**: All 72 persona tests passed successfully in the latest run, confirming that all Issue #27 fixes are working correctly. See `Docs/plans/Issue-27-plan-status-IN-PROGRESS.md` for complete verification details.
+**This summary aggregates 1,252 historical telemetry files from multiple test runs over time, including runs from before Issue #27 fixes were applied.**
+
+**The "critical" flags below (panic button, visibility toggle, runtime errors) reflect pre-fix historical data, NOT current regressions.**
+
+**✅ Latest Verification (2025-11-30)**: All 72 persona tests passed successfully, confirming that all Issue #27 fixes (panic button visibility, visibility toggle detection, error banner frequency) are working correctly. See `Docs/plans/Issue-27-plan-status-IN-PROGRESS.md` for complete verification details.
+
+**📋 Action Required**: Until telemetry hygiene is implemented (see follow-up issue), this summary cannot reliably surface fresh insights. The high occurrence counts are noise from historical runs, not actionable current issues.
 
 ## Overall Statistics
 
