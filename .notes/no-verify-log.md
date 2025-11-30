@@ -40,7 +40,12 @@ Use `npm run log:no-verify -- --reason "<details>" [--commit <sha>]` to append e
 - **Commit**: `f80d84d`
 - **Files changed**: .notes/no-verify-log.md
 ### [2025-11-30 22:00:04 UTC] Branch: `agent/pixel/27-verification-notes`
-- **Reason**: Not specified
+- **Reason**: Pre-commit hook failing due to pre-existing preflight issues. This is a tooling update (preflight.mjs) that doesn't affect runtime code.
 - **Commit**: `8a9dab7`
 - **Files changed**: tools/preflight.mjs
+
+### [2025-11-30 22:00:46 UTC] Branch: `agent/pixel/27-verification-notes`
+- **Reason**: Not specified
+- **Commit**: `91a6184`
+- **Files changed**: .notes/no-verify-log.md
 
