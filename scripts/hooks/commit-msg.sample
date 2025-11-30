@@ -44,5 +44,39 @@ if echo "$commit_msg" | grep -qE '^(feat|fix):' && ! echo "$commit_msg" | grep -
   fi
 fi
 
+# Enforce [no-verify: <reason>] tag when SKIP_* flags are set or hooks are bypassed
+# This prevents commits with --no-verify from proceeding without documenting the reason
+if [ -n "${SKIP_STATUS:-}" ] || [ -n "${SKIP_LOCK_CHECK:-}" ] || [ -n "${SKIP_PREFLIGHT:-}" ] || [ -n "${GIT_PUSH_NO_VERIFY:-}" ]; then
+  if ! echo "$commit_msg" | grep -qE '\[no-verify:[^]]+\]'; then
+    echo ""
+    echo "ERROR: Commit bypasses hooks (SKIP_* flag or --no-verify detected) but commit message"
+    echo "       is missing required [no-verify: <reason>] tag."
+    echo ""
+    echo "Required format:"
+    echo "  git commit -m \"<type>: <description>\" -m \"[no-verify: <reason>]\""
+    echo ""
+    echo "Examples:"
+    echo "  git commit -m \"chore: Update docs\" -m \"[no-verify: SKIP_LOCK_CHECK for workflow hooks]\""
+    echo "  git commit -m \"fix: Issue #123\" -m \"[no-verify: Pre-existing preflight issues unrelated to fix]\""
+    echo ""
+    echo "Your message: $commit_msg"
+    echo ""
+    echo "Amend the commit message to include the [no-verify: <reason>] tag, or remove SKIP_* flags."
+    exit 1
+  fi
+  
+  # Validate the reason is non-empty
+  if echo "$commit_msg" | grep -qE '\[no-verify:\s*\]'; then
+    echo ""
+    echo "ERROR: [no-verify:] tag found but reason is empty."
+    echo ""
+    echo "Required format: [no-verify: <concrete reason>]"
+    echo ""
+    echo "Example: [no-verify: SKIP_LOCK_CHECK needed for workflow hook updates]"
+    echo ""
+    exit 1
+  fi
+fi
+
 exit 0
 

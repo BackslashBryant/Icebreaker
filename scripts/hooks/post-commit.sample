@@ -14,9 +14,10 @@ if [[ "$last_message" =~ \[no-verify:([^]]*)\] ]]; then
   raw_reason="${BASH_REMATCH[1]}"
   reason=$(echo "$raw_reason" | xargs)
   if [ -z "$reason" ]; then
-    echo "[post-commit] ERROR: Found [no-verify:] tag with no reason."
-    echo "                Amend the commit message to include \"[no-verify: <why>]\"."
-    exit 1
+    echo "[post-commit] WARNING: Found [no-verify:] tag with no reason."
+    echo "                Skipping auto-log. Amend the commit message to include \"[no-verify: <why>]\"."
+    echo "                The commit-msg hook should have blocked this - check hook installation."
+    exit 0
   fi
   commit_sha=$(git rev-parse HEAD)
   branch_name=$(git rev-parse --abbrev-ref HEAD)

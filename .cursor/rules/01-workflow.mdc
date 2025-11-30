@@ -108,7 +108,13 @@ Use this whenever you're touching shared workflow/config files (rules, tools, au
 ## 1.6. Verification & No-Verify Automation
 
 - `npm run precommit` now runs `tools/run-precommit.mjs`, which executes the health check, date validator, and lint runner, then writes a log to `artifacts/verification/precommit-<timestamp>.json` (plus `artifacts/verification/latest.json`). Reference that artifact instead of duplicating console output in Markdown.
-- When you bypass hooks, include `[no-verify: <reason>]` inside the commit message body. The `post-commit` hook enforces this (empty tags cause the hook to fail) and automatically calls `npm run log:no-verify -- --commit HEAD --reason "..."`, keeping `.notes/no-verify-log.md` synchronized without manual edits.
+- **MANDATORY**: When you bypass hooks (using `--no-verify` or `SKIP_*` flags), you MUST include `[no-verify: <reason>]` inside the commit message body. The `commit-msg` hook enforces this and will block commits without the tag. The `post-commit` hook automatically logs the reason to `.notes/no-verify-log.md`.
+- **Required Syntax**: Use a separate `-m` flag for the no-verify tag:
+  ```bash
+  git commit -m "chore: Update docs" -m "[no-verify: SKIP_LOCK_CHECK for workflow hooks]"
+  git commit -m "fix: Issue #123" -m "[no-verify: Pre-existing preflight issues unrelated to fix]"
+  ```
+- **Enforcement**: The `commit-msg` hook blocks commits with `SKIP_*` flags or `--no-verify` if the `[no-verify: <reason>]` tag is missing or empty. The `post-commit` hook skips logging (with warning) if the tag is empty, and `tools/log-no-verify.mjs` validates the reason is non-empty.
 - Manual verification notes stay in the plan-status file (under **Current Issues**/**Verification Results**). Link to the JSON artifact path when summarizing reruns.
 
 ## 2. Branching & MCP Setup

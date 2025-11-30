@@ -20,6 +20,13 @@ if (!reason) {
   process.exit(1);
 }
 
+// Validate reason is non-empty (not just whitespace)
+if (!reason.trim()) {
+  console.error('Error: --reason cannot be empty. Provide a concrete reason for bypassing hooks.');
+  console.error('Example: --reason "SKIP_LOCK_CHECK needed for workflow hook updates"');
+  process.exit(1);
+}
+
 const commitRef = getArg('--commit') || run('git rev-parse HEAD');
 const shortCommit = run(`git rev-parse --short ${commitRef}`);
 const branch = getArg('--branch') || run('git rev-parse --abbrev-ref HEAD');
