@@ -94,3 +94,13 @@ Use `npm run log:no-verify -- --reason "<details>" [--commit <sha>]` to append e
 - **Reason**: Pre-commit hook failing due to pre-existing preflight issues. Documentation-only change to complete audit trail.
 - **Commit**: `20f8478`
 - **Files changed**: .notes/no-verify-log.md
+
+### [2025-11-30 22:24:48 UTC] Branch: `agent/pixel/27-verification-notes`
+- **Reason**: Pre-commit hook failing due to pre-existing preflight issues. Documentation-only change - post-commit hook auto-logged entry.
+- **Commit**: `867be81`
+- **Files changed**: .notes/no-verify-log.md
+### [2025-11-30 22:26:27 UTC] Branch: `agent/pixel/27-verification-notes`
+- **Reason**: Not specified
+- **Commit**: `34b70a1`
+- **Files changed**: scripts/hooks/pre-push.sample
+
