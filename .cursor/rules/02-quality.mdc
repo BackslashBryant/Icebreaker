@@ -202,9 +202,9 @@ async function loadSentry() {
 
 - **BEFORE starting work**: 
   - **MANDATORY PRE-FLIGHT CHECKS** (must pass ALL):
-    1. Research file exists: `docs/research/Issue-<#>-research.md`
-    2. Plan-status file exists: `Docs/plans/Issue-<#>-plan-status-<STATUS>.md` with checkpoints
-    3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
+    1. `Docs/plans/Issue-<#>-plan-status-<STATUS>.md` exists (it's the single planning artifact)
+    2. The plan file's Research Summary is complete and the Team Review section shows "✅ APPROVED"
+    3. Status Tracking lists numbered checkpoints with owners/tests
   - **IF ANY CHECK FAILS**: STOP immediately. Do not create, modify, or commit any files. Report which check failed and coordinate with Vector.
   - Create branch with format `agent/<agent>/<issue>-<slug>` (e.g., `agent/vector/1-onboarding-flow`) per `.cursor/rules/01-workflow.mdc`. Never work on existing branches unless they match the issue.
 - **BEFORE ANY GIT OPERATION** (add, commit, push):
@@ -217,15 +217,7 @@ async function loadSentry() {
   - **NEVER** run git commands from parent directories or outside the repository
 - One issue/task per branch; name it `agent/<agent>/<issue>-<slug>` (preferred) or `feat/<issue>-<slug>` (fallback).
 - Keep commits scoped and reference the issue ID in the message: `feat: Complete Issue #X - [description]`.
-- **When completing a feature** (MANDATORY workflow - NO EXCEPTIONS - complete ALL 7 steps):
-  1. Update plan-status file (mark complete, rename to COMPLETE, fill Outcome section)
-  2. Update `.notes/features/current.json` (set status to "complete")
-  3. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
-  4. **MANDATORY**: Push to GitHub: `git push -u origin agent/<agent>/<issue>-<slug>` (if auth fails, use credential helper: `git config --global credential.helper manager-core`)
-  5. **MANDATORY**: Close GitHub issue: `node tools/github-issue-complete.mjs <issue#>` (or fallback: comment + label + close)
-  6. **MANDATORY**: Sync plan file to main: `git checkout main && git pull origin main && git checkout <branch> -- Docs/plans/Issue-<#>-plan-status-COMPLETE.md && git commit -m "docs: Add Issue #<#> completion plan" && git push origin main`
-  7. **MANDATORY**: Switch back to main branch: `git checkout main`
-  - See `.cursor/rules/01-workflow.mdc` Section 6 for detailed instructions
+- **When completing a feature**: Follow `@rules/workflow` Section 6 and `@rules/workflow-appendix#issue-completion` for the seven mandatory steps (plan file, `current.json`, commit, push, GitHub issue, plan sync, end on `main`). Do not improvise or skip steps.
 - Use `gh` CLI for branch creation, issue comments, and label updates. Terminal git is used for commits and pushes.
 - Ask before committing (surface the staged diff and test results for approval), but pushing and issue updates are mandatory when completing a feature.
 - Merge cleanly (squash/rebase) after quality gates are green and the ticket is updated.
@@ -239,7 +231,7 @@ async function loadSentry() {
 - **Data / Storage**: Supabase MCP for schema diffs, advisor checks, and logs.
 - **Research**: DocFork MCP or Context7 for official references; summarize findings in the ticket.
 - **System Ops**: Desktop Commander MCP for local shell automation when allowed.
-- Always log citations in issue-specific research files (`docs/research/Issue-<#>-research.md`) when Docfork, Scout, or Vector pulls references.
+- Always log citations in the plan file's Research Summary (or `Docs/troubleshooting/` if it's a long-form postmortem) when DocFork, Scout, or Vector pulls references.
 
 Document the MCP run outputs or link to transcripts so reviewers can see what was validated.
 
@@ -258,13 +250,7 @@ Document the MCP run outputs or link to transcripts so reviewers can see what wa
 - Treat every bug, regression, or avoided incident as an opportunity to harden the rules.
 - Append concise notes to `.cursor/rules/07-process-improvement.mdc` (2-3 sentences max: trigger, lesson, rule update); when a theme recurs, evolve or add a rule file so the fix becomes default behavior.
 - Keep entries brief - no verbose sections, just essential facts.
-- **Date format**: **MANDATORY** - **NEVER guess dates or use placeholder dates**. Before adding ANY date to ANY file:
-  1. **First**: Try Time MCP to get current date/time
-  2. **If Time MCP unavailable**: Use system date command (`powershell -Command "Get-Date -Format 'yyyy-MM-dd'"` on Windows, `date +%Y-%m-%d` on Unix)
-  3. **Verify**: Confirm the date is correct before using it
-  4. **Never**: Use placeholder dates like "2025-01-27", "2025-01-XX", or future dates
-  5. **Never**: Assume or guess the current date
-  Format dates as YYYY-MM-DD. Always verify date accuracy before adding entries.
+- Follow `@rules/dates` for every timestamp—Time MCP first, system date as fallback, and zero placeholder strings.
 
 # Quality Checklist
 

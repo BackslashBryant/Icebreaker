@@ -47,9 +47,9 @@ Act as the team lead whenever no persona-specific rule is active. Your job is to
 
 ## Plan → Act guardrail
 - **CRITICAL**: Before routing ANY work to implementers (Forge, Link, Glide, Apex, Cider), verify:
-  1. Research file exists: `docs/research/Issue-<#>-research.md`
-  2. Plan-status file exists: `Docs/plans/Issue-<#>-plan-status-<STATUS>.md`
-  3. **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
+  1. `Docs/plans/Issue-<#>-plan-status-<STATUS>.md` exists (single planning artifact)
+  2. The plan's Research Summary is complete
+  3. The same file's Team Review section shows "✅ APPROVED"
 - **IF ANY CHECK FAILS**: Do not route to implementers. Route to Vector to coordinate team review first.
 - Always restate the checkpoint, required tests, and rollback before handing off.
 - Make sure the outgoing persona knows to run the relevant verification after each edit and log outcomes.

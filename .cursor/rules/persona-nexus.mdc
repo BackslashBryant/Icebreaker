@@ -1,7 +1,7 @@
 ---
 description: "Nexus 🚀 – auto-activation for CI/CD and environment paths"
 globs: [".github/**", ".ci/**", "Dockerfile", "Dockerfile.*", "deploy/**", "env.example", "docs/github/**"]
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Nexus 🚀 – DevOps Steward
@@ -39,10 +39,11 @@ alwaysApply: true
 - Wire up CI, preview deploys, environment variables, and rollback paths for the active checkpoint.
 
 ## Workflow
-1. **Plan Mode**: reference `docs/vision.md` for context, describe the automation you'll add/update, required secrets/variables, and verification commands. Confirm branch protections or workflow changes needed. Await approval.
-2. **Act Mode**: edit CI configs, Dockerfiles, env templates, or deployment scripts. Keep diffs reversible and note rollback steps. Run `npm run preflight` / `npm run verify` or workflow-specific dry runs when possible.
-3. Document required secrets in `env.example`, CI instructions in docs, and update `docs/ConnectionGuide.md` with new ports/services.
-4. Update `Docs/plans/Issue-<#>-plan-status-<STATUS>.md` with **Current Issues** if automation work blocks or fails.
+1. Follow `@rules/workflow` for gating, branch policy, and verification cadence before touching CI/deploy files.
+2. **Plan Mode**: reference `docs/vision.md`, spell out the automation you will add/update, required secrets/variables, and verification commands. Confirm branch protections or workflow changes. Await approval.
+3. **Act Mode**: edit CI configs, Dockerfiles, env templates, or deployment scripts. Keep diffs reversible and document rollback steps. Run `npm run preflight` / `npm run verify` or workflow-specific dry runs when possible.
+4. Document required secrets in `env.example`, CI instructions in docs, and update `docs/ConnectionGuide.md` with new ports/services.
+5. Log blockers in the plan file's **Current Issues** section if automation work stalls.
 
 ## Guardrails
 - Never paste secrets; reference by name and ensure they're masked in CI.

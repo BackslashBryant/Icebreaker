@@ -29,7 +29,7 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 
 ## 1. Plan (Vector) - MANDATORY AFTER RESEARCH
 - **MANDATORY**: Vector must wait for Scout's research to be complete.
-- Reference Scout's research file: `docs/research/Issue-<#>-research.md`
+- Reference the Research Summary section inside `Docs/plans/Issue-<#>-plan-status-<STATUS>.md` (Scout keeps it current). No separate research docs exist.
 - Use Cursor Plan Mode with the issue context plus `docs/vision.md` and research findings.
 - **CRITICAL**: Create ONE living document: `Docs/plans/Issue-<#>-plan-status-<STATUS>.md`
   - **Filename Format**: `Issue-<#>-plan-status-<STATUS>.md` where STATUS is one of: `IN-PROGRESS`, `COMPLETE`, `BLOCKED`, `CANCELLED`
@@ -61,6 +61,8 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 
 ## 1.5. Non-App Logic Changes Policy
 
+Use this whenever you're touching shared workflow/config files (rules, tools, automation docs). Issue-specific work (features, plans, research, QA) follows the branch rules in Section 2.
+
 **CRITICAL**: All non-app logic files MUST be committed to `main` branch, not feature branches. These files apply universally across all branches.
 
 **Non-App Logic Files** (go to `main`):
@@ -74,7 +76,6 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 **App Logic Files** (go to feature branches):
 - `frontend/**/*`, `backend/**/*`, `src/**/*` (application code)
 - `docs/Plan.md`, `Docs/plans/Issue-<#>-plan-status-<STATUS>.md` (plan files)
-- `docs/research/Issue-<#>-research.md` (research files)
 - `.notes/features/<slug>/**` (feature-specific notes)
 
 **Workflow for Non-App Logic Changes**:
@@ -112,7 +113,9 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
   3. Then commit issue-specific files to feature branch
 
 ## 2. Branching & MCP Setup
-- **MANDATORY**: Create branch with format `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`) **BEFORE starting any work**. Check current branch matches the issue being worked on. If on wrong branch, create correct branch and move commits.
+- **MANDATORY**: Pick the right branch mode BEFORE editing:
+  - **Non-app logic (Section 1.5)**: stay on `main` or create a short-lived `chore/workflow-<slug>` off `main`, merge immediately.
+  - **Issue-specific/app logic**: create `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`) and keep it scoped to that issue.
 - **CRITICAL**: Before ANY git operation (add, commit, push), verify:
   1. Current directory is the project root (contains `.git` folder)
   2. **Git Root Validation**: Run `git rev-parse --show-toplevel` and verify it returns the project root (should contain `docs/vision.md`, `tools/preflight.mjs`). If it returns a parent directory (e.g., `C:/Users/OrEo2`), there's a stray `.git` folder - use `tools/get-project-root.mjs` helper instead
@@ -123,22 +126,13 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - **NEVER** run git commands from parent directories or outside the repository
 - **Git Root Helper**: Use `node tools/get-project-root.mjs` when `git rev-parse --show-toplevel` returns unexpected results (validates project markers to ensure correct root)
 - Branch name format: `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`).
-- **GitHub Authentication & API Usage**: 
-  - **PRIMARY METHOD**: Use REST API via `tools/lib/github-api.mjs` utilities. All GitHub tools (`verify-github-issue.mjs`, `github-issue.mjs`, `github-pr.mjs`, etc.) use REST API as primary method.
-  - **Token Retrieval**: Tools automatically get token from GitHub CLI keyring first (`gh auth token`), then fall back to `GITHUB_TOKEN` env var if needed. This prevents issues with expired/invalid env vars.
-  - **Setup**: Run `gh auth login` once to authenticate. GitHub CLI stores token in keyring securely.
-  - **For MCP servers**: Other MCP servers (Desktop Commander, Playwright) may need `GITHUB_TOKEN` environment variable. Get token from GitHub CLI: `gh auth token` and set it as `GITHUB_TOKEN` environment variable (User-level on Windows). This is a one-time setup.
-  - **If authentication fails**: Run `tools/fix-github-auth.ps1` to clear conflicting env vars and re-authenticate.
-- **GitHub Operations**: 
-  - **For Node.js scripts**: Use `tools/lib/github-api.mjs` utilities (REST API, automatic token from keyring).
-  - **For CLI operations**: Use `gh` CLI directly for simple operations (`gh issue comment`, `gh issue edit`, etc.).
-  - **MANDATORY**: Before running ANY `gh` CLI command, clear `GITHUB_TOKEN` env var if set: `$env:GITHUB_TOKEN = $null` (PowerShell) or `unset GITHUB_TOKEN` (bash). This ensures GitHub CLI uses keyring authentication instead of potentially expired/invalid env var tokens.
-  - **Examples**: 
-    - PowerShell: `$env:GITHUB_TOKEN = $null; gh issue comment 10 --body "..."` 
-    - Bash: `unset GITHUB_TOKEN && gh issue comment 10 --body "..."`
-    - Node.js: `node tools/verify-github-issue.mjs`, `node tools/github-issue.mjs kickoff "Title"`
-  - **CRITICAL**: Do NOT set `GITHUB_TOKEN` in `.env` file - it interferes with GitHub CLI authentication. Tools get token from keyring automatically.
-  - **CRITICAL**: Always clear `GITHUB_TOKEN` env var before `gh` CLI commands to use keyring authentication (SSH protocol preferred).
+- **GitHub authentication & CLI usage**:
+  - Use REST helpers in `tools/lib/github-api.mjs`; tokens come from `gh auth token` (keyring) with `GITHUB_TOKEN` as fallback.
+  - Always `unset GITHUB_TOKEN`/`$env:GITHUB_TOKEN = $null` before running any `gh ...` command. Never store that token in `.env`.
+  - Detailed troubleshooting (auth resets, MCP env wiring, PowerShell fallbacks) lives in `@rules/workflow-appendix`.
+- **GitHub Operations**:
+  - Node scripts handle automation (`tools/github-*.mjs`), while `gh` CLI covers comments/labels and terminal git handles commits.
+  - For fallback commands, environment setup, and push troubleshooting, see `@rules/workflow-appendix`.
 - Nexus or the acting human runs `npm run agents:install-hook` to copy the path-scope pre-commit hook locally.
 - Run `npm run preflight` before pushing to ensure scaffolding is intact (includes branch name validation).
 - Execute `npm run mcp:suggest` after dependency or config changes and note the recommendations in `.notes/` or the active plan; run `npm run mcp:suggest -- --install <id>` to append required servers to `.cursor/mcp.json`.
@@ -202,7 +196,7 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
    - **REQUIRED**: Investigate root cause before proceeding
    - **REQUIRED**: Fix or document all errors before merging
 
-**NEVER**: 
+**NEVER**:
 - Merge PRs with failing CI checks (unless explicitly approved for known issues)
 - Ignore terminal errors as "display issues" without verification
 - Skip browser installation "to save time" in CI jobs
@@ -225,105 +219,21 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 - Always ask before pushing (per agent rules).
 
 ## 6. Close the Loop
-- **Issue completion checklist** (must complete all - NO EXCEPTIONS):
-  1. **MANDATORY**: Update `Docs/plans/Issue-<#>-plan-status-<STATUS>.md`:
-     - Mark ALL plan checkboxes (acceptance criteria) as complete `[x]` - not just Status Tracking
-     - Mark ALL steps as ✅ COMPLETE with completion date in Status Tracking
-     - **Update header metadata**: Change Status to `COMPLETE`, update Branch to actual branch name, update Labels to `status:done`, add Completion date
-     - **Rename file**: Use `git mv` to change filename from `Issue-<#>-plan-status-IN-PROGRESS.md` to `Issue-<#>-plan-status-COMPLETE.md` (ensures old file is deleted)
-     - Fill in Outcome section with status, completion date, branch, commit hash, verification results
-     - Document verification results (all acceptance tests passed)
-     - **CRITICAL**: This must be done BEFORE committing completion
-     - **VERIFY**: After renaming, confirm only the COMPLETE file exists (no stale IN-PROGRESS file)
-  2. **MANDATORY**: Update `.notes/features/current.json`:
-     - Set `status` to `"complete"`
-     - Update `branch` to actual branch name (not "main")
-     - Update `note` with completion summary and next steps
-     - **CRITICAL**: This must be done BEFORE committing completion
-  3. **MANDATORY**: Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
-     - **Pre-commit Hook Override**: When fixing bugs that cross agent boundaries (e.g., Pixel fixing frontend bugs discovered during testing), use `git commit --no-verify` with a clear message explaining why. This is acceptable for bug fixes that address issues identified in testing/insight reports.
-  4. **MANDATORY**: Push to GitHub: Use `node tools/git-push-with-retry.mjs [branch-name]` for automatic retry and DNS error handling
-     - **Preferred method**: `node tools/git-push-with-retry.mjs agent/<agent>/<issue>-<slug>`
-     - **Fallback**: `git push -u origin agent/<agent>/<issue>-<slug>` (if script unavailable)
-     - **If authentication fails**: 
-       - Verify GitHub CLI is authenticated: `gh auth status`
-       - If not authenticated: `gh auth login`
-       - Git uses GitHub CLI's credential helper automatically - no sync needed
-     - **If push fails with DNS error** (`getaddrinfo() thread failed`):
-       - Script automatically flushes DNS and retries
-       - If script unavailable: Restart PC (Windows DNS threading bug)
-       - If persists: Use system Git from terminal instead of Cursor's bundled Git
-       - Check for third-party firewalls blocking Git
-     - **If push fails with 403 error**:
-       - Verify token has `repo` scope: `gh auth status`
-       - Refresh token: `gh auth refresh -s repo`
-       - Ensure branch exists on GitHub FIRST (create via `gh` CLI: `gh repo create-branch BackslashBryant/Icebreaker <branch-name>`)
-     - **If push fails with "branch not found"**: Create branch on GitHub FIRST via `gh` CLI before pushing
-     - **DO NOT** ask user for permission - this is a mandatory completion step
-  5. **MANDATORY**: Update GitHub issue AND close it: Use `node tools/github-issue-complete.mjs <issue#> [commit-hash]`
-     - **Preferred method**: `node tools/github-issue-complete.mjs <issue#>`
-     - **Fallback (comment + label + close)**:
-       ```
-       $env:GITHUB_TOKEN = $null; gh issue comment <issue#> --body "..."
-       $env:GITHUB_TOKEN = $null; gh issue edit <issue#> --add-label "status:done"
-       $env:GITHUB_TOKEN = $null; gh issue close <issue#> --reason completed
-       ```
-     - **CRITICAL**: Adding `status:done` and closing are ONE ATOMIC ACTION - never separate them
-     - Include: Status summary, branch name, commit hash, test results, files created/modified, next steps
-     - Reference plan-status file: `Docs/plans/Issue-<#>-plan-status-COMPLETE.md`
-     - **If authentication fails**: Script provides clear error message and fix steps (`gh auth login`)
-     - **DO NOT** ask user for permission - this is a mandatory completion step
-     - **NEVER leave an issue open with `status:done` label** - if done, it's closed
-  6. **MANDATORY**: Sync plan file to main branch:
-     - **Switch to main**: `git checkout main && git pull origin main`
-     - **Copy plan file from feature branch**: `git checkout <feature-branch> -- Docs/plans/Issue-<#>-plan-status-COMPLETE.md`
-     - **Commit to main**: `git commit -m "docs: Add Issue #<#> completion plan (from <feature-branch>)"`
-     - **Push main**: `git push origin main`
-     - **CRITICAL**: Plan files on main are the source of truth for completion status
-     - **VERIFY**: Confirm `Docs/plans/Issue-<#>-plan-status-COMPLETE.md` exists on main after push
-  7. **MANDATORY**: Switch back to main branch:
-     - **After syncing plan file**: Stay on `main` branch (do not switch back to feature branch)
-     - **Verify**: Run `git branch --show-current` to confirm you're on `main`
-     - **Rationale**: Feature branches are for active work; main is the default branch for starting new work
-     - **Note**: Feature branch cleanup (deletion) is optional and can be done later if needed
-- Research file already exists at `docs/research/Issue-<#>-research.md` (created during research phase).
-- Archive security notes (if any) in `/docs/security/`.
-- Update `/docs/agents/KICKOFF.md` sanity checklist if the flow uncovered gaps.
-- **CRITICAL**: Never complete an issue without completing ALL steps in the checklist above (1-7). These steps must happen automatically without user reminders:
-  1. Update plan-status file (mark complete, rename to COMPLETE, fill Outcome)
-  2. Update current.json (set status to "complete")
-  3. Commit changes
-  4. Push to feature branch
-  5. Close GitHub issue (comment + label + close)
-  6. Sync plan file to main branch
-  7. Switch back to main branch
-- **AUTOMATION ENFORCEMENT**: If any step is skipped, the completion workflow is incomplete. The agent must complete ALL steps before considering the issue done.
-- **PROCESS ENFORCEMENT**: If an issue is marked complete in commit message but plan-status file/current.json show incomplete status, STOP and update status files before proceeding. Status files are the source of truth for issue completion state.
-- **DOCUMENTATION GUARDRAIL**: No issue is `status:done` unless:
-  1. Matching `Docs/plans/Issue-<#>-plan-status-COMPLETE.md` file exists (not just status field updated)
-  2. File is renamed to `-COMPLETE` (follows naming convention: `Issue-<id>-plan-status-<STATE>.md`)
-  3. "Outcome" section is complete with all required information (status summary, completion date, branch, commit hash, verification results)
-- **TESTING DOCS REQUIREMENT**: When test suites, matrix configurations, or visual snapshots change:
-  1. Update `Docs/testing/FLAKY_TESTS.md` if tests are quarantined or retry rules change
-  2. Update `Docs/testing/VISUAL-BASELINES.md` if baseline OS/browser matrix or regeneration process changes
-  3. Update `Docs/testing/TESTING-BACKLOG.md` if new test ideas are implemented
-- **MONITORING DOCS REQUIREMENT**: When CI workflows, health checks, or alerts change:
-  1. Update `Docs/monitoring/*` (DASHBOARDS.md, ALERTS.md, RUNBOOK.md) if monitoring/alerting changes
-  2. Update `Docs/verification/*` if deployment/rollback procedures or health validation changes
-  3. Update `Docs/troubleshooting/*` if incident runbooks or known issues change
-- **NO TOP-LEVEL DOC SPRAWL**: No new top-level doc directories; everything goes under `Docs/`. New categories go as subfolders of closest existing area. One-off notes go in `Docs/research/` or `Docs/troubleshooting/` with clear names.
+Finish every issue with the seven steps below. The command-level checklist, fallback flows, and troubleshooting live in `@rules/workflow-appendix#issue-completion`.
 
-## Tooling & Automation
-- `npm run agents:prompt -- all` prints prompt bodies for all agents.
-- `npm run agents:install-hook` copies the optional path-scope guard into `.git/hooks`.
-- `npm run github:labels` (future helper) will seed repo labels defined in `/docs/github/labels.json`.
-- GitHub Actions (`.github/workflows/`) run preflight + `verify-all`. Extend them as the stack evolves.
+1. Update `Docs/plans/Issue-<#>-plan-status-<STATUS>.md`: rename to `-COMPLETE`, fill the Outcome + Status Tracking, sync header metadata, and keep Research/Team Review inline. No other planning docs should exist.
+2. Update `.notes/features/current.json` with status `"complete"`, the actual branch name, and next-step notes.
+3. Log Muse’s UX/doc approval for any work that affects frontend UI, UX copy, or docs: share the latest screenshots/notes with Muse, have them respond with ✅ in chat, and record the approval (name/date + summary) inside the plan file’s Status Tracking or Current Issues section.
+4. Commit with the issue reference (`feat: Complete Issue #X - ...`). Only invoke `--no-verify` for cross-agent bug fixes and explain why.
+5. Push via `node tools/git-push-with-retry.mjs <branch>` (script handles DNS + auth fallbacks).
+6. Comment, label, and close the GitHub issue using `node tools/github-issue-complete.mjs <issue#>` so `status:done` and closure happen atomically.
+7. Sync the finalized plan file onto `main` (checkout `main`, pull, copy the plan file from your branch, commit `docs: Add Issue #<#> plan`, push).
+8. End on `main`. Feature branches are disposable; prune later if desired.
 
-## Guardrails
-- Never merge directly to `main`. Enforce branch protections: require PR, passing checks, linear history.
-- Keep secrets in GitHub Actions secrets or environment variables; never commit `.env` files.
-- If MCP access changes (new services, revoked tokens), open an issue for Nexus to update `.cursor/config.json` and automation.
-- **Repository Mode**: Template repos track Cursor files (`.cursor/`). App repos block them. The pre-commit hook enforces this separation. See `docs/development/SEPARATION.md` for mode conversion and override procedures.
-- **Documentation Standards**: See `Docs/README.md` for folder ownership and audience boundaries. All documentation must follow naming conventions in `Docs/plans/README.md`. No new top-level doc directories.
+Never skip these steps. Status files are the source of truth—if the plan file or `current.json` disagree with chat/commits, fix the docs first. Keep testing/monitoring docs in sync when suites, baselines, or health checks change.
+
+## Tooling & Guardrails
+- Script references (`npm run agents:*`, GitHub label helpers, CI runners) and repository guardrails (secrets management, template vs app mode, doc ownership) live in `@rules/workflow-appendix`. Pull that file when you need concrete commands or troubleshooting steps.
+- Documentation standards still point to `Docs/README.md`; avoid new top-level directories unless the README endorses them.
 
 Follow this loop for every change to keep GitHub the source of truth and Cursor Agents accountable.***

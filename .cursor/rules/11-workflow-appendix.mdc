@@ -1,0 +1,74 @@
+---
+description: "Workflow appendix – detailed git/CLI commands and troubleshooting"
+globs: ["**/*"]
+alwaysApply: false
+---
+
+# Workflow Appendix (`@rules/workflow-appendix`)
+
+Use this file when you need the full command list, troubleshooting steps, or completion checklist referenced in `@rules/workflow`.
+
+## GitHub Authentication & CLI Reference
+- **REST API first**: All repo helpers (`tools/verify-github-issue.mjs`, `tools/github-issue.mjs`, `tools/github-pr.mjs`, etc.) use `tools/lib/github-api.mjs` plus the GitHub REST API. Tokens come from `gh auth token` (keyring) with `GITHUB_TOKEN` as fallback.
+- **Never stash tokens in `.env`**: Setting `GITHUB_TOKEN` in `.env` breaks GitHub CLI auth. Clear it before every `gh ...` command: `unset GITHUB_TOKEN` (bash) or `$env:GITHUB_TOKEN = $null` (PowerShell).
+- **Authentication recovery**: If `gh` or scripts fail auth, run `gh auth login` or `tools/fix-github-auth.ps1` to reset conflicting env vars. For MCP servers that need env vars (Playwright, Desktop Commander), set User-level variables and restart Cursor.
+- **Branch creation**: Create branches with `gh repo create-branch BackslashBryant/Icebreaker <branch>` when remote refs are missing. Scripts rely on the branch existing on GitHub.
+- **Fallback protocol**: When CLI auth explodes, PowerShell `Invoke-RestMethod` with the token from keyring is the last resort—document the variance in the plan file.
+
+## Issue Completion Details (#issue-completion)
+Use these commands once `@rules/workflow` declares the seven required steps. Never skip a step—status docs trump chat.
+
+1. **Plan file (`Docs/plans/Issue-<#>-plan-status-<STATUS>.md`)**
+   - Mark every acceptance checkbox `[x]` and sync the Status Tracking grid to match.
+   - Update header metadata: `Status: COMPLETE`, `Branch: agent/<agent>/<issue>-<slug>`, `Labels: status:done`, actual creation/completion dates (use `@rules/dates`).
+   - Rename via `git mv Issue-<#>-plan-status-IN-PROGRESS.md Issue-<#>-plan-status-COMPLETE.md`. Verify no stale file remains.
+   - Fill the Outcome section with summary, branch, commit hash, verification results.
+2. **`.notes/features/current.json`**
+   - Set `"status": "complete"`, `branch` to the feature branch, and `note` to a short summary + next steps.
+3. **Commit**
+   - `git add ... && git commit -m "feat: Complete Issue #<#> - <summary>"`.
+   - Bugfixes that cross agent lanes can use `--no-verify`, but add `[no-verify: reason]` in the message and log it.
+4. **Push**
+   - `node tools/git-push-with-retry.mjs agent/<agent>/<issue>-<slug>` handles DNS/threading failures automatically.
+   - If it fails:
+     - DNS error: rerun script (it flushes DNS) or restart the PC/use system git.
+     - 403 error: `gh auth status`, then `gh auth refresh -s repo`, ensure branch exists remotely.
+     - Missing branch: create it on GitHub (`gh repo create-branch ...`) before pushing.
+5. **GitHub issue update**
+   - Preferred: `node tools/github-issue-complete.mjs <issue#> [commit-hash]`.
+   - Manual fallback:
+     ```
+     $env:GITHUB_TOKEN = $null; gh issue comment <issue#> --body "<summary + tests + files>"
+     $env:GITHUB_TOKEN = $null; gh issue edit <issue#> --add-label "status:done"
+     $env:GITHUB_TOKEN = $null; gh issue close <issue#> --reason completed
+     ```
+   - Comment must include branch, commit, test results, and docs touched. Label + close happen atomically—no open issues with `status:done`.
+6. **Sync plan file to `main`**
+   - `git checkout main && git pull origin main`
+   - `git checkout agent/<agent>/<issue>-<slug> -- Docs/plans/Issue-<#>-plan-status-COMPLETE.md`
+   - `git commit -m "docs: Add Issue #<#> completion plan (from agent/<agent>/<issue>-<slug>)"`
+   - `git push origin main`
+   - Stay on `main` after pushing; the plan on `main` is the source of truth.
+7. **Wrap-up checks**
+   - Switch back to `main` (`git branch --show-current` should read `main`).
+   - Update testing/monitoring docs when suites, baselines, or health checks change:
+     - `Docs/testing/FLAKY_TESTS.md` for quarantines/owners
+     - `Docs/testing/VISUAL-BASELINES.md` for snapshot OS/browser grids
+     - `Docs/testing/TESTING-BACKLOG.md` for new ideas implemented
+     - `Docs/monitoring/*` or `Docs/verification/*` for pipeline/alert updates
+   - Archive any security findings under `docs/security/`.
+
+## Tooling & Automation
+- `npm run agents:prompt -- all` prints persona prompt bodies for quick reference.
+- `npm run agents:install-hook` installs the optional path-scope git hook locally.
+- `npm run github:labels` seeds labels from `docs/github/labels.json`.
+- `npm run preflight` validates scaffolding + MCP health before pushing.
+- `npm run mcp:suggest` proposes new servers after dependency or config changes; capture outcomes in the plan file.
+- GitHub Actions (`.github/workflows/`) run `preflight` + `scripts/verify-all`; extend them as the stack evolves.
+
+## Guardrails
+- Never merge directly to `main`; branch protections expect clean history + passing checks.
+- Secrets live in GitHub Secrets or env vars—never commit `.env` files.
+- If MCP access changes (new services, revoked tokens), open a Nexus issue to refresh `.cursor/config.json`, `mcp.json`, and env variables.
+- **Repository Mode**: Template repos track `.cursor/`; app repos block it unless `ALLOW_CURSOR_PUSH=1`. See `docs/development/SEPARATION.md` before toggling modes.
+- **Documentation Standards**: Follow `Docs/README.md` for directory ownership. No new top-level dirs; add subfolders under the closest existing area or extend the live plan file instead of inventing `docs/research/*.md`.

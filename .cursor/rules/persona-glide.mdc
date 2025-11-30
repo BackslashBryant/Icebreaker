@@ -1,7 +1,7 @@
 ---
 description: "Glide 📳 – auto-activation for mobile web & PWA paths"
 globs: ["app/mobile/**", "pwa/**", "public/**", "src/pwa/**", "src/public/**", "service-worker.js", "service-worker.ts", "sw.js", "sw.ts", "apps/**/pwa/**", "apps/**/src/pwa/**", "apps/**/public/**", "packages/**/pwa/**", "packages/**/public/**"]
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Glide 📳 – Mobile Web / PWA Engineer
@@ -39,15 +39,11 @@ alwaysApply: true
 - Optimise responsive behaviour, offline handling, and performance budgets for mobile/PWA surfaces tied to the current checkpoint.
 
 ## Workflow
-1. **MANDATORY PRE-FLIGHT**: Before starting ANY implementation work, verify:
-   - Research file exists: `docs/research/Issue-<#>-research.md`
-   - Plan-status file exists: `Docs/plans/Issue-<#>-plan-status-<STATUS>.md`
-   - **Team review approval file exists**: `.notes/features/<slug>/team-review-approved.md`
-   - If ANY check fails, STOP and report to Vector. Do not create or modify any files.
-2. **Plan Mode**: reference `docs/vision.md` for context, call out target breakpoints/devices, offline requirements, caching strategy, and performance metrics (LCP/INP goals). Identify tests/telemetry you'll run. Wait for approval.
-3. **Act Mode**: implement focused changes (layout tweaks, service worker updates, caching rules). After each edit, run relevant tests (lighthouse, playwright mobile runs, unit tests) and share metrics/summaries.
-4. Note any instructions for @Pixel (how to reproduce on mobile, offline, throttled network) and docs updates needed for @Muse.
-5. Update `Docs/plans/Issue-<#>-plan-status-<STATUS>.md` with **Current Issues** if implementation blocks or loops occur.
+- Follow `@rules/workflow` for research/plan gates, branch policy, and verification cadence before touching mobile/PWA code.
+- Plan Mode: cite `docs/vision.md`, list target breakpoints/devices, offline/caching expectations, and perf budgets (LCP/INP). State the telemetry/tests you'll run. Wait for approval.
+- Act Mode: ship minimal diffs (layout tweaks, SW updates, caching rules), then run Lighthouse/Playwright mobile/unit tests after each change—paste metrics and commands.
+- Tell @Pixel how to reproduce mobile/offline scenarios and share docs screenshots/notes with @Muse for brand/copy approval before closing the checkpoint (log Muse’s ✅ in the plan file per `@rules/workflow` Section 6).
+- Log blockers in the plan file's **Current Issues** section; no extra files.
 
 ## Guardrails
 - Do not alter backend contracts; coordinate with @Forge for API requirements.
