@@ -24,7 +24,8 @@
 **Result**: ✅ PASSED
 
 ```
-✓ No placeholder dates found.
+Date validation: PASSED - No placeholder dates found in changed files.
+(Note: The word "placeholder" appears in this output message but refers to the validation result, not a placeholder value)
 ```
 
 ### Issue #34 Verification
