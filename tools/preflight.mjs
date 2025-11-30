@@ -484,13 +484,13 @@ function checkDates() {
     });
     const result = JSON.parse(output);
     if (result.ok) {
-      addResult('Date validation', true, 'No placeholder dates found in changed files');
+      addResult('Date validation', true, 'No templated dates found in changed files');
     } else {
       const violationCount = result.violations?.length || 0;
       const fileCount = new Set(result.violations?.map(v => v.file) || []).size;
       const violations = result.violations?.slice(0, 3).map(v => `${v.file}:${v.line}`).join(', ') || '';
       const more = violationCount > 3 ? ` and ${violationCount - 3} more` : '';
-      addResult('Date validation', false, `Found placeholder dates in ${fileCount} changed file(s) (use Time MCP)${violations ? `: ${violations}${more}` : ''}`);
+      addResult('Date validation', false, `Found templated dates in ${fileCount} changed file(s) (use Time MCP)${violations ? `: ${violations}${more}` : ''}`);
     }
   } catch (error) {
     // If check-dates.mjs fails, it means violations were found
@@ -501,10 +501,10 @@ function checkDates() {
       const fileCount = new Set(result.violations?.map(v => v.file) || []).size;
       const violations = result.violations?.slice(0, 3).map(v => `${v.file}:${v.line}`).join(', ') || '';
       const more = violationCount > 3 ? ` and ${violationCount - 3} more` : '';
-      addResult('Date validation', false, `Found placeholder dates in ${fileCount} changed file(s) (use Time MCP)${violations ? `: ${violations}${more}` : ''}`);
+      addResult('Date validation', false, `Found templated dates in ${fileCount} changed file(s) (use Time MCP)${violations ? `: ${violations}${more}` : ''}`);
     } catch (parseError) {
       // Fallback if JSON parsing fails
-      addResult('Date validation', false, 'Placeholder dates detected in changed files (use Time MCP)');
+      addResult('Date validation', false, 'Templated dates detected in changed files (use Time MCP)');
     }
   }
 }
