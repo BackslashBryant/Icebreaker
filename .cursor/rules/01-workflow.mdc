@@ -108,7 +108,7 @@ Use this whenever you're touching shared workflow/config files (rules, tools, au
 ## 1.6. Verification & No-Verify Automation
 
 - `npm run precommit` now runs `tools/run-precommit.mjs`, which executes the health check, date validator, and lint runner, then writes a log to `artifacts/verification/precommit-<timestamp>.json` (plus `artifacts/verification/latest.json`). Reference that artifact instead of duplicating console output in Markdown.
-- When you bypass hooks, include `[no-verify: <reason>]` inside the commit message body. The `post-commit` hook parses that tag and automatically calls `npm run log:no-verify -- --commit HEAD --reason "..."`, keeping `.notes/no-verify-log.md` synchronized without manual edits.
+- When you bypass hooks, include `[no-verify: <reason>]` inside the commit message body. The `post-commit` hook enforces this (empty tags cause the hook to fail) and automatically calls `npm run log:no-verify -- --commit HEAD --reason "..."`, keeping `.notes/no-verify-log.md` synchronized without manual edits.
 - Manual verification notes stay in the plan-status file (under **Current Issues**/**Verification Results**). Link to the JSON artifact path when summarizing reruns.
 
 ## 2. Branching & MCP Setup
