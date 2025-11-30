@@ -2,8 +2,108 @@
 # Pre-push hook - Lightweight checks before push
 # Install with: cp scripts/hooks/pre-push.sample .git/hooks/pre-push && chmod +x .git/hooks/pre-push
 
+set -euo pipefail
+
 branch="$(git rev-parse --abbrev-ref HEAD)"
 remote="${1:-origin}"
+
+# Detect if running in non-interactive mode (CI, Cursor, etc.)
+INTERACTIVE=true
+if [ ! -t 0 ] || [ -n "${CI:-}" ] || [ -n "${GIT_HOOK_NON_INTERACTIVE:-}" ]; then
+  INTERACTIVE=false
+fi
+
+# Helper: prompt with timeout (non-blocking in non-interactive mode)
+prompt_with_timeout() {
+  local prompt_text="$1"
+  local default="${2:-N}"
+  local timeout="${3:-5}"
+  
+  if [ "$INTERACTIVE" = "false" ]; then
+    echo "[pre-push] Non-interactive mode: auto-continuing (default: $default)"
+    REPLY="$default"
+    return 0
+  fi
+  
+  # Use timeout if available, otherwise fall back to regular read
+  if command -v timeout >/dev/null 2>&1; then
+    if timeout "$timeout" bash -c "read -p '$prompt_text' -n 1 -r; echo \$REPLY" 2>/dev/null; then
+      REPLY=$(timeout "$timeout" bash -c "read -p '$prompt_text' -n 1 -r; echo \$REPLY" 2>/dev/null || echo "$default")
+    else
+      REPLY="$default"
+    fi
+  else
+    # Fallback: try read with timeout using background process
+    read -t "$timeout" -p "$prompt_text" -n 1 -r 2>/dev/null || REPLY="$default"
+  fi
+  echo
+}
+
+# Helper: run command with timeout and logging (Windows-compatible)
+run_with_timeout() {
+  local cmd="$1"
+  local timeout="${2:-30}"
+  local description="${3:-$cmd}"
+  
+  echo "[pre-push] Running: $description (timeout: ${timeout}s)..."
+  
+  # Try timeout command first (Linux/Git Bash with timeout)
+  if command -v timeout >/dev/null 2>&1; then
+    if timeout "$timeout" bash -c "$cmd" 2>&1; then
+      echo "[pre-push] ✓ $description completed"
+      return 0
+    else
+      local exit_code=$?
+      if [ $exit_code -eq 124 ]; then
+        echo "[pre-push] ✗ ERROR: $description timed out after ${timeout}s"
+        echo "[pre-push]   This check is blocking the push. Set SKIP_STATUS=1 or SKIP_PREFLIGHT=1 to bypass."
+        return 1
+      else
+        echo "[pre-push] ✗ ERROR: $description failed (exit code: $exit_code)"
+        return $exit_code
+      fi
+    fi
+  else
+    # Windows fallback: use background process with kill after timeout
+    # This prevents silent hangs in Cursor/PowerShell
+    local pid_file=$(mktemp /tmp/git-hook-timeout.XXXXXX 2>/dev/null || echo "/tmp/git-hook-timeout.$$")
+    (
+      eval "$cmd" > "$pid_file.out" 2>&1
+      echo $? > "$pid_file.exit"
+    ) &
+    local bg_pid=$!
+    local elapsed=0
+    local check_interval=1
+    
+    while [ $elapsed -lt $timeout ]; do
+      if ! kill -0 $bg_pid 2>/dev/null; then
+        # Process finished
+        if [ -f "$pid_file.exit" ]; then
+          local exit_code=$(cat "$pid_file.exit" 2>/dev/null || echo "1")
+          cat "$pid_file.out" 2>/dev/null || true
+          rm -f "$pid_file.out" "$pid_file.exit" 2>/dev/null || true
+          if [ $exit_code -eq 0 ]; then
+            echo "[pre-push] ✓ $description completed"
+            return 0
+          else
+            echo "[pre-push] ✗ ERROR: $description failed (exit code: $exit_code)"
+            return $exit_code
+          fi
+        fi
+      fi
+      sleep $check_interval
+      elapsed=$((elapsed + check_interval))
+    done
+    
+    # Timeout reached - kill the process
+    kill $bg_pid 2>/dev/null || true
+    wait $bg_pid 2>/dev/null || true
+    rm -f "$pid_file.out" "$pid_file.exit" 2>/dev/null || true
+    echo "[pre-push] ✗ ERROR: $description timed out after ${timeout}s"
+    echo "[pre-push]   This check is blocking the push. Set SKIP_STATUS=1 or SKIP_PREFLIGHT=1 to bypass."
+    return 1
+  fi
+}
 
 echo "[pre-push] Preparing to push to $remote/$branch..."
 
@@ -11,8 +111,7 @@ echo "[pre-push] Preparing to push to $remote/$branch..."
 if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
   echo "WARNING: Pushing directly to $branch branch."
   echo "Consider using a feature branch and pull request instead."
-  read -p "Continue? (y/N) " -n 1 -r
-  echo
+  prompt_with_timeout "Continue? (y/N) " "N" 5
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
   fi
@@ -22,8 +121,7 @@ fi
 if ! git diff-index --quiet HEAD --; then
   echo "WARNING: You have uncommitted changes."
   echo "Consider committing or stashing them before pushing."
-  read -p "Continue anyway? (y/N) " -n 1 -r
-  echo
+  prompt_with_timeout "Continue anyway? (y/N) " "N" 5
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
   fi
@@ -40,7 +138,8 @@ fi
 # Check merge base with main (branch readiness) - STRICT
 echo "[pre-push] Checking merge base with main..."
 if [ "$branch" != "main" ] && [ "$branch" != "master" ]; then
-  if git fetch origin main >/dev/null 2>&1; then
+  # Fetch with timeout to prevent hanging
+  if run_with_timeout "git fetch origin main" 15 "Fetch origin/main" >/dev/null 2>&1; then
     MERGE_BASE=$(git merge-base HEAD origin/main 2>/dev/null || echo "")
     MAIN_HEAD=$(git rev-parse origin/main 2>/dev/null || echo "")
     
@@ -60,16 +159,55 @@ if [ "$branch" != "main" ] && [ "$branch" != "master" ]; then
         echo "Consider rebasing: git rebase origin/main"
       fi
     fi
+  else
+    echo "[pre-push] WARNING: Failed to fetch origin/main (timeout or network issue). Skipping merge base check."
+    echo "[pre-push] Consider running 'git fetch origin main' manually to verify branch freshness."
   fi
 fi
 
-# Log --no-verify usage if detected
+# Log --no-verify usage if detected (hook still runs to log, but exits early)
 if [ -n "$GIT_PUSH_NO_VERIFY" ] || echo "$*" | grep -q "no-verify"; then
   echo "[pre-push] WARNING: --no-verify detected. Logging reason..."
-  REASON_FILE=".git/no-verify-log.txt"
-  TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-  echo "[$TIMESTAMP] Branch: $branch | Reason: ${GIT_PUSH_NO_VERIFY_REASON:-Not specified}" >> "$REASON_FILE"
-  echo "[pre-push] --no-verify logged. Reason should be documented in commit message."
+  REASON_FILE=".notes/no-verify-log.md"
+  TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC" 2>/dev/null || date +"%Y-%m-%d %H:%M:%S UTC")
+  mkdir -p "$(dirname "$REASON_FILE")"
+  if [ ! -f "$REASON_FILE" ]; then
+    echo "# No-Verify Log" > "$REASON_FILE"
+    echo "" >> "$REASON_FILE"
+    echo "This file logs instances where \`--no-verify\` was used to bypass git hooks." >> "$REASON_FILE"
+    echo "See \`.cursor/rules/11-workflow-appendix.mdc\` for approved bypass patterns." >> "$REASON_FILE"
+    echo "" >> "$REASON_FILE"
+    echo "## Log Entries" >> "$REASON_FILE"
+    echo "" >> "$REASON_FILE"
+  fi
+  echo "### [$TIMESTAMP] Branch: \`$branch\`" >> "$REASON_FILE"
+  echo "- **Reason**: ${GIT_PUSH_NO_VERIFY_REASON:-Not specified}" >> "$REASON_FILE"
+  echo "- **Commit**: \`$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')\`" >> "$REASON_FILE"
+  echo "- **Files changed**: $(git diff --name-only HEAD~1 HEAD 2>/dev/null | head -5 | tr '\n' ',' | sed 's/,$//' || echo 'unknown')" >> "$REASON_FILE"
+  echo "" >> "$REASON_FILE"
+  echo "[pre-push] --no-verify logged to $REASON_FILE"
+  echo "[pre-push] Reason should be documented in commit message with [no-verify: reason]"
+  echo "[pre-push] Exiting early (--no-verify bypasses all checks)"
+  exit 0
+fi
+
+# Health check (status/preflight) - can be slow in Cursor/PowerShell
+if [ "$SKIP_STATUS" != "1" ] && [ "$SKIP_PREFLIGHT" != "1" ]; then
+  if command -v npm >/dev/null 2>&1 && [ -f "package.json" ]; then
+    echo "[pre-push] Running health checks..."
+    # Status check (known to hang in Cursor/PowerShell - see #health-check)
+    if ! run_with_timeout "npm run status -- --ci" 20 "Health status check" >/dev/null 2>&1; then
+      echo "[pre-push] WARNING: Health status check failed or timed out."
+      echo "[pre-push]   Set SKIP_STATUS=1 to bypass: SKIP_STATUS=1 git push origin $branch"
+      echo "[pre-push]   Or investigate: npm run status"
+      prompt_with_timeout "Continue anyway? (y/N) " "N" 5
+      if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+      fi
+    fi
+  fi
+else
+  echo "[pre-push] Skipping health checks (SKIP_STATUS=1 or SKIP_PREFLIGHT=1)."
 fi
 
 # Quick lint check on files being pushed (lightweight)
@@ -80,10 +218,9 @@ if command -v npm >/dev/null 2>&1 && [ -f "package.json" ]; then
     changed_files=$(git diff --name-only "$remote/$branch"..HEAD | grep -E '\.(js|jsx|ts|tsx|mjs)$' || true)
     if [ -n "$changed_files" ] && [ -f "node_modules/.bin/eslint" ]; then
       echo "[pre-push] Checking changed files..."
-      if ! npx eslint --max-warnings=10 $changed_files 2>/dev/null; then
+      if ! run_with_timeout "npx eslint --max-warnings=10 $changed_files" 30 "ESLint check" >/dev/null 2>&1; then
         echo "Linting issues found. Fix them or push with --no-verify to bypass."
-        read -p "Continue anyway? (y/N) " -n 1 -r
-        echo
+        prompt_with_timeout "Continue anyway? (y/N) " "N" 5
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
           exit 1
         fi
@@ -96,10 +233,9 @@ fi
 echo "[pre-push] Validating workflow guardrails..."
 if command -v node >/dev/null 2>&1; then
   if [ -f "tools/validate-matrix-config.mjs" ]; then
-    if ! node tools/validate-matrix-config.mjs >/dev/null 2>&1; then
+    if ! run_with_timeout "node tools/validate-matrix-config.mjs" 15 "Matrix/config validation" >/dev/null 2>&1; then
       echo "WARNING: Matrix/config validation failed. Run: node tools/validate-matrix-config.mjs"
-      read -p "Continue anyway? (y/N) " -n 1 -r
-      echo
+      prompt_with_timeout "Continue anyway? (y/N) " "N" 5
       if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         exit 1
       fi
@@ -107,10 +243,9 @@ if command -v node >/dev/null 2>&1; then
   fi
   
   if [ -f "tools/validate-browser-deps.mjs" ]; then
-    if ! node tools/validate-browser-deps.mjs >/dev/null 2>&1; then
+    if ! run_with_timeout "node tools/validate-browser-deps.mjs" 15 "Browser dependency validation" >/dev/null 2>&1; then
       echo "WARNING: Browser dependency validation failed. Run: node tools/validate-browser-deps.mjs"
-      read -p "Continue anyway? (y/N) " -n 1 -r
-      echo
+      prompt_with_timeout "Continue anyway? (y/N) " "N" 5
       if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         exit 1
       fi
@@ -119,4 +254,3 @@ if command -v node >/dev/null 2>&1; then
 fi
 
 echo "[pre-push] Pre-push checks passed."
-

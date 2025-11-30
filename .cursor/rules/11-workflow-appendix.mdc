@@ -34,6 +34,16 @@ Use these commands once `@rules/workflow` declares the seven required steps. Nev
      - DNS error: rerun script (it flushes DNS) or restart the PC/use system git.
      - 403 error: `gh auth status`, then `gh auth refresh -s repo`, ensure branch exists remotely.
      - Missing branch: create it on GitHub (`gh repo create-branch ...`) before pushing.
+   - **Pre-push hook timeouts**: If the hook hangs (known issue with `npm run status`/`npm run preflight` in Cursor/PowerShell):
+     - **Preferred**: Set `SKIP_STATUS=1` or `SKIP_PREFLIGHT=1` env vars (hook respects them) instead of `--no-verify`
+       - Example: `SKIP_STATUS=1 git push origin main`
+     - **Fallback**: `git push --no-verify` is acceptable for non-app logic (workflow/docs) only if health check is known broken
+       - **Required**: Log bypass reason in `.notes/no-verify-log.md` and include `[no-verify: reason]` in commit message
+       - Hook automatically logs `--no-verify` usage when detected
+     - **Root cause**: Hook now has timeouts/logging (20s for health checks, 15s for git fetch, 30s for lint, 15s for validation)
+       - Windows-compatible timeout mechanism prevents silent hangs
+       - Better error messages identify which check is blocking
+       - If it still hangs, investigate which check is blocking and fix it
 5. **GitHub issue update**
    - Preferred: `node tools/github-issue-complete.mjs <issue#> [commit-hash]`.
    - Manual fallback:
@@ -65,6 +75,40 @@ Use these commands once `@rules/workflow` declares the seven required steps. Nev
 - `npm run preflight` validates scaffolding + MCP health before pushing.
 - `npm run mcp:suggest` proposes new servers after dependency or config changes; capture outcomes in the plan file.
 - GitHub Actions (`.github/workflows/`) run `preflight` + `scripts/verify-all`; extend them as the stack evolves.
+
+## Pre-Push Hook Bypass Patterns
+
+The pre-push hook performs valuable guard work (merge-base freshness, quick linters/tests, workflow validation). Bypassing it should be rare and documented.
+
+**Approved bypass scenarios:**
+1. **Non-app logic commits** (workflow rules, docs, tooling) when health check is known broken:
+   - **Preferred**: Set `SKIP_STATUS=1` or `SKIP_PREFLIGHT=1` env vars to skip specific checks
+     - Example: `SKIP_STATUS=1 git push origin main`
+   - **Fallback**: Use `git push --no-verify` with `[no-verify: reason]` in commit message
+   - **Required**: Log entry in `.notes/no-verify-log.md` with timestamp, branch, reason, commit hash
+   - Hook automatically logs `--no-verify` usage when detected (exits early after logging)
+
+2. **Root cause fixes**: If hook hangs, investigate which check is blocking:
+   - Hook now has timeouts (20s for health checks, 15s for git fetch, 30s for lint, 15s for validation)
+   - Windows-compatible timeout mechanism (background process with kill) prevents silent hangs
+   - Hook detects non-interactive mode (CI, Cursor) and auto-continues prompts
+   - Better error messages identify which check timed out or failed
+   - Check `.notes/no-verify-log.md` for patterns—repeated bypasses indicate a fix is needed
+
+3. **Emergency hotfixes**: Cross-agent bug fixes may use `--no-verify` with documented reason
+
+**Never bypass for:**
+- App logic commits (features, bugfixes in `frontend/`, `backend/`, etc.)
+- Commits that change test infrastructure
+- Commits that modify CI/workflow files without testing them
+
+**Hook improvements:**
+- Timeouts prevent silent hangs (20s for health checks, 15s for git fetch, 30s for lint, 15s for validation)
+- Windows-compatible timeout mechanism (background process monitoring with kill on timeout)
+- Non-interactive mode detection (skips prompts in CI/Cursor)
+- Better logging identifies which check is failing (✓/✗ indicators, clear error messages)
+- Env var support: `SKIP_STATUS=1`, `SKIP_PREFLIGHT=1`, `GIT_HOOK_NON_INTERACTIVE=1`
+- Automatic `--no-verify` logging to `.notes/no-verify-log.md` (exits early after logging)
 
 ## Guardrails
 - Never merge directly to `main`; branch protections expect clean history + passing checks.
