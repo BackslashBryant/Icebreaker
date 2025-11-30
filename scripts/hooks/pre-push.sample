@@ -18,13 +18,13 @@ prompt_with_timeout() {
   local prompt_text="$1"
   local default="${2:-N}"
   local timeout="${3:-5}"
-  
+
   if [ "$INTERACTIVE" = "false" ]; then
     echo "[pre-push] Non-interactive mode: auto-continuing (default: $default)"
     REPLY="$default"
     return 0
   fi
-  
+
   # Use timeout if available, otherwise fall back to regular read
   if command -v timeout >/dev/null 2>&1; then
     if timeout "$timeout" bash -c "read -p '$prompt_text' -n 1 -r; echo \$REPLY" 2>/dev/null; then
@@ -44,9 +44,9 @@ run_with_timeout() {
   local cmd="$1"
   local timeout="${2:-30}"
   local description="${3:-$cmd}"
-  
+
   echo "[pre-push] Running: $description (timeout: ${timeout}s)..."
-  
+
   # Try timeout command first (Linux/Git Bash with timeout)
   if command -v timeout >/dev/null 2>&1; then
     if timeout "$timeout" bash -c "$cmd" 2>&1; then
@@ -74,7 +74,7 @@ run_with_timeout() {
     local bg_pid=$!
     local elapsed=0
     local check_interval=1
-    
+
     while [ $elapsed -lt $timeout ]; do
       if ! kill -0 $bg_pid 2>/dev/null; then
         # Process finished
@@ -94,7 +94,7 @@ run_with_timeout() {
       sleep $check_interval
       elapsed=$((elapsed + check_interval))
     done
-    
+
     # Timeout reached - kill the process
     kill $bg_pid 2>/dev/null || true
     wait $bg_pid 2>/dev/null || true
@@ -149,10 +149,10 @@ if [ "$branch" != "main" ] && [ "$branch" != "master" ]; then
   if run_with_timeout "git fetch origin main" 15 "Fetch origin/main" >/dev/null 2>&1; then
     MERGE_BASE=$(git merge-base HEAD origin/main 2>/dev/null || echo "")
     MAIN_HEAD=$(git rev-parse origin/main 2>/dev/null || echo "")
-    
+
     if [ -n "$MERGE_BASE" ] && [ -n "$MAIN_HEAD" ]; then
       COMMITS_BEHIND=$(git rev-list --count "$MERGE_BASE".."$MAIN_HEAD" 2>/dev/null || echo "0")
-      
+
       if [ "$COMMITS_BEHIND" -gt 10 ]; then
         echo "ERROR: Branch is $COMMITS_BEHIND commits behind main."
         echo "  Merge base: $(git rev-parse --short $MERGE_BASE)"
@@ -248,7 +248,7 @@ if command -v node >/dev/null 2>&1; then
       fi
     fi
   fi
-  
+
   if [ -f "tools/validate-browser-deps.mjs" ]; then
     if ! run_with_timeout "node tools/validate-browser-deps.mjs" 15 "Browser dependency validation" >/dev/null 2>&1; then
       echo "WARNING: Browser dependency validation failed. Run: node tools/validate-browser-deps.mjs"
