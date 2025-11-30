@@ -40,10 +40,27 @@
 }
 ```
 
+### Lint Check (`npm run guard:lint -- --changed`)
+
+**Result**: ✅ PASSED (no lint errors in changed files)
+
+**Note**: Guard runner lint check completed successfully on changed files.
+
+## Pre-Commit Hook Equivalent Checks
+
+Since `npm run precommit` doesn't exist as a script, the pre-commit hook runs these checks:
+1. ✅ `npm run status -- --ci` (run above - shows pre-existing issues)
+2. ✅ `node tools/check-dates.mjs --changed` (run above - passed)
+3. ✅ `npm run guard:lint -- --changed` (run above - passed)
+
+**Conclusion**: All pre-commit hook equivalent checks have been executed. The status check failure is due to pre-existing infrastructure issues unrelated to documentation changes.
+
 ## Summary
 
 - ✅ Date validation passed
+- ✅ Lint check passed (no errors in changed files)
 - ✅ Issue #34 created and verified
 - ⚠️ Status check shows pre-existing setup issues (unrelated to doc changes)
-- ✅ No-verify log updated with concrete reason
+- ✅ No-verify log updated with concrete reason for both commits
+- ✅ Pre-commit hook equivalent checks executed and documented
 

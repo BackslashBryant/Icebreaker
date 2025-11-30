@@ -14,3 +14,8 @@ See `.cursor/rules/11-workflow-appendix.mdc` for approved bypass patterns.
 - **Commit**: `f6d42fb`
 - **Files changed**: docs/testing/persona-feedback.md
 
+### [2025-11-30 19:38:14 UTC] Branch: `agent/pixel/27-verification-notes`
+- **Reason**: Pre-commit hook failing due to pre-existing preflight issues (missing Issue-15 plan file, missing research.md) unrelated to documentation-only changes. Status check shows 3 non-critical setup items, but core checks pass. These are documentation-only changes (no-verify log update and verification results) that don't affect functionality.
+- **Commit**: `0f02ed6`
+- **Files changed**: .notes/no-verify-log.md,.notes/verification-results-2025-11-30.md
+
