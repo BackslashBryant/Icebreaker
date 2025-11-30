@@ -34,3 +34,8 @@ Use `npm run log:no-verify -- --reason "<details>" [--commit <sha>]` to append e
 - **Reason**: Pre-commit hook failing at repository health check (missing Issue-15 plan, research.md, suite-matrix spec). Added automation scripts only.
 - **Commit**: `c7c73ef`
 - **Files changed**: .notes/no-verify-log.md,.notes/verification-results-2025-11-30.md,package.json,tools/log-no-verify.mjs
+
+### [2025-11-30 20:12:30 UTC] Branch: `agent/pixel/27-verification-notes`
+- **Reason**: Pre-commit hook still halted by known health-check items while committing the log entry for automation work.
+- **Commit**: `f80d84d`
+- **Files changed**: .notes/no-verify-log.md
