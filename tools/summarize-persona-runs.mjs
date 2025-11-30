@@ -74,9 +74,11 @@ const projectRoot = path.resolve(__dirname, '..');
 
 /**
  * Read all telemetry files from artifacts/persona-runs/
+ * @param {Date|null} sinceDate - Optional: Only include files with timestamp >= sinceDate
+ * @param {Date|null} untilDate - Optional: Only include files with timestamp <= untilDate
  * @returns {TelemetryData[]}
  */
-function readTelemetryFiles() {
+function readTelemetryFiles(sinceDate = null, untilDate = null) {
   const runsDir = path.join(projectRoot, 'artifacts', 'persona-runs');
   
   if (!fs.existsSync(runsDir)) {
@@ -90,6 +92,26 @@ function readTelemetryFiles() {
     try {
       const content = fs.readFileSync(path.join(runsDir, file), 'utf-8');
       const parsed = JSON.parse(content);
+      
+      // Apply date filtering if specified
+      if (sinceDate || untilDate) {
+        if (!parsed.timestamp) {
+          // Skip files without timestamp (shouldn't happen, but handle gracefully)
+          console.warn(`Warning: File ${file} missing timestamp field, skipping`);
+          continue;
+        }
+        
+        const fileTimestamp = new Date(parsed.timestamp);
+        
+        // Check if file is within date range
+        if (sinceDate && fileTimestamp < sinceDate) {
+          continue; // File is before sinceDate, skip it
+        }
+        if (untilDate && fileTimestamp > untilDate) {
+          continue; // File is after untilDate, skip it
+        }
+      }
+      
       data.push(parsed);
     } catch (error) {
       console.error(`Error reading ${file}:`, error);
@@ -558,18 +580,79 @@ function generateFeedbackMarkdown(stats, frictionPatterns, insights) {
 }
 
 /**
+ * Parse CLI arguments for date filtering
+ * @returns {{sinceDate: Date|null, untilDate: Date|null}}
+ */
+function parseDateFilters() {
+  const args = process.argv.slice(2);
+  let sinceDate = null;
+  let untilDate = null;
+
+  // Parse --since <YYYY-MM-DD>
+  const sinceIndex = args.indexOf('--since');
+  if (sinceIndex !== -1 && args[sinceIndex + 1]) {
+    const sinceValue = args[sinceIndex + 1];
+    const parsed = new Date(sinceValue + 'T00:00:00.000Z');
+    if (!isNaN(parsed.getTime())) {
+      sinceDate = parsed;
+    } else {
+      console.error(`Warning: Invalid date format for --since: ${sinceValue}. Expected YYYY-MM-DD. Ignoring.`);
+    }
+  }
+
+  // Parse --window <N>d (e.g., --window 7d)
+  const windowIndex = args.indexOf('--window');
+  if (windowIndex !== -1 && args[windowIndex + 1]) {
+    const windowValue = args[windowIndex + 1];
+    const match = windowValue.match(/^(\d+)d$/i);
+    if (match) {
+      const days = parseInt(match[1], 10);
+      const now = new Date();
+      sinceDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+      // If --since was also specified, --window takes precedence
+      if (sinceIndex !== -1) {
+        console.log(`Note: --window overrides --since. Using last ${days} days.`);
+      }
+    } else {
+      console.error(`Warning: Invalid window format: ${windowValue}. Expected <N>d (e.g., 7d). Ignoring.`);
+    }
+  }
+
+  return { sinceDate, untilDate };
+}
+
+/**
  * Main execution
  */
 function main() {
-  console.log('Reading telemetry files...');
-  const data = readTelemetryFiles();
+  // Parse date filters from CLI arguments
+  const { sinceDate, untilDate } = parseDateFilters();
+  
+  // Log filtering info
+  if (sinceDate || untilDate) {
+    console.log('Reading telemetry files with date filtering...');
+    if (sinceDate) {
+      console.log(`  Filtering: Since ${sinceDate.toISOString().split('T')[0]}`);
+    }
+    if (untilDate) {
+      console.log(`  Filtering: Until ${untilDate.toISOString().split('T')[0]}`);
+    }
+  } else {
+    console.log('Reading telemetry files...');
+  }
+  
+  const data = readTelemetryFiles(sinceDate, untilDate);
 
   if (data.length === 0) {
-    console.log('No telemetry files found. Run persona tests first.');
+    if (sinceDate || untilDate) {
+      console.log('No telemetry files found in specified date range. Try without date filters or run persona tests.');
+    } else {
+      console.log('No telemetry files found. Run persona tests first.');
+    }
     return;
   }
 
-  console.log(`Found ${data.length} telemetry files`);
+  console.log(`Found ${data.length} telemetry files${sinceDate || untilDate ? ' (filtered)' : ''}`);
 
   const stats = aggregateStats(data);
   const frictionPatterns = identifyFrictionPatterns(data);
