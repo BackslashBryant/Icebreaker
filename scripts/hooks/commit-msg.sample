@@ -64,7 +64,7 @@ if [ -n "${SKIP_STATUS:-}" ] || [ -n "${SKIP_LOCK_CHECK:-}" ] || [ -n "${SKIP_PR
     echo "Amend the commit message to include the [no-verify: <reason>] tag, or remove SKIP_* flags."
     exit 1
   fi
-  
+
   # Validate the reason is non-empty
   if echo "$commit_msg" | grep -qE '\[no-verify:\s*\]'; then
     echo ""
