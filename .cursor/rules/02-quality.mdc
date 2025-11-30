@@ -217,11 +217,15 @@ async function loadSentry() {
   - **NEVER** run git commands from parent directories or outside the repository
 - One issue/task per branch; name it `agent/<agent>/<issue>-<slug>` (preferred) or `feat/<issue>-<slug>` (fallback).
 - Keep commits scoped and reference the issue ID in the message: `feat: Complete Issue #X - [description]`.
-- **When completing a feature** (MANDATORY workflow - NO EXCEPTIONS):
-  1. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
-  2. **MANDATORY**: Push to GitHub: `git push -u origin agent/<agent>/<issue>-<slug>` (if auth fails, use credential helper: `git config --global credential.helper manager-core`)
-  3. **MANDATORY**: Update GitHub issue with completion comment (test results, verification summary, branch name, commit hash)
-  4. **MANDATORY**: Update GitHub issue labels: Add `status:done`, remove `status:in-progress` (if present)
+- **When completing a feature** (MANDATORY workflow - NO EXCEPTIONS - complete ALL 7 steps):
+  1. Update plan-status file (mark complete, rename to COMPLETE, fill Outcome section)
+  2. Update `.notes/features/current.json` (set status to "complete")
+  3. Commit all changes with message referencing issue: `feat: Complete Issue #X - [description]`
+  4. **MANDATORY**: Push to GitHub: `git push -u origin agent/<agent>/<issue>-<slug>` (if auth fails, use credential helper: `git config --global credential.helper manager-core`)
+  5. **MANDATORY**: Close GitHub issue: `node tools/github-issue-complete.mjs <issue#>` (or fallback: comment + label + close)
+  6. **MANDATORY**: Sync plan file to main: `git checkout main && git pull origin main && git checkout <branch> -- Docs/plans/Issue-<#>-plan-status-COMPLETE.md && git commit -m "docs: Add Issue #<#> completion plan" && git push origin main`
+  7. **MANDATORY**: Switch back to main branch: `git checkout main`
+  - See `.cursor/rules/01-workflow.mdc` Section 6 for detailed instructions
 - Use `gh` CLI for branch creation, issue comments, and label updates. Terminal git is used for commits and pushes.
 - Ask before committing (surface the staged diff and test results for approval), but pushing and issue updates are mandatory when completing a feature.
 - Merge cleanly (squash/rebase) after quality gates are green and the ticket is updated.
