@@ -145,9 +145,18 @@
 
 **Performance Notes**:
 - Profile screen optimized to use `setupSession()` instead of full onboarding flow (avoids repeating onboarding 24 times)
-- Total test count: 192 tests (8 screens × 24 combinations)
+- Total test count: 192 tests (8 screens × 24 combinations) for full matrix
 - Expected runtime: ~30-60 minutes for full matrix (depends on CI resources)
 - Recommendation: Run full matrix in nightly CI, use subset (e.g., mobile viewport only) for PR checks
+
+**Subset Selection**:
+- Environment variables allow filtering combinations for CI:
+  - `THEME_MATRIX_VIEWPORT`: Comma-separated viewport names (e.g., "mobile,desktop")
+  - `THEME_MATRIX_THEME`: Comma-separated themes (e.g., "light")
+  - `THEME_MATRIX_MOTION`: Comma-separated motion settings (e.g., "no-preference")
+  - `THEME_MATRIX_CONTRAST`: Comma-separated contrast settings (e.g., "off")
+- Example PR subset: `THEME_MATRIX_VIEWPORT=mobile,desktop THEME_MATRIX_THEME=light` (16 tests per screen = 128 total)
+- Example minimal subset: `THEME_MATRIX_VIEWPORT=mobile THEME_MATRIX_THEME=light THEME_MATRIX_MOTION=no-preference THEME_MATRIX_CONTRAST=off` (8 tests per screen = 64 total)
 
 ### Checkpoint 4: Update Documentation
 **Owner**: @Muse 🎨
