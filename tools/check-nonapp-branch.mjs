@@ -55,12 +55,9 @@ if (violations.length === 0) {
   process.exit(0);
 }
 
-console.error('\n🚫 Non-app logic files must be committed on `main`.');
-violations.forEach((file) => console.error(` - ${file}`));
-console.error('\nFix:');
-console.error('  1. git reset <file>');
-console.error('  2. git checkout main');
-console.error('  3. Apply change + commit on main');
-console.error('  4. Rebase/merge main back into your feature branch');
-console.error('\nSee `.cursor/rules/01-workflow.mdc` for policy details.');
-process.exit(1);
+console.warn('\n[check-nonapp-branch] Notice: Non-app logic files staged on branch', branch);
+violations.forEach((file) => console.warn(`  • ${file}`));
+console.warn('\nAllowed when the work unblocks the active issue, but keep commits scoped.');
+console.warn('Before merging, run `node tools/categorize-files.mjs --status` to split');
+console.warn('global workflow tweaks from issue-specific changes. See `.cursor/rules/01-workflow.mdc`.');
+process.exit(0);

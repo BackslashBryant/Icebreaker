@@ -85,6 +85,11 @@ async function loadSentry() {
 - **For comprehensive reviews**: Use domain team commands (`/team-testing`, `/team-security`, `/team-accessibility`, `/team-userexperience`) when multiple perspectives are needed.
 - **Before release**: Use `/team-release` for final readiness check (tests, security, docs).
 
+## Automated Verification Logging
+- `npm run precommit` (now backed by `tools/run-precommit.mjs`) runs the health check, date validator, and lint runner, then writes a structured artifact to `artifacts/verification/precommit-<timestamp>.json` and `artifacts/verification/latest.json`.
+- Reference the JSON artifact path in status updates instead of recreating terminal output in Markdown. Reviewers can open the file to audit command stdout/stderr.
+- If a hook must be bypassed, add `[no-verify: <reason>]` to the commit message; the `post-commit` hook records the entry automatically via `npm run log:no-verify`.
+
 ## CI Expectations
 - `Template CI` currently runs the preflight check and best-effort verification helper.
 - Extend the workflow once your stack is generated (e.g., add matrix jobs for frontend/backend services) and hook in any new verification commands you introduced.

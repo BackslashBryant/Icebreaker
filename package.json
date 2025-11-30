@@ -4,7 +4,7 @@
   "private": true,
   "description": "Icebreaker - A proximity-based ephemeral chat application for connecting people nearby",
   "scripts": {
-    "precommit": "npm run status -- --ci && node ./tools/check-dates.mjs --changed && npm run guard:lint -- --changed",
+    "precommit": "node ./tools/run-precommit.mjs",
     "log:no-verify": "node ./tools/log-no-verify.mjs",
     "preflight": "node ./tools/preflight.mjs",
     "check:dependencies": "node ./tools/check-dependencies.mjs",

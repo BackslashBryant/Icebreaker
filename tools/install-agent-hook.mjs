@@ -31,6 +31,11 @@ const hooks = [
     target: path.join(gitHooksDir, 'post-merge'),
   },
   {
+    name: 'post-commit',
+    sample: path.join(repoRoot, 'scripts', 'hooks', 'post-commit.sample'),
+    target: path.join(gitHooksDir, 'post-commit'),
+  },
+  {
     name: 'pre-push',
     sample: path.join(repoRoot, 'scripts', 'hooks', 'pre-push.sample'),
     target: path.join(gitHooksDir, 'pre-push'),

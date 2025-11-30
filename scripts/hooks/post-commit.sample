@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Auto-log no-verify usage by parsing the latest commit message for
+# `[no-verify: <reason>]`. Install via `npm run agents:install-hook`.
+
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  exit 0
+fi
+
+last_message=$(git log -1 --pretty=%B | tr '\n' ' ')
+if [[ "$last_message" =~ \[no-verify:([^]]+)\] ]]; then
+  reason=$(echo "${BASH_REMATCH[1]}" | xargs)
+  if [ -n "$reason" ]; then
+    commit_sha=$(git rev-parse HEAD)
+    branch_name=$(git rev-parse --abbrev-ref HEAD)
+    echo "[post-commit] Recording no-verify reason: $reason"
+    npm run log:no-verify -- --reason "$reason" --commit "$commit_sha" --branch "$branch_name" >/dev/null || true
+  fi
+fi
+
+exit 0

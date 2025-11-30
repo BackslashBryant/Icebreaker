@@ -149,6 +149,12 @@ What fixes and UX improvements are needed based on persona testing insights repo
        - Telemetry collection: 1252 historical files (aggregated summary includes pre-fix data)
        - **Note**: Telemetry summary aggregates all historical runs, so high numbers include pre-fix data. Current test run confirms all fixes working.
 
+## Acceptance Tests
+
+- [ ] All 72 persona tests pass across suites (college-students, professionals, market-research, multi-user).
+- [ ] Telemetry confirms panic button visibility, visibility toggle detection, and error banner frequency improvements after rerun.
+- [ ] Privacy reassurance copy updates appear throughout onboarding (validated manually or via screenshots).
+
 ## Final Summary
 
 **Overall Status**: COMPLETE  

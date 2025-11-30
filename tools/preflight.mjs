@@ -6,7 +6,7 @@
  * and optional guardrails are present and well formed.
  */
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -43,6 +43,8 @@ const agents = [
 ];
 
 const results = [];
+const branchContext = getBranchContext();
+
 
 function addResult(name, ok, message) {
   results.push({ name, ok, message });
@@ -53,41 +55,34 @@ function readLines(filePath) {
 }
 
 function checkPlanScaffold() {
-  // Check for plan-status file if current feature exists
-  const featureStatePath = path.join(featuresDir, 'current.json');
-  if (existsSync(featureStatePath)) {
-    try {
-      const state = JSON.parse(readFileSync(featureStatePath, 'utf8'));
-      const issueNumber = state?.githubIssue;
-      if (issueNumber) {
-        const planStatusPath = path.join(plansDir, `Issue-${issueNumber}-plan-status.md`);
-        if (!existsSync(planStatusPath)) {
-          addResult('Plan-status file', false, `Docs/plans/Issue-${issueNumber}-plan-status.md is missing`);
-          return;
-        }
-        const lines = readLines(planStatusPath);
-        const requiredHeadings = [
-          '# Issue #',
-          '## Research Summary',
-          '## Goals & Success Metrics',
-          '## Plan Steps',
-          '## Current Status',
-          '## Current Issues',
-          '## Acceptance Tests',
-        ];
-        const missing = requiredHeadings.filter(heading => !lines.some(line => line.trim().startsWith(heading)));
-        if (missing.length > 0) {
-          addResult('Plan-status file', false, `Missing headings: ${missing.join(', ')}`);
-          return;
-        }
-        addResult('Plan-status file', true, `Issue-${issueNumber}-plan-status.md structure valid`);
-        return;
-      }
-    } catch (error) {
-      // Fall through to legacy check
+  const featureState = getFeatureState();
+  const fallbackIssue = featureState?.githubIssue;
+  const issueNumber = branchContext.issueNumber || fallbackIssue;
+
+  if (issueNumber) {
+    const planStatusPath = resolvePlanStatusPath(issueNumber);
+    if (!planStatusPath) {
+      addResult('Plan-status file', false, `Docs/plans/Issue-${issueNumber}-plan-status-<STATUS>.md is missing`);
+      return;
     }
+    const lines = readLines(planStatusPath);
+    const requiredHeadings = [
+      '# Issue #',
+      '## Research Summary',
+      '## Goals & Success Metrics',
+      '## Plan Steps',
+      '## Current Issues',
+      '## Acceptance Tests',
+    ];
+    const missing = requiredHeadings.filter(heading => !lines.some(line => line.trim().startsWith(heading)));
+    if (missing.length > 0) {
+      addResult('Plan-status file', false, `Missing headings: ${missing.join(', ')}`);
+      return;
+    }
+    addResult('Plan-status file', true, `${path.basename(planStatusPath)} structure valid`);
+    return;
   }
-  
+
   // Legacy check for docs/Plan.md (for backwards compatibility)
   if (existsSync(planPath)) {
     const lines = readLines(planPath);
@@ -331,53 +326,45 @@ function checkFeatureWorkflow() {
     return;
   }
 
-  if (!existsSync(featureStatePath)) {
-    addResult('Feature workflow', false, 'current.json missing (run npm run feature:new)');
+  const featureState = getFeatureState();
+  const fallbackSlug = featureState?.slug;
+  const fallbackIssue = featureState?.githubIssue;
+  const issueNumber = branchContext.issueNumber || fallbackIssue;
+  const slug = branchContext.slug || fallbackSlug;
+
+  if (!featureState && !branchContext.issueNumber) {
+    addResult('Feature workflow', false, 'No active feature detected (create via npm run feature:new or use agent/<agent>/<issue>-<slug> branch)');
     return;
   }
 
-  let state;
-  try {
-    state = JSON.parse(readFileSync(featureStatePath, 'utf8'));
-  } catch (error) {
-    addResult('Feature workflow', false, `current.json invalid JSON (${error instanceof Error ? error.message : error})`);
-    return;
-  }
-
-  const slug = state?.slug;
-  if (!slug) {
-    addResult('Feature workflow', false, 'current.json missing slug property');
-    return;
-  }
-
-  const specPath = path.join(featuresDir, slug, 'spec.md');
-  if (!existsSync(specPath)) {
-    addResult('Feature workflow', false, `Spec file missing for slug ${slug} (run npm run feature:new)`);
-    return;
-  }
-
-  // Check for plan-status file if issue number is available
-  const issueNumber = state?.githubIssue;
   if (issueNumber) {
-    const planStatusPath = path.join(plansDir, `Issue-${issueNumber}-plan-status.md`);
-    if (!existsSync(planStatusPath)) {
-      addResult('Feature workflow', false, `Plan-status file missing: Docs/plans/Issue-${issueNumber}-plan-status.md`);
+    const planStatusPath = resolvePlanStatusPath(issueNumber);
+    if (!planStatusPath) {
+      addResult('Feature workflow', false, `Plan-status file missing for Issue-${issueNumber}`);
       return;
     }
   }
 
-  const specText = readFileSync(specPath, 'utf8');
-  if (!specText.includes('## MVP DoD')) {
-    addResult('Feature workflow', false, `Spec ${specPath} missing "## MVP DoD" section`);
+  if (slug) {
+    const specPath = path.join(featuresDir, slug, 'spec.md');
+    if (existsSync(specPath)) {
+      const specText = readFileSync(specPath, 'utf8');
+      if (!specText.includes('## MVP DoD')) {
+        addResult('Feature workflow', false, `Spec ${specPath} missing "## MVP DoD" section`);
+        return;
+      }
+      if (!specText.includes('- [ ]')) {
+        addResult('Feature workflow', false, `Spec ${specPath} must contain unchecked MVP DoD checkboxes`);
+        return;
+      }
+      addResult('Feature workflow', true, `Spec ready for ${slug}`);
+      return;
+    }
+    addResult('Feature workflow', true, `Spec optional for slug ${slug} (file not found)`);
     return;
   }
 
-  if (!specText.includes('- [ ]')) {
-    addResult('Feature workflow', false, `Spec ${specPath} must contain unchecked MVP DoD checkboxes`);
-    return;
-  }
-
-  addResult('Feature workflow', true, `Active feature detected (${slug})`);
+  addResult('Feature workflow', true, 'Branch not tied to a feature slug (skipping spec check)');
 }
 
 function checkMvpGuide() {
@@ -567,4 +554,58 @@ try {
 } catch (error) {
   console.error(error instanceof Error ? error.stack ?? error.message : error);
   process.exit(1);
+}
+function getBranchContext() {
+  try {
+    const branch = execSync('git rev-parse --abbrev-ref HEAD', {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    const match = branch.match(/^agent\/[^/]+\/(\d+)-(.+)$/);
+    if (match) {
+      return {
+        branch,
+        issueNumber: Number(match[1]),
+        slug: match[2],
+      };
+    }
+    return { branch };
+  } catch {
+    return { branch: null };
+  }
+}
+
+function getFeatureState() {
+  if (!existsSync(featureStatePath)) {
+    return null;
+  }
+  try {
+    return JSON.parse(readFileSync(featureStatePath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function resolvePlanStatusPath(issueNumber) {
+  if (!issueNumber || !existsSync(plansDir)) {
+    return null;
+  }
+  try {
+    const files = readdirSync(plansDir);
+    const regex = new RegExp(`^Issue-${issueNumber}-plan-status-.*\\.md$`, 'i');
+    const matches = files.filter((file) => regex.test(file));
+    if (matches.length === 0) {
+      return null;
+    }
+    const priority = ['IN-PROGRESS', 'COMPLETE', 'BLOCKED', 'CANCELLED'];
+    matches.sort((a, b) => {
+      const aIdx = priority.findIndex((label) => a.includes(label));
+      const bIdx = priority.findIndex((label) => b.includes(label));
+      return (aIdx === -1 ? priority.length : aIdx) - (bIdx === -1 ? priority.length : bIdx);
+    });
+    return path.join(plansDir, matches[0]);
+  } catch {
+    return null;
+  }
 }

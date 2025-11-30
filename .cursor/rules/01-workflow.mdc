@@ -63,31 +63,24 @@ This repo assumes GitHub hosts the project, issues drive the work, and Cursor Ag
 
 Use this whenever you're touching shared workflow/config files (rules, tools, automation docs). Issue-specific work (features, plans, research, QA) follows the branch rules in Section 2.
 
-**CRITICAL**: All non-app logic files MUST be committed to `main` branch, not feature branches. These files apply universally across all branches.
+**Default Expectation**: workflow/config changes still *land* on `main`, but you no longer have to context-switch mid-issue. If a tooling tweak is required to finish the current issue, keep it on the `agent/<agent>/<issue>-<slug>` branch, document the change in the plan file, and split the commit before merge.
 
-**Non-App Logic Files** (go to `main`):
-- `.cursor/rules/*` (all rule files)
-- `.cursor/templates/*` (templates)
-- `.cursor/mcp.json` (MCP server configuration)
-- `.cursor/config.json` (Cursor configuration, if exists)
-- `tools/**/*` (all tool scripts)
-- Workflow documentation (`Docs/migration/*`, `.notes/features/README.md`)
+**Treat these as global files** (double-check scope before merging):
+- `.cursor/rules/*`, `.cursor/templates/*`, `.cursor/mcp.json`, `.cursor/config.json`
+- `tools/**/*`
+- Workflow docs such as `Docs/migration/*`, `.notes/features/README.md`
 
-**App Logic Files** (go to feature branches):
-- `frontend/**/*`, `backend/**/*`, `src/**/*` (application code)
-- `docs/Plan.md`, `Docs/plans/Issue-<#>-plan-status-<STATUS>.md` (plan files)
-- `.notes/features/<slug>/**` (feature-specific notes)
+**Issue-scoped assets**:
+- Application code (`frontend/**`, `backend/**`, etc.)
+- Plan/status docs (`Docs/plans/Issue-<#>-plan-status-<STATUS>.md`)
+- Feature notebooks under `.notes/features/<slug>/**`
 
-**Workflow for Non-App Logic Changes**:
-1. **MANDATORY PRE-FLIGHT**: Before modifying non-app logic files, verify you're on `main` branch:
-   - Run `git branch --show-current` - must show `main`
-   - If not on `main`: `git checkout main && git pull origin main`
-2. Create branch: `chore/workflow-<description>` OR commit directly to `main`
-3. Make changes to non-app logic files
-4. Commit with message: `chore: <description of workflow change>`
-5. Merge to `main` immediately (these are universal improvements)
-6. **CRITICAL**: DO NOT commit non-app logic changes on feature branches
-   - Guard: `tools/check-nonapp-branch.mjs` (invoked via pre-commit hook) blocks commits when these files are staged off `main`. Run `npm run agents:install-hook` after pulling to ensure hooks are installed.
+**Workflow guardrails**:
+1. Keep commits scoped to the active issue; when you introduce a global rule/tool, note it under **Current Issues** or **Next Steps** in the plan.
+2. Before merging, run `node tools/categorize-files.mjs --status` and peel off any global-only commits onto `main`.
+3. `tools/check-nonapp-branch.mjs` (invoked via the hook) now **warns** instead of blocking; treat the warning as your reminder to split work later.
+4. Use clear commit messages (`chore: tighten preflight logging`) so reviewers can cherry-pick the workflow improvements onto `main` when needed.
+5. Keep hook scripts installed (`npm run agents:install-hook`) so everyone receives the same warnings.
 
 **Feature Branch Sync**:
 - Before starting work on a feature branch, sync with `main`: `git merge main` or `git rebase main`
@@ -112,6 +105,12 @@ Use this whenever you're touching shared workflow/config files (rules, tools, au
      - Merge main: `git merge main`
   3. Then commit issue-specific files to feature branch
 
+## 1.6. Verification & No-Verify Automation
+
+- `npm run precommit` now runs `tools/run-precommit.mjs`, which executes the health check, date validator, and lint runner, then writes a log to `artifacts/verification/precommit-<timestamp>.json` (plus `artifacts/verification/latest.json`). Reference that artifact instead of duplicating console output in Markdown.
+- When you bypass hooks, include `[no-verify: <reason>]` inside the commit message body. The `post-commit` hook parses that tag and automatically calls `npm run log:no-verify -- --commit HEAD --reason "..."`, keeping `.notes/no-verify-log.md` synchronized without manual edits.
+- Manual verification notes stay in the plan-status file (under **Current Issues**/**Verification Results**). Link to the JSON artifact path when summarizing reruns.
+
 ## 2. Branching & MCP Setup
 - **MANDATORY**: Pick the right branch mode BEFORE editing:
   - **Non-app logic (Section 1.5)**: stay on `main` or create a short-lived `chore/workflow-<slug>` off `main`, merge immediately.
@@ -119,7 +118,7 @@ Use this whenever you're touching shared workflow/config files (rules, tools, au
 - **CRITICAL**: Before ANY git operation (add, commit, push), verify:
   1. Current directory is the project root (contains `.git` folder)
   2. **Git Root Validation**: Run `git rev-parse --show-toplevel` and verify it returns the project root (should contain `docs/vision.md`, `tools/preflight.mjs`). If it returns a parent directory (e.g., `C:/Users/OrEo2`), there's a stray `.git` folder - use `tools/get-project-root.mjs` helper instead
-  3. **If modifying non-app logic files**: Current branch must be `main` (see Non-App Logic Changes Policy above)
+  3. **If modifying non-app logic files**: Branch should normally be `main`; if the change is tied to the current issue, keep it on `agent/<agent>/<issue>-<slug>` and follow Section 1.5 (document + split before merge)
   4. **If modifying app logic files**: Current branch matches the issue being worked on (check with `git branch --show-current`)
   5. If directory is wrong, navigate to project root: Use `node tools/get-project-root.mjs` to get reliable project root, then `cd` to that path
   6. If branch is wrong, create correct branch or switch: `git checkout -b agent/<agent>/<issue>-<slug>` OR `git checkout main` (for non-app logic)

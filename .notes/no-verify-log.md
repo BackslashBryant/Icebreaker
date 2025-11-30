@@ -2,7 +2,7 @@
 
 This file logs instances where `--no-verify` was used to bypass git hooks.
 See `.cursor/rules/11-workflow-appendix.mdc` for approved bypass patterns.
-Use `npm run log:no-verify -- --reason "<details>" [--commit <sha>]` to append entries automatically.
+Use `npm run log:no-verify -- --reason "<details>" [--commit <sha>]` to append entries manually. The post-commit hook also records entries automatically when commit messages contain `[no-verify: <reason>]`.
 
 ## Log Entries
 
