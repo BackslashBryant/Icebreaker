@@ -20,13 +20,13 @@ import { SEL } from '../../utils/selectors';
 
 /**
  * Get theme matrix based on environment variables or default to all combinations
- * 
+ *
  * Environment variables:
  * - THEME_MATRIX_VIEWPORT: Comma-separated viewport names (e.g., "mobile,desktop")
  * - THEME_MATRIX_THEME: Comma-separated theme settings (e.g., "light,dark")
  * - THEME_MATRIX_MOTION: Comma-separated motion settings (e.g., "no-preference")
  * - THEME_MATRIX_CONTRAST: Comma-separated contrast settings (e.g., "off")
- * 
+ *
  * Examples:
  * - Full matrix: No env vars (defaults to all 24 combinations)
  * - PR subset: THEME_MATRIX_VIEWPORT=mobile,desktop THEME_MATRIX_THEME=light
@@ -42,29 +42,29 @@ function getFilteredThemeMatrix(): ThemeMatrixConfig[] {
   const viewports = process.env.THEME_MATRIX_VIEWPORT
     ? process.env.THEME_MATRIX_VIEWPORT.split(',').map(v => v.trim())
     : allViewports;
-  
+
   const themes = process.env.THEME_MATRIX_THEME
     ? process.env.THEME_MATRIX_THEME.split(',').map(t => t.trim()) as ('light' | 'dark')[]
     : allThemes;
-  
+
   const motions = process.env.THEME_MATRIX_MOTION
     ? process.env.THEME_MATRIX_MOTION.split(',').map(m => m.trim()) as ('reduce' | 'no-preference')[]
     : allMotions;
-  
+
   const contrasts = process.env.THEME_MATRIX_CONTRAST
     ? process.env.THEME_MATRIX_CONTRAST.split(',').map(c => c.trim()) as ('on' | 'off')[]
     : allContrasts;
 
   // Build filtered matrix
   const matrix: ThemeMatrixConfig[] = [];
-  
+
   for (const viewportName of viewports) {
     const viewport = require('../../utils/viewports').VIEWPORTS[viewportName];
     if (!viewport) {
       console.warn(`Viewport "${viewportName}" not found, skipping`);
       continue;
     }
-    
+
     for (const colorScheme of themes) {
       for (const reducedMotion of motions) {
         for (const highContrast of contrasts) {
@@ -80,7 +80,7 @@ function getFilteredThemeMatrix(): ThemeMatrixConfig[] {
       }
     }
   }
-  
+
   return matrix;
 }
 
