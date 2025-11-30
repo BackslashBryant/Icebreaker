@@ -2,6 +2,7 @@
 
 This file logs instances where `--no-verify` was used to bypass git hooks.
 See `.cursor/rules/11-workflow-appendix.mdc` for approved bypass patterns.
+Use `npm run log:no-verify -- --reason "<details>" [--commit <sha>]` to append entries automatically.
 
 ## Log Entries
 
@@ -20,7 +21,11 @@ See `.cursor/rules/11-workflow-appendix.mdc` for approved bypass patterns.
 - **Files changed**: .notes/no-verify-log.md,.notes/verification-results-2025-11-30.md
 
 ### [2025-11-30 19:58:48 UTC] Branch: `agent/pixel/27-verification-notes`
-- **Reason**: Not specified
+- **Reason**: Pre-commit hook failing due to same preflight issues (missing Issue-15 plan, missing research.md, suite-matrix spec) while converting manual verification notes to automated scripts. Documentation-only updates that do not touch runtime code.
 - **Commit**: `64a14e0`
 - **Files changed**: .notes/no-verify-log.md,.notes/verification-results-2025-11-30.md
 
+### [2025-11-30 20:03:48 UTC] Branch: `agent/pixel/27-verification-notes`
+- **Reason**: Pre-commit hook failing due to existing preflight issues while finalizing automated verification logs (no runtime changes). All required status/date/lint checks recorded manually until hook passes again.
+- **Commit**: `e85fa0a`
+- **Files changed**: .notes/no-verify-log.md,.notes/verification-results-2025-11-30.md
