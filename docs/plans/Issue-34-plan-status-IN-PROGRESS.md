@@ -213,8 +213,10 @@ How should we implement date-based filtering for persona telemetry summaries to 
     - Fixed: Enter Radar button test (select vibe first, then click)
     - All Issue #26 accessibility tests now passing
   - E2E other tests: ⚠️ 3 failures in `tests/e2e/block-report.spec.ts` (pre-existing, unrelated to Issue #34)
-    - Issue: Block/Report functionality tests failing
-    - **Not related to Issue #34**: These are safety control tests
+    - Issue: Block/Report functionality tests failing due to chat setup requirements
+    - Tests updated to use shared onboarding helper (commit pending)
+    - **Not related to Issue #34**: These are safety control integration tests requiring proper WebSocket/chat setup
+    - **Action**: These failures should be addressed in a separate issue focused on chat/block-report test infrastructure
   - E2E performance tests: ⚠️ 1 interrupted test in `tests/e2e/performance.spec.ts` (pre-existing)
     - Issue: WebSocket/radar update test interrupted
     - **Not related to Issue #34**: This is a performance test
