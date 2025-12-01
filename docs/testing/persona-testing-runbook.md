@@ -1,7 +1,7 @@
 # Persona Testing Runbook
 
 **Last Updated**: 2025-01-27  
-**Owner**: QA Team (@Pixel üñ•Ô∏è)
+**Owner**: QA Team (@Pixel =É˚—n+≈)
 
 This runbook provides step-by-step instructions for running the persona testing suite, collecting telemetry data, and generating actionable UX insights.
 
@@ -61,12 +61,25 @@ ls artifacts/persona-runs/*.json | wc -l
 
 ```bash
 # From project root
+# Generate summary from all telemetry files (default)
 node tools/summarize-persona-runs.mjs
+
+# Generate summary from files after a specific date (recommended for verification)
+node tools/summarize-persona-runs.mjs --since 2025-11-30
+
+# Generate summary from files in last 7 days
+node tools/summarize-persona-runs.mjs --window 7d
 ```
+
+**Date Filtering Options**:
+- `--since <YYYY-MM-DD>`: Only include telemetry files with timestamp on or after the specified date
+- `--window <N>d`: Only include telemetry files from the last N days (e.g., `--window 7d` for last 7 days)
+- **Default**: No filtering (includes all telemetry files)
 
 **Output**:
 - Summary appended to `docs/testing/persona-feedback.md`
 - Console output showing top friction patterns and actionable insights
+- Filtering info displayed when date filters are used
 
 ### Step 5: Review Generated Reports
 
@@ -121,6 +134,19 @@ node tools/summarize-persona-runs.mjs
 1. Verify Node.js version (18+ required)
 2. Check script syntax (should be valid JavaScript, not TypeScript)
 3. Verify all dependencies are installed
+
+### Date Filtering Issues
+
+**Problem**: Date filters not working or invalid date format errors
+
+**Solution**:
+1. **Invalid date format**: Use `YYYY-MM-DD` format for `--since` (e.g., `2025-11-30`)
+2. **Invalid window format**: Use `<N>d` format for `--window` (e.g., `7d` for 7 days, not `7` or `7days`)
+3. **No files in range**: If filtering returns 0 files, try:
+   - Check date range (files may be outside specified window)
+   - Remove date filters to see all files: `node tools/summarize-persona-runs.mjs`
+   - Verify telemetry files have `timestamp` field (should be ISO format)
+4. **Both flags specified**: `--window` takes precedence over `--since` if both are provided
 
 ---
 
@@ -294,6 +320,31 @@ npm test -- tests/e2e/personas
 # (Update insight report if issues resolved)
 ```
 
+### Verification Workflow (After Fixes)
+
+When verifying that fixes resolved issues, use date filtering to exclude stale historical data:
+
+```bash
+# 1. Note the current date before running tests
+# Example: 2025-11-30
+
+# 2. Run persona tests to generate new telemetry
+cd tests
+npm test -- tests/e2e/personas
+
+# 3. Generate summary with date filter (only includes post-fix data)
+cd ..
+node tools/summarize-persona-runs.mjs --since 2025-11-30
+
+# 4. Review summary - should show only issues from post-fix runs
+# If fixes worked, critical issues should be resolved in filtered summary
+```
+
+**Why use date filtering for verification?**
+- Historical telemetry (pre-fix) can mask improvements
+- Filtered summaries show only post-fix data, making it clear if fixes worked
+- Example: After Issue #27 fixes, unfiltered summary showed 1,252 historical runs with issues, but filtered summary (--since 2025-11-30) showed only 80 post-fix runs
+
 ---
 
 ## Related Documentation
@@ -309,7 +360,7 @@ npm test -- tests/e2e/personas
 ## Support
 
 For questions or issues:
-- **QA Team**: @Pixel üñ•Ô∏è
+- **QA Team**: @Pixel =É˚—n+≈
 - **Product Team**: For prioritization questions
 - **Engineering Team**: For implementation questions
 
