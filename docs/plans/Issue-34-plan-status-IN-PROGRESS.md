@@ -188,32 +188,26 @@ How should we implement date-based filtering for persona telemetry summaries to 
 
 **Documentation Status**: 
 - ✅ Code implementation complete and committed (commit `69c6421`)
-- ⚠️ Runbook documentation (`docs/testing/persona-testing-runbook.md`) has been updated in working directory with:
-  - Date filtering examples in Step 4 (lines 64-77): `--since` and `--window` flag examples
-  - Date Filtering Options section (lines 74-77): Flag descriptions and default behavior
-  - Date Filtering Issues troubleshooting section (lines 139-150): Error handling and solutions
-  - Verification Workflow section (lines 350-373): Step-by-step verification process
-- ⚠️ **Git Issue**: Git is not detecting the runbook changes despite file content differences
-  - File on disk has documentation, but `git diff` shows no changes
-  - `git status` reports file as clean
-  - Possible causes: git index issue, line ending normalization, or file system sync issue
-- **Action Required**: 
-  - Runbook documentation needs to be committed in separate commit
-  - May require manual git add or investigation of git configuration
-  - Documentation is complete and ready, just needs to be committed
+- ✅ Runbook documentation committed (commit `55ab45e`): 
+  - Date filtering examples in Step 4: `--since` and `--window` flag examples
+  - Date Filtering Options section: Flag descriptions and default behavior
+  - Date Filtering Issues troubleshooting section: Error handling and solutions
+  - Verification Workflow section: Step-by-step verification process
 
 **Test Verification**:
 - ⚠️ `npm run test` fails due to path-with-spaces issue in `tools/guard-runner.mjs` (pre-existing infrastructure issue)
-  - Error: "Cannot find module 'C:\Users\OrEo2\Desktop\DevOps\1.'" (path truncated at space)
+  - Error: "Cannot find module 'C:\Users\OrEo2\Desktop\DevOps\1.'" (path truncated at space in `tools/guard-runner.mjs` line 46)
   - This is a known infrastructure issue, not related to Issue #34 changes
+  - **Note**: This blocks automated test verification but does not affect manual testing or Issue #34 functionality
 - ✅ Manual testing completed: `--since` and `--window` flags work correctly
-  - Tested: `--since 2025-11-30` filters to 80 files (from 1,252 total)
-  - Tested: `--window 7d` filters to 848 files (last 7 days)
-  - Tested: Invalid dates show warnings and fall back gracefully
-  - Tested: Backward compatible (no flags = all files)
+  - Tested: `--since 2025-11-30` filters to 80 files (from 1,252 total) ✅
+  - Tested: `--window 7d` filters to 848 files (last 7 days) ✅
+  - Tested: Invalid dates show warnings and fall back gracefully ✅
+  - Tested: Backward compatible (no flags = all files) ✅
 - **Action Required**: 
-  - Fix path issue in `tools/guard-runner.mjs` or run tests from directory without spaces
-  - Document path issue as separate infrastructure task if blocking
+  - Fix path issue in `tools/guard-runner.mjs` (quote `repoRoot` in path.join calls) or run tests from directory without spaces
+  - Document path issue as separate infrastructure task (Issue #35 or similar)
+  - Automated test verification pending until path issue resolved, but manual testing confirms functionality
 
 ## Team Review
 
