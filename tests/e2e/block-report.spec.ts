@@ -17,12 +17,10 @@ test.describe("Block/Report Safety Controls", () => {
     await completeOnboarding(page);
 
     // Navigate to chat (simulate having a chat partner)
-    // Set up chat state via session storage (Playwright doesn't support state in goto)
+    // Set up chat state via session storage (Chat page expects these specific keys)
     await page.addInitScript(() => {
-      sessionStorage.setItem("icebreaker_chat_partner", JSON.stringify({
-        sessionId: "target-session-123",
-        handle: "TestUser",
-      }));
+      sessionStorage.setItem("icebreaker:chat:partnerSessionId", "target-session-123");
+      sessionStorage.setItem("icebreaker:chat:partnerHandle", "TestUser");
     });
     await page.goto("/chat", { waitUntil: "networkidle" });
 
@@ -60,12 +58,10 @@ test.describe("Block/Report Safety Controls", () => {
     await completeOnboarding(page);
 
     // Navigate to chat with mock partner
-    // Set up chat state via session storage (Playwright doesn't support state in goto)
+    // Set up chat state via session storage (Chat page expects these specific keys)
     await page.addInitScript(() => {
-      sessionStorage.setItem("icebreaker_chat_partner", JSON.stringify({
-        sessionId: "target-session-456",
-        handle: "ReportTarget",
-      }));
+      sessionStorage.setItem("icebreaker:chat:partnerSessionId", "target-session-456");
+      sessionStorage.setItem("icebreaker:chat:partnerHandle", "ReportTarget");
     });
     await page.goto("/chat", { waitUntil: "networkidle" });
 
@@ -108,13 +104,12 @@ test.describe("Block/Report Safety Controls", () => {
     // Wait for radar content to be available (people list or empty state)
     // WebSocket connection status may not be immediately visible - wait for actual content instead
     await page.waitForLoadState("networkidle", { timeout: 10000 });
-    await expect(
-      page.getByRole("main")
-        .or(page.locator("canvas"))
-        .or(page.locator("ul[role='list']"))
-        .or(page.getByText(/No one nearby/i))
-        .or(page.getByText(/radar/i))
-    ).toBeVisible({ timeout: 10000 });
+    // Use first() to avoid strict mode violation (multiple elements match)
+    const radarContent = page.getByRole("main")
+      .or(page.locator("canvas"))
+      .or(page.locator("ul[role='list']"))
+      .or(page.getByText(/No one nearby/i));
+    await expect(radarContent.first()).toBeVisible({ timeout: 10000 });
 
     // Try to open PersonCard by clicking a person (if available)
     // For E2E, we'll check if people are available
@@ -288,13 +283,12 @@ test.describe("Block/Report Safety Controls", () => {
     // Complete onboarding
     await completeOnboarding(page);
 
-    // Navigate to chat
-    await page.goto("/chat", {
-      state: {
-        partnerSessionId: "test-session",
-        partnerHandle: "TestUser",
-      },
+    // Navigate to chat (set up chat state via session storage)
+    await page.addInitScript(() => {
+      sessionStorage.setItem("icebreaker:chat:partnerSessionId", "test-session");
+      sessionStorage.setItem("icebreaker:chat:partnerHandle", "TestUser");
     });
+    await page.goto("/chat", { waitUntil: "networkidle" });
 
     // Wait for chat header
     await expect(page.getByText("TestUser")).toBeVisible({ timeout: 5000 });
@@ -346,13 +340,12 @@ test.describe("Block/Report Safety Controls", () => {
     // Complete onboarding
     await completeOnboarding(page);
 
-    // Navigate to chat
-    await page.goto("/chat", {
-      state: {
-        partnerSessionId: "test-session",
-        partnerHandle: "TestUser",
-      },
+    // Navigate to chat (set up chat state via session storage)
+    await page.addInitScript(() => {
+      sessionStorage.setItem("icebreaker:chat:partnerSessionId", "test-session");
+      sessionStorage.setItem("icebreaker:chat:partnerHandle", "TestUser");
     });
+    await page.goto("/chat", { waitUntil: "networkidle" });
 
     // Wait for chat header
     await expect(page.getByText("TestUser")).toBeVisible({ timeout: 5000 });
