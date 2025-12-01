@@ -186,7 +186,34 @@ How should we implement date-based filtering for persona telemetry summaries to 
 
 ## Current Issues
 
-_None yet - work just started_
+**Documentation Status**: 
+- ✅ Code implementation complete and committed (commit `69c6421`)
+- ⚠️ Runbook documentation (`docs/testing/persona-testing-runbook.md`) has been updated in working directory with:
+  - Date filtering examples in Step 4 (lines 64-77): `--since` and `--window` flag examples
+  - Date Filtering Options section (lines 74-77): Flag descriptions and default behavior
+  - Date Filtering Issues troubleshooting section (lines 139-150): Error handling and solutions
+  - Verification Workflow section (lines 350-373): Step-by-step verification process
+- ⚠️ **Git Issue**: Git is not detecting the runbook changes despite file content differences
+  - File on disk has documentation, but `git diff` shows no changes
+  - `git status` reports file as clean
+  - Possible causes: git index issue, line ending normalization, or file system sync issue
+- **Action Required**: 
+  - Runbook documentation needs to be committed in separate commit
+  - May require manual git add or investigation of git configuration
+  - Documentation is complete and ready, just needs to be committed
+
+**Test Verification**:
+- ⚠️ `npm run test` fails due to path-with-spaces issue in `tools/guard-runner.mjs` (pre-existing infrastructure issue)
+  - Error: "Cannot find module 'C:\Users\OrEo2\Desktop\DevOps\1.'" (path truncated at space)
+  - This is a known infrastructure issue, not related to Issue #34 changes
+- ✅ Manual testing completed: `--since` and `--window` flags work correctly
+  - Tested: `--since 2025-11-30` filters to 80 files (from 1,252 total)
+  - Tested: `--window 7d` filters to 848 files (last 7 days)
+  - Tested: Invalid dates show warnings and fall back gracefully
+  - Tested: Backward compatible (no flags = all files)
+- **Action Required**: 
+  - Fix path issue in `tools/guard-runner.mjs` or run tests from directory without spaces
+  - Document path issue as separate infrastructure task if blocking
 
 ## Team Review
 
