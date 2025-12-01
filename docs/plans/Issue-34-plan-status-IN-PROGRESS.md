@@ -212,10 +212,14 @@ How should we implement date-based filtering for persona telemetry summaries to 
     - Fixed: Tab order test (focus checkbox directly then tab to button)
     - Fixed: Enter Radar button test (select vibe first, then click)
     - All Issue #26 accessibility tests now passing
-  - E2E other tests: ⚠️ 3 failures in `tests/e2e/block-report.spec.ts` (pre-existing, unrelated to Issue #34)
-    - Issue: Block/Report functionality tests failing due to chat setup requirements
-    - Tests updated to use shared onboarding helper (commit pending)
-    - **Not related to Issue #34**: These are safety control integration tests requiring proper WebSocket/chat setup
+  - E2E other tests: ⚠️ 3 failures in `tests/e2e/block-report.spec.ts` (test infrastructure issues, unrelated to Issue #34)
+    - Issue: Block/Report functionality tests failing on menu interactions
+    - Tests updated to use shared onboarding helper (commit `0322b2c`)
+    - Tests updated with correct sessionStorage keys (commit pending)
+    - Tests now complete onboarding and reach chat page successfully
+    - **Current failure**: Menu button interactions not working (requires WebSocket/chat state setup)
+    - **Not related to Issue #34**: These are safety control integration tests requiring proper WebSocket/chat infrastructure
+    - **Test log**: `artifacts/test-logs/all-tests-2025-12-01T03-54-30.log`
     - **Action**: These failures should be addressed in a separate issue focused on chat/block-report test infrastructure
   - E2E performance tests: ⚠️ 1 interrupted test in `tests/e2e/performance.spec.ts` (pre-existing)
     - Issue: WebSocket/radar update test interrupted
