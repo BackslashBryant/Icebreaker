@@ -1,7 +1,7 @@
-# Persona Testing Runbook
+ï»¿# Persona Testing Runbook
 
 **Last Updated**: 2025-01-27  
-**Owner**: QA Team (@Pixel =ƒûÑn+Å)
+**Owner**: QA Team (@Pixel )
 
 This runbook provides step-by-step instructions for running the persona testing suite, collecting telemetry data, and generating actionable UX insights.
 
@@ -360,7 +360,7 @@ node tools/summarize-persona-runs.mjs --since 2025-11-30
 ## Support
 
 For questions or issues:
-- **QA Team**: @Pixel =ƒûÑn+Å
+- **QA Team**: @Pixel 
 - **Product Team**: For prioritization questions
 - **Engineering Team**: For implementation questions
 

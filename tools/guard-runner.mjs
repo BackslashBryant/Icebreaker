@@ -45,7 +45,9 @@ switch (task) {
   case 'test': {
     const runTestsScript = path.join(repoRoot, 'scripts', 'run-tests.mjs');
     if (existsSync(runTestsScript)) {
-      run('node', [runTestsScript]);
+      // Use absolute path to handle spaces in directory names
+      const absoluteScriptPath = path.resolve(runTestsScript);
+      run('node', [absoluteScriptPath]);
     } else if (hasBin('jest')) {
       run('npx', ['--no-install', 'jest', '--runInBand']);
     } else if (existsSync(path.join(repoRoot, 'scripts', 'verify-all'))) {
