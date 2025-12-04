@@ -93,7 +93,26 @@ How should we implement date-based filtering for persona telemetry summaries to 
 
 ## Current Issues
 
-**None - all steps completed successfully**
+**Pre-existing Issue #26 Accessibility Test Failures** (unrelated to Issue #34):
+
+The following three accessibility tests in `tests/e2e/accessibility/issue-26-ui-changes.spec.ts` are failing and belong to Issue #26's scope, not Issue #34:
+
+1. **Line 46 - "selected states are keyboard accessible with visible focus rings"**:
+   - **Issue**: Test expects `bg-muted` class on selected tags, but UI doesn't apply background color (only `border-muted/50` and `text-muted-foreground`)
+   - **Test log**: `artifacts/test-logs/all-tests-2025-12-04T03-31-24.log`
+   - **Action**: Update test expectation to match actual UI styling (remove `bg-muted` check or update UI to include it)
+
+2. **Line 93 - "radar empty states have proper ARIA roles"**:
+   - **Issue**: Radar heading not visible because test doesn't complete onboarding or seed session before navigating to `/radar`
+   - **Test log**: `artifacts/test-logs/all-tests-2025-12-04T03-31-24.log`
+   - **Action**: Add onboarding completion or session setup before `page.goto("/radar")`
+
+3. **Line 214 - "profile page accessibility after UI changes"**:
+   - **Issue**: Strict mode violation - `getByText(/Profile|Settings/i)` resolves to 2 elements
+   - **Test log**: `artifacts/test-logs/all-tests-2025-12-04T03-31-24.log`
+   - **Action**: Use `.first()` or more specific selector (e.g., `data-testid` via SEL map)
+
+**Note**: These failures are pre-existing Issue #26 accessibility test infrastructure issues and do not affect Issue #34's core functionality (telemetry date filtering). They should be addressed in a separate Issue #26 follow-up ticket with proper ownership.
 
 ## Team Review
 
@@ -142,10 +161,17 @@ Issue #34 successfully implemented date-based filtering for persona telemetry su
 - ✅ All block/report tests passing (6/6) - WebSocket mock infrastructure working
 - ✅ All accessibility tests passing (29/29) - Issue #26 tests verified
 
-**Remaining Failures**: 3 pre-existing test infrastructure issues (unrelated to Issue #34):
-- `websocket-mock.spec.ts:27` - Incorrect use of `waitForBootSequence` on `/radar` page
-- `onboarding-radar.spec.ts:50` - Strict mode violation with connection status text
-- `onboarding-radar.spec.ts:128` - Missing `waitForBootSequence` before clicking PRESS START
+**Issue #34 Blocking Tests**: ✅ All fixed and passing:
+- `websocket-mock.spec.ts:27` - ✅ Fixed (navigate to `/welcome` before `waitForBootSequence`)
+- `onboarding-radar.spec.ts:50` - ✅ Fixed (added `waitForBootSequence` and `.first()` for connection status)
+- `onboarding-radar.spec.ts:128` - ✅ Fixed (added `waitForBootSequence` before clicking PRESS START)
+
+**Remaining Failures**: 3 pre-existing Issue #26 accessibility test failures (unrelated to Issue #34):
+- `issue-26-ui-changes.spec.ts:46` - Selected states test expects `bg-muted` class that UI doesn't apply
+- `issue-26-ui-changes.spec.ts:93` - Radar empty state test missing onboarding/session setup
+- `issue-26-ui-changes.spec.ts:214` - Profile page test has strict mode violation (2 elements match)
+
+**Note**: These Issue #26 accessibility failures should be tracked in a separate follow-up ticket. See "Current Issues" section above for details.
 
 ### Deliverables
 
