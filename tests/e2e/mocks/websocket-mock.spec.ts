@@ -103,8 +103,9 @@ test.describe('WebSocket Mock Infrastructure', () => {
 
     // Reset mock
     await page.evaluate(() => {
-      if ((window as any).__WS_MOCK_RESET__) {
-        (window as any).__WS_MOCK_RESET__();
+      const mock = (window as any).__WS_MOCK__;
+      if (mock && typeof mock.reset === 'function') {
+        mock.reset();
       }
     });
 

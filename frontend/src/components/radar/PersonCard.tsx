@@ -53,6 +53,30 @@ export function PersonCard({ person, open, onClose, onChatRequest, userTags = []
     }
   }, [open]);
 
+  useEffect(() => {
+    if (typeof window === "undefined" || !(window as any).__E2E_TESTING__) {
+      return;
+    }
+    const hookTarget = ((window as any).__ICEBREAKER_E2E__ = (window as any).__ICEBREAKER_E2E__ || {});
+    hookTarget.openPersonCardMenu = () => setShowMenu(true);
+    hookTarget.openPersonCardBlockDialog = () => {
+      setShowMenu(false);
+      setShowBlockDialog(true);
+    };
+    hookTarget.openPersonCardReportDialog = () => {
+      setShowMenu(false);
+      setShowReportDialog(true);
+    };
+    return () => {
+      if ((window as any).__ICEBREAKER_E2E__) {
+        delete (window as any).__ICEBREAKER_E2E__.openPersonCardMenu;
+        delete (window as any).__ICEBREAKER_E2E__.openPersonCardBlockDialog;
+        delete (window as any).__ICEBREAKER_E2E__.openPersonCardReportDialog;
+      }
+    };
+  }, [person?.sessionId]);
+
+
   // Handle long-press start (touch)
   const handleTouchStart = (e: React.TouchEvent) => {
     if (longPressTimerRef.current) {
@@ -136,6 +160,12 @@ export function PersonCard({ person, open, onClose, onChatRequest, userTags = []
           onMouseLeave={handleMouseUp}
           onContextMenu={handleContextMenu}
           onKeyDown={handleKeyDown}
+          onInteractOutside={(event) => {
+            const target = event.target as HTMLElement | null;
+            if (target && target.closest('[data-safety-menu="true"]')) {
+              event.preventDefault();
+            }
+          }}
           tabIndex={0}
           role="dialog"
           aria-label={`Person card for ${person.handle}. Long press or right-click for options.`}
@@ -207,32 +237,44 @@ export function PersonCard({ person, open, onClose, onChatRequest, userTags = []
               )}
               {!isInCooldown && (
                 <p className="text-xs text-muted-foreground text-center">
-                  Long press or right-click for safety options
+                  Long press, right-click, or use the Safety Options button for controls
                 </p>
               )}
+              <div className="flex justify-center pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowMenu(true)}
+                  aria-label="Open safety options menu"
+                  data-testid="person-card-safety"
+                  className="w-full sm:w-auto"
+                >
+                  SAFETY OPTIONS
+                </Button>
+              </div>
             </div>
           </div>
+
         </DialogContent>
       </Dialog>
 
-      {/* Block/Report Menu */}
       {showMenu && (
         <>
-          {/* Backdrop to close menu */}
           <div
-            className="fixed inset-0 z-50"
+            className="fixed inset-0 z-40"
             onClick={() => setShowMenu(false)}
             aria-hidden="true"
+            data-safety-menu="true"
           />
-          {/* Menu dropdown */}
-          <div 
+          <div
             className="fixed z-50 w-48 bg-card border-2 border-border rounded-lg shadow-lg font-mono"
             style={{
-              top: cardRef.current ? cardRef.current.getBoundingClientRect().bottom + 8 : '50%',
-              left: cardRef.current ? cardRef.current.getBoundingClientRect().left : '50%',
+              top: cardRef.current ? cardRef.current.getBoundingClientRect().bottom + 8 : "50%",
+              left: cardRef.current ? cardRef.current.getBoundingClientRect().left : "50%",
             }}
             role="menu"
             aria-label="Safety options"
+            data-safety-menu="true"
           >
             <button
               onClick={() => {

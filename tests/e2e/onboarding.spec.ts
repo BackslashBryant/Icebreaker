@@ -31,7 +31,7 @@ test.describe("Onboarding Flow", () => {
 
     // Step 1: 18+ Consent
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
-    const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await consentCheckbox.check();
     await expect(consentCheckbox).toBeChecked();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
@@ -150,11 +150,11 @@ test.describe("Onboarding Flow", () => {
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible({ timeout: 10000 });
     
     // Check consent checkbox has label (may be checkbox label or associated text)
-    const consentCheckbox = page.getByRole("checkbox", { name: /I confirm I am 18 or older/i });
+    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
     await expect(consentCheckbox).toBeVisible({ timeout: 5000 });
     
     // Verify label is associated
-    const consentLabel = page.getByText(/I confirm I am 18 or older/i);
+    const consentLabel = page.getByText(/I am 18 or older/i);
     await expect(consentLabel.or(consentCheckbox)).toBeVisible({ timeout: 5000 });
   });
 

@@ -169,8 +169,17 @@ export async function completeOnboarding(
   // Wait for navigation to Radar
   await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });
 
-  // Extract session token from localStorage (if available)
+  // Extract session token from sessionStorage (preferred) or legacy localStorage key
   const sessionToken = await page.evaluate(() => {
+    const storedSession = sessionStorage.getItem("icebreaker_session");
+    if (storedSession) {
+      try {
+        const parsed = JSON.parse(storedSession);
+        return parsed?.token ?? null;
+      } catch (error) {
+        console.warn("Failed to parse sessionStorage session:", error);
+      }
+    }
     return localStorage.getItem("icebreaker_session_token");
   });
 

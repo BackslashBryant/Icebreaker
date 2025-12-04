@@ -138,7 +138,9 @@ describe("PersonCard", () => {
       />
     );
 
-    expect(screen.getByText(/Long press or right-click for safety options/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Long press, right-click, or use the Safety Options button for controls/)
+    ).toBeInTheDocument();
   });
 
   // Note: Tap-hold functionality (long-press, right-click, keyboard shortcuts) is tested via E2E tests

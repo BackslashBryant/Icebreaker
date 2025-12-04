@@ -138,12 +138,44 @@ export class WsMock implements WsMockInterface {
    * Called during test teardown to prevent state leakage
    */
   reset(): void {
+    // Disconnect all connections properly (call onclose handlers)
+    for (const [sessionId, conn] of this.connections.entries()) {
+      if (conn.ws.onclose) {
+        conn.ws.onclose();
+      }
+    }
     // Clear all connections
     this.connections.clear();
     // Clear all active chats
     this.activeChats.clear();
     // Clear all pending chat requests
     this.pendingChatRequests.clear();
+  }
+
+  /**
+   * Public helper to trigger cooldown for a session
+   * Simulates 3 declined chat requests and sends cooldown error message
+   * Used by E2E tests to test cooldown behavior without creating multiple pages
+   * 
+   * @param sessionId - Session ID to trigger cooldown for
+   * @param declines - Number of declines to simulate (default: 3)
+   */
+  triggerCooldown(sessionId: string, declines: number = 3): void {
+    // Simulate declines by sending chat:declined messages
+    // The backend would normally track these, but for E2E we just trigger the cooldown error
+    const cooldownExpiresAt = Date.now() + (30 * 60 * 1000); // 30 minutes
+    const cooldownRemainingMs = cooldownExpiresAt - Date.now();
+    
+    // Send cooldown error message directly
+    this.sendToSession(sessionId, {
+      type: 'error',
+      payload: {
+        code: 'cooldown_active',
+        message: 'Cooldown active',
+        cooldownExpiresAt,
+        cooldownRemainingMs,
+      },
+    });
   }
 
   /**
@@ -442,6 +474,24 @@ export class WsMock implements WsMockInterface {
       return 'nearby';
     }
     return null;
+  }
+
+  /**
+   * Public helper to emit radar:update message to a session
+   * Used by E2E tests to seed mock people in Radar view
+   */
+  public emitRadarUpdate(sessionId: string, people: Array<{
+    sessionId: string;
+    handle: string;
+    vibe: string;
+    tags: string[];
+    signal: number;
+    proximity: string | null;
+  }>): void {
+    this.sendToSession(sessionId, {
+      type: 'radar:update',
+      payload: { people },
+    });
   }
 
   /**

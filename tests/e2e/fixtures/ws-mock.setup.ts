@@ -111,7 +111,7 @@ export const test = base.extend<WebSocketMockFixture>({
           }
         }
 
-        private handleMessage(sessionId: string, rawMessage: string) {
+        handleMessage(sessionId: string, rawMessage: string) {
           try {
             const message = JSON.parse(rawMessage);
             const conn = this.connections.get(sessionId);
@@ -276,9 +276,84 @@ export const test = base.extend<WebSocketMockFixture>({
           return null;
         }
 
-        private sendToSession(sessionId: string, message: any) {
+        /**
+         * Reset all connections and state
+         * Disconnects all connections properly (calls onclose handlers)
+         */
+        reset() {
+          // Disconnect all connections properly (call onclose handlers)
+          for (const [sessionId, conn] of this.connections.entries()) {
+            if (conn.ws.onclose) {
+              conn.ws.onclose();
+            }
+          }
+          // Clear all connections
+          this.connections.clear();
+          // Clear all active chats
+          this.activeChats.clear();
+          // Clear all pending chat requests
+          this.pendingChatRequests.clear();
+        }
+
+        /**
+         * Public helper to emit radar:update message to a session
+         * Used by E2E tests to seed mock people in Radar view
+         */
+        emitRadarUpdate(sessionId: string, people: Array<{
+          sessionId: string;
+          handle: string;
+          vibe: string;
+          tags: string[];
+          signal: number;
+          proximity: string | null;
+        }>) {
+          this.sendToSession(sessionId, {
+            type: 'radar:update',
+            payload: { people },
+          });
+        }
+
+        /**
+         * Public helper to trigger cooldown for a session
+         * Simulates declined chat requests and sends cooldown error message
+         * Used by E2E tests to test cooldown behavior without creating multiple pages
+         * 
+         * @param sessionId - Session ID to trigger cooldown for
+         * @param declines - Number of declines to simulate (default: 3)
+         */
+        triggerCooldown(sessionId: string, declines: number = 3) {
+          // Simulate declines by sending chat:declined messages
+          // The backend would normally track these, but for E2E we just trigger the cooldown error
+          const cooldownExpiresAt = Date.now() + (30 * 60 * 1000); // 30 minutes
+          const cooldownRemainingMs = cooldownExpiresAt - Date.now();
+          
+          // Send cooldown error message directly
+          this.sendToSession(sessionId, {
+            type: 'error',
+            payload: {
+              code: 'cooldown_active',
+              message: 'Cooldown active',
+              cooldownExpiresAt,
+              cooldownRemainingMs,
+            },
+          });
+        }
+
+        /**
+         * Public helper to send a message to a specific session
+         * Used by E2E tests to simulate WebSocket messages (e.g., cooldown errors)
+         */
+        sendToSession(sessionId: string, message: any) {
           const conn = this.connections.get(sessionId);
           if (conn) conn.onMessage(message);
+        }
+
+        /**
+         * Public helper to handle a message from a session
+         * Used by E2E tests to simulate WebSocket message handling
+         */
+        handleMessage(sessionId: string, rawMessage: string) {
+          this.handleMessage(sessionId, rawMessage);
         }
 
         private sendError(sessionId: string, message: string, code?: string) {

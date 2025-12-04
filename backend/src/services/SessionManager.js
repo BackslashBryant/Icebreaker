@@ -231,5 +231,17 @@ export function updateEmergencyContact(sessionId, emergencyContact) {
   return true;
 }
 
+/**
+ * Test-only helper to clear all sessions between suites.
+ * Prevents long-running test processes from accumulating thousands of sessions
+ * which slows down radar calculations.
+ */
+export function resetSessionsForTest() {
+  if (process.env.NODE_ENV !== "test") {
+    return;
+  }
+  sessions.clear();
+}
+
 // Run cleanup every minute
 setInterval(cleanupExpiredSessions, 60000);

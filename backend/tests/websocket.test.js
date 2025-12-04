@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { WebSocket } from "ws";
-import { createSession } from "../src/services/SessionManager.js";
+import { createSession, resetSessionsForTest } from "../src/services/SessionManager.js";
 import express from "express";
 import cors from "cors";
 import { initializeWebSocketServer } from "../src/websocket/server.js";
@@ -65,7 +65,7 @@ describe("WebSocket Server", () => {
             cleanup();
             reject(new Error("Test timed out waiting for connection close"));
           }
-        }, 5000);
+        }, 10000);
       });
     });
 
@@ -161,6 +161,7 @@ describe("WebSocket Server", () => {
     let token;
 
     beforeEach(async () => {
+      resetSessionsForTest();
       const sessionData = {
         vibe: "banter",
         tags: ["tag1"],

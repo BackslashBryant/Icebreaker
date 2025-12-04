@@ -73,7 +73,7 @@ test.describe("Keyboard-Only Journey: Onboarding Flow", () => {
     await expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout: 10000 });
 
     await page.keyboard.press("Tab");
-    await expect(page.getByLabel(/start onboarding/i)).toBeFocused();
+    await expect(page.getByTestId("cta-press-start")).toBeFocused();
 
     await page.keyboard.press("Tab");
     await expect(page.getByRole("link", { name: /Not for me/i })).toBeFocused();

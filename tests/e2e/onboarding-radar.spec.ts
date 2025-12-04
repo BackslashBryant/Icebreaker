@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { waitForBootSequence } from "../utils/test-helpers";
 
 test.describe("Onboarding → Radar Integration Flow", () => {
   test("complete flow: Onboarding → Radar navigation (< 30s total)", async ({
@@ -9,10 +10,11 @@ test.describe("Onboarding → Radar Integration Flow", () => {
 
     // Step 1: Navigate to welcome screen
     await page.goto("/welcome");
-    await expect(page.getByText("ICEBREAKER")).toBeVisible();
+    await waitForBootSequence(page);
+    await expect(page.getByTestId("cta-press-start")).toBeVisible();
 
     // Step 2: Click PRESS START
-    await page.getByRole("link", { name: /PRESS START/i }).click();
+    await page.getByTestId("cta-press-start").click();
     await expect(page).toHaveURL(/.*\/onboarding/);
 
     // Step 3: Complete onboarding steps
@@ -23,7 +25,7 @@ test.describe("Onboarding → Radar Integration Flow", () => {
     // 18+ Consent
     await expect(page.getByText("AGE VERIFICATION")).toBeVisible();
     const consentCheckbox = page.getByRole("checkbox", {
-      name: /I confirm I am 18 or older/i,
+      name: /I am 18 or older/i,
     });
     await consentCheckbox.check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
@@ -35,7 +37,7 @@ test.describe("Onboarding → Radar Integration Flow", () => {
     // Vibe & Tags
     await expect(page.getByText("YOUR VIBE")).toBeVisible();
     await page.getByRole("button", { name: /banter/i }).click();
-    await page.getByRole("button", { name: /SUBMIT/i }).click();
+    await page.getByRole("button", { name: /ENTER RADAR|SUBMIT/i }).click();
 
     // Step 4: Wait for navigation to Radar
     await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });
@@ -50,15 +52,16 @@ test.describe("Onboarding → Radar Integration Flow", () => {
   }) => {
     // Complete onboarding first
     await page.goto("/welcome");
-    await page.getByRole("link", { name: /PRESS START/i }).click();
+    await waitForBootSequence(page);
+    await page.getByTestId("cta-press-start").click();
 
     // Skip through onboarding quickly
     await page.getByRole("button", { name: /GOT IT/i }).click();
-    await page.getByRole("checkbox", { name: /I confirm I am 18 or older/i }).check();
+    await page.getByRole("checkbox", { name: /I am 18 or older/i }).check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
     await page.getByRole("button", { name: /Skip for now/i }).click();
     await page.getByRole("button", { name: /banter/i }).click();
-    await page.getByRole("button", { name: /SUBMIT/i }).click();
+    await page.getByRole("button", { name: /ENTER RADAR|SUBMIT/i }).click();
 
     // Wait for Radar page
     await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });
@@ -90,11 +93,11 @@ test.describe("Onboarding → Radar Integration Flow", () => {
     await page.goto("/welcome");
     await page.getByRole("link", { name: /PRESS START/i }).click();
     await page.getByRole("button", { name: /GOT IT/i }).click();
-    await page.getByRole("checkbox", { name: /I confirm I am 18 or older/i }).check();
+    await page.getByRole("checkbox", { name: /I am 18 or older/i }).check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
     await page.getByRole("button", { name: /Skip for now/i }).click();
     await page.getByRole("button", { name: /banter/i }).click();
-    await page.getByRole("button", { name: /SUBMIT/i }).click();
+    await page.getByRole("button", { name: /ENTER RADAR|SUBMIT/i }).click();
 
     // Wait for Radar page
     await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });
@@ -129,11 +132,11 @@ test.describe("Onboarding → Radar Integration Flow", () => {
     await page.goto("/welcome");
     await page.getByRole("link", { name: /PRESS START/i }).click();
     await page.getByRole("button", { name: /GOT IT/i }).click();
-    await page.getByRole("checkbox", { name: /I confirm I am 18 or older/i }).check();
+    await page.getByRole("checkbox", { name: /I am 18 or older/i }).check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
     await page.getByRole("button", { name: /Skip for now/i }).click();
     await page.getByRole("button", { name: /banter/i }).click();
-    await page.getByRole("button", { name: /SUBMIT/i }).click();
+    await page.getByRole("button", { name: /ENTER RADAR|SUBMIT/i }).click();
 
     // Wait for Radar page
     await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });
@@ -185,11 +188,11 @@ test.describe("Onboarding → Radar Integration Flow", () => {
     await page.goto("/welcome");
     await page.getByRole("link", { name: /PRESS START/i }).click();
     await page.getByRole("button", { name: /GOT IT/i }).click();
-    await page.getByRole("checkbox", { name: /I confirm I am 18 or older/i }).check();
+    await page.getByRole("checkbox", { name: /I am 18 or older/i }).check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
     await page.getByRole("button", { name: /Skip for now/i }).click();
     await page.getByRole("button", { name: /banter/i }).click();
-    await page.getByRole("button", { name: /SUBMIT/i }).click();
+    await page.getByRole("button", { name: /ENTER RADAR|SUBMIT/i }).click();
 
     // Measure load time from navigation to Radar view ready
     const loadStartTime = Date.now();
@@ -207,11 +210,11 @@ test.describe("Onboarding → Radar Integration Flow", () => {
     await page.goto("/welcome");
     await page.getByRole("link", { name: /PRESS START/i }).click();
     await page.getByRole("button", { name: /GOT IT/i }).click();
-    await page.getByRole("checkbox", { name: /I confirm I am 18 or older/i }).check();
+    await page.getByRole("checkbox", { name: /I am 18 or older/i }).check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
     await page.getByRole("button", { name: /Skip for now/i }).click();
     await page.getByRole("button", { name: /banter/i }).click();
-    await page.getByRole("button", { name: /SUBMIT/i }).click();
+    await page.getByRole("button", { name: /ENTER RADAR|SUBMIT/i }).click();
 
     // Wait for Radar page
     await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });

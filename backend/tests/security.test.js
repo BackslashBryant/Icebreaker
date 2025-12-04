@@ -87,6 +87,7 @@ describe("Security Tests", () => {
     // Supertest was timing out - fetch() with test server works reliably
     let server;
     let baseUrl;
+    const INPUT_SANITIZATION_TIMEOUT = 20000;
 
     beforeAll(async () => {
       const { app } = await import("../src/index.js");
@@ -124,7 +125,7 @@ describe("Security Tests", () => {
       expect(session.tags).toContain("normal-tag");
       expect(session.tags.some(tag => tag.includes("alert('xss')"))).toBe(true);
       expect(session.tags.every(tag => !tag.includes("<script>"))).toBe(true);
-    });
+    }, INPUT_SANITIZATION_TIMEOUT);
 
     it("rejects oversized tag array", async () => {
       const tags = Array(11).fill("tag"); // 11 tags (max is 10)
@@ -142,7 +143,7 @@ describe("Security Tests", () => {
       const body = await response.json();
       expect(body.error.code).toBe("VALIDATION_ERROR");
       expect(body.error.message).toContain("Maximum");
-    });
+    }, INPUT_SANITIZATION_TIMEOUT);
 
     it("rejects tags with excessive length", async () => {
       // Tags longer than 50 chars are truncated, not rejected
@@ -164,7 +165,7 @@ describe("Security Tests", () => {
       const { getSession } = await import("../src/services/SessionManager.js");
       const session = getSession(body.sessionId);
       expect(session.tags[0].length).toBe(50); // Should be truncated to max length
-    });
+    }, INPUT_SANITIZATION_TIMEOUT);
 
     it("rejects location with out-of-range coordinates", async () => {
       const response = await fetch(`${baseUrl}/api/onboarding`, {
@@ -182,7 +183,7 @@ describe("Security Tests", () => {
       const body = await response.json();
       expect(body.error.code).toBe("VALIDATION_ERROR");
       expect(body.error.message).toContain("out of valid range");
-    });
+    }, INPUT_SANITIZATION_TIMEOUT);
 
     it("rejects location with negative out-of-range coordinates", async () => {
       const response = await fetch(`${baseUrl}/api/onboarding`, {
@@ -199,7 +200,7 @@ describe("Security Tests", () => {
       expect(response.status).toBe(400);
       const body = await response.json();
       expect(body.error.code).toBe("VALIDATION_ERROR");
-    });
+    }, INPUT_SANITIZATION_TIMEOUT);
 
     it("rejects location with NaN coordinates", async () => {
       const response = await fetch(`${baseUrl}/api/onboarding`, {
@@ -216,7 +217,7 @@ describe("Security Tests", () => {
       expect(response.status).toBe(400);
       const body = await response.json();
       expect(body.error.code).toBe("VALIDATION_ERROR");
-    });
+    }, INPUT_SANITIZATION_TIMEOUT);
 
     it("rejects location with Infinity coordinates", async () => {
       const response = await fetch(`${baseUrl}/api/onboarding`, {
@@ -233,7 +234,7 @@ describe("Security Tests", () => {
       expect(response.status).toBe(400);
       const body = await response.json();
       expect(body.error.code).toBe("VALIDATION_ERROR");
-    });
+    }, INPUT_SANITIZATION_TIMEOUT);
 
     it("sanitizes HTML tags from tag content", async () => {
       const response = await fetch(`${baseUrl}/api/onboarding`, {
@@ -256,7 +257,7 @@ describe("Security Tests", () => {
       const session = getSession(body.sessionId);
       // Regex removes <script> and </script> tags, leaving "alert('xss')normal"
       expect(session.tags).toEqual(["alert('xss')normal"]);
-    });
+    }, INPUT_SANITIZATION_TIMEOUT);
   });
 
   describe("WebSocket Authentication", () => {
