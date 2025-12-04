@@ -1,12 +1,12 @@
 {
-  "slug": "telemetry-date-filtering",
-  "featureName": "Telemetry Hygiene: Date-Scoped Summaries for Persona Test Verification",
-  "updatedAt": "2025-12-04T00:00:00-05:00",
+  "slug": "fix-accessibility-tests",
+  "featureName": "Fix Issue #26 Accessibility Test Failures",
+  "updatedAt": "2025-12-03T00:00:00-05:00",
   "status": "complete",
   "vision": "docs/vision.md",
-  "description": "Add date-based filtering to persona telemetry summaries to enable clean verification insights that exclude stale historical data.",
-  "githubIssue": 34,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/34",
-  "branch": "agent/forge/34-telemetry-date-filtering",
-  "note": "Issue #34 COMPLETE (2025-12-04). Added date filtering to summarize-persona-runs.mjs with --since and --window flags. Updated runbook with filtering examples and verification workflow. All tests passing (63/63). Bonus: Fixed cooldown, mobile responsive, and WebSocket mock test infrastructure issues."
+  "description": "Fix three failing accessibility tests from Issue #26: selected states, radar empty states, and profile page tests.",
+  "githubIssue": 35,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/35",
+  "branch": "agent/pixel/35-fix-accessibility-tests",
+  "note": "Issue #35 COMPLETE (2025-12-03). Fixed three accessibility test failures: selected states (check focused button, remove bg-muted checks), radar empty states (add setupSession), profile page (add .first() for multiple matches). All 24 tests passing (8 tests × 3 browsers). Issue closed with status:done label."
 }
