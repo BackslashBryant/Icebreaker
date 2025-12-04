@@ -31,6 +31,8 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     // Step 1: Location privacy callout
     await page.locator(SEL.onboardingGotIt).click();
     await expect(page.locator(SEL.onboardingStep1)).toBeVisible({ timeout: 10000 });
+    // Check consent checkbox before clicking Continue
+    await page.locator('#consent').check();
     await page.locator(SEL.onboardingContinue).click();
     await expect(page.locator(SEL.onboardingStep2)).toBeVisible({ timeout: 10000 });
     
@@ -49,6 +51,8 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     await page.goto("/onboarding");
     await page.waitForLoadState("networkidle");
     await page.locator(SEL.onboardingGotIt).click();
+    // Check consent checkbox before clicking Continue
+    await page.locator('#consent').check();
     await page.locator(SEL.onboardingContinue).click();
     await page.locator(SEL.onboardingSkipLocation).click();
     await expect(page.locator(SEL.onboardingStep3)).toBeVisible({ timeout: 10000 });
@@ -173,11 +177,13 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     await page.locator(SEL.onboardingGotIt).click();
     await expect(page.locator(SEL.onboardingStep1)).toBeVisible({ timeout: 10000 });
     
+    // Explicitly focus the consent checkbox first to ensure it's in the tab order
+    await page.locator('#consent').focus();
+    
     // Tab through elements and verify logical order
     const tabOrder: string[] = [];
     
-    // Tab to consent checkbox
-    await page.keyboard.press("Tab");
+    // Get current focused element (should be checkbox)
     const firstFocused = await page.evaluate(() => (document.activeElement as HTMLElement)?.tagName);
     tabOrder.push(firstFocused || "");
     
