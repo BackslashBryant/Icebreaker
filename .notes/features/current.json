@@ -1,12 +1,12 @@
 {
-  "slug": "fix-accessibility-tests",
-  "featureName": "Fix Issue #26 Accessibility Test Failures",
-  "updatedAt": "2025-12-03T00:00:00-05:00",
-  "status": "complete",
+  "slug": "persona-presence-fixtures",
+  "featureName": "Add persona presence fixture schema + baseline scripts",
+  "updatedAt": "2025-12-04T00:00:00-05:00",
+  "status": "in-progress",
   "vision": "docs/vision.md",
-  "description": "Fix three failing accessibility tests from Issue #26: selected states, radar empty states, and profile page tests.",
-  "githubIssue": 35,
-  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/35",
-  "branch": "agent/pixel/35-fix-accessibility-tests",
-  "note": "Issue #35 COMPLETE (2025-12-03). Fixed three accessibility test failures: selected states (check focused button, remove bg-muted checks), radar empty states (add setupSession), profile page (add .first() for multiple matches). All 24 tests passing (8 tests × 3 browsers). Issue closed with status:done label."
+  "description": "Create loader helper for persona presence fixtures to expose fixture data consistently to tests and WebSocket mocks. Schema and fixtures already exist; need centralized loader.",
+  "githubIssue": 9,
+  "githubIssueUrl": "https://github.com/BackslashBryant/Icebreaker/issues/9",
+  "branch": "agent/pixel/9-persona-presence-fixtures",
+  "note": "Issue #9 IN PROGRESS (2025-12-04). Research complete: schema.d.ts and JSON fixtures exist. Main work: create loader helper (tests/fixtures/persona-presence/loader.ts) for consistent fixture access. Plan file created: Docs/plans/Issue-9-plan-status-IN-PROGRESS.md"
 }
