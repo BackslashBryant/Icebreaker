@@ -35,6 +35,18 @@ See \`Docs/plans/Issue-${issueNumber}-plan-status-COMPLETE.md\` for full details
 
 async function completeIssue() {
   try {
+    // Clear invalid GITHUB_TOKEN if it exists (prevents auth issues)
+    // On Windows, we can't unset parent process env vars, but getGitHubToken() will ignore invalid ones
+    if (process.env.GITHUB_TOKEN) {
+      const token = process.env.GITHUB_TOKEN;
+      // Check if token format is invalid
+      if (!token.startsWith('gho_') && !token.startsWith('ghp_')) {
+        console.warn('⚠️  Invalid GITHUB_TOKEN format detected - will use keyring token instead');
+        // Delete from process.env for this script only (doesn't affect parent)
+        delete process.env.GITHUB_TOKEN;
+      }
+    }
+    
     const repo = getRepo();
     console.log(`Updating issue #${issueNumber}...`);
     
@@ -55,11 +67,12 @@ async function completeIssue() {
     if (errorMsg.includes('401') || errorMsg.includes('Bad credentials')) {
       console.error('❌ Authentication failed');
       console.error('\n💡 Fix authentication:');
-      console.error('   1. Run: gh auth login');
-      console.error('   2. Select: GitHub.com');
-      console.error('   3. Select: HTTPS');
-      console.error('   4. Authenticate with browser');
-      console.error('\n   Or set GITHUB_TOKEN environment variable (User-level on Windows)');
+      console.error('   1. Clear invalid token: $env:GITHUB_TOKEN = $null (PowerShell) or unset GITHUB_TOKEN (bash)');
+      console.error('   2. Run: gh auth login');
+      console.error('   3. Select: GitHub.com');
+      console.error('   4. Select: HTTPS');
+      console.error('   5. Authenticate with browser');
+      console.error('\n   The script will automatically use keyring token after clearing invalid env var');
     } else if (errorMsg.includes('404')) {
       console.error(`❌ Issue #${issueNumber} not found`);
       console.error('   Verify issue number and repository access');

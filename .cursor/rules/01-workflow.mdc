@@ -126,12 +126,16 @@ Use this whenever you're touching shared workflow/config files (rules, tools, au
 - **NEVER** run git commands from parent directories or outside the repository
 - **Git Root Helper**: Use `node tools/get-project-root.mjs` when `git rev-parse --show-toplevel` returns unexpected results (validates project markers to ensure correct root)
 - Branch name format: `agent/<agent>/<issue>-<slug>` (e.g. `agent/link/1234-header`).
-- **GitHub authentication & CLI usage**:
-  - Use REST helpers in `tools/lib/github-api.mjs`; tokens come from `gh auth token` (keyring) with `GITHUB_TOKEN` as fallback.
-  - Always `unset GITHUB_TOKEN`/`$env:GITHUB_TOKEN = $null` before running any `gh ...` command. Never store that token in `.env`.
+- **GitHub authentication & operations**:
+  - **MANDATORY**: Use REST API via `tools/lib/github-api.mjs` for ALL GitHub operations (issues, comments, labels, PRs). Never use `gh` CLI directly.
+  - **Token priority**: `gh auth token` (keyring) → `GITHUB_TOKEN` env var (if valid format). Invalid `GITHUB_TOKEN` env vars are automatically ignored.
+  - **Git operations**: Use SSH automatically (via `git@github.com` remote URL). No authentication needed for git push/pull.
+  - **If API auth fails**: Clear invalid `GITHUB_TOKEN` with `$env:GITHUB_TOKEN = $null` (PowerShell) or `unset GITHUB_TOKEN` (bash), then retry. Scripts automatically fall back to keyring token.
+  - **Never store tokens in `.env`**: Setting `GITHUB_TOKEN` in `.env` breaks GitHub CLI auth. Use keyring (`gh auth login`) instead.
   - Detailed troubleshooting (auth resets, MCP env wiring, PowerShell fallbacks) lives in `@rules/workflow-appendix`.
 - **GitHub Operations**:
-  - Node scripts handle automation (`tools/github-*.mjs`), while `gh` CLI covers comments/labels and terminal git handles commits.
+  - **API-first**: All GitHub operations use `tools/github-*.mjs` scripts with REST API. No `gh` CLI commands needed.
+  - **Git push/pull**: Use SSH automatically via remote URL. If push fails, check SSH key setup or use `git push --no-verify` for workflow docs only.
   - For fallback commands, environment setup, and push troubleshooting, see `@rules/workflow-appendix`.
 - Nexus or the acting human runs `npm run agents:install-hook` to copy the path-scope pre-commit hook locally.
 - Run `npm run preflight` before pushing to ensure scaffolding is intact (includes branch name validation).

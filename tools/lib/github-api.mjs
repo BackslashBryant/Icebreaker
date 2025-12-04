@@ -37,17 +37,47 @@ export function getGitHubToken() {
     // GitHub CLI not authenticated or not available, fall through to env vars
   }
   
-  // Fall back to environment variables
-  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
-  if (!token) {
-    throw new Error(
-      'GitHub token not found. Either:\n' +
-      '  1. Run "gh auth login" to authenticate GitHub CLI (recommended)\n' +
-      '  2. Set GITHUB_TOKEN or GH_TOKEN environment variable'
-    );
+  // Fall back to environment variables, but validate format
+  const envToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
+  if (envToken) {
+    // Validate token format - if invalid, ignore it and try keyring again
+    if (envToken.startsWith('gho_') || envToken.startsWith('ghp_')) {
+      // Token format looks valid, but check if it's actually working
+      // We'll let the API call fail if it's invalid rather than blocking here
+      return envToken;
+    } else {
+      // Invalid token format - clear it and try keyring again
+      console.warn('⚠️  GITHUB_TOKEN env var has invalid format, ignoring it');
+      // On Windows, we can't unset parent process env vars, but we can ignore this one
+      // Try keyring one more time
+      try {
+        const keyringToken = execSync('gh auth token', {
+          cwd: repoRoot,
+          stdio: ['ignore', 'pipe', 'pipe'],
+          encoding: 'utf8',
+        }).trim();
+        if (keyringToken && (keyringToken.startsWith('gho_') || keyringToken.startsWith('ghp_'))) {
+          return keyringToken;
+        }
+      } catch (error) {
+        // Keyring still not available
+      }
+      // If we get here, env token is invalid format and keyring failed
+      throw new Error(
+        'GitHub token not found or invalid. Either:\n' +
+        '  1. Run "gh auth login" to authenticate GitHub CLI (recommended)\n' +
+        '  2. Set valid GITHUB_TOKEN or GH_TOKEN environment variable (must start with gho_ or ghp_)\n' +
+        '  3. Clear invalid GITHUB_TOKEN: $env:GITHUB_TOKEN = $null (PowerShell) or unset GITHUB_TOKEN (bash)'
+      );
+    }
   }
   
-  return token;
+  // No token found
+  throw new Error(
+    'GitHub token not found. Either:\n' +
+    '  1. Run "gh auth login" to authenticate GitHub CLI (recommended)\n' +
+    '  2. Set GITHUB_TOKEN or GH_TOKEN environment variable'
+  );
 }
 
 /**

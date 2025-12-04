@@ -8,6 +8,10 @@ alwaysApply: false
 
 **Format**: Keep entries to 2-3 sentences max. Include: trigger, lesson, rule update. No verbose sections. Follow `@rules/dates` for timestamp handling (Time MCP first, system date fallback, no placeholders).
 
+## 2025-12-04: GitHub API - Auto-Detect Invalid Tokens and Use SSH for Git
+
+**Trigger**: GitHub API calls failing with 401 errors due to invalid `GITHUB_TOKEN` env var. Git push failures due to authentication confusion. **Lesson**: **MANDATORY** - GitHub API scripts must automatically detect and ignore invalid `GITHUB_TOKEN` env vars. Git operations use SSH automatically via remote URL - no authentication needed. **Rule**: Updated `tools/lib/github-api.mjs` to validate token format and ignore invalid env tokens. Updated `tools/github-issue-complete.mjs` to clear invalid tokens before API calls. Updated `.cursor/rules/01-workflow.mdc` to emphasize API-first approach (never use `gh` CLI directly) and document SSH for git operations. All GitHub operations now use REST API via scripts, not `gh` CLI.
+
 ## 2025-11-23: GitHub CLI - Clear GITHUB_TOKEN Before Operations
 
 **Trigger**: GitHub CLI (`gh`) commands failing with 401 errors even when keyring authentication was valid. `GITHUB_TOKEN` environment variable was interfering with GitHub CLI's keyring authentication. **Lesson**: **MANDATORY** - Always clear `GITHUB_TOKEN` env var before running ANY `gh` CLI command. GitHub CLI prioritizes env var tokens over keyring, and env var tokens may be expired/invalid. Clearing the env var forces GitHub CLI to use keyring authentication (SSH protocol preferred). **Rule**: Updated `.cursor/rules/01-workflow.mdc` to require clearing `GITHUB_TOKEN` before `gh` CLI commands: PowerShell `$env:GITHUB_TOKEN = $null; gh ...`, Bash `unset GITHUB_TOKEN && gh ...`. This ensures reliable keyring-based authentication for all GitHub CLI operations.

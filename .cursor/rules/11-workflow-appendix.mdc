@@ -8,12 +8,18 @@ alwaysApply: false
 
 Use this file when you need the full command list, troubleshooting steps, or completion checklist referenced in `@rules/workflow`.
 
-## GitHub Authentication & CLI Reference
-- **REST API first**: All repo helpers (`tools/verify-github-issue.mjs`, `tools/github-issue.mjs`, `tools/github-pr.mjs`, etc.) use `tools/lib/github-api.mjs` plus the GitHub REST API. Tokens come from `gh auth token` (keyring) with `GITHUB_TOKEN` as fallback.
-- **Never stash tokens in `.env`**: Setting `GITHUB_TOKEN` in `.env` breaks GitHub CLI auth. Clear it before every `gh ...` command: `unset GITHUB_TOKEN` (bash) or `$env:GITHUB_TOKEN = $null` (PowerShell).
-- **Authentication recovery**: If `gh` or scripts fail auth, run `gh auth login` or `tools/fix-github-auth.ps1` to reset conflicting env vars. For MCP servers that need env vars (Playwright, Desktop Commander), set User-level variables and restart Cursor.
+## GitHub Authentication & API Reference
+- **REST API ONLY**: All GitHub operations use `tools/lib/github-api.mjs` with REST API. Never use `gh` CLI directly for issue/PR operations.
+- **Token priority**: `gh auth token` (keyring) → `GITHUB_TOKEN` env var (if valid format: starts with `gho_` or `ghp_`). Invalid env tokens are automatically ignored.
+- **Git operations**: Use SSH automatically via `git@github.com` remote URL. No authentication needed. If push fails, check SSH key or use `git push --no-verify` for workflow docs only.
+- **Never stash tokens in `.env`**: Setting `GITHUB_TOKEN` in `.env` breaks GitHub CLI auth. Use keyring (`gh auth login`) instead.
+- **Authentication recovery**: 
+  - If API calls fail with 401: Clear invalid `GITHUB_TOKEN` with `$env:GITHUB_TOKEN = $null` (PowerShell) or `unset GITHUB_TOKEN` (bash), then retry. Scripts automatically use keyring token.
+  - Run `gh auth login` to refresh keyring token if needed.
+  - Run `tools/fix-github-auth.ps1` to reset conflicting env vars.
+  - For MCP servers that need env vars (Playwright, Desktop Commander), set User-level variables and restart Cursor.
 - **Branch creation**: Create branches with `gh repo create-branch BackslashBryant/Icebreaker <branch>` when remote refs are missing. Scripts rely on the branch existing on GitHub.
-- **Fallback protocol**: When CLI auth explodes, PowerShell `Invoke-RestMethod` with the token from keyring is the last resort—document the variance in the plan file.
+- **Fallback protocol**: When API auth fails, scripts automatically try keyring token. If both fail, document the variance in the plan file.
 
 ## Issue Completion Details (#issue-completion)
 Use these commands once `@rules/workflow` declares the seven required steps. Never skip a step—status docs trump chat.
@@ -29,11 +35,14 @@ Use these commands once `@rules/workflow` declares the seven required steps. Nev
    - `git add ... && git commit -m "feat: Complete Issue #<#> - <summary>"`.
    - Bugfixes that cross agent lanes can use `--no-verify`, but add `[no-verify: reason]` in the message and log it.
 4. **Push**
+   - **Git uses SSH automatically** via `git@github.com` remote URL. No authentication needed.
    - `node tools/git-push-with-retry.mjs agent/<agent>/<issue>-<slug>` handles DNS/threading failures automatically.
    - If it fails:
      - DNS error: rerun script (it flushes DNS) or restart the PC/use system git.
-     - 403 error: `gh auth status`, then `gh auth refresh -s repo`, ensure branch exists remotely.
+     - SSH key error: Check SSH key setup with `ssh -T git@github.com`. If not configured, use HTTPS remote temporarily.
+     - 403 error: Usually means branch protection or permissions. Check branch exists remotely and you have push access.
      - Missing branch: create it on GitHub (`gh repo create-branch ...`) before pushing.
+     - Pre-push hook blocking: Use `SKIP_STATUS=1 git push` or `git push --no-verify` for workflow docs only (with reason logged).
    - **Pre-push hook timeouts**: If the hook hangs (known issue with `npm run status`/`npm run preflight` in Cursor/PowerShell):
      - **Preferred**: Set `SKIP_STATUS=1` or `SKIP_PREFLIGHT=1` env vars (hook respects them) instead of `--no-verify`
        - Example: `SKIP_STATUS=1 git push origin main`
@@ -45,13 +54,11 @@ Use these commands once `@rules/workflow` declares the seven required steps. Nev
        - Better error messages identify which check is blocking
        - If it still hangs, investigate which check is blocking and fix it
 5. **GitHub issue update**
-   - Preferred: `node tools/github-issue-complete.mjs <issue#> [commit-hash]`.
-   - Manual fallback:
-     ```
-     $env:GITHUB_TOKEN = $null; gh issue comment <issue#> --body "<summary + tests + files>"
-     $env:GITHUB_TOKEN = $null; gh issue edit <issue#> --add-label "status:done"
-     $env:GITHUB_TOKEN = $null; gh issue close <issue#> --reason completed
-     ```
+   - **MANDATORY**: Use `node tools/github-issue-complete.mjs <issue#> [commit-hash]` (uses REST API automatically).
+   - **If auth fails**: Clear invalid token first: `$env:GITHUB_TOKEN = $null` (PowerShell) or `unset GITHUB_TOKEN` (bash), then retry script.
+   - **Manual fallback** (only if script fails):
+     - Use API directly: `node -e "import('./tools/lib/github-api.mjs').then(m => m.addIssueComment(m.getRepo(), <issue#>, '<body>'))"`
+     - Or fix auth and retry script (preferred)
    - Comment must include branch, commit, test results, and docs touched. Label + close happen atomically—no open issues with `status:done`.
 6. **Sync plan file to `main`**
    - `git checkout main && git pull origin main`
