@@ -14,7 +14,7 @@ test.describe("Onboarding → Radar Integration Flow", () => {
     await expect(page.getByTestId("cta-press-start")).toBeVisible();
 
     // Step 2: Click PRESS START
-    await page.getByRole("link", { name: /PRESS START/i }).click();
+    await page.getByTestId("cta-press-start").click();
     await expect(page).toHaveURL(/.*\/onboarding/);
 
     // Step 3: Complete onboarding steps
@@ -187,7 +187,8 @@ test.describe("Onboarding → Radar Integration Flow", () => {
   test("radar view loads in < 2s", async ({ page }) => {
     // Complete onboarding first
     await page.goto("/welcome");
-    await page.getByRole("link", { name: /PRESS START/i }).click();
+    await waitForBootSequence(page);
+    await page.getByTestId("cta-press-start").click();
     await page.getByRole("button", { name: /GOT IT/i }).click();
     await page.getByRole("checkbox", { name: /I confirm I am 18 or older/i }).check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
