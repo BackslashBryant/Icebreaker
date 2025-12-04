@@ -127,6 +127,60 @@ export const expect = test.expect;
 
 ## Persona Presence Scripts
 
+### Persona Presence Loader (source of truth)
+
+- Location: `tests/fixtures/persona-presence/loader.ts`
+- Exports:
+  - `loadFixture(venue: string): PersonaPresenceScript`
+  - `getAvailableVenues(): string[]`
+  - `hasFixture(venue: string): boolean`
+- Fixtures available: `campus-library`, `coworking-downtown`, `gallery-opening`, `chat-performance-test`
+- When to use: prefer loader for tests and mocks to keep fixture names aligned; direct JSON imports still work for backward compatibility.
+
+#### Playwright example (WS mock setup)
+```ts
+// tests/e2e/fixtures/ws-mock.setup.ts
+import { test as base } from '@playwright/test';
+import { loadFixture } from '../fixtures/persona-presence/loader';
+import { WsMock } from '../mocks/websocket-mock';
+
+export const test = base.extend({
+  context: async ({ context }, use) => {
+    const script = loadFixture('campus-library');
+    await context.addInitScript(({ script }) => {
+      (window as any).__WS_MOCK__ = new (require('../mocks/websocket-mock').WsMock)(script);
+    }, { script });
+    await use(context);
+  },
+});
+export const expect = test.expect;
+```
+
+#### Backend/Vitest example
+```js
+// backend/tests/persona-loader.test.js
+import { loadFixture, getAvailableVenues, hasFixture } from '../../tests/fixtures/persona-presence/loader.ts';
+import { describe, it, expect } from 'vitest';
+
+describe('Persona Presence Fixture Loader (Backend)', () => {
+  it('loads fixture by venue', () => {
+    const script = loadFixture('campus-library');
+    expect(script.venue).toBe('campus-library');
+    expect(script.personas.length).toBeGreaterThan(0);
+  });
+
+  it('lists venues and validates presence', () => {
+    const venues = getAvailableVenues();
+    expect(venues).toContain('gallery-opening');
+    expect(hasFixture('non-existent')).toBe(false);
+  });
+});
+```
+
+#### Compatibility and temporary notes
+- Direct JSON imports remain supported; loader is the canonical path for shared tests/mocks.
+- Current E2E gating: Firefox/WebKit/msedge skips and axe filters are documented in the plan file; loader usage is unaffected and stable on chromium path.
+
 ### Schema
 
 ```ts
