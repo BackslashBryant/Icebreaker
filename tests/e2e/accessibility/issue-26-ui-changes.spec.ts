@@ -152,6 +152,8 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     await page.goto("/onboarding");
     await page.waitForLoadState("networkidle");
     await page.locator(SEL.onboardingGotIt).click();
+    // Check consent checkbox before clicking Continue
+    await page.locator('#consent').check();
     await page.locator(SEL.onboardingContinue).click();
     await expect(page.locator(SEL.onboardingStep2)).toBeVisible({ timeout: 10000 });
     
