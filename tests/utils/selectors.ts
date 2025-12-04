@@ -23,6 +23,7 @@ export const SEL = {
   onboardingSkipLocation: '[data-testid="onboarding-skip-location"]',
   onboardingEnterRadar: '[data-testid="onboarding-enter-radar"]',
   onboardingBack: '[data-testid="onboarding-back"]',
+  onboardingConsent: '[data-testid="onboarding-consent"]',
 
   // Vibe options
   vibeOption: (name: string) => `[data-testid="vibe-${name}"]`,

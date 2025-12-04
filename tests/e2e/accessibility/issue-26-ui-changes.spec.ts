@@ -32,7 +32,7 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     await page.locator(SEL.onboardingGotIt).click();
     await expect(page.locator(SEL.onboardingStep1)).toBeVisible({ timeout: 10000 });
     // Check consent checkbox before clicking Continue
-    await page.locator('#consent').check();
+    await page.locator(SEL.onboardingConsent).check();
     await page.locator(SEL.onboardingContinue).click();
     await expect(page.locator(SEL.onboardingStep2)).toBeVisible({ timeout: 10000 });
     
@@ -48,7 +48,7 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     await page.waitForLoadState("networkidle");
     await page.locator(SEL.onboardingGotIt).click();
     // Check consent checkbox before clicking Continue
-    await page.locator('#consent').check();
+    await page.locator(SEL.onboardingConsent).check();
     await page.locator(SEL.onboardingContinue).click();
     await page.locator(SEL.onboardingSkipLocation).click();
     await expect(page.locator(SEL.onboardingStep3)).toBeVisible({ timeout: 10000 });
@@ -131,7 +131,7 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     await page.waitForLoadState("networkidle");
     await page.locator(SEL.onboardingGotIt).click();
     // Check consent checkbox before clicking Continue
-    await page.locator('#consent').check();
+    await page.locator(SEL.onboardingConsent).check();
     await page.locator(SEL.onboardingContinue).click();
     await expect(page.locator(SEL.onboardingStep2)).toBeVisible({ timeout: 10000 });
     
@@ -192,7 +192,7 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     await page.waitForLoadState("networkidle");
     await page.locator(SEL.onboardingGotIt).click();
     // Check consent checkbox before clicking Continue
-    await page.locator('#consent').check();
+    await page.locator(SEL.onboardingConsent).check();
     await page.locator(SEL.onboardingContinue).click();
     await page.locator(SEL.onboardingSkipLocation).click();
     await expect(page.locator(SEL.onboardingStep3)).toBeVisible({ timeout: 10000 });
