@@ -72,7 +72,8 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     const selectedVibe = page.locator(SEL.vibeThinking);
     if (await selectedVibe.isVisible()) {
       const className = await selectedVibe.getAttribute("class");
-      expect(className).toContain("border-border");
+      // UI uses border-muted/50 for selected state, not border-border
+      expect(className).toContain("border-muted/50");
       expect(className).toContain("bg-muted/20");
       expect(className).not.toContain("border-accent");
       expect(className).not.toContain("bg-accent");
