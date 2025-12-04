@@ -91,7 +91,8 @@ test.describe("Onboarding → Radar Integration Flow", () => {
   }) => {
     // Complete onboarding
     await page.goto("/welcome");
-    await page.getByRole("link", { name: /PRESS START/i }).click();
+    await waitForBootSequence(page);
+    await page.getByTestId("cta-press-start").click();
     await page.getByRole("button", { name: /GOT IT/i }).click();
     await page.getByRole("checkbox", { name: /I confirm I am 18 or older/i }).check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
