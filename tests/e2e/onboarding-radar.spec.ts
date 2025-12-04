@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { waitForBootSequence } from "../utils/test-helpers";
 
 test.describe("Onboarding → Radar Integration Flow", () => {
   test("complete flow: Onboarding → Radar navigation (< 30s total)", async ({
@@ -64,8 +65,8 @@ test.describe("Onboarding → Radar Integration Flow", () => {
     await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });
     await expect(page.getByText("RADAR")).toBeVisible();
 
-    // Wait for WebSocket connection
-    await expect(page.getByText(/Connected|Connecting/i)).toBeVisible({
+    // Wait for WebSocket connection (use .first() to avoid strict mode violation)
+    await expect(page.getByText(/Connected|Connecting/i).first()).toBeVisible({
       timeout: 5000,
     });
 
@@ -127,7 +128,8 @@ test.describe("Onboarding → Radar Integration Flow", () => {
   }) => {
     // Complete onboarding
     await page.goto("/welcome");
-    await page.getByRole("link", { name: /PRESS START/i }).click();
+    await waitForBootSequence(page);
+    await page.getByTestId("cta-press-start").click();
     await page.getByRole("button", { name: /GOT IT/i }).click();
     await page.getByRole("checkbox", { name: /I confirm I am 18 or older/i }).check();
     await page.getByRole("button", { name: /CONTINUE/i }).click();
@@ -138,8 +140,8 @@ test.describe("Onboarding → Radar Integration Flow", () => {
     // Wait for Radar page
     await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });
 
-    // Wait for WebSocket connection
-    await expect(page.getByText(/Connected|Connecting/i)).toBeVisible({
+    // Wait for WebSocket connection (use .first() to avoid strict mode violation)
+    await expect(page.getByText(/Connected|Connecting/i).first()).toBeVisible({
       timeout: 5000,
     });
 
@@ -220,7 +222,7 @@ test.describe("Onboarding → Radar Integration Flow", () => {
     const connectionStartTime = Date.now();
 
     // Wait for connection status
-    await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/Connected/i).first()).toBeVisible({ timeout: 5000 });
 
     const connectionTime = Date.now() - connectionStartTime;
     expect(connectionTime).toBeLessThan(500); // < 500ms

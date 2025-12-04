@@ -32,8 +32,10 @@ test.describe('WebSocket Mock Infrastructure', () => {
       handle: 'QuietThinker42',
     });
 
-    await page.goto('/radar');
+    // Navigate to welcome first to trigger boot sequence, then go to radar
+    await page.goto('/welcome');
     await waitForBootSequence(page);
+    await page.goto('/radar');
 
     // Wait for WebSocket connection (mock should send radar:update)
     // This is a basic smoke test - full multi-user tests in Step 3

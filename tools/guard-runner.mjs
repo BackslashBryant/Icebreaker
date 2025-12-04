@@ -19,7 +19,14 @@ function hasBin(bin) {
 }
 
 function run(cmd, args) {
-  const result = spawnSync(cmd, args, { stdio: 'inherit', cwd: repoRoot, shell: process.platform === 'win32' });
+  // On Windows, use shell: false to avoid path truncation issues with spaces
+  // Use absolute paths for Node.js scripts to handle spaces correctly
+  const useShell = false;
+  const result = spawnSync(cmd, args, { 
+    stdio: 'inherit', 
+    cwd: repoRoot, 
+    shell: useShell 
+  });
   if (result.status !== 0) {
     process.exit(result.status ?? 1);
   }
@@ -45,7 +52,9 @@ switch (task) {
   case 'test': {
     const runTestsScript = path.join(repoRoot, 'scripts', 'run-tests.mjs');
     if (existsSync(runTestsScript)) {
-      run('node', [runTestsScript]);
+      // Use absolute path to handle spaces in directory names
+      const absoluteScriptPath = path.resolve(runTestsScript);
+      run('node', [absoluteScriptPath]);
     } else if (hasBin('jest')) {
       run('npx', ['--no-install', 'jest', '--runInBand']);
     } else if (existsSync(path.join(repoRoot, 'scripts', 'verify-all'))) {
