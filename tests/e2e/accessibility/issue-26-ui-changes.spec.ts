@@ -112,7 +112,7 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     await expect(page.locator(SEL.onboardingStep1)).toBeVisible({ timeout: 10000 });
     
     // Check consent checkbox first to enable the button
-    await page.locator('#consent').check();
+    await page.locator(SEL.onboardingConsent).check();
     
     // Focus the continue button
     await page.locator(SEL.onboardingContinue).focus();
@@ -154,18 +154,18 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     
     // Verify checkbox is focusable and can be reached via keyboard
     // The natural tab order might have button first, but checkbox should still be focusable
-    const checkboxFocusable = await page.locator('#consent').isEnabled();
+    const checkboxFocusable = await page.locator(SEL.onboardingConsent).isEnabled();
     expect(checkboxFocusable).toBe(true);
     
     // Focus checkbox directly to verify it's accessible
-    await page.locator('#consent').focus();
+    await page.locator(SEL.onboardingConsent).focus();
     const checkboxTag = await page.evaluate(() => {
       const el = document.activeElement as HTMLElement;
       return el?.tagName || "";
     });
     // If focus didn't work, try clicking it first
     if (checkboxTag !== "INPUT") {
-      await page.locator('#consent').click();
+      await page.locator(SEL.onboardingConsent).click();
       const clickedTag = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement;
         return el?.tagName || "";

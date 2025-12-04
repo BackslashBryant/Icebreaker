@@ -21,6 +21,7 @@ export function ConsentStep({ consent, onConsentChange, onContinue }: ConsentSte
       <div className="flex items-start space-x-3 p-3 sm:p-4 border-2 border-border rounded-md bg-card">
         <Checkbox
           id="consent"
+          data-testid="onboarding-consent"
           checked={consent}
           onCheckedChange={(checked) => onConsentChange(checked as boolean)}
           className="mt-1"
