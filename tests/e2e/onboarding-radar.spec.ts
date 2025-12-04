@@ -10,7 +10,8 @@ test.describe("Onboarding → Radar Integration Flow", () => {
 
     // Step 1: Navigate to welcome screen
     await page.goto("/welcome");
-    await expect(page.getByText("ICEBREAKER")).toBeVisible();
+    await waitForBootSequence(page);
+    await expect(page.getByTestId("cta-press-start")).toBeVisible();
 
     // Step 2: Click PRESS START
     await page.getByRole("link", { name: /PRESS START/i }).click();
@@ -51,7 +52,8 @@ test.describe("Onboarding → Radar Integration Flow", () => {
   }) => {
     // Complete onboarding first
     await page.goto("/welcome");
-    await page.getByRole("link", { name: /PRESS START/i }).click();
+    await waitForBootSequence(page);
+    await page.getByTestId("cta-press-start").click();
 
     // Skip through onboarding quickly
     await page.getByRole("button", { name: /GOT IT/i }).click();
