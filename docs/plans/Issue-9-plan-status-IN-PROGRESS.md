@@ -74,10 +74,10 @@ What is the current state of persona presence fixtures, and what loader helper i
 **Intent**: Create `tests/fixtures/persona-presence/loader.ts` with functions to load fixtures by venue name
 
 **Acceptance Criteria**:
-- [ ] `loadFixture(venue: string): PersonaPresenceScript` function exists
-- [ ] `getAvailableVenues(): string[]` function exists
-- [ ] TypeScript types are correct
-- [ ] Loader works with existing fixture files
+- [x] `loadFixture(venue: string): PersonaPresenceScript` function exists
+- [x] `getAvailableVenues(): string[]` function exists
+- [x] TypeScript types are correct
+- [x] Loader works with existing fixture files
 
 **Tests**:
 - Unit test: `tests/fixtures/persona-presence/loader.test.ts` (if needed)
@@ -110,9 +110,11 @@ What is the current state of persona presence fixtures, and what loader helper i
 ## Status Tracking
 
 ### Checkpoint 1: Loader Helper Created
-- [ ] Step 1 complete
-- [ ] Loader helper tested
-- [ ] Ready for Step 2
+- [x] Step 1 complete (2025-12-04)
+- [x] Loader helper created: `tests/fixtures/persona-presence/loader.ts`
+- [x] Functions implemented: `loadFixture()`, `getAvailableVenues()`, `hasFixture()`
+- [x] TypeScript types correct (uses `PersonaPresenceScript` from schema)
+- [x] Ready for Step 2
 
 ### Checkpoint 2: WebSocket Mock Updated
 - [ ] Step 2 complete
