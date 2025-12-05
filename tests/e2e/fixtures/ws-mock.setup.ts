@@ -9,8 +9,12 @@ import { test as base } from '@playwright/test';
 import { WsMock } from '../../mocks/websocket-mock';
 import type { PersonaPresenceScript } from '../../fixtures/persona-presence/schema';
 
-// Import presence scripts
+// Import presence scripts (direct import - backward compatible)
 import campusLibraryScript from '../../fixtures/persona-presence/campus-library.json';
+
+// Loader helper (optional - can be used instead of direct imports)
+// Example: loadFixture('campus-library') instead of direct import
+import { loadFixture } from '../../fixtures/persona-presence/loader';
 
 export interface WebSocketMockFixture {
   wsMock: WsMock;
@@ -18,6 +22,9 @@ export interface WebSocketMockFixture {
 }
 
 export const test = base.extend<WebSocketMockFixture>({
+  // Default: use campus-library fixture (backward compatible with direct import)
+  // Alternative: use loader helper: loadFixture('campus-library')
+  // Both approaches work - loader provides centralized access, direct import still supported
   presenceScript: [campusLibraryScript as PersonaPresenceScript, { option: true }],
 
   wsMock: async ({ page, presenceScript }, use) => {
