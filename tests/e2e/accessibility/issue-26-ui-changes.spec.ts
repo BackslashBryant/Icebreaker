@@ -16,6 +16,8 @@ import { SEL } from "../../utils/selectors";
 
 test.describe("Accessibility: Issue #26 UI Changes", () => {
   test("onboarding callouts meet WCAG AA standards", async ({ page }) => {
+    await page.goto("/welcome");
+    await waitForBootSequence(page);
     await page.goto("/onboarding");
     await page.waitForLoadState("networkidle");
     
@@ -44,6 +46,8 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
   });
 
   test("selected states are keyboard accessible with visible focus rings", async ({ page }) => {
+    await page.goto("/welcome");
+    await waitForBootSequence(page);
     await page.goto("/onboarding");
     await page.waitForLoadState("networkidle");
     await page.locator(SEL.onboardingGotIt).click();
@@ -114,6 +118,8 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
   });
 
   test("focus rings meet contrast requirements", async ({ page }) => {
+    await page.goto("/welcome");
+    await waitForBootSequence(page);
     await page.goto("/onboarding");
     await page.waitForLoadState("networkidle");
     await page.locator(SEL.onboardingGotIt).click();
