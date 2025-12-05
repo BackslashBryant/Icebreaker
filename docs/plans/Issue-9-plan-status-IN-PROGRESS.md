@@ -90,7 +90,7 @@ What is the current state of persona presence fixtures, and what loader helper i
 **Acceptance Criteria**:
 - [x] WebSocket mock setup uses loader helper (loadFixture('campus-library') as default)
 - [x] Backward compatibility maintained (direct import commented but available)
-- [x] Tests pass with loader helper (loader tests moved to e2e directory, accessibility tests fixed)
+- [ ] Tests pass with loader helper (fixes applied, awaiting test run verification)
 
 **Tests**:
 - Run existing multi-user tests: `npm test -- tests/e2e/personas/multi-user.spec.ts`
@@ -117,12 +117,15 @@ What is the current state of persona presence fixtures, and what loader helper i
 - [x] Ready for Step 2
 
 ### Checkpoint 2: WebSocket Mock Updated
-- [x] Step 2 complete (2025-12-05)
+- [x] Step 2 implementation complete (2025-12-05)
 - [x] Loader helper implemented in ws-mock.setup.ts (loadFixture('campus-library') as default)
 - [x] Loader tests moved to tests/e2e/fixtures/persona-presence/loader.test.ts (Playwright can run them)
 - [x] Backward compatibility maintained (direct import commented but available)
 - [x] Accessibility tests fixed (Issue #26 fixes applied: removed bg-muted checks, added setupSession, added .first())
-- [x] Ready for Step 3
+- [x] Block-report tests fixed (updated selector to use data-testid for Press Start button)
+- [x] Error callout test fixed (mock API error to trigger error state)
+- [ ] Test suite verification pending (fixes applied, need to run npm test to confirm green)
+- [ ] Ready for Step 3 (pending test verification)
 
 ### Checkpoint 3: Documentation Updated
 - [ ] Step 3 complete
