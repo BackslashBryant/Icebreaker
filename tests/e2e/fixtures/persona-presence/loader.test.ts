@@ -5,8 +5,8 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { loadFixture, getAvailableVenues, hasFixture } from './loader';
-import type { PersonaPresenceScript } from './schema';
+import { loadFixture, getAvailableVenues, hasFixture } from '../../../fixtures/persona-presence/loader';
+import type { PersonaPresenceScript } from '../../../fixtures/persona-presence/schema';
 
 test.describe('Persona Presence Fixture Loader', () => {
   test('getAvailableVenues() returns all fixture venues', () => {
