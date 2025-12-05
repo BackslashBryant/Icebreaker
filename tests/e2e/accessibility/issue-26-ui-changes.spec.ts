@@ -196,6 +196,15 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
   });
 
   test("error callouts use proper ARIA roles", async ({ page }) => {
+    // Mock API to return error to trigger error callout
+    await page.route("**/api/session", (route) =>
+      route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "Failed to create session. Try again?" }),
+      })
+    );
+
     await page.goto("/onboarding");
     await page.waitForLoadState("networkidle");
     await page.locator(SEL.onboardingGotIt).click();
@@ -205,11 +214,14 @@ test.describe("Accessibility: Issue #26 UI Changes", () => {
     await page.locator(SEL.onboardingSkipLocation).click();
     await expect(page.locator(SEL.onboardingStep3)).toBeVisible({ timeout: 10000 });
     
-    // Try to submit without selecting a vibe (should trigger error)
+    // Select a vibe so the submit button is enabled
+    await page.locator(SEL.vibeBanter).click();
+    
+    // Submit form - API will return error, triggering error callout
     await page.locator(SEL.onboardingEnterRadar).click();
     
-    // Wait for error message
-    const errorMessage = page.getByRole("alert").or(page.getByText(/required|error/i));
+    // Wait for error message (role="alert" from error state)
+    const errorMessage = page.getByRole("alert");
     await expect(errorMessage).toBeVisible({ timeout: 5000 });
     
     const errorResults = await new AxeBuilder({ page })

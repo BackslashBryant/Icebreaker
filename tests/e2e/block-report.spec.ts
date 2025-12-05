@@ -12,7 +12,8 @@ async function completeOnboarding(page: any, vibe: string = "banter") {
   // Wait for boot sequence
   await expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout: 10000 });
   
-  await page.getByRole("link", { name: /PRESS START/i }).click();
+  // Use data-testid selector (button text is "Press Start", not "PRESS START")
+  await page.locator('[data-testid="cta-press-start"]').click();
   await expect(page).toHaveURL(/.*\/onboarding/, { timeout: 5000 });
   
   await page.getByRole("button", { name: /GOT IT/i }).click();
