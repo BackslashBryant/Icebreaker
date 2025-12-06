@@ -181,6 +181,43 @@ describe("CooldownManager", () => {
     });
   });
 
+  describe("integration: cooldown lifecycle", () => {
+    it("enters cooldown after threshold declines and reports remaining time", () => {
+      const sessionData = createSession({
+        vibe: "banter",
+        tags: [],
+        visibility: true,
+      });
+
+      recordDecline(sessionData.sessionId);
+      recordDecline(sessionData.sessionId);
+      recordDecline(sessionData.sessionId);
+      triggerCooldown(sessionData.sessionId);
+
+      expect(isInCooldown(sessionData.sessionId)).toBe(true);
+      const remaining = getCooldownRemaining(sessionData.sessionId);
+      expect(remaining).toBeGreaterThan(0);
+    });
+
+    it("clears expired cooldown after time passes", () => {
+      vi.useFakeTimers();
+      const sessionData = createSession({
+        vibe: "banter",
+        tags: [],
+        visibility: true,
+      });
+
+      triggerCooldown(sessionData.sessionId);
+      expect(isInCooldown(sessionData.sessionId)).toBe(true);
+
+      vi.setSystemTime(Date.now() + 60 * 60 * 1000);
+      clearExpiredCooldown();
+
+      expect(isInCooldown(sessionData.sessionId)).toBe(false);
+      vi.useRealTimers();
+    });
+  });
+
   describe("isInCooldown", () => {
     it("returns true for session in active cooldown", () => {
       const sessionData = createSession({
