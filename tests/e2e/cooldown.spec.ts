@@ -6,25 +6,47 @@ import { getBackendURL } from "../utils/test-helpers";
  * Helper function to complete onboarding and return session token
  */
 async function completeOnboarding(page: any, vibe: string = "banter") {
+  // Wait for page to be ready
   await page.goto("/welcome", { waitUntil: "networkidle" });
-  await page.waitForLoadState("networkidle");
-  // Wait for boot sequence
+  // Wait for boot sequence to complete
   await expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout: 10000 });
+  // Additional wait to ensure page is fully loaded
+  await page.waitForLoadState("domcontentloaded");
   
-  await page.getByRole("link", { name: /PRESS START/i }).click();
+  // Use data-testid selector (button text is "Press Start", not "PRESS START")
+  await page.locator('[data-testid="cta-press-start"]').click();
   await expect(page).toHaveURL(/.*\/onboarding/, { timeout: 5000 });
   
-  await page.getByRole("button", { name: /GOT IT/i }).click();
-  await page.getByRole("checkbox", { name: /I confirm I am 18 or older/i }).check();
-  await page.getByRole("button", { name: /CONTINUE/i }).click();
-  await page.getByRole("button", { name: /Skip for now/i }).click();
-  await page.getByRole("button", { name: new RegExp(vibe, "i") }).click();
-  await page.getByRole("button", { name: /SUBMIT/i }).click();
+  // Step 0: What We Are/Not
+  await expect(page.locator('[data-testid="onboarding-step-0"]')).toBeVisible({ timeout: 10000 });
+  await page.locator('[data-testid="onboarding-got-it"]').click();
   
+  // Step 1: 18+ Consent
+  await expect(page.locator('[data-testid="onboarding-step-1"]')).toBeVisible({ timeout: 10000 });
+  // Use data-testid selector for checkbox (label is "I am 18 or older", not "I confirm...")
+  await page.locator('[data-testid="onboarding-consent"]').check();
+  await page.locator('[data-testid="onboarding-continue"]').click();
+  
+  // Step 2: Location
+  await expect(page.locator('[data-testid="onboarding-step-2"]')).toBeVisible({ timeout: 10000 });
+  await page.locator('[data-testid="onboarding-skip-location"]').click();
+  
+  // Step 3: Vibe & Tags
+  await expect(page.locator('[data-testid="onboarding-step-3"]')).toBeVisible({ timeout: 10000 });
+  await page.locator(`[data-testid="vibe-${vibe}"]`).click();
+  await page.locator('[data-testid="onboarding-enter-radar"]').click();
+  
+  // Wait for navigation to Radar
   await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });
   
+  // Extract session token from sessionStorage (session is stored as JSON object)
   const sessionToken = await page.evaluate(() => {
-    return localStorage.getItem("icebreaker_session_token");
+    const sessionStr = sessionStorage.getItem("icebreaker_session");
+    if (sessionStr) {
+      const session = JSON.parse(sessionStr);
+      return session.token || null;
+    }
+    return null;
   });
   
   return sessionToken;
@@ -37,10 +59,11 @@ test.describe("Chat Request Cooldowns", () => {
     expect(requesterToken).toBeTruthy();
 
     // Wait for Radar connection
-    await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Connected/i).first()).toBeVisible({ timeout: 10000 });
     // Wait for radar content to be available (people list or empty state)
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one nearby/i))).toBeVisible({ timeout: 5000 });
+    // Use .first() to resolve strict mode violation (main element is always visible)
+    await expect(page.getByRole("main").first()).toBeVisible({ timeout: 5000 });
 
     // Create 3 target sessions that will decline
     const contexts = [];
@@ -53,11 +76,12 @@ test.describe("Chat Request Cooldowns", () => {
       contexts.push(context);
       pages.push(targetPage);
       
-      const token = await completeOnboarding(targetPage, `target${i}`);
+      const token = await completeOnboarding(targetPage, "banter");
+      expect(token).toBeTruthy();
       tokens.push(token);
       
-      // Wait for connection
-      await expect(targetPage.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
+      // Wait for connection (use .first() to resolve strict mode violation)
+      await expect(targetPage.getByText(/Connected/i).first()).toBeVisible({ timeout: 10000 });
     }
 
     // Get requester session ID from backend (via API)
@@ -88,7 +112,7 @@ test.describe("Chat Request Cooldowns", () => {
     // Verify cooldown is active by trying to request a chat
     // Navigate to Radar and try to request chat
     await page.goto("/radar");
-    await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Connected/i).first()).toBeVisible({ timeout: 10000 });
 
     // If people are available, try to request chat
     const personButtons = page.locator("ul[role='list'] li button");
@@ -126,10 +150,11 @@ test.describe("Chat Request Cooldowns", () => {
     await completeOnboarding(page);
 
     // Wait for Radar connection
-    await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Connected/i).first()).toBeVisible({ timeout: 10000 });
     // Wait for radar content to be available
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one nearby/i))).toBeVisible({ timeout: 5000 });
+    // Use .first() to resolve strict mode violation (main element is always visible)
+    await expect(page.getByRole("main").first()).toBeVisible({ timeout: 5000 });
 
     // Simulate cooldown by sending WebSocket error message
     // Note: In real E2E, we'd trigger actual cooldown via backend
@@ -137,7 +162,7 @@ test.describe("Chat Request Cooldowns", () => {
 
     // Navigate to Radar
     await page.goto("/radar");
-    await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Connected/i).first()).toBeVisible({ timeout: 10000 });
 
     // If people are available, open PersonCard
     const personButtons = page.locator("ul[role='list'] li button");
@@ -166,11 +191,11 @@ test.describe("Chat Request Cooldowns", () => {
     await completeOnboarding(page);
 
     // Wait for Radar connection
-    await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Connected/i).first()).toBeVisible({ timeout: 10000 });
 
     // Navigate to Radar
     await page.goto("/radar");
-    await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Connected/i).first()).toBeVisible({ timeout: 10000 });
 
     // Note: Testing countdown timer updates requires actual cooldown state
     // This test verifies the UI structure supports countdown display
@@ -202,14 +227,15 @@ test.describe("Chat Request Cooldowns", () => {
     await completeOnboarding(page);
 
     // Wait for Radar connection
-    await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Connected/i).first()).toBeVisible({ timeout: 10000 });
     // Wait for radar content to be available
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one nearby/i))).toBeVisible({ timeout: 5000 });
+    // Use .first() to resolve strict mode violation (main element is always visible)
+    await expect(page.getByRole("main").first()).toBeVisible({ timeout: 5000 });
 
     // Navigate to Radar
     await page.goto("/radar");
-    await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Connected/i).first()).toBeVisible({ timeout: 10000 });
 
     // Open PersonCard
     const personButtons = page.locator("ul[role='list'] li button");
@@ -242,14 +268,15 @@ test.describe("Chat Request Cooldowns", () => {
     await completeOnboarding(page);
 
     // Wait for Radar connection
-    await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Connected/i).first()).toBeVisible({ timeout: 10000 });
     // Wait for radar content to be available
     await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("main").or(page.locator("canvas")).or(page.locator("ul[role='list']")).or(page.getByText(/No one nearby/i))).toBeVisible({ timeout: 5000 });
+    // Use .first() to resolve strict mode violation (main element is always visible)
+    await expect(page.getByRole("main").first()).toBeVisible({ timeout: 5000 });
 
     // Navigate to Radar
     await page.goto("/radar");
-    await expect(page.getByText(/Connected/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Connected/i).first()).toBeVisible({ timeout: 10000 });
 
     // Navigate to PersonCard with keyboard
     const personButtons = page.locator("ul[role='list'] li button");
