@@ -33,6 +33,19 @@
         "@modelcontextprotocol/server-filesystem",
         "C:\\Users\\OrEo2\\Desktop\\DevOps\\1. Projects\\Icebreaker"
       ]
+    },
+    "semgrep": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@semgrep/mcp"
+      ],
+      "env": {
+        "SEMGREP_APP_TOKEN": "${env:SEMGREP_APP_TOKEN}"
+      }
+    },
+    "sentry": {
+      "url": "https://mcp.sentry.dev/mcp"
     }
   }
 }

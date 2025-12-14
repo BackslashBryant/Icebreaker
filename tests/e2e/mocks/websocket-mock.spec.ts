@@ -49,8 +49,8 @@ test.describe('WebSocket Mock Infrastructure', () => {
   test('connect() triggers onConnect callback', async ({ page, wsMock }) => {
     await page.goto('/welcome');
     
-    let onConnectCalled = false;
-    let receivedMessage: any = null;
+    const browserName = page.context().browser()?.browserType().name();
+    const isWebKit = browserName === "webkit";
 
     await page.evaluate(() => {
       const mock = (window as any).__WS_MOCK__;
@@ -64,19 +64,22 @@ test.describe('WebSocket Mock Infrastructure', () => {
       }
     });
 
-    // Wait for connection to establish (mock uses 10ms setTimeout)
-    await page.waitForTimeout(50);
+    // WebKit needs longer wait for setTimeout(10ms) to fire
+    const waitTime = isWebKit ? 200 : 50;
+    await page.waitForTimeout(waitTime);
 
-    const result = await page.evaluate(() => {
-      return {
-        onOpenCalled: (window as any).__TEST_ONOPEN_CALLED__ === true,
-        message: (window as any).__TEST_MESSAGE__,
-      };
-    });
-
-    expect(result.onOpenCalled).toBe(true);
-    expect(result.message).toBeDefined();
-    expect(result.message.type).toBe('connected');
+    // Poll for WebKit timing - onopen might fire after initial timeout
+    await expect(async () => {
+      const result = await page.evaluate(() => {
+        return {
+          onOpenCalled: (window as any).__TEST_ONOPEN_CALLED__ === true,
+          message: (window as any).__TEST_MESSAGE__,
+        };
+      });
+      expect(result.onOpenCalled).toBe(true);
+      expect(result.message).toBeDefined();
+      expect(result.message.type).toBe('connected');
+    }).toPass({ timeout: isWebKit ? 2000 : 500 });
   });
 
   test('reset() clears all connections and state', async ({ page, wsMock }) => {
@@ -104,21 +107,34 @@ test.describe('WebSocket Mock Infrastructure', () => {
     expect(connectionsBefore).toBeGreaterThan(0);
 
     // Reset mock
+    const browserName = page.context().browser()?.browserType().name();
+    const isWebKit = browserName === "webkit";
+    
     await page.evaluate(() => {
-      if ((window as any).__WS_MOCK_RESET__) {
+      const mock = (window as any).__WS_MOCK__;
+      if (mock && typeof mock.reset === 'function') {
+        mock.reset();
+      } else if ((window as any).__WS_MOCK_RESET__) {
         (window as any).__WS_MOCK_RESET__();
       }
     });
 
-    // Verify connections cleared
-    const connectionsAfter = await page.evaluate(() => {
-      const mock = (window as any).__WS_MOCK__;
-      if (mock && mock.connections) {
-        return mock.connections.size;
-      }
-      return 0;
-    });
-    expect(connectionsAfter).toBe(0);
+    // WebKit needs time for reset to propagate
+    if (isWebKit) {
+      await page.waitForTimeout(100);
+    }
+
+    // Verify connections cleared (poll for WebKit timing)
+    await expect(async () => {
+      const connectionsAfter = await page.evaluate(() => {
+        const mock = (window as any).__WS_MOCK__;
+        if (mock && mock.connections) {
+          return mock.connections.size;
+        }
+        return 0;
+      });
+      expect(connectionsAfter).toBe(0);
+    }).toPass({ timeout: isWebKit ? 3000 : 1000 });
   });
 
   test('disconnect() removes connection and triggers onclose', async ({ page, wsMock }) => {
