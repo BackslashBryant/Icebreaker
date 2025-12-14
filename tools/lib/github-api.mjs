@@ -17,23 +17,102 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..', '..');
 
 /**
+ * Clear user-level GITHUB_TOKEN on Windows if it's blocking GitHub CLI keyring
+ * This is a one-time fix that prevents the "GITHUB_TOKEN env var is being used" error
+ */
+function clearBlockingUserToken() {
+  if (process.platform === 'win32') {
+    try {
+      // Check if user-level token exists
+      const userToken = execSync(
+        'powershell -Command "[System.Environment]::GetEnvironmentVariable(\'GITHUB_TOKEN\', \'User\')"',
+        { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }
+      ).trim();
+      
+      if (userToken) {
+        // Clear user-level token (one-time fix)
+        execSync(
+          'powershell -Command "[System.Environment]::SetEnvironmentVariable(\'GITHUB_TOKEN\', $null, \'User\')"',
+          { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }
+        );
+        console.warn('⚠️  Cleared user-level GITHUB_TOKEN that was blocking GitHub CLI keyring');
+        console.warn('   This was a one-time fix. Future sessions will use keyring token automatically.');
+      }
+    } catch (error) {
+      // Ignore errors - clearing is best-effort
+    }
+  }
+}
+
+/**
  * Get GitHub token from GitHub CLI keyring first, then fall back to env vars
  * This prevents issues with expired/invalid GITHUB_TOKEN env vars
+ * Automatically clears blocking user-level tokens on Windows
  */
 export function getGitHubToken() {
   // Try GitHub CLI keyring first (most reliable)
   try {
-    const token = execSync('gh auth token', {
+    // Clear process-level GITHUB_TOKEN to ensure gh CLI uses keyring
+    const originalToken = process.env.GITHUB_TOKEN;
+    delete process.env.GITHUB_TOKEN;
+    
+    const tokenOutput = execSync('gh auth token', {
       cwd: repoRoot,
       stdio: ['ignore', 'pipe', 'pipe'],
       encoding: 'utf8',
+      env: { ...process.env, GITHUB_TOKEN: undefined },
     }).trim();
     
+    // Check if gh CLI complained about env var blocking
+    if (tokenOutput.includes('GITHUB_TOKEN environment variable') || 
+        tokenOutput.includes('environment variable is being used')) {
+      // User-level token is blocking - clear it automatically
+      clearBlockingUserToken();
+      // Retry after clearing
+      const retryToken = execSync('gh auth token', {
+        cwd: repoRoot,
+        stdio: ['ignore', 'pipe', 'pipe'],
+        encoding: 'utf8',
+        env: { ...process.env, GITHUB_TOKEN: undefined },
+      }).trim();
+      
+      if (retryToken && (retryToken.startsWith('gho_') || retryToken.startsWith('ghp_'))) {
+        return retryToken;
+      }
+    }
+    
     // Check if token looks valid (starts with gho_ or ghp_)
-    if (token && (token.startsWith('gho_') || token.startsWith('ghp_'))) {
-      return token;
+    if (tokenOutput && (tokenOutput.startsWith('gho_') || tokenOutput.startsWith('ghp_'))) {
+      return tokenOutput;
+    }
+    
+    // Restore original token if we had one
+    if (originalToken) {
+      process.env.GITHUB_TOKEN = originalToken;
     }
   } catch (error) {
+    // Check if error message indicates env var blocking
+    const errorMsg = error.message || error.stderr?.toString() || '';
+    if (errorMsg.includes('GITHUB_TOKEN environment variable') || 
+        errorMsg.includes('environment variable is being used')) {
+      // User-level token is blocking - clear it automatically
+      clearBlockingUserToken();
+      // Retry after clearing
+      try {
+        const retryToken = execSync('gh auth token', {
+          cwd: repoRoot,
+          stdio: ['ignore', 'pipe', 'pipe'],
+          encoding: 'utf8',
+          env: { ...process.env, GITHUB_TOKEN: undefined },
+        }).trim();
+        
+        if (retryToken && (retryToken.startsWith('gho_') || retryToken.startsWith('ghp_'))) {
+          return retryToken;
+        }
+      } catch (retryError) {
+        // GitHub CLI not authenticated or not available, fall through to env vars
+      }
+    }
     // GitHub CLI not authenticated or not available, fall through to env vars
   }
   
@@ -46,17 +125,20 @@ export function getGitHubToken() {
       // We'll let the API call fail if it's invalid rather than blocking here
       return envToken;
     } else {
-      // Invalid token format - clear it and try keyring again
-      console.warn('⚠️  GITHUB_TOKEN env var has invalid format, ignoring it');
-      // On Windows, we can't unset parent process env vars, but we can ignore this one
-      // Try keyring one more time
+      // Invalid token format - clear user-level token and try keyring again
+      console.warn('⚠️  GITHUB_TOKEN env var has invalid format, attempting auto-recovery...');
+      clearBlockingUserToken();
+      
+      // Try keyring one more time after clearing
       try {
         const keyringToken = execSync('gh auth token', {
           cwd: repoRoot,
           stdio: ['ignore', 'pipe', 'pipe'],
           encoding: 'utf8',
+          env: { ...process.env, GITHUB_TOKEN: undefined },
         }).trim();
         if (keyringToken && (keyringToken.startsWith('gho_') || keyringToken.startsWith('ghp_'))) {
+          console.log('✅ Auto-recovery successful: using GitHub CLI keyring token');
           return keyringToken;
         }
       } catch (error) {
@@ -67,7 +149,7 @@ export function getGitHubToken() {
         'GitHub token not found or invalid. Either:\n' +
         '  1. Run "gh auth login" to authenticate GitHub CLI (recommended)\n' +
         '  2. Set valid GITHUB_TOKEN or GH_TOKEN environment variable (must start with gho_ or ghp_)\n' +
-        '  3. Clear invalid GITHUB_TOKEN: $env:GITHUB_TOKEN = $null (PowerShell) or unset GITHUB_TOKEN (bash)'
+        '  3. Run: node tools/fix-github-auth.ps1 (automatically clears blocking tokens)'
       );
     }
   }
@@ -127,9 +209,23 @@ export function getApiBase() {
 /**
  * Make a REST API request to GitHub
  * Uses REST API (not GraphQL) for reliability
+ * Automatically retries with keyring token if env var token fails
  */
-export async function githubApiRequest(endpoint, options = {}) {
-  const token = getGitHubToken();
+export async function githubApiRequest(endpoint, options = {}, retryCount = 0) {
+  let token;
+  try {
+    token = getGitHubToken();
+  } catch (error) {
+    // If token retrieval failed and we haven't retried, try clearing blocking tokens
+    if (retryCount === 0 && process.platform === 'win32') {
+      clearBlockingUserToken();
+      // Retry once after clearing
+      token = getGitHubToken();
+    } else {
+      throw error;
+    }
+  }
+  
   const apiBase = getApiBase();
   const url = endpoint.startsWith('http') ? endpoint : `${apiBase}${endpoint}`;
   
@@ -152,6 +248,15 @@ export async function githubApiRequest(endpoint, options = {}) {
   
   if (!response.ok) {
     const errorText = await response.text();
+    
+    // If 401 and we haven't retried, try clearing blocking tokens and retry
+    if (response.status === 401 && retryCount === 0 && process.platform === 'win32') {
+      console.warn('⚠️  GitHub API returned 401, attempting auto-recovery...');
+      clearBlockingUserToken();
+      // Retry once with fresh token
+      return githubApiRequest(endpoint, options, retryCount + 1);
+    }
+    
     throw new Error(`GitHub API error (${response.status}): ${errorText}`);
   }
   
