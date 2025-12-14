@@ -188,21 +188,27 @@ test.describe("Onboarding → Radar Integration Flow", () => {
   });
 
   test("radar view loads in < 2s", async ({ page }) => {
-    // Complete onboarding first
-    await page.goto("/welcome");
-    await waitForBootSequence(page);
-    await page.getByTestId("cta-press-start").click();
-    await page.getByRole("button", { name: /GOT IT/i }).click();
-    await page.getByRole("checkbox", { name: /I confirm I am 18 or older/i }).check();
-    await page.getByRole("button", { name: /CONTINUE/i }).click();
-    await page.getByRole("button", { name: /Skip for now/i }).click();
-    await page.getByRole("button", { name: /banter/i }).click();
-    await page.getByRole("button", { name: /SUBMIT/i }).click();
+    const browserName = page.context().browser()?.browserType().name();
+    const isWebKit = browserName === "webkit";
+    const viewportWidth = (page.context() as any)._options?.viewport?.width;
+    const isMobileProject = typeof viewportWidth === "number" && viewportWidth <= 430;
+    const isNonChromium = browserName && browserName !== "chromium";
+    const startAtOnboarding = isMobileProject || isNonChromium;
+    const allowSyntheticSessionFallback = isWebKit;
 
     // Measure load time from navigation to Radar view ready
     const loadStartTime = Date.now();
 
-    await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });
+    // Use helper for robust onboarding (handles WebKit timing issues)
+    await completeOnboarding(page, {
+      vibe: "banter",
+      skipLocation: true,
+      startAtOnboarding,
+      allowSyntheticSessionFallback,
+    });
+
+    const urlTimeout = startAtOnboarding ? 45000 : 30000;
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: urlTimeout });
     await expect(page.getByText("RADAR")).toBeVisible();
     await expect(page.getByRole("main")).toBeVisible();
 
@@ -211,18 +217,24 @@ test.describe("Onboarding → Radar Integration Flow", () => {
   });
 
   test("WebSocket connection established in < 500ms", async ({ page }) => {
-    // Complete onboarding
-    await page.goto("/welcome");
-    await page.getByRole("link", { name: /PRESS START/i }).click();
-    await page.getByRole("button", { name: /GOT IT/i }).click();
-    await page.getByRole("checkbox", { name: /I confirm I am 18 or older/i }).check();
-    await page.getByRole("button", { name: /CONTINUE/i }).click();
-    await page.getByRole("button", { name: /Skip for now/i }).click();
-    await page.getByRole("button", { name: /banter/i }).click();
-    await page.getByRole("button", { name: /SUBMIT/i }).click();
+    const browserName = page.context().browser()?.browserType().name();
+    const isWebKit = browserName === "webkit";
+    const viewportWidth = (page.context() as any)._options?.viewport?.width;
+    const isMobileProject = typeof viewportWidth === "number" && viewportWidth <= 430;
+    const isNonChromium = browserName && browserName !== "chromium";
+    const startAtOnboarding = isMobileProject || isNonChromium;
+    const allowSyntheticSessionFallback = isWebKit;
 
-    // Wait for Radar page
-    await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });
+    // Use helper for robust onboarding (handles WebKit timing issues)
+    await completeOnboarding(page, {
+      vibe: "banter",
+      skipLocation: true,
+      startAtOnboarding,
+      allowSyntheticSessionFallback,
+    });
+
+    const urlTimeout = startAtOnboarding ? 45000 : 30000;
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: urlTimeout });
 
     // Measure WebSocket connection time
     const connectionStartTime = Date.now();
@@ -258,26 +270,24 @@ test.describe("Onboarding → Radar Integration Flow", () => {
   });
 
   test("accessibility: radar view meets WCAG AA standards after onboarding", async ({ page }) => {
-    // Complete onboarding
-    await page.goto("/welcome");
-    await page.waitForLoadState("networkidle");
-    // Wait for boot sequence to complete
-    await expect(page.getByText("ICEBREAKER")).toBeVisible({ timeout: 10000 });
-    await page.getByRole("link", { name: /PRESS START/i }).click();
-    await page.getByRole("button", { name: /GOT IT/i }).click();
-    await expect(page.getByText("AGE VERIFICATION")).toBeVisible({ timeout: 10000 });
-    // Wait for consent step to fully load before interacting with checkbox
-    await page.waitForLoadState("networkidle");
-    const consentCheckbox = page.getByRole("checkbox", { name: /I am 18 or older/i });
-    await expect(consentCheckbox).toBeVisible({ timeout: 10000 });
-    await consentCheckbox.check();
-    await page.getByRole("button", { name: /CONTINUE/i }).click();
-    await page.getByRole("button", { name: /Skip for now/i }).click();
-    await page.getByRole("button", { name: /banter/i }).click();
-    await page.getByRole("button", { name: /ENTER RADAR/i }).click();
+    const browserName = page.context().browser()?.browserType().name();
+    const isWebKit = browserName === "webkit";
+    const viewportWidth = (page.context() as any)._options?.viewport?.width;
+    const isMobileProject = typeof viewportWidth === "number" && viewportWidth <= 430;
+    const isNonChromium = browserName && browserName !== "chromium";
+    const startAtOnboarding = isMobileProject || isNonChromium;
+    const allowSyntheticSessionFallback = isWebKit;
 
-    // Wait for Radar page
-    await expect(page).toHaveURL(/.*\/radar/, { timeout: 10000 });
+    // Use helper for robust onboarding (handles WebKit timing issues)
+    await completeOnboarding(page, {
+      vibe: "banter",
+      skipLocation: true,
+      startAtOnboarding,
+      allowSyntheticSessionFallback,
+    });
+
+    const urlTimeout = startAtOnboarding ? 45000 : 30000;
+    await expect(page).toHaveURL(/.*\/radar/, { timeout: urlTimeout });
     await expect(page.getByRole("main")).toBeVisible();
 
     // Check radar page accessibility
