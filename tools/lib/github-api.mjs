@@ -17,10 +17,43 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..', '..');
 
 /**
+ * Check if .env file contains GITHUB_TOKEN and warn/remove it
+ * This is the PRIMARY source of auth issues - .env files are auto-loaded
+ */
+function checkAndRemoveEnvFileToken() {
+  try {
+    const fs = require('fs');
+    const envPath = path.join(repoRoot, '.env');
+    if (fs.existsSync(envPath)) {
+      const envContent = fs.readFileSync(envPath, 'utf8');
+      const tokenMatch = envContent.match(/^\s*GITHUB_TOKEN\s*=\s*.+$/m);
+      if (tokenMatch) {
+        console.error('❌ CRITICAL: GITHUB_TOKEN found in .env file - this breaks GitHub CLI authentication!');
+        console.error('   Removing GITHUB_TOKEN from .env file...');
+        const newContent = envContent.replace(/^\s*GITHUB_TOKEN\s*=\s*.+$/gm, 
+          '# GitHub MCP - DO NOT SET GITHUB_TOKEN HERE\n' +
+          '# GitHub CLI uses keyring authentication (gh auth login)\n' +
+          '# Setting GITHUB_TOKEN in .env breaks GitHub CLI authentication\n' +
+          '# MCP servers should call \'gh auth token\' to get token when needed'
+        );
+        fs.writeFileSync(envPath, newContent, 'utf8');
+        console.error('   ✅ Removed GITHUB_TOKEN from .env file');
+        console.error('   Run "gh auth login" to authenticate with GitHub CLI keyring');
+      }
+    }
+  } catch (error) {
+    // Ignore errors - best effort
+  }
+}
+
+/**
  * Clear user-level GITHUB_TOKEN on Windows if it's blocking GitHub CLI keyring
- * This is a one-time fix that prevents the "GITHUB_TOKEN env var is being used" error
+ * Also checks .env file for GITHUB_TOKEN (PRIMARY source of issues)
  */
 function clearBlockingUserToken() {
+  // FIRST: Check .env file (most common source of issues)
+  checkAndRemoveEnvFileToken();
+  
   if (process.platform === 'win32') {
     try {
       // Check if user-level token exists

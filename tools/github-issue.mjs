@@ -17,7 +17,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadCurrentFeature } from './lib/workflow-utils.mjs';
-import { getRepo, createIssue } from './lib/github-api.mjs';
+import { getRepo, createIssue, getGitHubToken } from './lib/github-api.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -137,7 +137,7 @@ async function main() {
     body = loadTemplateBody(template.file);
   }
 
-  const token = getToken();
+  const token = getGitHubToken();
   const repo = getRepo();
 
   const templateLabels = [];
@@ -162,7 +162,6 @@ async function main() {
   const inferred = deriveLabelsFromBody(body);
   const labels = Array.from(new Set([...templateLabels, ...inferred]));
 
-  const repo = getRepo();
   const result = await createIssue(repo, { title, body, labels });
   console.log(`Created issue #${result.number}: ${result.html_url}`);
 

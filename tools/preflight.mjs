@@ -264,6 +264,21 @@ function checkMcpConfig() {
   for (const serverName of serverNames) {
     const server = servers[serverName];
     if (githubTokenServers.some(name => serverName.includes(name.replace('-v2', '')))) {
+      // CRITICAL: Check if .env file contains GITHUB_TOKEN (breaks GitHub CLI auth)
+      try {
+        const fs = require('fs');
+        const envPath = path.join(repoRoot, '.env');
+        if (fs.existsSync(envPath)) {
+          const envContent = fs.readFileSync(envPath, 'utf8');
+          if (envContent.match(/^\s*GITHUB_TOKEN\s*=\s*.+$/m)) {
+            addResult('GitHub Auth', false, 'CRITICAL: GITHUB_TOKEN found in .env file - this breaks GitHub CLI authentication! Remove it immediately.');
+            hasErrors = true;
+          }
+        }
+      } catch (error) {
+        // Ignore errors
+      }
+      
       if (!server.env || !server.env.GITHUB_TOKEN) {
         missingEnv = true;
         break;
@@ -280,25 +295,48 @@ function checkMcpConfig() {
 }
 
 function checkGitHubToken() {
+  // CRITICAL: Check if .env file contains GITHUB_TOKEN (breaks GitHub CLI auth)
+  try {
+    const fs = require('fs');
+    const envPath = path.join(repoRoot, '.env');
+    if (fs.existsSync(envPath)) {
+      const envContent = fs.readFileSync(envPath, 'utf8');
+      if (envContent.match(/^\s*GITHUB_TOKEN\s*=\s*.+$/m)) {
+        addResult('GitHub Auth', false, 'CRITICAL: GITHUB_TOKEN in .env breaks GitHub CLI! Remove it from .env file immediately.');
+        hasErrors = true;
+        return; // Don't check auth if .env has token
+      }
+    }
+  } catch (error) {
+    // Ignore errors
+  }
+  
   try {
     // Simple check: verify GitHub CLI is authenticated
     const output = execSync('gh auth status', {
       cwd: repoRoot,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
-      timeout: 5000
+      timeout: 5000,
+      env: { ...process.env, GITHUB_TOKEN: undefined },
     });
     
     if (output.includes('Logged in') || output.includes('✓')) {
       addResult('GitHub auth', true, 'GitHub CLI authenticated');
     } else {
       addResult('GitHub auth', false, 'GitHub CLI not authenticated. Run: gh auth login');
+      hasErrors = true;
     }
   } catch (error) {
     // GitHub CLI not installed or not authenticated
     const errorMsg = error instanceof Error ? error.message : String(error);
-    if (errorMsg.includes('not authenticated') || errorMsg.includes('not logged in')) {
+    const stderr = error.stderr?.toString() || '';
+    if (errorMsg.includes('GITHUB_TOKEN environment variable') || stderr.includes('GITHUB_TOKEN environment variable')) {
+      addResult('GitHub Auth', false, 'CRITICAL: GITHUB_TOKEN env var blocking GitHub CLI! Clear it: $env:GITHUB_TOKEN = $null (PowerShell)');
+      hasErrors = true;
+    } else if (errorMsg.includes('not authenticated') || errorMsg.includes('not logged in')) {
       addResult('GitHub auth', false, 'GitHub CLI not authenticated. Run: gh auth login');
+      hasErrors = true;
     } else {
       addResult('GitHub auth', true, 'GitHub CLI check skipped (CLI may not be installed)');
     }

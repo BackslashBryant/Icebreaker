@@ -131,7 +131,7 @@ Use this whenever you're touching shared workflow/config files (rules, tools, au
   - **Token priority**: `gh auth token` (keyring) → `GITHUB_TOKEN` env var (if valid format). Invalid `GITHUB_TOKEN` env vars are automatically ignored.
   - **Git operations**: Use SSH automatically (via `git@github.com` remote URL). No authentication needed for git push/pull.
   - **If API auth fails**: Clear invalid `GITHUB_TOKEN` with `$env:GITHUB_TOKEN = $null` (PowerShell) or `unset GITHUB_TOKEN` (bash), then retry. Scripts automatically fall back to keyring token.
-  - **Never store tokens in `.env`**: Setting `GITHUB_TOKEN` in `.env` breaks GitHub CLI auth. Use keyring (`gh auth login`) instead.
+  - **CRITICAL - NEVER SET GITHUB_TOKEN IN .env FILE**: Setting `GITHUB_TOKEN` in `.env` breaks GitHub CLI authentication. The `.env` file is automatically loaded by many tools, which sets the env var and blocks GitHub CLI keyring. **If `.env` contains `GITHUB_TOKEN`, remove it immediately.** Use keyring (`gh auth login`) instead. Scripts automatically detect and warn about `.env` tokens.
   - Detailed troubleshooting (auth resets, MCP env wiring, PowerShell fallbacks) lives in `@rules/workflow-appendix`.
 - **GitHub Operations**:
   - **API-first**: All GitHub operations use `tools/github-*.mjs` scripts with REST API. No `gh` CLI commands needed.

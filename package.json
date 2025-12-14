@@ -59,7 +59,8 @@
     "verify:production": "node scripts/verify-production-endpoints.mjs",
     "test:all": "node ./scripts/run-tests.mjs && npm run test:security",
     "docs:audit": "node ./tools/docs-audit.mjs",
-    "check:nonapp-branch": "node ./tools/check-nonapp-branch.mjs"
+    "check:nonapp-branch": "node ./tools/check-nonapp-branch.mjs",
+    "check:github-auth": "node ./tools/check-github-auth.mjs"
   },
   "engines": {
     "node": ">=18.0.0"
