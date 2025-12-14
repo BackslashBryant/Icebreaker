@@ -288,10 +288,21 @@ export const test = base.extend<WebSocketMockFixture>({
         private getPersona(sessionId: string) {
           return this.script.personas.find((p) => p.sessionId === sessionId);
         }
+
+        reset() {
+          // Clear all connections
+          this.connections.clear();
+          // Clear all active chats
+          this.activeChats.clear();
+          // Clear all pending chat requests
+          this.pendingChatRequests.clear();
+        }
       }
 
       // Create mock instance and expose globally
-      (window as any).__WS_MOCK__ = new BrowserWsMock(script);
+      const mockInstance = new BrowserWsMock(script);
+      (window as any).__WS_MOCK__ = mockInstance;
+      (window as any).__WS_MOCK_RESET__ = () => mockInstance.reset();
       (window as any).__PLAYWRIGHT_WS_MOCK__ = '1';
     }, presenceScript);
 
